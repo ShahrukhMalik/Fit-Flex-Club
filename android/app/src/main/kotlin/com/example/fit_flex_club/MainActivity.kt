@@ -1,4 +1,4 @@
-package com.example.fit_flex_club
+package com.fitflexiclub.com
 
 import io.flutter.embedding.android.FlutterActivity
 

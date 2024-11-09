@@ -45,6 +45,9 @@ dependencies:
   firebase_auth: ^5.3.2
   cloud_firestore: ^5.4.5
   bloc: ^8.1.4
+  flutter_bloc: ^8.1.6
+  flutter_native_splash: ^2.4.2
+  # flutter_splash_screen: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -55,9 +58,40 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   build_runner: ^2.4.13
   injectable_generator: ^2.6.2
+  flutter_launcher_icons: ^0.14.1
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/fit_flex_splash.png
+  branding: assets/images/fit_flex_splash.png
+  android: true  # Enable for Android
+  ios: true
+  android_gravity: center 
+
+  android_12:
+    image: assets/images/fit_flex_logo.png
+    icon_background_color: "#121212"
+  
+# flutter_icons:
+#   android: "launcher_icon"
+#   ios: truels
+#   image_path: "assets/fit_flex_text.png"
+#   min_sdk_android: 21 # android min sdk min:16, default 21
+  # web:
+  #   generate: true
+  #   image_path: "assets/icons/doc_note_launch_icon.png"
+  #   background_color: "#hexcode"
+  #   theme_color: "#hexcode"
+  # windows:
+  #   generate: true
+  #   image_path: "assets/icons/doc_note_launch_icon.png"
+  #   icon_size: 48 # min:48, max:256, default: 48
+  # macos:
+  #   generate: true
+  #   image_path: "assets/icons/doc_note_launch_icon.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
