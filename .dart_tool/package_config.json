@@ -326,6 +326,12 @@
       "languageVersion": "2.19"
     },
     {
+      "name": "go_router",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/go_router-14.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "graphs",
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/graphs-2.3.2",
       "packageUri": "lib/",
@@ -722,7 +728,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-11-09T19:17:00.165327Z",
+  "generated": "2024-11-10T06:46:07.017254Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/apple/development/flutter",

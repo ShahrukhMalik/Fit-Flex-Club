@@ -26,9 +26,10 @@ flutter_native_splash:
   
   # iOS configuration
   ios: true
-  image_ios: assets/images/fit_flex_ios_splash.png
+  image_ios: assets/images/fit_flex_splash_ios.png
   ios_content_mode: scaleAspectFill
   branding_ios: assets/images/fit_flex_branding_dark.png
+  # branding_ios_color: "#FFFFFF"
 
   info_plist_files:
     - 'ios/Runner/Info-Debug.plist'
