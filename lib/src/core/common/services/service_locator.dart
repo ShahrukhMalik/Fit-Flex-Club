@@ -1,7 +1,8 @@
-
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
+late GetIt sl;
 
 @injectableInit
-GetIt configureDependencies() => GetIt.instance;
+configureDependencies() => sl = GetIt.instance;
+

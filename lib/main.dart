@@ -14,7 +14,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final sl = configureDependencies();
+  configureDependencies();
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
   final settingsController = SettingsController(SettingsService());
@@ -26,7 +26,7 @@ void main() async {
   // SettingsController for changes, then passes it further down to the
   // SettingsView
 
-  // Future.delayed(Durations.medium4, () => FlutterNativeSplash.remove());
+  Future.delayed(Durations.medium4, () => FlutterNativeSplash.remove());
   runApp(
     MyApp(
       settingsController: settingsController,

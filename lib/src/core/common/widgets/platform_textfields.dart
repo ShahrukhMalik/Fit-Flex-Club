@@ -6,23 +6,31 @@ class AppTextFields {
   static Widget basicTextField({
     String? labelText,
     String? hintText,
+    TextStyle? style,
     TextEditingController? controller,
     void Function(String)? onChanged,
     TextInputType? keyboardType,
+    BoxDecoration? boxDecoration,
     bool enabled = true,
+    InputBorder? border,
   }) {
     if (Platform.isIOS) {
       return CupertinoTextField(
+        style: style ??
+            TextStyle(
+              color: Color(0xFFFFCD7C),
+            ),
         controller: controller,
         placeholder: labelText ?? hintText,
         onChanged: onChanged,
         padding: const EdgeInsets.all(12),
         keyboardType: keyboardType,
         enabled: enabled,
-        decoration: BoxDecoration(
-          border: Border.all(color: CupertinoColors.systemGrey),
-          borderRadius: BorderRadius.circular(8),
-        ),
+        decoration: boxDecoration ??
+            BoxDecoration(
+              border: Border.all(color: CupertinoColors.systemGrey),
+              borderRadius: BorderRadius.circular(8),
+            ),
       );
     }
 
@@ -34,17 +42,25 @@ class AppTextFields {
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        border: const OutlineInputBorder(),
+        border: border ??
+            UnderlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: Color(0xFFFFCD7C),
+              ),
+            ),
       ),
     );
   }
 
   static Widget passwordTextField({
     String? labelText,
+    BoxDecoration? boxDecoration,
     TextEditingController? controller,
     void Function(String)? onChanged,
     required bool obscureText,
     required VoidCallback onToggleVisibility,
+    InputBorder? border,
   }) {
     if (Platform.isIOS) {
       return CupertinoTextField(
@@ -53,10 +69,11 @@ class AppTextFields {
         onChanged: onChanged,
         padding: const EdgeInsets.all(12),
         obscureText: obscureText,
-        decoration: BoxDecoration(
-          border: Border.all(color: CupertinoColors.systemGrey),
-          borderRadius: BorderRadius.circular(8),
-        ),
+        decoration: boxDecoration ??
+            BoxDecoration(
+              border: Border.all(color: CupertinoColors.systemGrey),
+              borderRadius: BorderRadius.circular(8),
+            ),
         suffix: Padding(
           padding: const EdgeInsets.only(right: 8),
           child: GestureDetector(
@@ -77,7 +94,13 @@ class AppTextFields {
       obscureText: obscureText,
       decoration: InputDecoration(
         labelText: labelText,
-        border: const OutlineInputBorder(),
+        border: border ??
+            UnderlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: Color(0xFFFFCD7C),
+              ),
+            ),
         suffixIcon: IconButton(
           icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
           onPressed: onToggleVisibility,

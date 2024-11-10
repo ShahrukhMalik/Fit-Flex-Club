@@ -43,6 +43,7 @@ class PlatformButton {
     Function(String)? onMenuItemSelected,
     List<Color>? gradientColors,
     EdgeInsets? padding,
+    EdgeInsets? textPadding,
     TextStyle? textStyle,
     BorderSide? border,
     List<BoxShadow>? boxShadow,
@@ -67,6 +68,7 @@ class PlatformButton {
           width: width,
           height: height,
           textStyle: textStyle,
+          textPadding : textPadding,
         );
 
       case ButtonType.secondary:
@@ -802,6 +804,7 @@ class PlatformButton {
     bool isLoading = false,
     bool isIOS = false,
     EdgeInsets? padding,
+    EdgeInsets? textPadding,
     double? borderRadius,
     double? width,
     double? height,
@@ -809,11 +812,18 @@ class PlatformButton {
   }) {
     if (isIOS) {
       return CupertinoButton.filled(
+        borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 10)),
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
         onPressed: onPressed,
         child: isLoading
             ? const CupertinoActivityIndicator(color: Colors.white)
-            : Text(text, style: textStyle),
+            : Padding(
+                padding: textPadding ?? const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  text,
+                  style: textStyle,
+                ),
+              ),
       );
     }
 

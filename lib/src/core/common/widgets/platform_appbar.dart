@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 
-class AppBarTheme {
+class PlatformAppbar {
   // Basic AppBar with title
   static PreferredSizeWidget basicAppBar({
     required String title,
@@ -14,14 +16,20 @@ class AppBarTheme {
   }) {
     if (Platform.isIOS) {
       return CupertinoNavigationBar(
-        middle: Text(title),
+        middle: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFFFCD7C),
+            fontSize: 22,
+          ),
+        ),
         backgroundColor: backgroundColor,
         automaticallyImplyLeading: automaticallyImplyLeading,
         leading: automaticallyImplyLeading
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
-                onPressed:
-                    onLeadingPressed ?? () => Navigator.of(context).pop(),
+                onPressed: onLeadingPressed ?? () => context.pop(),
                 child: const Icon(CupertinoIcons.back),
               )
             : null,
@@ -29,7 +37,14 @@ class AppBarTheme {
     }
 
     return AppBar(
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFFFCD7C),
+          fontSize: 20,
+        ),
+      ),
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       automaticallyImplyLeading: automaticallyImplyLeading,

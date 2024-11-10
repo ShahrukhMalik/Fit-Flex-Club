@@ -13,7 +13,7 @@ abstract class AuthRemoteDatasource {
   Future<void>? logOut();
 
   ///Let user signup
-  Future<void>? signup({
+  Future<AuthEntity>? signup({
     required AuthEntity authEntity,
   });
 
@@ -95,7 +95,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void>? signup({
+  Future<AuthEntity>? signup({
     required AuthEntity authEntity,
   }) async {
     try {
@@ -107,6 +107,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         );
       } else {
         await auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        return AuthEntity(
+          uid: auth.currentUser?.uid,
           email: email,
           password: password,
         );

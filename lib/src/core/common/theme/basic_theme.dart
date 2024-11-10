@@ -51,7 +51,7 @@ class PlatformApp extends StatelessWidget {
   ThemeData get _defaultMaterialTheme {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.blue,
+        seedColor: Color(0xFFFFCD7C),
       ),
       useMaterial3: true,
       // Add your default Material styling here
@@ -61,6 +61,8 @@ class PlatformApp extends StatelessWidget {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          foregroundColor: Color.fromARGB(255, 94, 87, 86),
+          backgroundColor: Color.fromARGB(255, 94, 87, 86),
           minimumSize: const Size(120, 48),
         ),
       ),
@@ -69,9 +71,12 @@ class PlatformApp extends StatelessWidget {
 
   CupertinoThemeData get _defaultCupertinoTheme {
     return const CupertinoThemeData(
-      primaryColor: CupertinoColors.systemBlue,
+      applyThemeToAll: true,
+      primaryColor: Color(0xFFFFCD7C),
+
       // Add your default Cupertino styling here
       barBackgroundColor: CupertinoColors.systemBackground,
+
       scaffoldBackgroundColor: CupertinoColors.systemBackground,
     );
   }

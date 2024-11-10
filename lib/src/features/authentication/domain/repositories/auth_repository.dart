@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
+import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
 
 ///[Marker Interface] abstraction of auth repository
 abstract class AuthRepository {
@@ -8,8 +9,9 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
+
   ///Let user signup
-  Future<Either<Failures, void>>? signup({
+  Future<Either<Failures, AuthEntity?>>? signup({
     required String email,
     required String password,
   });

@@ -3,6 +3,7 @@ import 'package:fit_flex_club/src/features/client_profile/domain/entities/client
 
 class ClientModel extends ClientEntity {
   const ClientModel({
+    required super.authId,
     required super.age,
     required super.gender,
     required super.heightInCm,
@@ -17,6 +18,7 @@ class ClientModel extends ClientEntity {
   @override
   List<Object?> get props {
     return [
+      authId,
       age,
       gender,
       heightInCm,
@@ -42,8 +44,10 @@ class ClientModel extends ClientEntity {
     String? username,
     int? weightInKg,
     int? weightInLb,
+    String? authId,
   }) {
     return ClientModel(
+      authId: authId ?? this.authId,
       age: age ?? this.age,
       gender: gender ?? this.gender,
       heightInCm: heightInCm ?? this.heightInCm,
@@ -59,6 +63,7 @@ class ClientModel extends ClientEntity {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'authId': authId,
       'age': age,
       'gender': gender,
       'heightInCm': heightInCm,
@@ -74,6 +79,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
+      authId: map["authId"],
       age: map['age'] as int,
       gender: map['gender'] as String,
       heightInCm: map['heightInCm'] as int,

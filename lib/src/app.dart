@@ -1,5 +1,7 @@
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +17,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformApp(
-      title: "Fit Flex Club",
-      routerConfig: goRouter(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => sl<AuthenticationBloc>(),
+        )
+      ],
+      child: PlatformApp(
+        title: "Fit Flex Club",
+        routerConfig: goRouter(),
+      ),
     );
   }
 }

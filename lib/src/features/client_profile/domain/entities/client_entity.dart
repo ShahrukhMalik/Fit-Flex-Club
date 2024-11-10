@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 
 class ClientEntity extends Equatable {
+  final String? authId;
   final int? age;
   final String? gender;
   final int? heightInCm;
@@ -14,6 +15,7 @@ class ClientEntity extends Equatable {
   final int? weightInLb;
 
   const ClientEntity({
+    required this.authId,
     required this.age,
     required this.gender,
     required this.heightInCm,
@@ -28,6 +30,7 @@ class ClientEntity extends Equatable {
   @override
   List<Object?> get props {
     return [
+      authId,
       age,
       gender,
       heightInCm,

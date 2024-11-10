@@ -1,5 +1,7 @@
 import 'package:fit_flex_club/src/core/common/widgets/transition_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +14,27 @@ GoRouter goRouter() {
     routes: [
       GoRoute(
         path: '/',
+        redirect: (context, state) => FitFlexAuthLandingPage.route,
+      ),
+      GoRoute(
+        path: FitFlexAuthLandingPage.route,
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
           child: const FitFlexAuthLandingPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexAuthLogInPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexAuthLogInPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexAuthSignUpPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexAuthSignUpPage(),
         ),
       ),
       // GoRoute(

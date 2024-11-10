@@ -85,7 +85,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failures, void>>? signup({
+  Future<Either<Failures, AuthEntity?>>? signup({
     required String email,
     required String password,
   }) async {
