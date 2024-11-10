@@ -1,5 +1,82 @@
 import 'package:flutter/material.dart';
 
+import 'dart:io' show Platform;
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
+class PlatformApp extends StatelessWidget {
+  final String title;
+  final ThemeData? materialTheme;
+  final CupertinoThemeData? cupertinoTheme;
+  final Map<String, WidgetBuilder>? routes;
+  final Widget Function(BuildContext, Widget?)? builder;
+  final RouterConfig<Object>? routerConfig;
+
+  const PlatformApp({
+    super.key,
+    required this.title,
+    this.materialTheme,
+    this.cupertinoTheme,
+    this.routes,
+    this.builder,
+    this.routerConfig,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Platform.isIOS ? _buildCupertinoApp() : _buildMaterialApp();
+  }
+
+  Widget _buildMaterialApp() {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: title,
+      theme: materialTheme ?? _defaultMaterialTheme,
+      routerConfig: routerConfig,
+      builder: builder,
+    );
+  }
+
+  Widget _buildCupertinoApp() {
+    return CupertinoApp.router(
+      debugShowCheckedModeBanner: false,
+      title: title,
+      theme: cupertinoTheme ?? _defaultCupertinoTheme,
+      routerConfig: routerConfig,
+      builder: builder,
+    );
+  }
+
+  // Default themes if none provided
+  ThemeData get _defaultMaterialTheme {
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.blue,
+      ),
+      useMaterial3: true,
+      // Add your default Material styling here
+      appBarTheme: const AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(120, 48),
+        ),
+      ),
+    );
+  }
+
+  CupertinoThemeData get _defaultCupertinoTheme {
+    return const CupertinoThemeData(
+      primaryColor: CupertinoColors.systemBlue,
+      // Add your default Cupertino styling here
+      barBackgroundColor: CupertinoColors.systemBackground,
+      scaffoldBackgroundColor: CupertinoColors.systemBackground,
+    );
+  }
+}
+
 ///Basic Theme for the application
 ThemeData basicTheme() {
   TextTheme _basicTextTheme(TextTheme base) {
@@ -158,7 +235,8 @@ ThemeData basicTheme() {
             MaterialStateProperty.all(const Color.fromARGB(255, 29, 131, 48)),
         elevation: MaterialStateProperty.all<double>(8),
       ),
-    ), colorScheme: const ColorScheme(
+    ),
+    colorScheme: const ColorScheme(
       brightness: Brightness.light,
       primary: Colors.greenAccent,
       onPrimary: Colors.black,
