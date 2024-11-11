@@ -1,9 +1,21 @@
 part of 'client_profile_bloc.dart';
 
 abstract class ClientProfileState extends Equatable {
-  const ClientProfileState();  
+  const ClientProfileState();
 
   @override
   List<Object> get props => [];
 }
+
 class ClientProfileInitial extends ClientProfileState {}
+
+class ClientProfileLoading extends ClientProfileState {}
+
+class ClientProfileComplete extends ClientProfileState {}
+
+class ClientProfileError extends ClientProfileState {
+  final Failures failures;
+  const ClientProfileError({required this.failures});
+  @override
+  List<Object> get props => [failures];
+}

@@ -41,6 +41,7 @@ class PlatformButton {
     bool isEnabled = true,
     List<String>? menuItems,
     Function(String)? onMenuItemSelected,
+    IconAlignment? iconAlignment,
     List<Color>? gradientColors,
     EdgeInsets? padding,
     EdgeInsets? textPadding,
@@ -68,7 +69,7 @@ class PlatformButton {
           width: width,
           height: height,
           textStyle: textStyle,
-          textPadding : textPadding,
+          textPadding: textPadding,
         );
 
       case ButtonType.secondary:
@@ -129,6 +130,7 @@ class PlatformButton {
 
       case ButtonType.iconText:
         return _buildIconTextButton(
+          iconAlignment: iconAlignment,
           text: text,
           icon: icon ?? Icons.add,
           onPressed: isEnabled ? onPressed : null,
@@ -536,6 +538,7 @@ class PlatformButton {
     double? height,
     TextStyle? textStyle,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center,
+    IconAlignment? iconAlignment,
   }) {
     if (isIOS) {
       return CupertinoButton(
@@ -549,10 +552,18 @@ class PlatformButton {
                 mainAxisAlignment: mainAxisAlignment,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, color: foregroundColor),
+                  if (iconAlignment == IconAlignment.start)
+                    Icon(icon, color: foregroundColor),
                   const SizedBox(width: 8),
-                  Text(text,
-                      style: textStyle?.copyWith(color: foregroundColor)),
+                  Text(
+                    text,
+                    style: textStyle?.copyWith(
+                      color: foregroundColor,
+                    ),
+                  ),
+                  if (iconAlignment == null ||
+                      iconAlignment == IconAlignment.end)
+                    Icon(icon, color: foregroundColor),
                 ],
               ),
       );
@@ -576,6 +587,7 @@ class PlatformButton {
         label: isLoading
             ? const SizedBox.shrink() // Hide label when loading
             : Text(text, style: textStyle?.copyWith(color: foregroundColor)),
+        iconAlignment: iconAlignment ?? IconAlignment.end,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           padding: padding,
@@ -811,19 +823,25 @@ class PlatformButton {
     TextStyle? textStyle,
   }) {
     if (isIOS) {
-      return CupertinoButton.filled(
-        borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 10)),
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-        onPressed: onPressed,
-        child: isLoading
-            ? const CupertinoActivityIndicator(color: Colors.white)
-            : Padding(
-                padding: textPadding ?? const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  text,
-                  style: textStyle,
+      return SizedBox(
+        height: height,
+        width: width,
+        child: CupertinoButton(
+          borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 10)),
+          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
+          onPressed: onPressed,
+          color: backgroundColor,
+          child: isLoading
+              ? const CupertinoActivityIndicator()
+              : Padding(
+                  padding:
+                      textPadding ?? const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    text,
+                    style: textStyle,
+                  ),
                 ),
-              ),
+        ),
       );
     }
 

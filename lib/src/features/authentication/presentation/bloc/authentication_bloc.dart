@@ -36,43 +36,46 @@ class AuthenticationBloc
     required Emitter<AuthenticationState> emit,
   }) async {
     emit(AuthenticationLoading());
-    final result = await createAccountUsecase(
-      signup.Params(
-        email: event.email,
-        password: event.password,
-      ),
-    );
+    await Future.delayed(Duration(seconds: 2), () {
+      emit(AuthenticationComplete());
+    });
+    // final result = await createAccountUsecase(
+    //   signup.Params(
+    //     email: event.email,
+    //     password: event.password,
+    //   ),
+    // );
 
-    if (result == null) {
-      emit(
-        AuthenticationError(
-          failures: ServerFailure(
-            message: "Something went wrong!",
-          ),
-        ),
-      );
-    } else {
-      result.fold(
-        (l) => emit(AuthenticationError(failures: l)),
-        (r) {
-          if (r == null) {
-            emit(
-              AuthenticationError(
-                failures: ServerFailure(
-                  message: "No UID found",
-                ),
-              ),
-            );
-          } else {
-            emit(
-              AuthenticationComplete(
-                authId: r.uid,
-                isSignedUp: true,
-              ),
-            );
-          }
-        },
-      );
-    }
+    // if (result == null) {
+    //   emit(
+    //     AuthenticationError(
+    //       failures: ServerFailure(
+    //         message: "Something went wrong!",
+    //       ),
+    //     ),
+    //   );
+    // } else {
+    //   result.fold(
+    //     (l) => emit(AuthenticationError(failures: l)),
+    //     (r) {
+    //       if (r == null) {
+    //         emit(
+    //           AuthenticationError(
+    //             failures: ServerFailure(
+    //               message: "No UID found",
+    //             ),
+    //           ),
+    //         );
+    //       } else {
+    //         emit(
+    //           AuthenticationComplete(
+    //             authId: r.uid,
+    //             isSignedUp: true,
+    //           ),
+    //         );
+    //       }
+    //     },
+    //   );
+    // }
   }
 }

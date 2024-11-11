@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'package:fit_flex_club/src/core/common/validators/textform_field_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+enum TextFieldType { name, email, password }
+
 class AppTextFields {
   static Widget basicTextField({
+    // required GlobalKey<FormState> formStateKey,
+    TextFieldType? fieldType,
     String? labelText,
     String? hintText,
     TextStyle? style,
@@ -15,14 +20,26 @@ class AppTextFields {
     InputBorder? border,
   }) {
     if (Platform.isIOS) {
-      return CupertinoTextField(
+      return CupertinoTextFormFieldRow(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        // key: formStateKey,
+        validator: (value) {
+          if (fieldType == TextFieldType.name) {
+            return nameValidator(value);
+          }
+          if (fieldType == TextFieldType.email) {
+            return emailValidator(value);
+          }
+
+          return null;
+        },
         style: style ??
             TextStyle(
               color: Color(0xFFFFCD7C),
             ),
+        // autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: controller,
         placeholder: labelText ?? hintText,
-        onChanged: onChanged,
         padding: const EdgeInsets.all(12),
         keyboardType: keyboardType,
         enabled: enabled,
@@ -34,11 +51,26 @@ class AppTextFields {
       );
     }
 
-    return TextField(
+    return TextFormField(
+       autovalidateMode: AutovalidateMode.onUserInteraction,
+      // key: formStateKey,
+      style: style ??
+          TextStyle(
+            color: Color(0xFFFFCD7C),
+          ),
       controller: controller,
       onChanged: onChanged,
       keyboardType: keyboardType,
       enabled: enabled,
+      validator: (value) {
+        if (fieldType == TextFieldType.name) {
+          return nameValidator(value);
+        }
+        if (fieldType == TextFieldType.email) {
+          return emailValidator(value);
+        }
+        return null;
+      },
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
@@ -61,37 +93,39 @@ class AppTextFields {
     required bool obscureText,
     required VoidCallback onToggleVisibility,
     InputBorder? border,
+    TextStyle? style,
   }) {
     if (Platform.isIOS) {
-      return CupertinoTextField(
+      return CupertinoTextFormFieldRow(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        style: style ??
+            TextStyle(
+              color: Color(0xFFFFCD7C),
+            ),
         controller: controller,
-        placeholder: labelText,
-        onChanged: onChanged,
-        padding: const EdgeInsets.all(12),
-        obscureText: obscureText,
-        decoration: boxDecoration ??
-            BoxDecoration(
-              border: Border.all(color: CupertinoColors.systemGrey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-        suffix: Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: GestureDetector(
-            onTap: onToggleVisibility,
-            child: Icon(
-              obscureText ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
-              size: 20,
-              color: CupertinoColors.systemGrey,
-            ),
+        prefix: GestureDetector(
+          onTap: onToggleVisibility,
+          child: Icon(
+            obscureText ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
+            size: 20,
+            // color: CupertinoColors.systemGrey,
           ),
         ),
+        placeholder: 'Enter your password',
+        obscureText: obscureText,
+        // autovalidateMode: AutovalidateMode.onUserInteraction,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        validator: (value) => passwordValidator(value),
       );
     }
 
-    return TextField(
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       controller: controller,
       onChanged: onChanged,
       obscureText: obscureText,
+      // autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (value) => passwordValidator(value),
       decoration: InputDecoration(
         labelText: labelText,
         border: border ??

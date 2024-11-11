@@ -14,8 +14,8 @@ enum LoaderType {
   countdown // Countdown timer loader
 }
 
-class PlatfomLoader {
-  Widget buildLoader({
+class PlatformLoader {
+   Widget buildLoader({
     required LoaderType type,
     Color? color,
     double? size,

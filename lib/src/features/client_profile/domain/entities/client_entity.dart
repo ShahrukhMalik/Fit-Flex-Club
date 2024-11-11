@@ -15,17 +15,17 @@ class ClientEntity extends Equatable {
   final int? weightInLb;
 
   const ClientEntity({
-    required this.authId,
-    required this.age,
-    required this.gender,
-    required this.heightInCm,
-    required this.heightInFt,
-    required this.heightInFtInches,
-    required this.isTrainer,
-    required this.isUserActive,
-    required this.username,
-    required this.weightInKg,
-    required this.weightInLb,
+     this.authId,
+     this.age,
+     this.gender,
+     this.heightInCm,
+     this.heightInFt,
+     this.heightInFtInches,
+     this.isTrainer,
+     this.isUserActive,
+     this.username,
+     this.weightInKg,
+     this.weightInLb,
   });
   @override
   List<Object?> get props {

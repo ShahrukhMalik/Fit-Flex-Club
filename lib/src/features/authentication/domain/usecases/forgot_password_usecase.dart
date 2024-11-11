@@ -4,6 +4,7 @@ import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/auth_usecase.dart';
+import 'package:injectable/injectable.dart';
 
 ///[Marker Interface] to let user recieve password reset link
 abstract class ForgotPasswordUsecase extends AuthUsecase
@@ -22,7 +23,7 @@ class Params extends Equatable {
         email,
       ];
 }
-
+@Singleton(as: ForgotPasswordUsecase)
 class ForgotPasswordUsecaseImpl extends ForgotPasswordUsecase {
   final AuthRepository authRepository;
 

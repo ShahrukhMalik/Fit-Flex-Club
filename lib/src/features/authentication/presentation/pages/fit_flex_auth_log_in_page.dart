@@ -23,7 +23,7 @@ class FitFlexAuthLogInPage extends StatelessWidget {
             backgroundColor: Colors.transparent,
             appBar: PlatformAppbar.basicAppBar(
               onLeadingPressed: () =>
-                  context.pushReplacement(FitFlexAuthLandingPage.route),
+                  context.goNamed(FitFlexAuthLandingPage.route),
               title: "Log In",
               context: context,
               backgroundColor: Colors.transparent,
