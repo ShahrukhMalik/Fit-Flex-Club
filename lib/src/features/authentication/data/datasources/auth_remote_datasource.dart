@@ -222,7 +222,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       }
       final data = snapshot.data() as Map<String, dynamic>?;
 
-      isUserActive = data == null ? false : (data)['isUserActive'] == true;
+      isUserActive = data == null ? false : (data)['isUserActive'];
 
       if (data != null) {
         for (var field in [

@@ -30,23 +30,7 @@ class MyApp extends StatelessWidget {
       child: Builder(builder: (context) {
         return BlocConsumer<AuthenticationBloc, AuthenticationState>(
           buildWhen: (previous, current) => current.rebuild ?? false,
-          listener: (context, state) {
-            // if (state is AuthenticationComplete) {
-            //   final entity = state.entity;
-
-            //   if (entity?.isUserActive == null) {
-            //   } else {
-            //     final bool isUserActive = entity!.isUserActive ?? true;
-            //     if (!isUserActive) {
-            //       PlatformDialog.showAlertDialog(
-            //         context: context,
-            //         title: "Account Inactive",
-            //         message: "Your Account is not active!",
-            //       );
-            //     }
-            //   }
-            // }
-          },
+          listener: (context, state) {},
           builder: (context, state) {
             return PlatformApp(
               title: "Fit Flex Club",
@@ -62,11 +46,7 @@ class MyApp extends StatelessWidget {
           create: (context) =>
               getIt<AuthenticationBloc>()..add(AuthenticateUserEvent()),
         ),
-        BlocProvider(create: (context) => getIt<ClientProfileBloc>()
-            // ..add(CheckIfUserActive())
-            // ..add(CheckClientProfileExist()),
-            // lazy: false,
-            ),
+        BlocProvider(create: (context) => getIt<ClientProfileBloc>()),
       ],
       child: localizations,
     );

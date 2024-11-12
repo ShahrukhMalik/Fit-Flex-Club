@@ -111,11 +111,11 @@ GoRouter goRouter(appState) {
       GoRoute(
         path: FitFlexAuthLandingPage.route,
         pageBuilder: (context, state) {
-          final isUserActive = state.pathParameters["flag"] == "0";
+          final isUserInActive = state.pathParameters["flag"] == "0";
           return TransitionPage(
             key: state.pageKey,
             child: FitFlexAuthLandingPage(
-              isUserActive: isUserActive,
+              isUserActive: !isUserInActive,
             ),
           );
         },
@@ -125,6 +125,13 @@ GoRouter goRouter(appState) {
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
           child: const FitFlexAuthLogInPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexAuthLandingPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexAuthLandingPage(),
         ),
       ),
       GoRoute(
@@ -149,10 +156,11 @@ GoRouter goRouter(appState) {
                 return FitFlexClientProfileSelectGenderPage.route;
               }
             } else {
-              context.read<AuthenticationBloc>().add(
-                    LogOutAuthenticationEvent(),
-                  );
-              return '/fit-flex-landing/0';
+              if (appState.entity?.isUserActive != null) {
+                return '/fit-flex-landing/0';
+              } else {
+                return null;
+              }
             }
           } else {
             return FitFlexAuthLandingPage.route;

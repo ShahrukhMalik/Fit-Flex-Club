@@ -123,9 +123,11 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                       listener: (context, state) {
                         if (state is AuthenticationComplete) {
                           if (state.entity?.isLoggedIn ?? false) {
-                            context
-                                .read<AuthenticationBloc>()
-                                .add(AuthenticateUserEvent());
+                            if (!state.rebuild!) {
+                              context
+                                  .read<AuthenticationBloc>()
+                                  .add(AuthenticateUserEvent());
+                            }
                           }
                         }
                         if (state is AuthenticationError) {

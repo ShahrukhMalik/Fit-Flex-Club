@@ -25,7 +25,7 @@ class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
   void initState() {
     // TODO: implement initState
 
-    if (widget.isUserActive!= null && widget.isUserActive!) {
+    if (widget.isUserActive!= null && !widget.isUserActive!) {
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) {
           PlatformDialog.showAlertDialog(
