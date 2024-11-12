@@ -1,13 +1,42 @@
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class FitFlexAuthLandingPage extends StatelessWidget {
-  static const String route = '/fit-flex-landing';
-  const FitFlexAuthLandingPage({super.key});
+class FitFlexAuthLandingPage extends StatefulWidget {
+  final bool? isUserActive;
+  final bool? isUserLoggedOut;
+  static const String route = '/fit-flex-landing/:flag';
+  const FitFlexAuthLandingPage({
+    super.key,
+    this.isUserActive,
+    this.isUserLoggedOut,
+  });
+
+  @override
+  State<FitFlexAuthLandingPage> createState() => _FitFlexAuthLandingPageState();
+}
+
+class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    if (widget.isUserActive!= null && widget.isUserActive!) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) {
+          PlatformDialog.showAlertDialog(
+            context: context,
+            title: "Account Inactive",
+            message: "Your Account is not active!",
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +73,7 @@ class FitFlexAuthLandingPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PlatformButton().buildButton(
+                  width: width * 0.8,
                   backgroundColor: Color(0xFFFFCD7C),
                   borderRadius: 100,
                   context: context,
@@ -62,6 +92,7 @@ class FitFlexAuthLandingPage extends StatelessWidget {
                 )!,
                 const SizedBox(height: 16), // Space between buttons
                 PlatformButton().buildButton(
+                  width: width * 0.85,
                   borderRadius: 100,
                   textPadding: EdgeInsets.symmetric(
                     horizontal: width * 0.3,

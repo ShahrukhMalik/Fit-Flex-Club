@@ -9,8 +9,7 @@ import 'package:fit_flex_club/src/features/client_profile/domain/usecases/client
 
 ///[Marker Interface] to let user IsUserActive
 abstract class IsUserActiveUsecase extends ClientProfileUsecase
-    implements UseCase<Stream<bool>?, NoParams> {}
-
+    implements UseCase<bool?, NoParams> {}
 
 @Singleton(as: IsUserActiveUsecase)
 class IsUserActiveUsecaseImpl extends IsUserActiveUsecase {
@@ -19,7 +18,7 @@ class IsUserActiveUsecaseImpl extends IsUserActiveUsecase {
   IsUserActiveUsecaseImpl({required this.clientProfileRepository});
 
   @override
-  Future<Either<Failures, Stream<bool>?>>? call(NoParams params) {
+  Future<Either<Failures, bool?>>? call(NoParams params) {
     return clientProfileRepository.isUserActive();
   }
 }

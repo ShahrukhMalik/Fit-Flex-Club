@@ -1,5 +1,10 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
+import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
 import 'package:injectable/injectable.dart';
 
@@ -8,6 +13,18 @@ abstract class AuthRemoteDatasource {
   Future<void>? logIn({
     required AuthEntity authEntity,
   });
+
+  ///Let user logged in
+  Future<bool>? isUserLogged();
+
+  ///Let user active
+  Future<bool>? isUserActive();
+
+  ///Let profile created
+  Future<bool>? isProfileCreated();
+
+  ///
+  Future<AuthEntity>? authenticateUser();
 
   ///Let user log out
   Future<void>? logOut();
@@ -30,8 +47,9 @@ abstract class AuthRemoteDatasource {
 @Singleton(as: AuthRemoteDatasource)
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final FirebaseAuth auth;
+  final FirebaseFirestore db;
 
-  AuthRemoteDatasourceImpl({required this.auth});
+  AuthRemoteDatasourceImpl(this.db, {required this.auth});
   @override
   Future<Stream<bool>>? checkWhetherUserIsLoggedIn() async => auth
       .authStateChanges()
@@ -119,6 +137,122 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } on FirebaseAuthException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something Went Wrong!",
+      );
+    }
+  }
+
+  @override
+  Future<bool>? isUserActive() async {
+    try {
+      final CollectionReference ref = db.collection('Users');
+      final DocumentSnapshot<Object?> snapshot =
+          await ref.doc(auth.currentUser?.uid).get();
+
+      final data = snapshot.data();
+
+      return data == null
+          ? false
+          : (data as Map<String, dynamic>)['isUserActive'] == true;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<bool>? isUserLogged() async {
+    return Future.value(
+      auth.currentUser != null,
+    );
+  }
+
+  @override
+  Future<bool>? isProfileCreated() async {
+    final docRef = db.collection('User').doc(auth.currentUser?.uid);
+
+    try {
+      final docSnapshot = await docRef.get();
+
+      if (!docSnapshot.exists) {
+        return false;
+      }
+
+      final data = docSnapshot.data();
+
+      if (data != null) {
+        for (var field in [
+          'age',
+          'gender',
+          'weightInKg',
+          'weightInLb',
+          'heightInCm',
+          'heightInFt',
+        ]) {
+          if (data[field] == null) {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+    return false;
+  }
+
+  @override
+  Future<AuthEntity>? authenticateUser() async {
+    try {
+      bool isUserLoggedIn = auth.currentUser != null;
+      bool isUserActive = true;
+      bool isProfileCreated = true;
+      final CollectionReference ref = db.collection('Users');
+      final DocumentSnapshot<Object?> snapshot =
+          await ref.doc(auth.currentUser?.uid).get();
+
+      if (!snapshot.exists) {
+        isUserActive = false;
+        isProfileCreated = false;
+      }
+      final data = snapshot.data() as Map<String, dynamic>?;
+
+      isUserActive = data == null ? false : (data)['isUserActive'] == true;
+
+      if (data != null) {
+        for (var field in [
+          'age',
+          'gender',
+          'weightInKg',
+          'weightInLb',
+          'heightInCm',
+          'heightInFt',
+        ]) {
+          print(data[field] == null);
+          if (data[field] == null) {
+            print(data[field] == null);
+            isProfileCreated = false;
+          }
+        }
+      } else {
+        isProfileCreated = false;
+      }
+      return Future.value(
+        AuthEntity(
+          isLoggedIn: isUserLoggedIn,
+          isProfileCreated: isProfileCreated,
+          isUserActive: isUserActive,
+        ),
+      );
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
       );
     }
   }

@@ -33,12 +33,17 @@ class AppTextFields {
 
           return null;
         },
+
         style: style ??
             TextStyle(
               color: Color(0xFFFFCD7C),
             ),
         // autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: controller,
+        placeholderStyle: style ??
+            TextStyle(
+              color: Color.fromARGB(152, 255, 205, 124),
+            ),
         placeholder: labelText ?? hintText,
         padding: const EdgeInsets.all(12),
         keyboardType: keyboardType,
@@ -52,7 +57,7 @@ class AppTextFields {
     }
 
     return TextFormField(
-       autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       // key: formStateKey,
       style: style ??
           TextStyle(
@@ -125,6 +130,10 @@ class AppTextFields {
       controller: controller,
       onChanged: onChanged,
       obscureText: obscureText,
+      style: style ??
+          TextStyle(
+            color: Color(0xFFFFCD7C),
+          ),
       // autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) => passwordValidator(value),
       decoration: InputDecoration(

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/widgets/transition_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
@@ -14,7 +15,7 @@ import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-GoRouter goRouter(ClientProfileState appState) {
+GoRouter goRouter(appState) {
   return GoRouter(
     routes: [
       GoRoute(
@@ -29,6 +30,13 @@ GoRouter goRouter(ClientProfileState appState) {
         ),
       ),
       GoRoute(
+        path: FitFlexAuthForgotPasswordPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexAuthForgotPasswordPage(),
+        ),
+      ),
+      GoRoute(
         path: FitFlexDashboardPage.route,
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
@@ -38,8 +46,12 @@ GoRouter goRouter(ClientProfileState appState) {
       GoRoute(
         path: FitFlexClientProfileSelectAgePage.route,
         pageBuilder: (context, state) {
-          final String gender =
-              (state.extra! as Map<String, dynamic>)['gender'] ?? "Unknown";
+          String gender = "";
+          if (state.extra != null) {
+            gender =
+                (state.extra as Map<String, dynamic>)['gender'] ?? "Unknown";
+          }
+
           return TransitionPage(
             key: state.pageKey,
             child: FitFlexClientProfileSelectAgePage(
@@ -51,10 +63,15 @@ GoRouter goRouter(ClientProfileState appState) {
       GoRoute(
         path: FitFlexClientProfileSelectWeightPage.route,
         pageBuilder: (context, state) {
-          final String gender =
-              (state.extra! as Map<String, dynamic>)['gender'] ?? "Unknown";
-          final String age =
-              (state.extra! as Map<String, dynamic>)['age'] ?? "Unknown";
+          String gender = "";
+          String age = "";
+          if (state.extra != null && state.extra is Map<String, dynamic>) {
+            final Map<String, dynamic> extraData =
+                state.extra! as Map<String, dynamic>;
+            gender = extraData['gender'] ?? "Unknown";
+            age = extraData['age'] ?? "Unknown";
+          }
+
           return TransitionPage(
             key: state.pageKey,
             child: FitFlexClientProfileSelectWeightPage(
@@ -67,14 +84,19 @@ GoRouter goRouter(ClientProfileState appState) {
       GoRoute(
         path: FitFlexClientProfileSelectHeightPage.route,
         pageBuilder: (context, state) {
-          final String gender =
-              (state.extra! as Map<String, dynamic>)['gender'] ?? "Unknown";
-          final String age =
-              (state.extra! as Map<String, dynamic>)['age'] ?? "Unknown";
-          final String weight =
-              (state.extra! as Map<String, dynamic>)['weight'] ?? "Unknown";
-          final String weightUnit =
-              (state.extra! as Map<String, dynamic>)['weightUnit'] ?? "Unknown";
+          String gender = "";
+          String age = "";
+          String weight = "";
+          String weightUnit = "";
+          if (state.extra != null && state.extra is Map<String, dynamic>) {
+            final Map<String, dynamic> extraData =
+                state.extra! as Map<String, dynamic>;
+            gender = extraData['gender'] ?? "Unknown";
+            age = extraData['age'] ?? "Unknown";
+            weight = extraData['weight'] ?? "Unknown";
+            weightUnit = extraData['weightUnit'] ?? "Unknown";
+          }
+
           return TransitionPage(
             key: state.pageKey,
             child: FitFlexClientProfileSelectHeightPage(
@@ -88,10 +110,15 @@ GoRouter goRouter(ClientProfileState appState) {
       ),
       GoRoute(
         path: FitFlexAuthLandingPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexAuthLandingPage(),
-        ),
+        pageBuilder: (context, state) {
+          final isUserActive = state.pathParameters["flag"] == "0";
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexAuthLandingPage(
+              isUserActive: isUserActive,
+            ),
+          );
+        },
       ),
       GoRoute(
         path: FitFlexAuthLogInPage.route,
@@ -109,26 +136,30 @@ GoRouter goRouter(ClientProfileState appState) {
       ),
     ],
     redirect: (context, state) {
-      if (appState is ClientProfileComplete) {
+      if (appState is AuthenticationLoading) {
+        return FitFlexAuthLandingPage.route;
+      }
+      if (appState is AuthenticationComplete) {
         if (state.matchedLocation == '/') {
-          if (!appState.isUserActive!) {
-            if (getIt<FirebaseAuth>().currentUser != null) {
+          if (appState.entity?.isLoggedIn ?? false) {
+            if (appState.entity?.isUserActive ?? false) {
+              if (appState.entity?.isProfileCreated ?? false) {
+                return FitFlexDashboardPage.route;
+              } else {
+                return FitFlexClientProfileSelectGenderPage.route;
+              }
+            } else {
               context.read<AuthenticationBloc>().add(
                     LogOutAuthenticationEvent(),
                   );
+              return '/fit-flex-landing/0';
             }
+          } else {
             return FitFlexAuthLandingPage.route;
-          }
-          if (appState.isUserActive!) {
-            return FitFlexDashboardPage.route;
-          }
-
-          if (!appState.clientProfileExist!) {
-            return FitFlexClientProfileSelectGenderPage.route;
           }
         }
       }
-      return FitFlexAuthLandingPage.route;
+      return state.matchedLocation;
     },
   );
 }

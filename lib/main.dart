@@ -4,6 +4,7 @@ import 'package:fit_flex_club/src/app.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_service.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -14,7 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  configureDependencies();
+  await configureDependencies();
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
   final settingsController = SettingsController(SettingsService());
@@ -26,7 +27,14 @@ void main() async {
   // SettingsController for changes, then passes it further down to the
   // SettingsView
 
-  Future.delayed(Durations.medium4, () => FlutterNativeSplash.remove());
+  await getIt.allReady().whenComplete(
+    () {
+      if (getIt.isRegistered<AuthenticationBloc>()) {
+        FlutterNativeSplash.remove();
+      }
+    },
+  );
+
   runApp(
     MyApp(
       settingsController: settingsController,

@@ -48,11 +48,13 @@ class PlatformAppbar {
       ),
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
+      actions: [trailing ?? SizedBox()],
       automaticallyImplyLeading: automaticallyImplyLeading,
       leading: automaticallyImplyLeading && onLeadingPressed != null
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: onLeadingPressed,
+              color: Color(0xFFFFCD7C),
             )
           : null,
     );

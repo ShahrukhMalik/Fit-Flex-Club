@@ -16,7 +16,9 @@ abstract class ClientProfileRepository {
   });
 
   ///Check if client is active
-  Future<Either<Failures, Stream<bool>?>>? isUserActive();
+  Future<Either<Failures, bool?>>? isUserActive();
+
+
 
   /// Check if client profile is created
   Future<Either<Failures, bool>> isClientProfileCreated();

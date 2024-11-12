@@ -2,9 +2,17 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
+import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
+import 'package:fit_flex_club/src/features/authentication/domain/usecases/authenticate_user_usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/create_account_usecase.dart'
     as signup;
-import 'package:fit_flex_club/src/features/authentication/domain/usecases/forgot_password_usecase.dart';
+import 'package:fit_flex_club/src/features/authentication/domain/usecases/forgot_password_usecase.dart'
+    as forgot;
+import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_client_profile_created_usecase.dart'
+    as client;
+import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_client_profile_created_usecase.dart';
+import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_user_active_usecase.dart'
+    as userActive;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/login_usecase.dart'
     as login;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/logout_usecase.dart'
@@ -21,13 +29,20 @@ class AuthenticationBloc
   final signup.CreateAccountUsecase createAccountUsecase;
   final login.LogInUsecase logInUsecase;
   final logout.LogOutUsecase logOutUsecase;
-  final ForgotPasswordUsecase forgotPasswordUsecase;
+  final AuthenticateUserUsecase authenticateUserUsecase;
+  // final client.IsClientProfileCreatedActiveUsecase
+  //     isClientProfileCreatedActiveUsecase;
+  // final userActive.IsUserActiveUsecase isUserActiveUsecase;
+  final forgot.ForgotPasswordUsecase forgotPasswordUsecase;
   AuthenticationBloc({
+    // required this.isClientProfileCreatedActiveUsecase,
+    // required this.isUserActiveUsecase,
+    required this.authenticateUserUsecase,
     required this.createAccountUsecase,
     required this.logInUsecase,
     required this.logOutUsecase,
     required this.forgotPasswordUsecase,
-  }) : super(AuthenticationInitial()) {
+  }) : super(AuthenticationInitial(false)) {
     on<AuthenticationEvent>((event, emit) async {
       if (event is CreateAccountAuthenticationEvent) {
         await _createAccount(event: event, emit: emit);
@@ -38,14 +53,100 @@ class AuthenticationBloc
       if (event is LogOutAuthenticationEvent) {
         await _logOut(event: event, emit: emit);
       }
+
+      if (event is AuthenticateUserEvent) {
+        await _authenticateUser(event: event, emit: emit);
+      }
+
+      if (event is ForgotPasswordAuthenticationEvent) {
+        await _forgotPassword(event: event, emit: emit);
+      }
     });
   }
+
+  Future<void> _forgotPassword({
+    required ForgotPasswordAuthenticationEvent event,
+    required Emitter<AuthenticationState> emit,
+  }) async {
+    emit(AuthenticationLoading(false));
+    final result =
+        await forgotPasswordUsecase(forgot.Params(email: event.email));
+    if (result == null) {
+      emit(
+        AuthenticationError(
+          true,
+          ServerFailure(
+            message: "Something went wrong!",
+          ),
+        ),
+      );
+    } else {
+      result.fold(
+        (l) => emit(AuthenticationError(false, l)),
+        (r) => emit(AuthenticationComplete(false, AuthEntity(mailSent: true))),
+      );
+    }
+  }
+
+  Future<void> _authenticateUser({
+    required AuthenticateUserEvent event,
+    required Emitter<AuthenticationState> emit,
+  }) async {
+    emit(AuthenticationLoading(false));
+    final result = await authenticateUserUsecase(NoParams());
+    if (result == null) {
+      emit(
+        AuthenticationError(
+          true,
+          ServerFailure(
+            message: "Something went wrong!",
+          ),
+        ),
+      );
+    } else {
+      result.fold(
+        (l) => emit(AuthenticationError(false, l)),
+        (r) => emit(AuthenticationComplete(true, r)),
+      );
+    }
+  }
+
+  // Future<void> _userActive(
+  //   CheckIfUserActive event,
+  //   Emitter<AuthenticationState> emit,
+  // ) async {
+  //   emit(AuthenticationLoading());
+  //   final result = await isUserActiveUsecase(NoParams());
+  //   if (result == null) {
+  //     emit(
+  //       AuthenticationError(
+  //         failures: ServerFailure(
+  //           message: "Something went wrong!",
+  //         ),
+  //       ),
+  //     );
+  //   } else {
+  //     result.fold(
+  //       (l) => emit(AuthenticationError(failures: l)),
+  //       (r) async {
+  //         if (r == null) {
+  //         } else {
+  //           emit(
+  //             AuthenticationComplete(
+  //                 // isUserActive: r,
+  //                 ),
+  //           );
+  //         }
+  //       },
+  //     );
+  //   }
+  // }
 
   Future<void> _createAccount({
     required CreateAccountAuthenticationEvent event,
     required Emitter<AuthenticationState> emit,
   }) async {
-    emit(AuthenticationLoading());
+    emit(AuthenticationLoading(false));
     final result = await createAccountUsecase(
       signup.Params(
         email: event.email,
@@ -56,29 +157,28 @@ class AuthenticationBloc
     if (result == null) {
       emit(
         AuthenticationError(
-          failures: ServerFailure(
+          false,
+          ServerFailure(
             message: "Something went wrong!",
           ),
         ),
       );
     } else {
       result.fold(
-        (l) => emit(AuthenticationError(failures: l)),
+        (l) => emit(AuthenticationError(false, l)),
         (r) {
           if (r == null) {
             emit(
               AuthenticationError(
-                failures: ServerFailure(
+                false,
+                ServerFailure(
                   message: "No UID found",
                 ),
               ),
             );
           } else {
             emit(
-              AuthenticationComplete(
-                authId: r.uid,
-                isSignedUp: true,
-              ),
+              AuthenticationComplete(false, AuthEntity(isSignedUp: true)),
             );
           }
         },
@@ -90,7 +190,7 @@ class AuthenticationBloc
     required LogInAuthenticationEvent event,
     required Emitter<AuthenticationState> emit,
   }) async {
-    emit(AuthenticationLoading());
+    emit(AuthenticationLoading(false));
     final result = await logInUsecase(
       login.Params(
         email: event.email,
@@ -101,18 +201,20 @@ class AuthenticationBloc
     if (result == null) {
       emit(
         AuthenticationError(
-          failures: ServerFailure(
+          false,
+          ServerFailure(
             message: "Something went wrong!",
           ),
         ),
       );
     } else {
       result.fold(
-        (l) => emit(AuthenticationError(failures: l)),
+        (l) => emit(AuthenticationError(false, l)),
         (r) {
           emit(
             AuthenticationComplete(
-              isLoggedIn: true,
+              false,
+              AuthEntity(isLoggedIn: true),
             ),
           );
         },
@@ -124,24 +226,26 @@ class AuthenticationBloc
     required LogOutAuthenticationEvent event,
     required Emitter<AuthenticationState> emit,
   }) async {
-    emit(AuthenticationLoading());
+    emit(AuthenticationLoading(true));
     final result = await logOutUsecase(NoParams());
 
     if (result == null) {
       emit(
         AuthenticationError(
-          failures: ServerFailure(
+          true,
+          ServerFailure(
             message: "Something went wrong!",
           ),
         ),
       );
     } else {
       result.fold(
-        (l) => emit(AuthenticationError(failures: l)),
+        (l) => emit(AuthenticationError(true, l)),
         (r) {
           emit(
             AuthenticationComplete(
-              isLoggedOut: true,
+              true,
+              AuthEntity(isLoggedIn: false),
             ),
           );
         },

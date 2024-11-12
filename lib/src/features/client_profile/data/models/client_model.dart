@@ -14,6 +14,7 @@ class ClientModel extends ClientEntity {
     required super.isTrainer,
     required super.isUserActive,
     required super.username,
+    required super.email,
   });
   @override
   List<Object?> get props {
@@ -42,8 +43,10 @@ class ClientModel extends ClientEntity {
     bool? isTrainer,
     bool? isUserActive,
     String? username,
+    String? email,
   }) {
     return ClientModel(
+      email: email ?? this.email,
       authId: authId ?? this.authId,
       age: age ?? this.age,
       gender: gender ?? this.gender,
@@ -74,6 +77,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
+      email: map['email'],
       authId: map['authId'] as String,
       age: map['age'] as int,
       gender: map['gender'] as String,
@@ -93,6 +97,7 @@ class ClientModel extends ClientEntity {
   ) {
     final data = snapshot.data();
     return ClientModel(
+      email: data?['email'],
       authId: data?['authId'],
       age: data?['age'] as int,
       gender: data?['gender'] as String,
@@ -108,6 +113,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromClientEntity(ClientEntity clientEntity) {
     return ClientModel(
+      email: clientEntity.email,
       authId: clientEntity.authId,
       age: clientEntity.age,
       gender: clientEntity.gender,
@@ -150,6 +156,7 @@ class ClientModel extends ClientEntity {
     if (isTrainer != null) data['isTrainer'] = isTrainer;
     if (isUserActive != null) data['isUserActive'] = isUserActive;
     if (username != null) data['username'] = username;
+    if (email != null) data['email'] = email;
 
     return data;
   }
@@ -161,7 +168,7 @@ class ClientModel extends ClientEntity {
 }
 
 // Helper conversion methods
- int _convertKgToLb(int? kg) => kg != null ? (kg * 2.205).round() : 0;
- int _convertLbToKg(int? lb) => lb != null ? (lb / 2.205).round() : 0;
- int _convertFtToCm(int? ft) => ft != null ? (ft * 30.48).round() : 0;
- int _convertCmToFt(int? cm) => cm != null ? (cm / 30.48).round() : 0;
+int _convertKgToLb(int? kg) => kg != null ? (kg * 2.205).round() : 0;
+int _convertLbToKg(int? lb) => lb != null ? (lb / 2.205).round() : 0;
+int _convertFtToCm(int? ft) => ft != null ? (ft * 30.48).round() : 0;
+int _convertCmToFt(int? cm) => cm != null ? (cm / 30.48).round() : 0;

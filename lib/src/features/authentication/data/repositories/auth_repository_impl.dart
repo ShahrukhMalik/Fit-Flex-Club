@@ -23,9 +23,28 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failures, void>>? forgotPassword(String email) {
-    // TODO: implement forgotPassword
-    throw UnimplementedError();
+  Future<Either<Failures, void>>? forgotPassword(String email) async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected!) {
+      try {
+        return Right(
+          await remoteDatasource.forgotPassword(
+            AuthEntity(
+              email: email,
+            ),
+          ),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    } else {
+      return const Left(NetworkFailure(message: 'No Internet Connection'));
+    }
   }
 
   @override
@@ -99,6 +118,106 @@ class AuthRepositoryImpl implements AuthRepository {
               password: password,
             ),
           ),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: 'No Internet Connection',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, bool?>>? isUserActive() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected!) {
+      try {
+        return Right(
+          await remoteDatasource.isUserActive(),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: 'No Internet Connection',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, bool?>>? isUserLogged() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected!) {
+      try {
+        return Right(
+          await remoteDatasource.isUserLogged(),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: 'No Internet Connection',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, bool?>>? isProfileCreated() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected!) {
+      try {
+        return Right(
+          await remoteDatasource.isProfileCreated(),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: 'No Internet Connection',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, AuthEntity?>>? authenticateUser() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected!) {
+      try {
+        return Right(
+          await remoteDatasource.authenticateUser(),
         );
       } on ServerException catch (error) {
         return Left(

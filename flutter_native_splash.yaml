@@ -15,7 +15,7 @@ flutter_native_splash:
   android_12:
     # Base image that will be center cropped
     image: assets/images/fit_flex_splash_12_2.png
-    branding: assets/images/fit_flex_branding_dark.png
+    # branding: assets/images/fit_flex_branding_dark.png
     icon_background_color: "#121212"
     image_dark: assets/images/fit_flex_splash_12_2.png
     icon_background_color_dark: "#121212"

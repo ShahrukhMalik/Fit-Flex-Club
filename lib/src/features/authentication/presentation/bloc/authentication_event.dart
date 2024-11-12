@@ -35,15 +35,21 @@ class LogInAuthenticationEvent extends AuthenticationEvent {
 
 class ForgotPasswordAuthenticationEvent extends AuthenticationEvent {
   final String email;
-  final String password;
 
   const ForgotPasswordAuthenticationEvent({
     required this.email,
-    required this.password,
   });
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [
+        email,
+      ];
 }
 
 class LogOutAuthenticationEvent extends AuthenticationEvent {}
+
+class CheckClientProfileExist extends AuthenticationEvent {}
+
+class CheckIfUserActive extends AuthenticationEvent {}
+
+class AuthenticateUserEvent extends AuthenticationEvent {}

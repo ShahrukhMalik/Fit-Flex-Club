@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
@@ -140,7 +141,14 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                               ),
                             );
                       }
-                      if (state is AuthenticationError) {}
+                      if (state is AuthenticationError) {
+                        PlatformDialog.showAlertDialog(
+                          context: context,
+                          title: "Create Account",
+                          message:
+                              state.failures.message ?? "Something went wrong!",
+                        );
+                      }
                       if (state is AuthenticationLoading) {}
                     },
                     builder: (context, state) {
@@ -169,9 +177,6 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                             }
                           },
                           width: double.maxFinite,
-                          // textPadding: EdgeInsets.symmetric(
-                          //   horizontal: width * 0.3,
-                          // ),
                         )!,
                       );
                     },
@@ -197,9 +202,46 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                 FitFlexClientProfileSelectGenderPage.route,
               );
             }
+            if (state is ClientProfileError) {
+              PlatformDialog.showAlertDialog(
+                context: context,
+                title: "Create Account",
+                message: state.failures.message ?? "Something went wrong!",
+              );
+            }
           },
         )
       ],
+    );
+  }
+}
+
+class FitFlexLoaderPage extends StatelessWidget {
+  static const String route = '/fit_flex_loader';
+  const FitFlexLoaderPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/fit_flex_image.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
+          ),
+          Positioned.fill(
+            child: FitFlexLoaderWidget(
+              height: height,
+              width: width,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

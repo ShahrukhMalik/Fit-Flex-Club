@@ -48,7 +48,9 @@ class FitFlexDashboardPage extends StatelessWidget {
               },
               listener: (context, state) {
                 if (state is AuthenticationComplete) {
-                  if (state.isLoggedOut ?? true) {
+                  if (state.entity?.isLoggedIn ?? false) {
+                    context.pushReplacement(FitFlexAuthLandingPage.route);
+                  } else {
                     context.pushReplacement(FitFlexAuthLandingPage.route);
                   }
                 }

@@ -36,70 +36,11 @@ class ClientProfileBloc extends Bloc<ClientProfileEvent, ClientProfileState> {
       if (event is UpdateUserClientProfileEvent) {
         await _updateUser(event, emit);
       }
-      if (event is CheckClientProfileExist) {
-        await _checkClientProfile(event, emit);
-      }
-      if (event is CheckIfUserActive) {
-        await _userActive(event, emit);
-      }
+    
     });
   }
 
-  Future<void> _checkClientProfile(
-    CheckClientProfileExist event,
-    Emitter<ClientProfileState> emit,
-  ) async {
-    emit(ClientProfileLoading());
-    final result = await isClientProfileCreatedActiveUsecase(NoParams());
-    if (result == null) {
-      emit(
-        ClientProfileError(
-          failures: ServerFailure(
-            message: "Something went wrong!",
-          ),
-        ),
-      );
-    } else {
-      result.fold(
-        (l) => emit(ClientProfileError(failures: l)),
-        (r) => emit(ClientProfileComplete(clientProfileExist: r)),
-      );
-    }
-  }
-
-  Future<void> _userActive(
-    CheckIfUserActive event,
-    Emitter<ClientProfileState> emit,
-  ) async {
-    emit(ClientProfileLoading());
-    final result = await isUserActiveUsecase(NoParams());
-    if (result == null) {
-      emit(
-        ClientProfileError(
-          failures: ServerFailure(
-            message: "Something went wrong!",
-          ),
-        ),
-      );
-    } else {
-      result.fold(
-        (l) => emit(ClientProfileError(failures: l)),
-        (r) async {
-          if (r == null) {
-          } else {
-            await for (final isUserActive in r) {
-              emit(
-                ClientProfileComplete(
-                  isUserActive: isUserActive,
-                ),
-              );
-            }
-          }
-        },
-      );
-    }
-  }
-
+ 
   Future<void> _addUser(
     AddUserClientProfileEvent event,
     Emitter<ClientProfileState> emit,

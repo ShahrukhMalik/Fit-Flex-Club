@@ -22,10 +22,16 @@ import '../../../features/authentication/data/repositories/auth_repository_impl.
     as _i441;
 import '../../../features/authentication/domain/repositories/auth_repository.dart'
     as _i20;
+import '../../../features/authentication/domain/usecases/authenticate_user_usecase.dart'
+    as _i949;
 import '../../../features/authentication/domain/usecases/create_account_usecase.dart'
     as _i955;
 import '../../../features/authentication/domain/usecases/forgot_password_usecase.dart'
     as _i988;
+import '../../../features/authentication/domain/usecases/is_client_profile_created_usecase.dart'
+    as _i98;
+import '../../../features/authentication/domain/usecases/is_user_active_usecase.dart'
+    as _i374;
 import '../../../features/authentication/domain/usecases/login_usecase.dart'
     as _i831;
 import '../../../features/authentication/domain/usecases/logout_usecase.dart'
@@ -75,6 +81,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i769.PlatformButton>(() => _i769.PlatformButton());
     gh.singleton<_i228.NetworkInfo>(() => _i228.NetworkInfoImpl(
         connectionChecker: gh<_i973.InternetConnectionChecker>()));
+    gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
+          gh<_i974.FirebaseFirestore>(),
+          auth: gh<_i59.FirebaseAuth>(),
+        ));
     gh.singleton<_i305.ClientProfileRemoteDatasource>(
         () => _i305.ClientProfileRemoteDatasourceImpl(
               auth: gh<_i59.FirebaseAuth>(),
@@ -86,42 +96,49 @@ extension GetItInjectableX on _i174.GetIt {
               clientProfileRemoteDatasource:
                   gh<_i305.ClientProfileRemoteDatasource>(),
             ));
-    gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
-        _i617.IsClientProfileCreatedActiveUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i40.AuthRemoteDatasource>(
-        () => _i40.AuthRemoteDatasourceImpl(auth: gh<_i59.FirebaseAuth>()));
-    gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(
           remoteDatasource: gh<_i40.AuthRemoteDatasource>(),
           networkInfo: gh<_i228.NetworkInfo>(),
         ));
+    gh.singleton<_i98.IsClientProfileCreatedActiveUsecase>(() =>
+        _i98.IsClientProfileCreatedActiveUsecaseImpl(
+            clientProfileRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i374.IsUserActiveUsecase>(() => _i374.IsUserActiveUsecaseImpl(
+        clientProfileRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i831.LogInUsecase>(() =>
         _i831.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i988.ForgotPasswordUsecase>(() =>
         _i988.ForgotPasswordUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
+        _i617.IsClientProfileCreatedActiveUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i949.AuthenticateUserUsecase>(() =>
+        _i949.AuthenticateUserUsecaseImpl(
+            authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i955.CreateAccountUsecase>(() =>
         _i955.CreateAccountUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i447.LogOutUsecase>(() =>
         _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
+          authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
+          createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
+          logInUsecase: gh<_i831.LogInUsecase>(),
+          logOutUsecase: gh<_i447.LogOutUsecase>(),
+          forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
+        ));
     gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
           gh<_i541.AddUserUsecase>(),
           gh<_i864.UpdateUserUsecase>(),
           gh<_i617.IsClientProfileCreatedActiveUsecase>(),
           gh<_i899.IsUserActiveUsecase>(),
-        ));
-    gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
-          createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
-          logInUsecase: gh<_i831.LogInUsecase>(),
-          logOutUsecase: gh<_i447.LogOutUsecase>(),
-          forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
         ));
     return this;
   }

@@ -1,7 +1,9 @@
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_dashboard_page.dart';
 import 'package:flutter/material.dart';
@@ -120,11 +122,20 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                         BlocConsumer<AuthenticationBloc, AuthenticationState>(
                       listener: (context, state) {
                         if (state is AuthenticationComplete) {
-                          if (state.isLoggedIn ?? false) {
-                            context.pushReplacement(FitFlexDashboardPage.route);
+                          if (state.entity?.isLoggedIn ?? false) {
+                            context
+                                .read<AuthenticationBloc>()
+                                .add(AuthenticateUserEvent());
                           }
                         }
-                        if (state is AuthenticationError) {}
+                        if (state is AuthenticationError) {
+                          PlatformDialog.showAlertDialog(
+                            context: context,
+                            title: "Log In",
+                            message: state.failures.message ??
+                                "Something went wrong!",
+                          );
+                        }
                         if (state is AuthenticationLoading) {}
                       },
                       builder: (context, state) {
@@ -154,6 +165,25 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                         )!;
                       },
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PlatformButton().buildButton(
+                      borderRadius: 100,
+                      context: context,
+                      type: ButtonType.primary,
+                      backgroundColor: Colors.transparent,
+                      textStyle: TextStyle(
+                        color: Color(0xFFFFCD7C),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                      text: "Forgot Password ?",
+                      onPressed: () {
+                        context.go(FitFlexAuthForgotPasswordPage.route);
+                      },
+                      width: double.maxFinite,
+                    )!,
                   ),
                 ],
               ),

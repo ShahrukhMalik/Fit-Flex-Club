@@ -116,13 +116,15 @@ class PlatformLoader {
       );
     } else {
       return SizedBox(
-        width: size,
-        height: size,
-        child: CircularProgressIndicator(
-          color: color,
-          strokeWidth: strokeWidth ?? 4.0,
-          semanticsLabel: semanticsLabel,
-          semanticsValue: semanticsValue,
+        // width: size,
+        // height: size,
+        child: Center(
+          child: CircularProgressIndicator(
+            color: color,
+            strokeWidth: strokeWidth ?? 4.0,
+            semanticsLabel: semanticsLabel,
+            semanticsValue: semanticsValue,
+          ),
         ),
       );
     }

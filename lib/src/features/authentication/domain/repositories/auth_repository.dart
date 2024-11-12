@@ -10,6 +10,18 @@ abstract class AuthRepository {
     required String password,
   });
 
+  ///Let user logged in
+  Future<Either<Failures, bool?>>? isUserLogged();
+
+  ///Let user active
+  Future<Either<Failures, bool?>>? isUserActive();
+
+  ///
+  Future<Either<Failures, AuthEntity?>>? authenticateUser();
+
+  ///Let profile created
+  Future<Either<Failures, bool?>>? isProfileCreated();
+
   ///Let user signup
   Future<Either<Failures, AuthEntity?>>? signup({
     required String email,

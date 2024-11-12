@@ -16,7 +16,7 @@ abstract class ClientProfileRemoteDatasource {
   });
 
   ///Check if client is active
-  Future<Stream<bool>?>? isUserActive();
+  Future<bool?>? isUserActive();
 
   /// Check if client profile is created
   Future<bool> isClientProfileCreated();
@@ -100,22 +100,17 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
   }
 
   @override
-  Future<Stream<bool>?>? isUserActive() async {
+  Future<bool?>? isUserActive() async {
     try {
       final CollectionReference ref = db.collection('Users');
-      final Stream<DocumentSnapshot<Map<String, dynamic>>> userDetails = ref
-          .doc(auth.currentUser?.uid)
-          .snapshots()
-          .cast<DocumentSnapshot<Map<String, dynamic>>>()
-          .asBroadcastStream()
-          .handleError(
-            (error) =>
-                throw ServerException(errorMessage: 'Something went wrong'),
-          );
-      return userDetails.map(
-        (snapshot) =>
-            snapshot.data()?['isUserActive'] && auth.currentUser != null,
-      );
+      final DocumentSnapshot<Object?> snapshot =
+          await ref.doc(auth.currentUser?.uid).get();
+
+      final data = snapshot.data();
+
+      return data == null
+          ? false
+          : (data as Map<String, dynamic>)['isUserActive'] == true;
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

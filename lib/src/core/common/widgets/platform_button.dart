@@ -572,7 +572,7 @@ class PlatformButton {
     return SizedBox(
       width: width,
       height: height,
-      child: ElevatedButton.icon(
+      child: TextButton.icon(
         onPressed: onPressed,
         icon: isLoading
             ? const SizedBox(
@@ -588,7 +588,7 @@ class PlatformButton {
             ? const SizedBox.shrink() // Hide label when loading
             : Text(text, style: textStyle?.copyWith(color: foregroundColor)),
         iconAlignment: iconAlignment ?? IconAlignment.end,
-        style: ElevatedButton.styleFrom(
+        style: TextButton.styleFrom(
           backgroundColor: backgroundColor,
           padding: padding,
           foregroundColor: foregroundColor,
@@ -686,31 +686,39 @@ class PlatformButton {
       );
     }
 
-    return SizedBox(
-      width: width,
-      height: height,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: foregroundColor,
-          padding: padding,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius ?? 8),
-          ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Icon(icon, color: foregroundColor),
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(
+        icon,
+        color: foregroundColor,
       ),
     );
+
+    // return SizedBox(
+    //   width: width,
+    //   height: height,
+    //   child: ElevatedButton(
+    //     onPressed: onPressed,
+    //     style: ElevatedButton.styleFrom(
+    //       backgroundColor: backgroundColor,
+    //       foregroundColor: foregroundColor,
+    //       padding: padding,
+    //       shape: RoundedRectangleBorder(
+    //         borderRadius: BorderRadius.circular(borderRadius ?? 8),
+    //       ),
+    //     ),
+    //     child: isLoading
+    //         ? const SizedBox(
+    //             width: 20,
+    //             height: 20,
+    //             child: CircularProgressIndicator(
+    //               strokeWidth: 2,
+    //               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+    //             ),
+    //           )
+    //         : Icon(icon, color: foregroundColor),
+    //   ),
+    // );
   }
 
   // Outlined Button
@@ -846,11 +854,12 @@ class PlatformButton {
     }
 
     return SizedBox(
-      width: width,
-      height: height,
+      // width: width,
+      // height: height,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          minimumSize: Size(width ?? 100, height ?? 50),
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
           padding: padding,

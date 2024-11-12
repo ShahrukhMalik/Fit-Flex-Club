@@ -99,7 +99,7 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
   }
 
   @override
-  Future<Either<Failures, Stream<bool>?>>? isUserActive() async {
+  Future<Either<Failures, bool?>>? isUserActive() async {
     final isNetworkConnected = await networkInfo.isConnected;
     if (isNetworkConnected == null || !isNetworkConnected) {
       return const Left(
@@ -119,5 +119,11 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
         );
       }
     }
+  }
+  
+  @override
+  Future<Either<Failures, bool>>? isProfileCreated() {
+    // TODO: implement isProfileCreated
+    throw UnimplementedError();
   }
 }

@@ -15,7 +15,7 @@ class ClientEntity extends Equatable {
   final String? weightUnit;
 
   const ClientEntity({
-    this.email,
+     this.email,
      this.authId,
      this.age,
      this.gender,
