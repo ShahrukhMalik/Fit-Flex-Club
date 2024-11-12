@@ -6,14 +6,14 @@ import 'package:go_router/go_router.dart';
 
 class PlatformAppbar {
   // Basic AppBar with title
-  static PreferredSizeWidget basicAppBar({
-    required String title,
-    Color? backgroundColor,
-    Color? foregroundColor,
-    bool automaticallyImplyLeading = true,
-    VoidCallback? onLeadingPressed,
-    required BuildContext context,
-  }) {
+  static PreferredSizeWidget basicAppBar(
+      {required String title,
+      Color? backgroundColor,
+      Color? foregroundColor,
+      bool automaticallyImplyLeading = true,
+      VoidCallback? onLeadingPressed,
+      required BuildContext context,
+      Widget? trailing}) {
     if (Platform.isIOS) {
       return CupertinoNavigationBar(
         middle: Text(
@@ -24,6 +24,7 @@ class PlatformAppbar {
             fontSize: 22,
           ),
         ),
+        trailing: trailing,
         backgroundColor: backgroundColor,
         automaticallyImplyLeading: automaticallyImplyLeading,
         leading: automaticallyImplyLeading

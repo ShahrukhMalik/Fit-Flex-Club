@@ -7,14 +7,13 @@ class ClientModel extends ClientEntity {
     required super.authId,
     required super.age,
     required super.gender,
-    required super.heightInCm,
-    required super.heightInFt,
-    required super.heightInFtInches,
+    required super.weight,
+    required super.weightUnit,
+    required super.height,
+    required super.heightUnit,
     required super.isTrainer,
     required super.isUserActive,
     required super.username,
-    required super.weightInKg,
-    required super.weightInLb,
   });
   @override
   List<Object?> get props {
@@ -22,77 +21,72 @@ class ClientModel extends ClientEntity {
       authId,
       age,
       gender,
-      heightInCm,
-      heightInFt,
-      heightInFtInches,
+      weight,
+      weightUnit,
+      height,
+      heightUnit,
       isTrainer,
       isUserActive,
       username,
-      weightInKg,
-      weightInLb,
     ];
   }
 
   ClientModel copyWith({
+    String? authId,
     int? age,
-    String? email,
     String? gender,
-    int? heightInCm,
-    int? heightInFt,
-    int? heightInFtInches,
+    int? weight,
+    String? weightUnit,
+    int? height,
+    String? heightUnit,
     bool? isTrainer,
     bool? isUserActive,
     String? username,
-    int? weightInKg,
-    int? weightInLb,
-    String? authId,
   }) {
     return ClientModel(
       authId: authId ?? this.authId,
       age: age ?? this.age,
       gender: gender ?? this.gender,
-      heightInCm: heightInCm ?? this.heightInCm,
-      heightInFt: heightInFt ?? this.heightInFt,
-      heightInFtInches: heightInFtInches ?? this.heightInFtInches,
+      weight: weight ?? this.weight,
+      weightUnit: weightUnit ?? this.weightUnit,
+      height: height ?? this.height,
+      heightUnit: heightUnit ?? this.heightUnit,
       isTrainer: isTrainer ?? this.isTrainer,
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
-      weightInKg: weightInKg ?? this.weightInKg,
-      weightInLb: weightInLb ?? this.weightInLb,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
       'authId': authId,
       'age': age,
       'gender': gender,
-      'heightInCm': heightInCm,
-      'heightInFt': heightInFt,
-      'heightInFtInches': heightInFtInches,
+      'weight': weight,
+      'weightUnit': weightUnit,
+      'height': height,
+      'heightUnit': heightUnit,
       'isTrainer': isTrainer,
       'isUserActive': isUserActive,
       'username': username,
-      'weightInKg': weightInKg,
-      'weightInLb': weightInLb,
     };
   }
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
-      authId: map["authId"],
+      authId: map['authId'] as String,
       age: map['age'] as int,
       gender: map['gender'] as String,
-      heightInCm: map['heightInCm'] as int,
-      heightInFt: map['heightInFt'] as int,
-      heightInFtInches: map['heightInFtInches'] as int,
+      weight: map['weight'] as int,
+      weightUnit: map['weightUnit'] as String,
+      height: map['height'] as int,
+      heightUnit: map['heightUnit'] as String,
       isTrainer: map['isTrainer'] as bool,
       isUserActive: map['isUserActive'] as bool,
       username: map['username'] as String,
-      weightInKg: map['weightInKg'] as int,
-      weightInLb: map['weightInLb'] as int,
     );
   }
+
   factory ClientModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
@@ -102,14 +96,13 @@ class ClientModel extends ClientEntity {
       authId: data?['authId'],
       age: data?['age'] as int,
       gender: data?['gender'] as String,
-      heightInCm: data?['heightInCm'] as int,
-      heightInFt: data?['heightInFt'] as int,
-      heightInFtInches: data?['heightInFtInches'] as int,
+      weight: data?['weight'] as int,
+      weightUnit: data?['weightUnit'] as String,
+      height: data?['height'] as int,
+      heightUnit: data?['heightUnit'] as String,
       isTrainer: data?['isTrainer'] as bool,
       isUserActive: data?['isUserActive'] as bool,
       username: data?['username'] as String,
-      weightInKg: data?['weightInKg'] as int,
-      weightInLb: data?['weightInLb'] as int,
     );
   }
 
@@ -118,14 +111,13 @@ class ClientModel extends ClientEntity {
       authId: clientEntity.authId,
       age: clientEntity.age,
       gender: clientEntity.gender,
-      heightInCm: clientEntity.heightInCm,
-      heightInFt: clientEntity.heightInFt,
-      heightInFtInches: clientEntity.heightInFtInches,
+      weight: clientEntity.weight,
+      weightUnit: clientEntity.weightUnit,
+      height: clientEntity.height,
+      heightUnit: clientEntity.heightUnit,
       isTrainer: clientEntity.isTrainer,
       isUserActive: clientEntity.isUserActive,
       username: clientEntity.username,
-      weightInKg: clientEntity.weightInKg,
-      weightInLb: clientEntity.weightInLb,
     );
   }
 
@@ -135,14 +127,29 @@ class ClientModel extends ClientEntity {
     if (authId != null) data['authId'] = authId;
     if (age != null) data['age'] = age;
     if (gender != null) data['gender'] = gender;
-    if (heightInCm != null) data['heightInCm'] = heightInCm;
-    if (heightInFt != null) data['heightInFt'] = heightInFt;
-    if (heightInFtInches != null) data['heightInFtInches'] = heightInFtInches;
+    if (weightUnit != null && weightUnit == 'kg') data['weightInKg'] = weight;
+    if (weightUnit != null && weightUnit == 'lb') data['weightInLb'] = weight;
+    if (weightUnit != null) {
+      if (weightUnit == 'kg') {
+        data['weightInLb'] = _convertKgToLb(weight!);
+      }
+      if (weightUnit == 'lb') {
+        data['weightInKg'] = _convertLbToKg(weight!);
+      }
+    }
+    if (heightUnit != null && heightUnit == 'cm') data['heightInCm'] = height;
+    if (heightUnit != null && heightUnit == 'ft') data['heightInFt'] = height;
+    if (heightUnit != null) {
+      if (heightUnit == 'cm') {
+        data['heightInFt'] = _convertCmToFt(height!);
+      }
+      if (heightUnit == 'ft') {
+        data['heightInCm'] = _convertFtToCm(height!);
+      }
+    }
     if (isTrainer != null) data['isTrainer'] = isTrainer;
     if (isUserActive != null) data['isUserActive'] = isUserActive;
     if (username != null) data['username'] = username;
-    if (weightInKg != null) data['weightInKg'] = weightInKg;
-    if (weightInLb != null) data['weightInLb'] = weightInLb;
 
     return data;
   }
@@ -152,3 +159,9 @@ class ClientModel extends ClientEntity {
   factory ClientModel.fromJson(String source) =>
       ClientModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }
+
+// Helper conversion methods
+ int _convertKgToLb(int? kg) => kg != null ? (kg * 2.205).round() : 0;
+ int _convertLbToKg(int? lb) => lb != null ? (lb / 2.205).round() : 0;
+ int _convertFtToCm(int? ft) => ft != null ? (ft * 30.48).round() : 0;
+ int _convertCmToFt(int? cm) => cm != null ? (cm / 30.48).round() : 0;

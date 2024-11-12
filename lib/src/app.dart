@@ -20,12 +20,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => getIt<AuthenticationBloc>(),),
-        BlocProvider(create: (context) => getIt<ClientProfileBloc>(),),
+        BlocProvider(
+          create: (context) => getIt<AuthenticationBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<ClientProfileBloc>(),
+        ),
       ],
-      child: PlatformApp(
-        title: "Fit Flex Club",
-        routerConfig: goRouter(),
+      child: BlocConsumer<ClientProfileBloc, ClientProfileState>(
+        listener: (context, state) {
+          // TODO: implement listener
+        },
+        builder: (context, state) {
+          return PlatformApp(
+            title: "Fit Flex Club",
+            routerConfig: goRouter(state),
+          );
+        },
       ),
     );
   }

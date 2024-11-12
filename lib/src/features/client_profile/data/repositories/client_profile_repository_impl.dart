@@ -74,4 +74,50 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
       }
     }
   }
+
+  @override
+  Future<Either<Failures, bool>> isClientProfileCreated() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected == null || !isNetworkConnected) {
+      return const Left(
+        NetworkFailure(message: 'No internet Connection'),
+      );
+    } else {
+      try {
+        return Right(
+          await clientProfileRemoteDatasource.isClientProfileCreated(),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failures, Stream<bool>?>>? isUserActive() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected == null || !isNetworkConnected) {
+      return const Left(
+        NetworkFailure(message: 'No internet Connection'),
+      );
+    } else {
+      try {
+        return Right(
+          await clientProfileRemoteDatasource.isUserActive(),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    }
+  }
 }

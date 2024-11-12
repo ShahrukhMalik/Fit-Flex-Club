@@ -103,6 +103,7 @@ class AppTextFields {
               color: Color(0xFFFFCD7C),
             ),
         controller: controller,
+        decoration: boxDecoration,
         prefix: GestureDetector(
           onTap: onToggleVisibility,
           child: Icon(

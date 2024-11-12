@@ -44,6 +44,7 @@ class FitFlexAuthLandingPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PlatformButton().buildButton(
+                  backgroundColor: Color(0xFFFFCD7C),
                   borderRadius: 100,
                   context: context,
                   type: ButtonType.primary,
@@ -54,7 +55,7 @@ class FitFlexAuthLandingPage extends StatelessWidget {
                   ),
                   text: "Log In",
                   onPressed: () => context.go(FitFlexAuthLogInPage.route),
-                  width: width * 0.6,
+                  // width: width * 0.6,
                   textPadding: EdgeInsets.symmetric(
                     horizontal: width * 0.3,
                   ),
@@ -66,6 +67,7 @@ class FitFlexAuthLandingPage extends StatelessWidget {
                     horizontal: width * 0.3,
                   ),
                   context: context,
+                  backgroundColor: Color(0xFFFFCD7C),
                   textStyle: TextStyle(
                     color: Color.fromARGB(255, 94, 87, 86),
                     fontWeight: FontWeight.bold,
@@ -75,7 +77,6 @@ class FitFlexAuthLandingPage extends StatelessWidget {
                       .primary, // Assuming you have a secondary button type
                   text: "Sign Up",
                   onPressed: () => context.go(FitFlexAuthSignUpPage.route),
-                  width: width * 0.6,
                 )!,
                 const SizedBox(height: 50),
               ],

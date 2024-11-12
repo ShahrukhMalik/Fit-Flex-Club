@@ -3,29 +3,29 @@ import 'package:equatable/equatable.dart';
 
 class ClientEntity extends Equatable {
   final String? authId;
+  final String? email;
   final int? age;
   final String? gender;
-  final int? heightInCm;
-  final int? heightInFt;
-  final int? heightInFtInches;
+  final int? height;
+  final String? heightUnit;
   final bool? isTrainer;
   final bool? isUserActive;
   final String? username;
-  final int? weightInKg;
-  final int? weightInLb;
+  final int? weight;
+  final String? weightUnit;
 
   const ClientEntity({
+    this.email,
      this.authId,
      this.age,
      this.gender,
-     this.heightInCm,
-     this.heightInFt,
-     this.heightInFtInches,
+     this.height,
+     this.heightUnit,
      this.isTrainer,
      this.isUserActive,
      this.username,
-     this.weightInKg,
-     this.weightInLb,
+     this.weight,
+     this.weightUnit,
   });
   @override
   List<Object?> get props {
@@ -33,14 +33,14 @@ class ClientEntity extends Equatable {
       authId,
       age,
       gender,
-      heightInCm,
-      heightInFt,
-      heightInFtInches,
+      height,
+      heightUnit,
       isTrainer,
       isUserActive,
       username,
-      weightInKg,
-      weightInLb,
+      weight,
+      weightUnit,
+      email,
     ];
   }
 }

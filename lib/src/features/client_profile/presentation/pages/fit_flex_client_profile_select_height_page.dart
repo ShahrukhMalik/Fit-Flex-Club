@@ -1,8 +1,15 @@
+import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_gender_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_weight_page.dart';
+import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_dashboard_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 // class FitFlexClientProfileSelectHeightPage extends StatelessWidget {
 //   final String gender;
@@ -27,12 +34,14 @@ class FitFlexClientProfileSelectHeightPage extends StatefulWidget {
   final String gender;
   final String age;
   final String weight;
+  final String weightUnit;
   static const String route = "/select-height";
   const FitFlexClientProfileSelectHeightPage({
     super.key,
     required this.gender,
     required this.age,
     required this.weight,
+    required this.weightUnit,
   });
 
   @override
@@ -68,112 +77,138 @@ class _FitFlexClientProfileSelectHeightPageState
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        "What is your age?",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 25),
-                      child: Text(
-                        "This is used in getting personlized results and plans",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          // fontSize: 25,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ),
-                    AnimatedSwitch(
-                      isFirstMetricSelected: isFirstMetricSelected,
-                      metrics: metrics,
-                    ),
-                    ValueListenableBuilder(
-                      valueListenable: metricSelected,
-                      builder: (context, metric, _) {
-                        return Column(
-                          children: [
-                            ValueListenableBuilder(
-                              valueListenable: heightSelected,
-                              builder: (context, age, _) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 25),
-                                  child: Text(
-                                    "$age " "$metric",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: height * 0.4,
-                              child: FitFlexScrollWheelWidget(
-                                selectedValue: heightSelected,
-                                maxCount: 1499,
-                                metric: metric,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
                 children: [
-                  PlatformButton().buildButton(
-                    foregroundColor: Color(0xFFFFC26A),
-                    backgroundColor: Colors.transparent,
-                    textStyle: TextStyle(
-                      color: Color(0xFFFFC26A),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Text(
+                            "What is your age?",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 25),
+                          child: Text(
+                            "This is used in getting personlized results and plans",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              // fontSize: 25,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ),
+                        AnimatedSwitch(
+                          isFirstMetricSelected: isFirstMetricSelected,
+                          metrics: metrics,
+                        ),
+                        ValueListenableBuilder(
+                          valueListenable: metricSelected,
+                          builder: (context, metric, _) {
+                            return Column(
+                              children: [
+                                ValueListenableBuilder(
+                                  valueListenable: heightSelected,
+                                  builder: (context, age, _) {
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 25),
+                                      child: Text(
+                                        "$age " "$metric",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(
+                                  height: height * 0.4,
+                                  child: FitFlexScrollWheelWidget(
+                                    selectedValue: heightSelected,
+                                    maxCount: 1499,
+                                    metric: metric,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    context: context,
-                    type: ButtonType.iconText,
-                    icon: Icons.arrow_back_ios_new,
-                    iconAlignment: IconAlignment.start,
-                    text: "Previous",
-                    onPressed: () {},
-                  )!,
-                  PlatformButton().buildButton(
-                    backgroundColor: Color(0xFFFFC26A),
-                    foregroundColor: Color(0xFFF2F2F7),
-                    context: context,
-                    type: ButtonType.iconText,
-                    icon: Icons.arrow_forward_ios,
-                    text: "Continue",
-                    onPressed: () {
-                      PlatformDialog.showAlertDialog(
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      PlatformButton().buildButton(
+                        foregroundColor: Color(0xFFFFC26A),
+                        backgroundColor: Colors.transparent,
+                        textStyle: TextStyle(
+                          color: Color(0xFFFFC26A),
+                        ),
                         context: context,
-                        title: "Sign Up",
-                        message: "Please select Gender before you proceed.",
-                      );
-                    },
-                  )!
+                        type: ButtonType.iconText,
+                        icon: Icons.arrow_back_ios_new,
+                        iconAlignment: IconAlignment.start,
+                        text: "Previous",
+                        onPressed: () {},
+                      )!,
+                      PlatformButton().buildButton(
+                        backgroundColor: Color(0xFFFFC26A),
+                        foregroundColor: Color(0xFFF2F2F7),
+                        context: context,
+                        type: ButtonType.iconText,
+                        icon: Icons.arrow_forward_ios,
+                        text: "Continue",
+                        onPressed: () {
+                          context.read<ClientProfileBloc>().add(
+                                UpdateUserClientProfileEvent(
+                                  clientEntity: ClientEntity(
+                                    isTrainer: false,
+                                    age: int.tryParse(widget.age),
+                                    gender: widget.gender,
+                                    weight: int.tryParse(widget.weight),
+                                    height: int.tryParse(heightSelected.value),
+                                    heightUnit: metricSelected.value,
+                                    weightUnit: widget.weightUnit,
+                                  ),
+                                ),
+                              );
+                        },
+                      )!
+                    ],
+                  )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+          BlocConsumer<ClientProfileBloc, ClientProfileState>(
+            builder: (context, state) {
+              if (state is ClientProfileLoading) {
+                return FitFlexLoaderWidget(height: height, width: width);
+              }
+              return SizedBox();
+            },
+            listener: (context, state) {
+              if (state is ClientProfileComplete) {
+                context.go(FitFlexDashboardPage.route);
+              }
+            },
+          )
+        ],
       ),
     );
   }

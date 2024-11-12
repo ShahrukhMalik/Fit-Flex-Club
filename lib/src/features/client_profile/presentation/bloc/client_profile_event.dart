@@ -22,3 +22,7 @@ class UpdateUserClientProfileEvent extends ClientProfileEvent {
   @override
   List<Object> get props => [clientEntity];
 }
+
+class CheckClientProfileExist extends ClientProfileEvent {}
+
+class CheckIfUserActive extends ClientProfileEvent {}

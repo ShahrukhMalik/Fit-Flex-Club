@@ -15,18 +15,20 @@ class AuthenticationComplete extends AuthenticationState {
   final String? authId;
   final bool? isSignedUp;
   final bool? isLoggedIn;
+  final bool? isLoggedOut;
   final bool? isChangePasswordMailSent;
 
   const AuthenticationComplete({
-     this.authId,
-     this.isSignedUp,
-     this.isLoggedIn,
-     this.isChangePasswordMailSent,
+    this.authId,
+    this.isSignedUp,
+    this.isLoggedIn,
+    this.isLoggedOut,
+    this.isChangePasswordMailSent,
   });
 
   @override
   List<Object?> get props =>
-      [isSignedUp, isLoggedIn, isChangePasswordMailSent, authId];
+      [isSignedUp, isLoggedIn, isChangePasswordMailSent, authId, isLoggedOut];
 }
 
 class AuthenticationError extends AuthenticationState {

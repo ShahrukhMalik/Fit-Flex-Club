@@ -133,7 +133,9 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                         context.read<ClientProfileBloc>().add(
                               AddUserClientProfileEvent(
                                 clientEntity: ClientEntity(
-                                  username: _emailController.text,
+                                  username: _nameController.text,
+                                  email: _emailController.text,
+                                  isUserActive: true,
                                 ),
                               ),
                             );
@@ -142,32 +144,36 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                       if (state is AuthenticationLoading) {}
                     },
                     builder: (context, state) {
-                      return PlatformButton().buildButton(
-                        borderRadius: 100,
-                        context: context,
-                        isLoading: state is AuthenticationLoading,
-                        type: ButtonType.primary,
-                        textStyle: TextStyle(
-                          color: Color.fromARGB(255, 94, 87, 86),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                        text: "Sign Up",
-                        onPressed: () {
-                          if (formStateKey.currentState!.validate()) {
-                            context.read<AuthenticationBloc>().add(
-                                  CreateAccountAuthenticationEvent(
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                  ),
-                                );
-                          }
-                        },
-                        width: double.maxFinite,
-                        textPadding: EdgeInsets.symmetric(
-                          horizontal: width * 0.3,
-                        ),
-                      )!;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: PlatformButton().buildButton(
+                          backgroundColor: Color(0xFFFFCD7C),
+                          borderRadius: 100,
+                          context: context,
+                          isLoading: state is AuthenticationLoading,
+                          type: ButtonType.primary,
+                          textStyle: TextStyle(
+                            color: Color.fromARGB(255, 94, 87, 86),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                          text: "Sign Up",
+                          onPressed: () {
+                            if (formStateKey.currentState!.validate()) {
+                              context.read<AuthenticationBloc>().add(
+                                    CreateAccountAuthenticationEvent(
+                                      email: _emailController.text,
+                                      password: _passwordController.text,
+                                    ),
+                                  );
+                            }
+                          },
+                          width: double.maxFinite,
+                          // textPadding: EdgeInsets.symmetric(
+                          //   horizontal: width * 0.3,
+                          // ),
+                        )!,
+                      );
                     },
                   ),
                 ],

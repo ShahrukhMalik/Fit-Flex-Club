@@ -14,4 +14,10 @@ abstract class ClientProfileRepository {
   Future<Either<Failures, void>>? updateUser({
     required ClientEntity clientEntity,
   });
+
+  ///Check if client is active
+  Future<Either<Failures, Stream<bool>?>>? isUserActive();
+
+  /// Check if client profile is created
+  Future<Either<Failures, bool>> isClientProfileCreated();
 }
