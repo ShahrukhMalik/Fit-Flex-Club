@@ -25,7 +25,7 @@ class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
   void initState() {
     // TODO: implement initState
 
-    if (widget.isUserActive!= null && !widget.isUserActive!) {
+    if (widget.isUserActive != null && !widget.isUserActive!) {
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) {
           PlatformDialog.showAlertDialog(
@@ -85,18 +85,11 @@ class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
                   ),
                   text: "Log In",
                   onPressed: () => context.go(FitFlexAuthLogInPage.route),
-                  // width: width * 0.6,
-                  textPadding: EdgeInsets.symmetric(
-                    horizontal: width * 0.3,
-                  ),
                 )!,
                 const SizedBox(height: 16), // Space between buttons
                 PlatformButton().buildButton(
                   width: width * 0.85,
                   borderRadius: 100,
-                  textPadding: EdgeInsets.symmetric(
-                    horizontal: width * 0.3,
-                  ),
                   context: context,
                   backgroundColor: Color(0xFFFFCD7C),
                   textStyle: TextStyle(

@@ -15,6 +15,7 @@ class ClientModel extends ClientEntity {
     required super.isUserActive,
     required super.username,
     required super.email,
+    required super.phone,
   });
   @override
   List<Object?> get props {
@@ -29,6 +30,7 @@ class ClientModel extends ClientEntity {
       isTrainer,
       isUserActive,
       username,
+      phone,
     ];
   }
 
@@ -44,8 +46,10 @@ class ClientModel extends ClientEntity {
     bool? isUserActive,
     String? username,
     String? email,
+     Map<String, dynamic>? phone,
   }) {
     return ClientModel(
+      phone: phone ?? this.phone,
       email: email ?? this.email,
       authId: authId ?? this.authId,
       age: age ?? this.age,
@@ -77,6 +81,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
+      phone: map['phone'],
       email: map['email'],
       authId: map['authId'] as String,
       age: map['age'] as int,
@@ -97,6 +102,7 @@ class ClientModel extends ClientEntity {
   ) {
     final data = snapshot.data();
     return ClientModel(
+      phone: data?['phone'],
       email: data?['email'],
       authId: data?['authId'],
       age: data?['age'] as int,
@@ -113,6 +119,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromClientEntity(ClientEntity clientEntity) {
     return ClientModel(
+      phone: clientEntity.phone,
       email: clientEntity.email,
       authId: clientEntity.authId,
       age: clientEntity.age,
@@ -137,26 +144,27 @@ class ClientModel extends ClientEntity {
     if (weightUnit != null && weightUnit == 'lb') data['weightInLb'] = weight;
     if (weightUnit != null) {
       if (weightUnit == 'kg') {
-        data['weightInLb'] = _convertKgToLb(weight!);
+        data['weightInLb'] = convertKgToLb(weight!);
       }
       if (weightUnit == 'lb') {
-        data['weightInKg'] = _convertLbToKg(weight!);
+        data['weightInKg'] = convertLbToKg(weight!);
       }
     }
     if (heightUnit != null && heightUnit == 'cm') data['heightInCm'] = height;
     if (heightUnit != null && heightUnit == 'ft') data['heightInFt'] = height;
     if (heightUnit != null) {
       if (heightUnit == 'cm') {
-        data['heightInFt'] = _convertCmToFt(height!);
+        data['heightInFt'] = convertCmToFt(height!);
       }
       if (heightUnit == 'ft') {
-        data['heightInCm'] = _convertFtToCm(height!);
+        data['heightInCm'] = convertFtToCm(height!);
       }
     }
     if (isTrainer != null) data['isTrainer'] = isTrainer;
     if (isUserActive != null) data['isUserActive'] = isUserActive;
     if (username != null) data['username'] = username;
     if (email != null) data['email'] = email;
+    if (phone != null) data['phone'] = phone;
 
     return data;
   }
@@ -168,7 +176,7 @@ class ClientModel extends ClientEntity {
 }
 
 // Helper conversion methods
-int _convertKgToLb(int? kg) => kg != null ? (kg * 2.205).round() : 0;
-int _convertLbToKg(int? lb) => lb != null ? (lb / 2.205).round() : 0;
-int _convertFtToCm(int? ft) => ft != null ? (ft * 30.48).round() : 0;
-int _convertCmToFt(int? cm) => cm != null ? (cm / 30.48).round() : 0;
+int convertKgToLb(int? kg) => kg != null ? (kg * 2.205).floor() : 0;
+int convertLbToKg(int? lb) => lb != null ? (lb / 2.205).floor() : 0;
+int convertFtToCm(int? ft) => ft != null ? (ft * 30.48).floor() : 0;
+int convertCmToFt(int? cm) => cm != null ? (cm / 30.48).floor() : 0;

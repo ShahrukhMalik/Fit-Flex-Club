@@ -12,6 +12,8 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_height_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_weight_page.dart';
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_dashboard_page.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,6 +24,48 @@ GoRouter goRouter(appState) {
         path: '/',
         redirect: (context, state) => FitFlexAuthLandingPage.route,
       ),
+      // GoRoute(
+      //   path: '/reset_password_email_sent',
+      //   pageBuilder: (context, state) {
+      //     return CustomTransitionPage(
+      //       key: state.pageKey,
+      //       child: Scaffold(
+      //         body: Stack(
+      //           children: [
+      //             Positioned.fill(
+      //               child: Image.asset(
+      //                 'assets/images/fit_flex_image.png',
+      //                 fit: BoxFit.cover,
+      //                 alignment: Alignment.center,
+      //               ),
+      //             ),
+      //             CupertinoAlertDialog(
+      //               title: const Text('Forgot Password'),
+      //               content: const Text('Kindly check your email inbox'),
+      //               actions: [
+      //                 TextButton(
+      //                   onPressed: () => context.go('/'),
+      //                   child: const Text('Close'),
+      //                 ),
+      //               ],
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //       barrierDismissible: true,
+      //       barrierColor: Colors.black54,
+      //       opaque: false,
+      //       transitionDuration: const Duration(milliseconds: 200),
+      //       transitionsBuilder:
+      //           (context, animation, secondaryAnimation, child) {
+      //         return FadeTransition(
+      //           opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+      //           child: child,
+      //         );
+      //       },
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: FitFlexClientProfileSelectGenderPage.route,
         pageBuilder: (context, state) => TransitionPage(
@@ -108,18 +152,18 @@ GoRouter goRouter(appState) {
           );
         },
       ),
-      GoRoute(
-        path: FitFlexAuthLandingPage.route,
-        pageBuilder: (context, state) {
-          final isUserInActive = state.pathParameters["flag"] == "0";
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexAuthLandingPage(
-              isUserActive: !isUserInActive,
-            ),
-          );
-        },
-      ),
+      // GoRoute(
+      //   path: FitFlexAuthLandingPage.route,
+      //   pageBuilder: (context, state) {
+      //     final isUserInActive = state.pathParameters["flag"] == "0";
+      //     return TransitionPage(
+      //       key: state.pageKey,
+      //       child: FitFlexAuthLandingPage(
+      //         isUserActive: !isUserInActive,
+      //       ),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: FitFlexAuthLogInPage.route,
         pageBuilder: (context, state) => TransitionPage(

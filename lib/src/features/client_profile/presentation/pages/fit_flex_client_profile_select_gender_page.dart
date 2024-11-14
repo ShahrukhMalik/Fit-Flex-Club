@@ -65,11 +65,11 @@ class _FitFlexClientProfileSelectGenderPageState
                         valueListenable: selectedButton,
                         builder: (context, button, _) {
                           final Color bgColor = button == "Male"
-                              ? Color(0xFFFFC26A)
-                              : Color(0xFFF2F2F7);
+                              ? Color.fromRGBO(255, 161, 29, 1)
+                              : Color.fromARGB(69, 255, 193, 106);
                           final Color fgColor = button == "Male"
                               ? Color(0xFFF2F2F7)
-                              : Color(0xFFFFC26A);
+                              : Color.fromRGBO(255, 161, 29, 1);
                           return PlatformButton().buildButton(
                             width: width,
                             context: context,
@@ -91,11 +91,11 @@ class _FitFlexClientProfileSelectGenderPageState
                         valueListenable: selectedButton,
                         builder: (context, button, _) {
                           final Color bgColor = button == "Female"
-                              ? Color(0xFFFFC26A)
-                              : Color(0xFFF2F2F7);
+                              ? Color.fromRGBO(255, 161, 29, 1)
+                              : Color.fromARGB(69, 255, 193, 106);
                           final Color fgColor = button == "Female"
                               ? Color(0xFFF2F2F7)
-                              : Color(0xFFFFC26A);
+                              : Color.fromRGBO(255, 161, 29, 1);
                           return PlatformButton().buildButton(
                             width: width,
                             context: context,

@@ -1,5 +1,6 @@
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_age_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_gender_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_height_page.dart';
@@ -26,8 +27,18 @@ class _FitFlexClientProfileSelectWeightPageState
   final ValueNotifier<String> weightSelected = ValueNotifier<String>("");
   final ValueNotifier<String> metricSelected = ValueNotifier<String>("");
   final ValueNotifier<bool> isFirstMetricSelected = ValueNotifier<bool>(true);
+  final FixedExtentScrollController fixedExtentScrollController =
+      FixedExtentScrollController(initialItem: 50);
 
   final List<String> metrics = ['kg', 'lb'];
+
+  void _scrollToIndex(int index) {
+    fixedExtentScrollController.animateToItem(
+      index,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   void initState() {
@@ -36,8 +47,14 @@ class _FitFlexClientProfileSelectWeightPageState
       () {
         if (isFirstMetricSelected.value) {
           metricSelected.value = metrics[0];
+          weightSelected.value =
+              convertLbToKg(int.tryParse(weightSelected.value)).toString();
+          _scrollToIndex(int.tryParse(weightSelected.value) ?? 1 - 1);
         } else {
           metricSelected.value = metrics[1];
+          weightSelected.value =
+              convertKgToLb(int.tryParse(weightSelected.value)).toString();
+          _scrollToIndex(int.tryParse(weightSelected.value) ?? 1 - 1);
         }
       },
     );
@@ -122,6 +139,7 @@ class _FitFlexClientProfileSelectWeightPageState
                               SizedBox(
                                 height: height * 0.4,
                                 child: FitFlexScrollWheelWidget(
+                                  controller: fixedExtentScrollController,
                                   selectedValue: weightSelected,
                                   maxCount: 1499,
                                   metric: metric,
@@ -181,6 +199,7 @@ class _FitFlexClientProfileSelectWeightPageState
 
 class FitFlexScrollWheelWidget extends StatefulWidget {
   final ValueNotifier<String> selectedValue;
+  final FixedExtentScrollController controller;
   final int maxCount;
   final String? metric;
   const FitFlexScrollWheelWidget({
@@ -188,6 +207,7 @@ class FitFlexScrollWheelWidget extends StatefulWidget {
     required this.selectedValue,
     this.metric,
     required this.maxCount,
+    required this.controller,
   });
 
   @override
@@ -196,13 +216,28 @@ class FitFlexScrollWheelWidget extends StatefulWidget {
 }
 
 class _FitFlexScrollWheelWidgetState extends State<FitFlexScrollWheelWidget> {
-  final _controller = FixedExtentScrollController(initialItem: 50);
+  late FixedExtentScrollController _controller;
 
   @override
   void initState() {
+    _controller = widget.controller;
     widget.selectedValue.value = _controller.initialItem.toString();
     super.initState();
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // void _scrollToIndex(int index) {
+  //   _controller.animateToItem(
+  //     index,
+  //     duration: const Duration(milliseconds: 500),
+  //     curve: Curves.easeInOut,
+  //   );
+  // }
 
   Widget _buildAgeView({
     required int index,
@@ -262,6 +297,7 @@ class _FitFlexScrollWheelWidgetState extends State<FitFlexScrollWheelWidget> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0),
             width: MediaQuery.of(context).size.width - 32,
             child: ListWheelScrollView.useDelegate(
+              squeeze: 1.2,
               controller: _controller,
               itemExtent: 25.0,
               diameterRatio: 1,

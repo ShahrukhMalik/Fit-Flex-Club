@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_phone_field.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
@@ -15,6 +17,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class FitFlexAuthSignUpPage extends StatefulWidget {
   static const String route = '/sign_up_page';
@@ -28,8 +31,10 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
   final ValueNotifier<bool> passwordVisible = ValueNotifier<bool>(true);
   final GlobalKey<FormState> formStateKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _codeController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
@@ -103,6 +108,29 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                           height: 20,
                         ),
                         Text(
+                          "Phone",
+                          style:
+                              TextStyle(color: Color(0xFFFFCD7C), fontSize: 18),
+                        ),
+                        CustomPhoneField(
+                          keyboardType: TextInputType.number,
+                          onCountrySelect: (p0) {
+                            _codeController.text = p0.toString();
+                          },
+                          controller: _phoneController,
+                          boxDecoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 2,
+                                color: Color(0xFFFFCD7C),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
                           "Password",
                           style:
                               TextStyle(color: Color(0xFFFFCD7C), fontSize: 18),
@@ -134,6 +162,10 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                         context.read<ClientProfileBloc>().add(
                               AddUserClientProfileEvent(
                                 clientEntity: ClientEntity(
+                                  phone: {
+                                    "countryCode": _codeController.text,
+                                    "phoneNumber": _phoneController.text,
+                                  },
                                   username: _nameController.text,
                                   email: _emailController.text,
                                   isUserActive: true,

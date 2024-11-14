@@ -2,6 +2,7 @@ import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_gender_page.dart';
@@ -54,8 +55,18 @@ class _FitFlexClientProfileSelectHeightPageState
   final ValueNotifier<String> heightSelected = ValueNotifier<String>("");
   final ValueNotifier<String> metricSelected = ValueNotifier<String>("");
   final ValueNotifier<bool> isFirstMetricSelected = ValueNotifier<bool>(true);
+  final FixedExtentScrollController fixedExtentScrollController =
+      FixedExtentScrollController(initialItem: 4);
 
   final List<String> metrics = ['ft', 'cm'];
+
+  void _scrollToIndex(int index) {
+    fixedExtentScrollController.animateToItem(
+      index,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   void initState() {
@@ -64,8 +75,14 @@ class _FitFlexClientProfileSelectHeightPageState
       () {
         if (isFirstMetricSelected.value) {
           metricSelected.value = metrics[0];
+          heightSelected.value =
+              convertCmToFt(int.tryParse(heightSelected.value)).toString();
+          _scrollToIndex(int.tryParse(heightSelected.value) ?? 1 - 1);
         } else {
           metricSelected.value = metrics[1];
+          heightSelected.value =
+              convertFtToCm(int.tryParse(heightSelected.value)).toString();
+          _scrollToIndex(int.tryParse(heightSelected.value) ?? 1 - 1);
         }
       },
     );
@@ -97,7 +114,7 @@ class _FitFlexClientProfileSelectHeightPageState
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Text(
-                              "What is your age?",
+                              "What is your height?",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 25,
@@ -145,8 +162,9 @@ class _FitFlexClientProfileSelectHeightPageState
                                   SizedBox(
                                     height: height * 0.4,
                                     child: FitFlexScrollWheelWidget(
+                                      controller: fixedExtentScrollController,
                                       selectedValue: heightSelected,
-                                      maxCount: 1499,
+                                      maxCount: metric == metric[0] ? 8 : 245,
                                       metric: metric,
                                     ),
                                   ),

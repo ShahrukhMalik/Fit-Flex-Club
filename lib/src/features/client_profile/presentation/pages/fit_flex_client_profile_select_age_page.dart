@@ -23,6 +23,8 @@ class FitFlexClientProfileSelectAgePage extends StatefulWidget {
 class _FitFlexClientProfileSelectAgePageState
     extends State<FitFlexClientProfileSelectAgePage> {
   final ValueNotifier<String> ageSelected = ValueNotifier<String>("");
+  final FixedExtentScrollController fixedExtentScrollController =
+      FixedExtentScrollController(initialItem: 50);
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
@@ -83,6 +85,7 @@ class _FitFlexClientProfileSelectAgePageState
                       SizedBox(
                         height: height * 0.4,
                         child: FitFlexScrollWheelWidget(
+                          controller: fixedExtentScrollController,
                           selectedValue: ageSelected,
                           maxCount: 149,
                         ),

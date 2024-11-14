@@ -31,10 +31,12 @@ String? passwordValidator(String? value) {
     return 'Please enter your password';
   }
 
-  final passwordRegExp = RegExp(
-      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+  // final passwordRegExp = RegExp(
+  //     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+  final passwordRegExp = RegExp(r'^.{8,}$');
   if (!passwordRegExp.hasMatch(value)) {
-    return '''Password must have 8+ chars, uppercase, number & symbol''';
+    // return '''Password must have 8+ chars, uppercase, number & symbol''';
+    return '''Password must have 8+ chars.''';
   }
   return null;
 }

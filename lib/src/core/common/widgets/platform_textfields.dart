@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:fit_flex_club/src/core/common/validators/textform_field_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 enum TextFieldType { name, email, password }
 
@@ -9,6 +10,7 @@ class AppTextFields {
   static Widget basicTextField({
     // required GlobalKey<FormState> formStateKey,
     TextFieldType? fieldType,
+    List<TextInputFormatter>? textInputFormatter,
     String? labelText,
     String? hintText,
     TextStyle? style,
@@ -23,6 +25,7 @@ class AppTextFields {
       return CupertinoTextFormFieldRow(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         // key: formStateKey,
+        inputFormatters: textInputFormatter,
         validator: (value) {
           if (fieldType == TextFieldType.name) {
             return nameValidator(value);
@@ -57,6 +60,7 @@ class AppTextFields {
     }
 
     return TextFormField(
+      inputFormatters: textInputFormatter,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       // key: formStateKey,
       style: style ??
@@ -114,7 +118,7 @@ class AppTextFields {
           child: Icon(
             obscureText ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
             size: 20,
-            // color: CupertinoColors.systemGrey,
+            color: Color(0xFFFFCD7C),
           ),
         ),
         placeholder: 'Enter your password',
