@@ -163,7 +163,9 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                               AddUserClientProfileEvent(
                                 clientEntity: ClientEntity(
                                   phone: {
-                                    "countryCode": _codeController.text,
+                                    "countryCode": _codeController.text.isEmpty
+                                        ? "+92"
+                                        : _codeController.text,
                                     "phoneNumber": _phoneController.text,
                                   },
                                   username: _nameController.text,

@@ -163,7 +163,10 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
               builder: (context, value, child) {
                 return Row(
                   children: [
-                    Icon(Icons.arrow_drop_down_rounded),
+                    Icon(
+                      Icons.arrow_drop_down_rounded,
+                      color: Color(0xFFFFCD7C),
+                    ),
                     Text(
                       value,
                       style: TextStyle(color: Color(0xFFFFCD7C)),
@@ -198,16 +201,18 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
   void _showCountryCodePicker(BuildContext context) {
     if (Platform.isIOS) {
       showCupertinoModalPopup(
+        // barrierColor: Color.fromARGB(197, 255, 205, 124),
         context: context,
         builder: (_) {
           return Container(
             height: 400,
-            color: CupertinoColors.systemBackground,
+            color: Color.fromARGB(155, 255, 205, 124),
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: CupertinoSearchTextField(
+                    backgroundColor: Colors.white,
                     controller: _searchController,
                     placeholder: 'Search Country',
                   ),
@@ -240,13 +245,18 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                                        child: Text(country['name']!,
-                                            style: TextStyle(fontSize: 16)),
+                                        child: Text(
+                                          country['name']!,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                       ),
                                       Text(
                                         country['dial_code']!,
                                         style: TextStyle(
-                                          color: CupertinoColors.secondaryLabel,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ],
@@ -272,8 +282,12 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(country['name']!,
-                                        style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      country['name']!,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
                                     Text(
                                       country['dial_code']!,
                                       style: TextStyle(
@@ -297,50 +311,66 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
       );
     } else {
       showModalBottomSheet(
+        backgroundColor: Color.fromARGB(155, 255, 205, 124),
         context: context,
         builder: (_) {
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    labelText: 'Search Country',
-                    border: OutlineInputBorder(),
+          return Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      labelText: 'Search Country',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ValueListenableBuilder(
-                  valueListenable: filteredCountryCodes,
-                  builder: (context, codes, child) {
-                    return ListView.builder(
-                      itemCount: codes.length,
+                Expanded(
+                  child: ValueListenableBuilder(
+                    valueListenable: filteredCountryCodes,
+                    builder: (context, codes, child) {
+                      return ListView.builder(
+                        itemCount: codes.length,
+                        itemBuilder: (context, index) {
+                          final country = codes[index];
+                          return ListTile(
+                            title: Text(
+                              country['name']!,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Text(
+                              country['dial_code']!,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () =>
+                                _onCountrySelect(country['dial_code']!),
+                          );
+                        },
+                      );
+                    },
+                    child: ListView.builder(
+                      itemCount: filteredCountryCodes.value.length,
                       itemBuilder: (context, index) {
-                        final country = codes[index];
+                        final country = filteredCountryCodes.value[index];
                         return ListTile(
                           title: Text(country['name']!),
                           subtitle: Text(country['dial_code']!),
                           onTap: () => _onCountrySelect(country['dial_code']!),
                         );
                       },
-                    );
-                  },
-                  child: ListView.builder(
-                    itemCount: filteredCountryCodes.value.length,
-                    itemBuilder: (context, index) {
-                      final country = filteredCountryCodes.value[index];
-                      return ListTile(
-                        title: Text(country['name']!),
-                        subtitle: Text(country['dial_code']!),
-                        onTap: () => _onCountrySelect(country['dial_code']!),
-                      );
-                    },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       );
