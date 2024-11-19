@@ -5,6 +5,36 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 class PlatformAppbar {
+  static Widget basicBottomNavBar({
+    required int currentIndex,
+    required List<BottomNavigationBarItem> items,
+    required ValueChanged<int> onTap,
+    Color? backgroundColor,
+    Color? activeColor,
+    Color? inactiveColor,
+  }) {
+    if (Platform.isIOS) {
+      return CupertinoTabBar(
+        items: items,
+        currentIndex: currentIndex,
+        onTap: onTap,
+        backgroundColor: backgroundColor ?? Colors.white,
+        activeColor: activeColor ?? Color(0xFFFFCD7C),
+        inactiveColor: inactiveColor ?? Colors.grey,
+      );
+    }
+
+    return BottomNavigationBar(
+      items: items,
+      currentIndex: currentIndex,
+      onTap: onTap,
+      backgroundColor: backgroundColor,
+      selectedItemColor: activeColor ?? Color(0xFFFFCD7C),
+      unselectedItemColor: inactiveColor ?? Colors.grey,
+      type: BottomNavigationBarType.fixed,
+    );
+  }
+
   // Basic AppBar with title
   static PreferredSizeWidget basicAppBar(
       {required String title,
@@ -13,14 +43,16 @@ class PlatformAppbar {
       bool automaticallyImplyLeading = true,
       VoidCallback? onLeadingPressed,
       required BuildContext context,
-      Widget? trailing}) {
+      Widget? trailing,
+      EdgeInsetsDirectional? padding}) {
     if (Platform.isIOS) {
       return CupertinoNavigationBar(
+        padding: padding,
         middle: Text(
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFFFFCD7C),
+            color: foregroundColor ?? Color(0xFFFFCD7C),
             fontSize: 22,
           ),
         ),
@@ -31,7 +63,10 @@ class PlatformAppbar {
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: onLeadingPressed ?? () => context.pop(),
-                child: const Icon(CupertinoIcons.back),
+                child: Icon(
+                  CupertinoIcons.back,
+                  color: foregroundColor,
+                ),
               )
             : null,
       );

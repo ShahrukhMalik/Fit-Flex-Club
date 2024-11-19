@@ -737,14 +737,28 @@ class PlatformButton {
     BorderSide? border,
   }) {
     if (isIOS) {
-      return CupertinoButton(
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-        onPressed: onPressed,
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(borderRadius ?? 8),
-        child: isLoading
-            ? const CupertinoActivityIndicator()
-            : Text(text, style: textStyle),
+      return Container(
+        constraints: BoxConstraints.expand(
+          height: height,
+          width: width,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: borderColor ?? Colors.blue, // Set your border color
+            width: 1.5, // Set the border width
+          ),
+          borderRadius: BorderRadius.circular(borderRadius ?? 8),
+        ),
+        child: CupertinoButton(
+          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
+          onPressed: onPressed,
+          color:
+              Colors.transparent, // Transparent background for outline effect
+          borderRadius: BorderRadius.circular(borderRadius ?? 8),
+          child: isLoading
+              ? const CupertinoActivityIndicator()
+              : Text(text, style: textStyle),
+        ),
       );
     }
 

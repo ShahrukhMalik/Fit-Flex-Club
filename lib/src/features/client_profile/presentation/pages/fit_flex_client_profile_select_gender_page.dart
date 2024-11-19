@@ -66,14 +66,21 @@ class _FitFlexClientProfileSelectGenderPageState
                         builder: (context, button, _) {
                           final Color bgColor = button == "Male"
                               ? Color.fromRGBO(255, 161, 29, 1)
-                              : Color.fromARGB(69, 255, 193, 106);
+                              : Color.fromARGB(255, 255, 193, 106);
                           final Color fgColor = button == "Male"
                               ? Color(0xFFF2F2F7)
                               : Color.fromRGBO(255, 161, 29, 1);
                           return PlatformButton().buildButton(
                             width: width,
                             context: context,
-                            type: ButtonType.primary,
+                            height: 50,
+                            border: BorderSide(
+                              width: 1.5,
+                              color: Color.fromRGBO(255, 161, 29, 1),
+                            ),
+                            type: button.isEmpty || button != "Male"
+                                ? ButtonType.outlined
+                                : ButtonType.primary,
                             backgroundColor: bgColor,
                             foregroundColor: fgColor,
                             textStyle: TextStyle(
@@ -92,14 +99,21 @@ class _FitFlexClientProfileSelectGenderPageState
                         builder: (context, button, _) {
                           final Color bgColor = button == "Female"
                               ? Color.fromRGBO(255, 161, 29, 1)
-                              : Color.fromARGB(69, 255, 193, 106);
+                              : Color.fromARGB(255, 255, 193, 106);
                           final Color fgColor = button == "Female"
                               ? Color(0xFFF2F2F7)
                               : Color.fromRGBO(255, 161, 29, 1);
                           return PlatformButton().buildButton(
                             width: width,
                             context: context,
-                            type: ButtonType.primary,
+                            height: 50,
+                            type: button.isEmpty || button != "Female"
+                                ? ButtonType.outlined
+                                : ButtonType.primary,
+                            border: BorderSide(
+                              width: 1.5,
+                              color: Color.fromRGBO(255, 161, 29, 1),
+                            ),
                             backgroundColor: bgColor,
                             foregroundColor: fgColor,
                             textStyle: TextStyle(

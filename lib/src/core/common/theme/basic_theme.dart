@@ -4,6 +4,178 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+final Color primaryColor = Color(0xFFFFCD7C);
+final Color primaryContrastingColor =
+    Color(0xFF333333); // Primary color for the app.
+
+///WIth Worm COlors
+// final ColorScheme globalColorScheme = ColorScheme(
+//   brightness: Brightness.light,
+
+//   // Primary Colors
+//   primary: Color(0xFFFFCD7C), // Main peachy-orange
+//   onPrimary: Color(0xFF2D3142), // Dark text for contrast on primary
+//   primaryContainer: Color(0xFFFFB84D), // Darker variant of primary
+//   onPrimaryContainer: Color(0xFF2D3142), // Text on primary container
+
+//   // Secondary Colors
+//   secondary: Color(0xFF7C9EFF), // Complementary blue
+//   onSecondary: Colors.white, // White text on secondary
+//   secondaryContainer: Color(0xFF5C7AE6), // Darker blue for emphasis
+//   onSecondaryContainer: Colors.white, // Text on secondary container
+
+//   // Tertiary Colors
+//   tertiary: Color(0xFF65D6AD), // Teal accent
+//   onTertiary: Colors.white, // Text on tertiary
+//   tertiaryContainer: Color(0xFF53C69B), // Darker teal
+//   onTertiaryContainer: Colors.white, // Text on tertiary container
+
+//   // Error Colors
+//   error: Color(0xFFE53935), // Error red
+//   onError: Colors.white, // Text on error
+//   errorContainer: Color(0xFFFFCDD2), // Light error background
+//   onErrorContainer: Color(0xFFB71C1C), // Dark error text
+
+//   // Neutral Colors
+//   surface: Colors.white, // Surface color
+//   onSurface: Color(0xFF2D3142), // Text on surface
+//   surfaceContainerHighest: Color(0xFFF8F8F8), // Alternative surface
+//   onSurfaceVariant: Color(0xFF6C6F80), // Secondary text
+
+//   // Additional Colors
+//   outline: Color(0xFFE1E1E1), // Borders and dividers
+//   outlineVariant: Color(0xFFBDBDBD), // Secondary borders
+//   shadow: Colors.black.withOpacity(0.1), // Elevation shadows
+//   scrim: Colors.black.withOpacity(0.3), // Modal overlays
+
+//   // Inverse Colors
+//   inverseSurface: Color(0xFF2D3142), // Dark surface
+//   onInverseSurface: Colors.white, // Text on dark surface
+//   inversePrimary: Color(0xFFFFE2B0), // Light primary for dark themes
+// );
+final ColorScheme globalColorScheme = ColorScheme(
+  brightness: Brightness.light,
+  // Primary Colors
+  primary: Color(0xFFFFCD7C), // Main peachy-orange
+  onPrimary: Color(0xFF2D3142), // Dark text for contrast on primary
+  primaryContainer: Color(0xFFFFB84D), // Darker variant of primary
+  onPrimaryContainer: Color(0xFF2D3142), // Text on primary container
+
+  // Secondary Colors (Red Shades)
+  secondary: Color(0xFFFF7C7C), // Coral red
+  onSecondary: Colors.white, // White text on secondary
+  secondaryContainer: Color(0xFFFF5252), // Deeper red for emphasis
+  onSecondaryContainer: Colors.white, // Text on secondary container
+
+  // Tertiary Colors (Darker Reds)
+  tertiary: Color(0xFFE64A4A), // Dark red accent
+  onTertiary: Colors.white, // Text on tertiary
+  tertiaryContainer: Color(0xFFD32F2F), // Even darker red
+  onTertiaryContainer: Colors.white, // Text on tertiary container
+
+  // Error Colors
+  error: Color(0xFFB71C1C), // Deep red for errors
+  onError: Colors.white, // Text on error
+  errorContainer: Color(0xFFFFEBEE), // Light error background
+  onErrorContainer: Color(0xFF932121), // Dark error text
+
+  // Neutral Colors
+  background: Color(0xFFFFFBF7), // Warm white background
+  onBackground: Color(0xFF2D3142), // Text on background
+  surface: Color(0xFFFFF4E6), // Surface color
+  onSurface: Color(0xFF2D3142), // Text on surface
+  surfaceVariant: Color(0xFFFFF4E6), // Slightly peachy surface
+  onSurfaceVariant: Color(0xFF6C6F80), // Secondary text
+
+  // Additional Colors
+  outline: Color(0xFFE8D5C4), // Warm borders and dividers
+  outlineVariant: Color(0xFFDBC4B1), // Secondary borders
+  shadow: Colors.black.withOpacity(0.1), // Elevation shadows
+  scrim: Colors.black.withOpacity(0.3), // Modal overlays
+
+  // Inverse Colors
+  inverseSurface: Color(0xFF2D3142), // Dark surface
+  onInverseSurface: Colors.white, // Text on dark surface
+  inversePrimary: Color(0xFFFFE2B0), // Light primary for dark themes
+);
+final TextTheme textTheme = TextTheme(
+  displayLarge: TextStyle(
+    fontSize: 57,
+    fontWeight: FontWeight.bold,
+    color: globalColorScheme.onSurface,
+  ),
+  displayMedium: TextStyle(
+    fontSize: 45,
+    fontWeight: FontWeight.bold,
+    color: globalColorScheme.onSurface,
+  ),
+  displaySmall: TextStyle(
+    fontSize: 36,
+    fontWeight: FontWeight.bold,
+    color: globalColorScheme.onSurface,
+  ),
+  headlineLarge: TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    color: globalColorScheme.onSurface,
+  ),
+  headlineMedium: TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    color: globalColorScheme.onSurface,
+  ),
+  headlineSmall: TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: globalColorScheme.onSurface,
+  ),
+  titleLarge: TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
+    color: globalColorScheme.primary,
+  ),
+  titleMedium: TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: globalColorScheme.onSurface,
+  ),
+  titleSmall: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: globalColorScheme.onSurface,
+  ),
+  bodyLarge: TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    color: globalColorScheme.onSurface,
+  ),
+  bodyMedium: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: globalColorScheme.onSurface,
+  ),
+  bodySmall: TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    color: globalColorScheme.onSurface,
+  ),
+  labelLarge: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: globalColorScheme.primary,
+  ),
+  labelMedium: TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: globalColorScheme.primary,
+  ),
+  labelSmall: TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w500,
+    color: globalColorScheme.onSurface,
+  ),
+);
+
 class PlatformApp extends StatelessWidget {
   final String title;
   final ThemeData? materialTheme;
@@ -50,34 +222,68 @@ class PlatformApp extends StatelessWidget {
   // Default themes if none provided
   ThemeData get _defaultMaterialTheme {
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFFFFCD7C),
+      colorScheme: globalColorScheme,
+      primaryColor: globalColorScheme.primary,
+      scaffoldBackgroundColor: globalColorScheme.surface,
+      appBarTheme: AppBarTheme(
+        backgroundColor: globalColorScheme.primary,
+        foregroundColor: globalColorScheme.onPrimary,
+        titleTextStyle: TextStyle(
+          color: globalColorScheme.onPrimary,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
       ),
-      useMaterial3: true,
-      // Add your default Material styling here
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 0,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: globalColorScheme.surface,
+        selectedItemColor: globalColorScheme.primary,
+        unselectedItemColor: globalColorScheme.tertiary,
       ),
+      textTheme: textTheme,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Color.fromARGB(255, 94, 87, 86),
-          backgroundColor: Color.fromARGB(255, 94, 87, 86),
-          minimumSize: const Size(120, 48),
+          backgroundColor: globalColorScheme.primary,
+          foregroundColor: globalColorScheme.onPrimary,
         ),
       ),
     );
   }
 
   CupertinoThemeData get _defaultCupertinoTheme {
-    return const CupertinoThemeData(
+    return CupertinoThemeData(
+      brightness: Brightness.light, // Light theme
+      primaryColor: Color(0xFFFFCD7C), // Main peachy-orange
+      primaryContrastingColor: Color(0xFF2D3142), // Contrasting dark text color
+      barBackgroundColor: Color(0xFFFFFBF7), // Warm white for navigation bars
+      scaffoldBackgroundColor:
+          Color(0xFFFFFBF7), // Warm white for scaffold background
+
+      // Text Styles
+      textTheme: CupertinoTextThemeData(
+        primaryColor: Color(0xFF2D3142), // Default text color
+        textStyle: TextStyle(
+          color: Color(0xFF2D3142),
+          fontSize: 16,
+        ),
+        actionTextStyle: TextStyle(
+          color: Color(0xFFFF7C7C), // Coral red for actionable text
+        ),
+        navTitleTextStyle: TextStyle(
+          color: Color(0xFF2D3142),
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        navActionTextStyle: TextStyle(
+          color: Color(0xFFFF5252), // Deeper red for navigation actions
+        ),
+        tabLabelTextStyle: TextStyle(
+          color: Color(0xFFD32F2F), // Dark red for tab labels
+        ),
+      ),
       applyThemeToAll: true,
-      primaryColor: Color(0xFFFFCD7C),
-
-      // Add your default Cupertino styling here
-      barBackgroundColor: CupertinoColors.systemBackground,
-
-      scaffoldBackgroundColor: CupertinoColors.systemBackground,
+      // Custom Cupertino components
+      // barBackgroundColor: Color(0xFFFFF4E6), // Peachy tone for headers
+      // dividerColor: Color(0xFFE8D5C4), // Warm border and divider color
     );
   }
 }

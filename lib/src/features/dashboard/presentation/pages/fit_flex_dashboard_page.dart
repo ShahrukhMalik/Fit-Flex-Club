@@ -1,64 +1,149 @@
-import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
-import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
-import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
-import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+// ... other imports remain the same
 
-class FitFlexDashboardPage extends StatelessWidget {
-  static const String route = "/fit-dashboard";
-  const FitFlexDashboardPage({super.key});
+class FitFlexDashboardPage extends StatefulWidget {
+  final StatefulNavigationShell navigationShell;
+
+  const FitFlexDashboardPage({
+    super.key,
+    required this.navigationShell,
+  });
+
+  @override
+  State<FitFlexDashboardPage> createState() => _FitFlexDashboardPageState();
+}
+
+class _FitFlexDashboardPageState extends State<FitFlexDashboardPage> {
+  final ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
+
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex.value = widget.navigationShell.currentIndex;
+  }
+
+  Widget _buildBottomNavOverlay(BuildContext context, double width) {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: width * 0.17, vertical: 30),
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: globalColorScheme.onPrimaryContainer,
+          borderRadius: BorderRadius.circular(100),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ValueListenableBuilder<int>(
+              valueListenable: selectedIndex,
+              builder: (context, currentIndex, _) {
+                return AnimatedPositioned(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  left: currentIndex * (width * 0.24),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: globalColorScheme.surfaceContainer.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                );
+              },
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                _buildIcon(0, Icons.person, selectedIndex, widget.navigationShell),
+                _buildIcon(1, Icons.history_rounded, selectedIndex, widget.navigationShell),
+                _buildIcon(2, Icons.scale_outlined, selectedIndex, widget.navigationShell),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIcon(
+    int index,
+    IconData icon,
+    ValueNotifier<int> valueNotifier,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        valueNotifier.value = index;
+        navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        );
+      },
+      child: ValueListenableBuilder<int>(
+        valueListenable: valueNotifier,
+        builder: (context, currentIndex, _) {
+          bool isSelected = currentIndex == index;
+          return Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(50),
+              splashColor: globalColorScheme.tertiaryContainer.withOpacity(0.4),
+              highlightColor: globalColorScheme.surfaceContainer.withOpacity(0.2),
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                decoration: isSelected
+                    ? BoxDecoration(
+                        color: globalColorScheme.surfaceContainer,
+                        shape: BoxShape.circle,
+                      )
+                    : null,
+                padding: EdgeInsets.all(15),
+                child: Icon(
+                  icon,
+                  color: isSelected
+                      ? globalColorScheme.tertiaryContainer
+                      : globalColorScheme.surfaceContainer,
+                  size: isSelected ? 28 : 24,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: PlatformAppbar.basicAppBar(
-        title: "Dashboard",
-        context: context,
-        trailing: PlatformButton().buildButton(
-          context: context,
-          type: ButtonType.icon,
-          icon: Icons.logout,
-          text: "",
-          onPressed: () => context
-              .read<AuthenticationBloc>()
-              .add(LogOutAuthenticationEvent()),
-        ),
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(
-              child: Text('//TODO: Dashboard'),
-            ),
-            BlocConsumer<AuthenticationBloc, AuthenticationState>(
-              builder: (context, state) {
-                if (state is AuthenticationLoading) {
-                  return FitFlexLoaderWidget(
-                    height: height,
-                    width: width,
-                  );
-                }
-                return SizedBox();
-              },
-              listener: (context, state) {
-                if (state is AuthenticationComplete) {
-                  if (state.entity?.isLoggedIn ?? false) {
-                    context.pushReplacement(FitFlexAuthLandingPage.route);
-                  } else {
-                    context.pushReplacement(FitFlexAuthLandingPage.route);
-                  }
-                }
-                if (state is AuthenticationError) {}
-              },
-            )
-          ],
-        ),
+      body: Stack(
+        children: [
+          // Main content
+          widget.navigationShell,
+          // Bottom navigation overlay
+          _buildBottomNavOverlay(context, width),
+        ],
       ),
     );
   }

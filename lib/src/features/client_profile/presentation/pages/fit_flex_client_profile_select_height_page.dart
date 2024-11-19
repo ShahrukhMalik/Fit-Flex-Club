@@ -231,7 +231,7 @@ class _FitFlexClientProfileSelectHeightPageState
               },
               listener: (context, state) {
                 if (state is ClientProfileComplete) {
-                  context.go(FitFlexDashboardPage.route);
+                  context.go('/profile');
                 }
                 if (state is ClientProfileError) {
                   PlatformDialog.showAlertDialog(
