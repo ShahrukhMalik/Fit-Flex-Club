@@ -1,20 +1,25 @@
-import 'package:equatable/equatable.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/entities/set_entity.dart';
 
-class ExerciseEntity extends Equatable {
-  final int? code;
-  final String? equipment;
-  final String? muscleGroup;
-  final String? name;
-  final Map<String, bool>? parameters;
-
-  const ExerciseEntity({
-    required this.code,
-    required this.equipment,
-    required this.muscleGroup,
-    required this.name,
-    required this.parameters,
+class Exercise extends ExerciseEntity {
+  final List<SetModel> sets;
+  const Exercise(
+    this.sets, {
+    required super.code,
+    super.equipment,
+    super.muscleGroup,
+    required super.name,
+    super.parameters,
   });
 
   @override
-  List<Object?> get props => [code, equipment, muscleGroup, name, parameters];
+  List<Object?> get props => [
+        name,
+        muscleGroup,
+        sets,
+        parameters,
+        code,
+        equipment,
+      ];
 }

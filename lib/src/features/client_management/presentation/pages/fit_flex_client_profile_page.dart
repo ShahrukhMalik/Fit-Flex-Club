@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -252,7 +253,7 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
 class WeightGraphPainter extends CustomPainter {
   final Color lineColor;
   final Color pointColor;
-  final List<WeightEntry> entries;
+  final List<ClientWeightEntity> entries;
 
   WeightGraphPainter({
     required this.lineColor,
@@ -399,13 +400,8 @@ class WeightGraphPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-// Don't forget to add the WeightEntry class if you haven't already:
-class WeightEntry {
-  final DateTime date;
-  final double weight;
+// Don't forget to add the ClientWeightEntity class if you haven't already:
 
-  WeightEntry({required this.date, required this.weight});
-}
 
 class WeightTrackerScreen extends StatelessWidget {
   const WeightTrackerScreen({super.key});
@@ -414,10 +410,10 @@ class WeightTrackerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Sample weight data
     final weightData = [
-      // WeightEntry(date: DateTime(2023, 1, 1), weight: 92.3),
-      WeightEntry(date: DateTime(2023, 4, 1), weight: 80.4),
-      WeightEntry(date: DateTime(2023, 5, 1), weight: 83.8),
-      WeightEntry(date: DateTime(2023, 6, 1), weight: 90.22),
+      // ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
+      ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
+      ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
+      ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
     ];
 
     return Container(
@@ -541,7 +537,7 @@ class WeightTrackerScreen extends StatelessWidget {
   }
 }
 
-// WeightEntry class
+// ClientWeightEntity class
 Widget _buildStatItem(String label, String value, String unit) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -582,7 +578,7 @@ Widget _buildStatItem(String label, String value, String unit) {
 
 // WeightTrackerGraph Widget
 class WeightTrackerGraph extends StatelessWidget {
-  final List<WeightEntry> entries;
+  final List<ClientWeightEntity> entries;
   final double minWeight;
   final double maxWeight;
 
@@ -745,12 +741,12 @@ class FitFlexClientProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     final weightData = [
-      WeightEntry(date: DateTime(2023, 1, 1), weight: 92.3),
-      WeightEntry(date: DateTime(2023, 2, 1), weight: 89.5),
-      WeightEntry(date: DateTime(2023, 3, 1), weight: 85.7),
-      WeightEntry(date: DateTime(2023, 4, 1), weight: 80.4),
-      WeightEntry(date: DateTime(2023, 5, 1), weight: 83.8),
-      WeightEntry(date: DateTime(2023, 6, 1), weight: 90.22),
+      ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
+      ClientWeightEntity(date: DateTime(2023, 2, 1), weight: 89.5),
+      ClientWeightEntity(date: DateTime(2023, 3, 1), weight: 85.7),
+      ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
+      ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
+      ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
     ];
     return Scaffold(
       backgroundColor: globalColorScheme.surface,
