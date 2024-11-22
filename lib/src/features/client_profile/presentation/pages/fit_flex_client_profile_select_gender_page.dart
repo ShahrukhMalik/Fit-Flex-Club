@@ -150,6 +150,7 @@ class _FitFlexClientProfileSelectGenderPageState
                       type: ButtonType.iconText,
                       icon: Icons.arrow_forward_ios,
                       text: "Continue",
+                      textStyle: TextStyle(),
                       onPressed: () {
                         if (selectedButton.value.isEmpty) {
                           PlatformDialog.showAlertDialog(

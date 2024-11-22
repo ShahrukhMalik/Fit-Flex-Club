@@ -4,8 +4,10 @@ import 'package:fit_flex_club/src/app.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_service.dart';
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
@@ -15,6 +17,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+
+      statusBarColor: globalColorScheme.tertiary.withOpacity(0.4), // Background color of the status bar
+      statusBarIconBrightness:
+          Brightness.light, // Light icons (for dark background)
+    ),
+  );
   await configureDependencies();
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.

@@ -36,15 +36,16 @@ class PlatformAppbar {
   }
 
   // Basic AppBar with title
-  static PreferredSizeWidget basicAppBar(
-      {required String title,
-      Color? backgroundColor,
-      Color? foregroundColor,
-      bool automaticallyImplyLeading = true,
-      VoidCallback? onLeadingPressed,
-      required BuildContext context,
-      Widget? trailing,
-      EdgeInsetsDirectional? padding}) {
+  static PreferredSizeWidget basicAppBar({
+    required String title,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    bool automaticallyImplyLeading = true,
+    VoidCallback? onLeadingPressed,
+    required BuildContext context,
+    Widget? trailing,
+    EdgeInsetsDirectional? padding,
+  }) {
     if (Platform.isIOS) {
       return CupertinoNavigationBar(
         padding: padding,
@@ -73,6 +74,7 @@ class PlatformAppbar {
     }
 
     return AppBar(
+      
       title: Text(
         title,
         style: TextStyle(

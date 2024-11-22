@@ -5,8 +5,10 @@ import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthRemoteDatasource {
   ///Let user login
@@ -48,8 +50,13 @@ abstract class AuthRemoteDatasource {
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final FirebaseAuth auth;
   final FirebaseFirestore db;
+  final SharedPrefsUtil prefs;
 
-  AuthRemoteDatasourceImpl(this.db, {required this.auth});
+  AuthRemoteDatasourceImpl(
+    this.db,
+    this.prefs, {
+    required this.auth,
+  });
   @override
   Future<Stream<bool>>? checkWhetherUserIsLoggedIn() async => auth
       .authStateChanges()
@@ -89,6 +96,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           email: email,
           password: password,
         );
+
+        final uid = auth.currentUser?.uid;
+        if (uid != null) {
+          prefs.setAuthUid(uid);
+        }
       }
     } on FirebaseAuthException catch (err) {
       throw ServerException(
@@ -98,7 +110,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void>? logOut() async => await auth.signOut().catchError(
+  Future<void>? logOut() async => await auth.signOut().then(
+        (value) async {
+          await prefs.clearAuthData();
+        },
+      ).catchError(
         (error) => throw (
           ServerException(
             errorMessage: error.message ?? "Something Went Wrong!",
@@ -128,6 +144,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           email: email,
           password: password,
         );
+
+        final uid = auth.currentUser?.uid;
+        if (uid != null) {
+          prefs.setAuthUid(uid);
+        }
+
         return AuthEntity(
           uid: auth.currentUser?.uid,
           email: email,
@@ -212,43 +234,71 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       bool isUserLoggedIn = auth.currentUser != null;
       bool isUserActive = true;
       bool isProfileCreated = true;
-      final CollectionReference ref = db.collection('Users');
-      final DocumentSnapshot<Object?> snapshot =
-          await ref.doc(auth.currentUser?.uid).get();
+      bool? isTrainer;
 
-      if (!snapshot.exists) {
-        isUserActive = false;
-        isProfileCreated = false;
-      }
-      final data = snapshot.data() as Map<String, dynamic>?;
+      final AuthEntity? authEntity = prefs.getAuthEntity();
+      if (authEntity == null || prefs.isDataStale()) {
+        final CollectionReference ref = db.collection('Users');
+        final DocumentSnapshot<Object?> snapshot =
+            await ref.doc(auth.currentUser?.uid).get();
 
-      isUserActive = data == null ? false : (data)['isUserActive'];
-
-      if (data != null) {
-        for (var field in [
-          'age',
-          'gender',
-          'weightInKg',
-          'weightInLb',
-          'heightInCm',
-          'heightInFt',
-        ]) {
-          print(data[field] == null);
-          if (data[field] == null) {
-            print(data[field] == null);
-            isProfileCreated = false;
-          }
+        if (!snapshot.exists) {
+          isUserActive = false;
+          isProfileCreated = false;
         }
-      } else {
-        isProfileCreated = false;
-      }
-      return Future.value(
-        AuthEntity(
+        final data = snapshot.data() as Map<String, dynamic>?;
+
+        isUserActive = data == null ? false : (data)['isUserActive'];
+        isTrainer = data == null ? null : (data)['isTrainer'];
+
+        if (isTrainer == null) {
+          throw ServerException(
+            errorMessage:
+                "Your role is not defined, kindly reach out to us for help!",
+          );
+        } else if (isTrainer) {
+          final AuthEntity toStoreEntity = AuthEntity(
+            uid: auth.currentUser?.uid,
+            isLoggedIn: isUserLoggedIn,
+            isProfileCreated: true,
+            isUserActive: isUserActive,
+            isTrainer: isTrainer,
+          );
+          await prefs.setAuthEntity(toStoreEntity);
+          return Future.value(
+            toStoreEntity,
+          );
+        }
+        if (data != null) {
+          for (var field in [
+            'age',
+            'gender',
+            'weightInKg',
+            'weightInLb',
+            'heightInCm',
+            'heightInFt',
+          ]) {
+            if (data[field] == null) {
+              isProfileCreated = false;
+            }
+          }
+        } else {
+          isProfileCreated = false;
+        }
+        final AuthEntity toStoreEntity = AuthEntity(
+          uid: auth.currentUser?.uid,
           isLoggedIn: isUserLoggedIn,
           isProfileCreated: isProfileCreated,
           isUserActive: isUserActive,
-        ),
-      );
+          isTrainer: isTrainer,
+        );
+        await prefs.setAuthEntity(toStoreEntity);
+        return Future.value(
+          toStoreEntity,
+        );
+      } else {
+        return Future.value(authEntity);
+      }
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

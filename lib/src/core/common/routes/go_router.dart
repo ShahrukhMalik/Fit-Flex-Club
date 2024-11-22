@@ -4,6 +4,7 @@ import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_measure_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_workout_history_page.dart';
@@ -11,15 +12,24 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_gender_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_height_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_weight_page.dart';
-import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_dashboard_page.dart';
+import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_client_dashboard_page.dart';
+import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_trainer_dashboard_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 // ... other imports remain the same
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');
-final _shellNavigatorBKey = GlobalKey<NavigatorState>(debugLabel: 'shellB');
-final _shellNavigatorCKey = GlobalKey<NavigatorState>(debugLabel: 'shellC');
+final _shellNavigatorAKey =
+    GlobalKey<NavigatorState>(debugLabel: 'clientProfile');
+final _shellNavigatorBKey =
+    GlobalKey<NavigatorState>(debugLabel: 'clientHistory');
+final _shellNavigatorCKey =
+    GlobalKey<NavigatorState>(debugLabel: 'clientMeasurement');
+final _shellNavigatorTPKey =
+    GlobalKey<NavigatorState>(debugLabel: 'trainerProfile');
+final _shellNavigatorTWKey =
+    GlobalKey<NavigatorState>(debugLabel: 'trainerWorkout');
 
 GoRouter goRouter(appState) {
   return GoRouter(
@@ -36,6 +46,13 @@ GoRouter goRouter(appState) {
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
           child: const FitFlexAuthLandingPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexClientAssignedWorkoutPlanPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexClientAssignedWorkoutPlanPage(),
         ),
       ),
       GoRoute(
@@ -108,11 +125,44 @@ GoRouter goRouter(appState) {
           );
         },
       ),
-
-      // Main app shell route
+      // Trainer app shell route
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return FitFlexDashboardPage(
+          return FitFlexTrainerDashboardPage(
+            navigationShell: navigationShell,
+          );
+        },
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorTPKey,
+            routes: [
+              GoRoute(
+                path: FitFlexTrainerProfilePage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
+                  child: FitFlexTrainerProfilePage(),
+                ),
+              )
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorTWKey,
+            routes: [
+              GoRoute(
+                path: FitFlexTrainerProfilePage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
+                  child: FitFlexTrainerProfilePage(),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+      // Client app shell route
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return FitFlexClientDashboardPage(
             navigationShell: navigationShell,
           );
         },
@@ -121,8 +171,9 @@ GoRouter goRouter(appState) {
             navigatorKey: _shellNavigatorAKey,
             routes: [
               GoRoute(
-                path: '/profile',
-                pageBuilder: (context, state) => const NoTransitionPage(
+                path: FitFlexClientProfilePage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
                   child: FitFlexClientProfilePage(),
                 ),
                 routes: [
@@ -139,9 +190,11 @@ GoRouter goRouter(appState) {
             navigatorKey: _shellNavigatorCKey,
             routes: [
               GoRoute(
-                path: '/history',
-                builder: (context, state) =>
-                    const FitFlexClientWorkoutHistoryPage(),
+                path: FitFlexClientWorkoutHistoryPage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
+                  child: FitFlexClientWorkoutHistoryPage(),
+                ),
               ),
             ],
           ),
@@ -149,8 +202,9 @@ GoRouter goRouter(appState) {
             navigatorKey: _shellNavigatorBKey,
             routes: [
               GoRoute(
-                path: '/measures',
-                pageBuilder: (context, state) => const NoTransitionPage(
+                path: FitFlexClientMeasurePage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
                   child: FitFlexClientMeasurePage(),
                 ),
               ),
@@ -174,7 +228,11 @@ GoRouter goRouter(appState) {
           if (user?.isLoggedIn == true) {
             if (user?.isUserActive == true) {
               if (user?.isProfileCreated == true) {
-                return '/profile';
+                if (user?.isTrainer ?? false) {
+                  return FitFlexClientProfilePage.route;
+                } else {
+                  return FitFlexTrainerProfilePage.route;
+                }
               } else {
                 return FitFlexClientProfileSelectGenderPage.route;
               }

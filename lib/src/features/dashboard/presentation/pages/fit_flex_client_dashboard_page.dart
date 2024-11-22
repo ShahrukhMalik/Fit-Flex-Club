@@ -4,19 +4,19 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // ... other imports remain the same
 
-class FitFlexDashboardPage extends StatefulWidget {
+class FitFlexClientDashboardPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
-  const FitFlexDashboardPage({
+  const FitFlexClientDashboardPage({
     super.key,
     required this.navigationShell,
   });
 
   @override
-  State<FitFlexDashboardPage> createState() => _FitFlexDashboardPageState();
+  State<FitFlexClientDashboardPage> createState() => _FitFlexClientDashboardPageState();
 }
 
-class _FitFlexDashboardPageState extends State<FitFlexDashboardPage> {
+class _FitFlexClientDashboardPageState extends State<FitFlexClientDashboardPage> {
   final ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
 
   @override

@@ -1,7 +1,5 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class FitFlexClientWorkoutHistoryPage extends StatefulWidget {
@@ -36,18 +34,8 @@ class _FitFlexClientWorkoutHistoryPageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: globalColorScheme.surface,
-      appBar: PlatformAppbar.basicAppBar(
-        // padding: EdgeInsetsDirectional.only(bottom: 100),
-        title: "History",
-        context: context,
-        backgroundColor: globalColorScheme.onPrimary,
-        foregroundColor: globalColorScheme.primary,
-      ),
       body: Column(
         children: [
-          // SizedBox(
-          //   height: 40,
-          // ),
           _buildDateSelector(),
           Expanded(
             child: _buildWorkoutList(),
@@ -59,7 +47,7 @@ class _FitFlexClientWorkoutHistoryPageState
 
   Widget _buildDateSelector() {
     return Container(
-      padding: EdgeInsets.only(top: 40, bottom: 10, left: 20, right: 20),
+      padding: EdgeInsets.only(top: 60, bottom: 10, left: 20, right: 20),
       margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),
       decoration: BoxDecoration(
         color: globalColorScheme.onPrimaryContainer,
@@ -136,9 +124,9 @@ class _FitFlexClientWorkoutHistoryPageState
         _buildExerciseCard(
           'Diamond Push-Ups',
           [
-            WorkoutSet(reps: 6, weight: 12.5,targetReps: 12),
-            WorkoutSet(reps: 4, weight: 17.5,targetReps: 10),
-            WorkoutSet(reps: 5, weight: 20,targetReps: 8),
+            WorkoutSet(reps: 6, weight: 12.5, targetReps: 12),
+            WorkoutSet(reps: 4, weight: 17.5, targetReps: 10),
+            WorkoutSet(reps: 5, weight: 20, targetReps: 8),
           ],
           Icons.fitness_center,
         ),
@@ -177,7 +165,8 @@ class _FitFlexClientWorkoutHistoryPageState
                     color: globalColorScheme.surface,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: globalColorScheme.tertiaryContainer, size: 24),
+                  child: Icon(icon,
+                      color: globalColorScheme.tertiaryContainer, size: 24),
                 ),
                 SizedBox(width: 12),
                 Text(
@@ -258,59 +247,60 @@ class _FitFlexClientWorkoutHistoryPageState
   }
 
   Widget _buildSetRow(WorkoutSet set) {
-  final completionPercentage = set.completionPercentage.clamp(0, 100).toStringAsFixed(1);
+    final completionPercentage =
+        set.completionPercentage.clamp(0, 100).toStringAsFixed(1);
 
-  return Padding(
-    padding: EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      children: [
-        // Icon for completion
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: completionPercentage == '100.0'
-                ? Colors.green[100]
-                : globalColorScheme.secondary.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Center(
-            child: Icon(
-              completionPercentage == '100.0' ? Icons.check : Icons.timelapse,
-              size: 18,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          // Icon for completion
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
               color: completionPercentage == '100.0'
-                  ? Colors.green[700]
-                  : globalColorScheme.onPrimaryContainer,
+                  ? Colors.green[100]
+                  : globalColorScheme.secondary.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Icon(
+                completionPercentage == '100.0' ? Icons.check : Icons.timelapse,
+                size: 18,
+                color: completionPercentage == '100.0'
+                    ? Colors.green[700]
+                    : globalColorScheme.onPrimaryContainer,
+              ),
             ),
           ),
-        ),
-        SizedBox(width: 12),
+          SizedBox(width: 12),
 
-        // Reps completed
-        Text(
-          '${set.reps}/${set.targetReps} Reps',
-          style: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w500,
+          // Reps completed
+          Text(
+            '${set.reps}/${set.targetReps} Reps',
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
 
-        Spacer(),
+          Spacer(),
 
-        // Percentage of completion
-        Text(
-          '$completionPercentage%',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: completionPercentage == '100.0'
-                ? Colors.green[700]
-                : globalColorScheme.tertiaryContainer,
+          // Percentage of completion
+          Text(
+            '$completionPercentage%',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: completionPercentage == '100.0'
+                  ? Colors.green[700]
+                  : globalColorScheme.tertiaryContainer,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget _buildCardioMetric(String label, String value) {
     return Column(

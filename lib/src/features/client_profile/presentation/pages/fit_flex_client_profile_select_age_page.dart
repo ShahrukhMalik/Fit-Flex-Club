@@ -116,6 +116,7 @@ class _FitFlexClientProfileSelectAgePageState
                       context: context,
                       type: ButtonType.iconText,
                       icon: Icons.arrow_forward_ios,
+                      textStyle: TextStyle(),
                       text: "Continue",
                       onPressed: () => context.go(
                         FitFlexClientProfileSelectWeightPage.route,

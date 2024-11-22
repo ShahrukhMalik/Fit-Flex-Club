@@ -1,12 +1,15 @@
+import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 // class FitFlexClientProfilePage extends StatefulWidget {
 //   static const String route = "/fit-flex-client-profile";
@@ -401,7 +404,6 @@ class WeightGraphPainter extends CustomPainter {
 }
 
 // Don't forget to add the ClientWeightEntity class if you haven't already:
-
 
 class WeightTrackerScreen extends StatelessWidget {
   const WeightTrackerScreen({super.key});
@@ -848,7 +850,12 @@ class FitFlexClientProfilePage extends StatelessWidget {
             ),
             // Workout Plan Tile
 
-            const WorkoutPlanWidget()
+            InkWell(
+              onTap: () => context.go(
+                FitFlexClientAssignedWorkoutPlanPage.route,
+              ),
+              child: const WorkoutPlanWidget(),
+            )
             // Padding(
             //   padding: const EdgeInsets.all(16.0),
             //   child: Container(
