@@ -26,6 +26,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "analyzer_plugin",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/analyzer_plugin-0.11.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "ansicolor",
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/ansicolor-2.0.3",
       "packageUri": "lib/",
@@ -116,6 +122,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "charcode",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/charcode-1.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "checked_yaml",
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/checked_yaml-2.0.3",
       "packageUri": "lib/",
@@ -204,6 +216,24 @@
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/dartz-0.10.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "drift",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/drift-2.21.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "drift_dev",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/drift_dev-2.21.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "drift_flutter",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/drift_flutter-0.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "equatable",
@@ -500,6 +530,24 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "path_provider",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/path_provider-2.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "path_provider_android",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/path_provider_android-2.2.14",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "path_provider_foundation",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "path_provider_linux",
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1",
       "packageUri": "lib/",
@@ -644,6 +692,24 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "sqlite3",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/sqlite3-2.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "sqlite3_flutter_libs",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/sqlite3_flutter_libs-0.5.26",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "sqlparser",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/sqlparser-0.39.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "stack_trace",
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/stack_trace-1.11.1",
       "packageUri": "lib/",
@@ -764,7 +830,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-11-22T05:06:00.415011Z",
+  "generated": "2024-11-26T07:43:39.902562Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/apple/development/flutter",

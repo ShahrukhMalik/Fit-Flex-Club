@@ -6,13 +6,16 @@ class DayModel extends Day {
   const DayModel({
     required super.dayNumber,
     required super.exercises,
+    required super.id,
   });
 
   factory DayModel.forEachElement(
     int dayNumber,
+    int id,
     List<ExerciseModel> exercises,
   ) {
     return DayModel(
+      id: id,
       dayNumber: dayNumber,
       exercises: exercises,
     );

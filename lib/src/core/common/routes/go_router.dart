@@ -15,6 +15,7 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_client_dashboard_page.dart';
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_trainer_dashboard_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 // ... other imports remain the same
@@ -149,10 +150,10 @@ GoRouter goRouter(appState) {
             navigatorKey: _shellNavigatorTWKey,
             routes: [
               GoRoute(
-                path: FitFlexTrainerProfilePage.route,
+                path: FitFlexTrainerWorkoutPage.route,
                 pageBuilder: (context, state) => TransitionPage(
                   key: state.pageKey,
-                  child: FitFlexTrainerProfilePage(),
+                  child: FitFlexTrainerWorkoutPage(),
                 ),
               )
             ],
@@ -176,13 +177,6 @@ GoRouter goRouter(appState) {
                   key: state.pageKey,
                   child: FitFlexClientProfilePage(),
                 ),
-                routes: [
-                  GoRoute(
-                    path: 'history',
-                    builder: (context, state) =>
-                        const FitFlexClientWorkoutHistoryPage(),
-                  ),
-                ],
               ),
             ],
           ),
@@ -228,10 +222,11 @@ GoRouter goRouter(appState) {
           if (user?.isLoggedIn == true) {
             if (user?.isUserActive == true) {
               if (user?.isProfileCreated == true) {
-                if (user?.isTrainer ?? false) {
-                  return FitFlexClientProfilePage.route;
-                } else {
+                // if (user?.isTrainer ?? false) {
+                if (true) {
                   return FitFlexTrainerProfilePage.route;
+                } else {
+                  return FitFlexClientProfilePage.route;
                 }
               } else {
                 return FitFlexClientProfileSelectGenderPage.route;

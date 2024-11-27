@@ -45,36 +45,43 @@ class PlatformAppbar {
     required BuildContext context,
     Widget? trailing,
     EdgeInsetsDirectional? padding,
+    double? width,
+    double? height,
   }) {
     if (Platform.isIOS) {
-      return CupertinoNavigationBar(
-        padding: padding,
-        middle: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: foregroundColor ?? Color(0xFFFFCD7C),
-            fontSize: 22,
-          ),
+      return PreferredSize(
+        preferredSize: Size(
+          width ?? double.maxFinite,
+          height ?? 100,
         ),
-        trailing: trailing,
-        backgroundColor: backgroundColor,
-        automaticallyImplyLeading: automaticallyImplyLeading,
-        leading: automaticallyImplyLeading
-            ? CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: onLeadingPressed ?? () => context.pop(),
-                child: Icon(
-                  CupertinoIcons.back,
-                  color: foregroundColor,
-                ),
-              )
-            : null,
+        child: CupertinoNavigationBar(
+          padding: padding,
+          middle: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: foregroundColor ?? Color(0xFFFFCD7C),
+              fontSize: 22,
+            ),
+          ),
+          trailing: trailing,
+          backgroundColor: backgroundColor,
+          automaticallyImplyLeading: automaticallyImplyLeading,
+          leading: automaticallyImplyLeading
+              ? CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: onLeadingPressed ?? () => context.pop(),
+                  child: Icon(
+                    CupertinoIcons.back,
+                    color: foregroundColor,
+                  ),
+                )
+              : null,
+        ),
       );
     }
 
     return AppBar(
-      
       title: Text(
         title,
         style: TextStyle(

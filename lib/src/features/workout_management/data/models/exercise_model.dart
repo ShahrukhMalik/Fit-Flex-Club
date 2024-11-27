@@ -5,6 +5,7 @@ class ExerciseModel extends Exercise {
   const ExerciseModel(
     super.sets, {
     required super.code,
+    required super.id,
     required super.name,
   });
 
@@ -17,6 +18,7 @@ class ExerciseModel extends Exercise {
       ),
       code: data['code'],
       name: data['name'],
+      id: data['id'],
     );
   }
 }

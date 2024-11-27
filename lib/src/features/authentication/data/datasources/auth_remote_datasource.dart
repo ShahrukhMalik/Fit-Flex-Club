@@ -263,6 +263,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             isProfileCreated: true,
             isUserActive: isUserActive,
             isTrainer: isTrainer,
+            timeStamp: DateTime.now(),
           );
           await prefs.setAuthEntity(toStoreEntity);
           return Future.value(
@@ -291,6 +292,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           isProfileCreated: isProfileCreated,
           isUserActive: isUserActive,
           isTrainer: isTrainer,
+          timeStamp: DateTime.now(),
         );
         await prefs.setAuthEntity(toStoreEntity);
         return Future.value(

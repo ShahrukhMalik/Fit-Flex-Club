@@ -5,13 +5,16 @@ class WeekModel extends Week {
   const WeekModel({
     required super.weekNumber,
     required super.days,
+    required super.id,
   });
 
   factory WeekModel.forEachElement(
     int weekNumber,
+    int id,
     List<DayModel> days,
   ) {
     return WeekModel(
+      id: id,
       weekNumber: weekNumber,
       days: days,
     );

@@ -16,6 +16,7 @@ class ClientModel extends ClientEntity {
     required super.username,
     required super.email,
     required super.phone,
+    required super.currentWorkoutId,
   });
   @override
   List<Object?> get props {
@@ -31,6 +32,7 @@ class ClientModel extends ClientEntity {
       isUserActive,
       username,
       phone,
+      currentWorkoutId
     ];
   }
 
@@ -46,9 +48,11 @@ class ClientModel extends ClientEntity {
     bool? isUserActive,
     String? username,
     String? email,
-     Map<String, dynamic>? phone,
+    String? currentWorkoutId,
+    Map<String, dynamic>? phone,
   }) {
     return ClientModel(
+      currentWorkoutId: currentWorkoutId ?? this.currentWorkoutId,
       phone: phone ?? this.phone,
       email: email ?? this.email,
       authId: authId ?? this.authId,
@@ -81,6 +85,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
+      currentWorkoutId: map['currentWorkoutId'],
       phone: map['phone'],
       email: map['email'],
       authId: map['authId'] as String,
@@ -102,6 +107,7 @@ class ClientModel extends ClientEntity {
   ) {
     final data = snapshot.data();
     return ClientModel(
+      currentWorkoutId: data?['currentWorkoutId'],
       phone: data?['phone'],
       email: data?['email'],
       authId: data?['authId'],
@@ -119,6 +125,7 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromClientEntity(ClientEntity clientEntity) {
     return ClientModel(
+      currentWorkoutId: clientEntity.currentWorkoutId,
       phone: clientEntity.phone,
       email: clientEntity.email,
       authId: clientEntity.authId,
@@ -138,6 +145,7 @@ class ClientModel extends ClientEntity {
     final data = <String, dynamic>{};
 
     if (authId != null) data['authId'] = authId;
+    if (currentWorkoutId != null) data['currentWorkoutId'] = currentWorkoutId;
     if (age != null) data['age'] = age;
     if (gender != null) data['gender'] = gender;
     if (weightUnit != null && weightUnit == 'kg') data['weightInKg'] = weight;

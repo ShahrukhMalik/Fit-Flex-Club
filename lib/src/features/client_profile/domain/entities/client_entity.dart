@@ -14,6 +14,7 @@ class ClientEntity extends Equatable {
   final String? username;
   final int? weight;
   final String? weightUnit;
+  final String? currentWorkoutId;
 
   const ClientEntity({
     this.phone,
@@ -28,6 +29,7 @@ class ClientEntity extends Equatable {
     this.username,
     this.weight,
     this.weightUnit,
+    this.currentWorkoutId,
   });
   @override
   List<Object?> get props {
@@ -44,6 +46,7 @@ class ClientEntity extends Equatable {
       weight,
       weightUnit,
       email,
+      currentWorkoutId
     ];
   }
 }

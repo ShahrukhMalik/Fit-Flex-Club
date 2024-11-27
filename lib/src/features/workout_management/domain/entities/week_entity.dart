@@ -5,12 +5,14 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/da
 class Week extends Equatable {
   final int weekNumber;
   final List<DayModel> days;
+  final int id;
 
   const Week({
     required this.weekNumber,
     required this.days,
+    required this.id,
   });
 
   @override
-  List<Object?> get props => [weekNumber, days];
+  List<Object?> get props => [weekNumber, days, id];
 }

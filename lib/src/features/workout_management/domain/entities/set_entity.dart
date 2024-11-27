@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class SetEntity extends Equatable {
   // Target fields
+
   final int? targetReps;
   final double? targetWeight;
   final double? targetDistance;
@@ -13,8 +14,12 @@ class SetEntity extends Equatable {
   final double? actualDistance;
   final Duration? actualTime;
 
+  //
+  final int id;
+
   const SetEntity({
     this.targetReps,
+    required this.id,
     this.targetWeight,
     this.targetDistance,
     this.targetTime,

@@ -10,11 +10,13 @@ class SetModel extends SetEntity {
     super.actualWeight,
     super.actualDistance,
     super.actualTime,
+    required super.id,
   });
 
   // Convert a Map to a Set instance
   factory SetModel.fromMap(Map<String, dynamic> map) {
     return SetModel(
+      id: map['id'],
       targetReps: map['targetReps'] as int?,
       targetWeight: (map['targetWeight'] as num?)?.toDouble(),
       targetDistance: (map['targetDistance'] as num?)?.toDouble(),
@@ -33,6 +35,7 @@ class SetModel extends SetEntity {
   // Convert a SetModel instance to a Map
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       if (targetReps != null) 'targetReps': targetReps,
       if (targetWeight != null) 'targetWeight': targetWeight,
       if (targetDistance != null) 'targetDistance': targetDistance,
