@@ -250,35 +250,36 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
   }
 }
 
-class FitFlexLoaderPage extends StatelessWidget {
-  static const String route = '/fit_flex_loader';
-  const FitFlexLoaderPage({super.key});
+// class FitFlexLoaderPage extends StatelessWidget {
+//   static const String route = '/fit_flex_loader';
+//   const FitFlexLoaderPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/fit_flex_image.png',
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-            ),
-          ),
-          Positioned.fill(
-            child: FitFlexLoaderWidget(
-              height: height,
-              width: width,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final double width = MediaQuery.of(context).size.width;
+//     final double height = MediaQuery.of(context).size.height;
+//     return Scaffold(
+//       body: Stack(
+//         children: [
+//           Positioned.fill(
+//             child: Image.asset(
+//               'assets/images/fit_flex_image.png',
+//               fit: BoxFit.cover,
+//               alignment: Alignment.center,
+//             ),
+//           ),
+//           // Positioned.fill(
+//           //   child:
+//           FitFlexLoaderWidget(
+//             height: height,
+//             width: width,
+//           ),
+//           // ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class FitFlexLoaderWidget extends StatelessWidget {
   const FitFlexLoaderWidget({

@@ -5,4 +5,5 @@ part of 'client_dao.dart';
 // ignore_for_file: type=lint
 mixin _$ClientsDaoMixin on DatabaseAccessor<AppDatabase> {
   $ClientsTable get clients => attachedDatabase.clients;
+  $ClientWeightTable get clientWeight => attachedDatabase.clientWeight;
 }

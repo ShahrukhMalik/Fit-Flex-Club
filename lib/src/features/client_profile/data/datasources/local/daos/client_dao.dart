@@ -1,41 +1,243 @@
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
+import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_weight.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
+import 'package:injectable/injectable.dart';
 part 'client_dao.g.dart';
 
-@DriftAccessor(tables: [Clients])
+@DriftAccessor(tables: [Clients, ClientWeight])
+@singleton
 class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
-  ClientsDao(super.db);
+  ClientsDao(super.attachedDatabase);
+
+  Future<void> insertClientWeightsBatch(List<ClientWeightModel> models) async {
+    await batch(
+      (batch) {
+        batch.insertAll(
+          clientWeight, // The table you're inserting into
+          models.map(
+            (model) {
+              return ClientWeightCompanion(
+                clientId: model.clientId != null
+                    ? Value(model.clientId!)
+                    : Value.absent(),
+                timeStamp: Value(model.timeStamp),
+                weightInKg: Value(model.weightInKg),
+                weightInLb: Value(model.weightInLb),
+              );
+            },
+          ).toList(),
+        );
+      },
+    );
+  }
+
+  // Insert method
+  Future<int> insertClientWeight(ClientWeightModel model) {
+    return into(clientWeight).insert(
+      ClientWeightCompanion(
+        clientId:
+            model.clientId != null ? Value(model.clientId!) : Value.absent(),
+        timeStamp: Value(model.timeStamp), // Use int timestamp directly
+        weightInKg: Value(model.weightInKg),
+        weightInLb: Value(model.weightInLb),
+      ),
+    );
+  }
+
+// Fetch method
+  Future<List<ClientWeightModel>> getClientWeights(String? clientId) async {
+    final query = select(clientWeight);
+    if (clientId != null) {
+      query.where((tbl) => tbl.clientId.equals(clientId));
+    }
+    final rows = await query.get();
+
+    return rows.map((row) => ClientWeightModel.fromRow(row)).toList();
+  }
+
+  Future<void> assignWorkoutPlan(
+    String authId,
+    String workoutPlanUid,
+  ) async {
+    // Perform the update where the authId matches
+    await (update(clients)..where((tbl) => tbl.authId.equals(authId))).write(
+      ClientsCompanion(
+        currentWorkoutId: Value(workoutPlanUid), // Update currentWorkoutId
+        updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+      ),
+    );
+  }
 
   // Method to fetch paginated clients
-  Future<List<Client>> getClientsPaginated(int page, int pageSize) {
+  Future<List<Client>> getClientsPaginated(
+    int page,
+    int pageSize,
+  ) {
     final offset = (page - 1) * pageSize; // Calculate the offset for pagination
 
     // Use LIMIT and OFFSET to paginate results
     return (select(clients)..limit(pageSize, offset: offset)).get();
   }
 
-// Method to count total number of clients (for total pages calculation)
+  // Method to count total number of clients (for total pages calculation)
   Future<int> getTotalClientsCount() async {
     final row =
         await customSelect('SELECT COUNT(*) AS count FROM clients').getSingle();
     return row.read<int>('count'); // Parse the result to an int
   }
 
-  // Insert a single client
-  Future<int> insertClient(Client client) {
+  // Insert a single client using ClientModel
+  Future<int> insertClient(ClientModel clientModel) {
+    // Map the ClientModel fields to the Clients table fields, with null checks
+    final client = ClientsCompanion(
+      createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+      authId: Value(clientModel.authId!),
+      age: clientModel.age != null ? Value(clientModel.age!) : Value.absent(),
+      gender: clientModel.gender != null
+          ? Value(clientModel.gender!)
+          : Value.absent(),
+      weight: clientModel.weight != null
+          ? Value(clientModel.weight!)
+          : Value.absent(),
+      weightUnit: clientModel.weightUnit != null
+          ? Value(clientModel.weightUnit!)
+          : Value.absent(),
+      height: clientModel.height != null
+          ? Value(clientModel.height!)
+          : Value.absent(),
+      heightUnit: clientModel.heightUnit != null
+          ? Value(clientModel.heightUnit!)
+          : Value.absent(),
+      isTrainer: clientModel.isTrainer != null
+          ? Value(clientModel.isTrainer!)
+          : Value.absent(),
+      isUserActive: clientModel.isUserActive != null
+          ? Value(clientModel.isUserActive!)
+          : Value.absent(),
+      username: clientModel.username != null
+          ? Value(clientModel.username!)
+          : Value.absent(),
+      email: clientModel.email != null
+          ? Value(clientModel.email!)
+          : Value.absent(),
+      phone: clientModel.phone?['phoneNumber'] != null
+          ? Value(clientModel.phone!['phoneNumber']!)
+          : Value.absent(),
+      phoneCountryCode: clientModel.phone?['countryCode'] != null
+          ? Value(clientModel.phone!['countryCode']!)
+          : Value.absent(),
+      currentWorkoutId: clientModel.currentWorkoutId != null
+          ? Value(clientModel.currentWorkoutId!)
+          : Value.absent(),
+    );
+
     return into(clients).insert(client);
   }
 
-  // Insert multiple clients
-  Future<void> insertClients(List<Client> clientsList) {
-    return batch((batch) {
-      batch.insertAll(clients, clientsList);
-    });
+  // Insert multiple clients using ClientModel
+  Future<void> insertClients(List<ClientModel> clientsList) {
+    return transaction(() async {
+      batch((batch) {
+        batch.insertAll(
+          clients,
+          clientsList.map(
+            (clientModel) {
+              return ClientsCompanion(
+                authId: Value(clientModel.authId!),
+                age: clientModel.age != null
+                    ? Value(clientModel.age!)
+                    : Value.absent(),
+                gender: clientModel.gender != null
+                    ? Value(clientModel.gender!)
+                    : Value.absent(),
+                weight: clientModel.weight != null
+                    ? Value(clientModel.weight!)
+                    : Value.absent(),
+                weightUnit: clientModel.weightUnit != null
+                    ? Value(clientModel.weightUnit!)
+                    : Value.absent(),
+                height: clientModel.height != null
+                    ? Value(clientModel.height!)
+                    : Value.absent(),
+                heightUnit: clientModel.heightUnit != null
+                    ? Value(clientModel.heightUnit!)
+                    : Value.absent(),
+                isTrainer: clientModel.isTrainer != null
+                    ? Value(clientModel.isTrainer!)
+                    : Value.absent(),
+                isUserActive: clientModel.isUserActive != null
+                    ? Value(clientModel.isUserActive!)
+                    : Value.absent(),
+                username: clientModel.username != null
+                    ? Value(clientModel.username!)
+                    : Value.absent(),
+                email: clientModel.email != null
+                    ? Value(clientModel.email!)
+                    : Value.absent(),
+                phone: clientModel.phone?['phoneNumber'] != null
+                    ? Value(clientModel.phone?['phoneNumber']!)
+                    : Value.absent(),
+                phoneCountryCode: clientModel.phone?['countryCode'] != null
+                    ? Value(clientModel.phone?['countryCode']!)
+                    : Value.absent(),
+                currentWorkoutId: clientModel.currentWorkoutId != null
+                    ? Value(clientModel.currentWorkoutId!)
+                    : Value.absent(),
+                createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+                updatedAt: Value.absent()
+              );
+            },
+          ).toList(),
+        );
+      }).then(
+        (value) {
+          // print(value);
+        },
+      );
+    }).then(
+      (value) {
+        print(value);
+      },
+    );
+  }
+
+  // Method to get a client by their primary key (authId)
+  Future<ClientModel?> getClientByAuthId(String authId) async {
+    final clientRow = await (select(clients)
+          ..where((tbl) => tbl.authId.equals(authId)))
+        .getSingleOrNull(); // Returns null if no client is found
+
+    // Directly map fields from the clientRow to ClientModel constructor
+    if (clientRow != null) {
+      return ClientModel(
+        authId: clientRow.authId,
+        age: clientRow.age,
+        gender: clientRow.gender,
+        weight: clientRow.weight,
+        weightUnit: clientRow.weightUnit,
+        height: clientRow.height,
+        heightUnit: clientRow.heightUnit,
+        isTrainer: clientRow.isTrainer,
+        isUserActive: clientRow.isUserActive,
+        username: clientRow.username,
+        email: clientRow.email,
+        phone: {
+          "phoneNumber": clientRow.phone,
+          "countryCode": clientRow.phoneCountryCode
+        },
+        currentWorkoutId: clientRow.currentWorkoutId,
+      );
+    }
+    return null; // Return null if no client is found
   }
 
   // Fetch all clients
-  Future<List<Client>> getAllClients() {
-    return select(clients).get();
+  Future<List<Client>> getAllClients() async {
+    final insertedClients = await select(clients).get();
+    print(insertedClients);
+    return insertedClients;
   }
 }

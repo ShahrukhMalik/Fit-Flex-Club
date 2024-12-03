@@ -31,7 +31,7 @@ class WorkoutHistoryModel extends WorkoutHistoryEntity {
               if (e.name != null) 'name': e.name,
               if (e.muscleGroup != null) 'muscleGroup': e.muscleGroup,
               if (e.parameters != null) 'parameters': e.parameters,
-              if (e.equipment != null) 'weight': e.equipment,
+              if (e.category != null) 'category': e.category,
             },
           )
           .toList(),

@@ -1,10 +1,18 @@
 import 'package:drift/drift.dart';
 
 class WorkoutPlans extends Table {
-  TextColumn get uid => text().customConstraint('PRIMARY KEY NOT NULL')(); // Primary key
+  TextColumn get uid => text()(); // Primary key
   TextColumn get name => text().withLength(min: 1, max: 255)(); // Plan name
-}
+  IntColumn get createdAt =>
+      integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
+  IntColumn get totalExercises => integer()();
+  IntColumn get muscleBuildingExercises => integer()();
+  IntColumn get cardioExercises => integer()();
+  IntColumn get updatedAt => integer()();
 
+  @override
+  Set<Column> get primaryKey => {uid};
+}
 
 //    ├── tables/
 // │   │   ├── workout_plan_table.dart

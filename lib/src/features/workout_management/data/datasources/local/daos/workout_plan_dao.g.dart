@@ -9,4 +9,5 @@ mixin _$WorkoutPlanDaoMixin on DatabaseAccessor<AppDatabase> {
   $DaysTable get days => attachedDatabase.days;
   $ExercisesTable get exercises => attachedDatabase.exercises;
   $ExerciseSetsTable get exerciseSets => attachedDatabase.exerciseSets;
+  $ExerciseBpTable get exerciseBp => attachedDatabase.exerciseBp;
 }

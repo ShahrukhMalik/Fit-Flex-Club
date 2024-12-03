@@ -21,7 +21,10 @@ class DayModel extends Day {
     );
   }
 
-  Map<int, List<ExerciseModel>> toMap() {
-    return {dayNumber: exercises};
+  Map<String, dynamic> toMap() {
+    return {
+      'dayNumber': dayNumber,
+      'id': id,
+    };
   }
 }

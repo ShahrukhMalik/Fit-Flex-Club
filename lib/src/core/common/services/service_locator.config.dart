@@ -38,6 +38,10 @@ import '../../../features/authentication/domain/usecases/logout_usecase.dart'
     as _i447;
 import '../../../features/authentication/presentation/bloc/authentication_bloc.dart'
     as _i70;
+import '../../../features/client_profile/data/datasources/local/client_profile_local_datasource.dart'
+    as _i648;
+import '../../../features/client_profile/data/datasources/local/daos/client_dao.dart'
+    as _i899;
 import '../../../features/client_profile/data/datasources/remote/client_profile_remote_datasource.dart'
     as _i588;
 import '../../../features/client_profile/data/repositories/client_profile_repository_impl.dart'
@@ -54,6 +58,11 @@ import '../../../features/client_profile/domain/usecases/update_user_usecase.dar
     as _i864;
 import '../../../features/client_profile/presentation/bloc/client_profile_bloc.dart'
     as _i268;
+import '../../../features/trainer_profile/domain/usecases/get_clients_usecase.dart'
+    as _i781;
+import '../../../features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart'
+    as _i812;
+import '../../db/fit_flex_local_db.dart' as _i987;
 import '../../util/module/register_module.dart' as _i19;
 import '../../util/network/network_info.dart' as _i228;
 import '../../util/sharedpref/shared_prefs_util.dart' as _i878;
@@ -79,6 +88,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i59.FirebaseAuth>(() => registerModule.auth);
     gh.factory<_i974.FirebaseFirestore>(() => registerModule.db);
+    gh.singleton<_i987.AppDatabase>(() => registerModule.localDb);
     gh.singleton<_i769.PlatformButton>(() => _i769.PlatformButton());
     gh.singleton<_i878.SharedPrefsUtil>(
         () => _i878.SharedPrefsUtil(gh<_i460.SharedPreferences>()));
@@ -89,17 +99,39 @@ extension GetItInjectableX on _i174.GetIt {
               auth: gh<_i59.FirebaseAuth>(),
               db: gh<_i974.FirebaseFirestore>(),
             ));
-    gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
-          gh<_i974.FirebaseFirestore>(),
-          gh<_i878.SharedPrefsUtil>(),
-          auth: gh<_i59.FirebaseAuth>(),
-        ));
+    gh.singleton<_i899.ClientsDao>(
+        () => _i899.ClientsDao(gh<_i987.AppDatabase>()));
+    gh.singleton<_i648.ClientLocalDatasource>(
+        () => _i648.ClientLocalDatasourceImpl(
+              dao: gh<_i899.ClientsDao>(),
+              database: gh<_i987.AppDatabase>(),
+            ));
     gh.singleton<_i627.ClientProfileRepository>(
         () => _i560.ClientProfileRepositoryImpl(
               networkInfo: gh<_i228.NetworkInfo>(),
               clientProfileRemoteDatasource:
                   gh<_i588.ClientProfileRemoteDatasource>(),
+              clientProfileLocalDatasource: gh<_i648.ClientLocalDatasource>(),
             ));
+    gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
+        _i617.IsClientProfileCreatedActiveUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
+        _i781.GetClientsUsecaseUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
+          gh<_i974.FirebaseFirestore>(),
+          gh<_i878.SharedPrefsUtil>(),
+          auth: gh<_i59.FirebaseAuth>(),
+        ));
+    gh.factory<_i812.TrainerProfileBloc>(
+        () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
     gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(
           remoteDatasource: gh<_i40.AuthRemoteDatasource>(),
           networkInfo: gh<_i228.NetworkInfo>(),
@@ -114,35 +146,26 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i988.ForgotPasswordUsecase>(() =>
         _i988.ForgotPasswordUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
-        _i617.IsClientProfileCreatedActiveUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i949.AuthenticateUserUsecase>(() =>
         _i949.AuthenticateUserUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i955.CreateAccountUsecase>(() =>
         _i955.CreateAccountUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i447.LogOutUsecase>(() =>
         _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
+          gh<_i541.AddUserUsecase>(),
+          gh<_i864.UpdateUserUsecase>(),
+          gh<_i617.IsClientProfileCreatedActiveUsecase>(),
+          gh<_i899.IsUserActiveUsecase>(),
+        ));
     gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
           authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
           createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
           logInUsecase: gh<_i831.LogInUsecase>(),
           logOutUsecase: gh<_i447.LogOutUsecase>(),
           forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
-        ));
-    gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
-          gh<_i541.AddUserUsecase>(),
-          gh<_i864.UpdateUserUsecase>(),
-          gh<_i617.IsClientProfileCreatedActiveUsecase>(),
-          gh<_i899.IsUserActiveUsecase>(),
         ));
     return this;
   }

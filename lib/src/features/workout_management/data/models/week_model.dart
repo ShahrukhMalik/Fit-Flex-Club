@@ -20,9 +20,10 @@ class WeekModel extends Week {
     );
   }
 
-  Map<int, List<DayModel>> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      weekNumber: days,
+      'weekNumber': weekNumber,
+      'id': id,
     };
   }
 }

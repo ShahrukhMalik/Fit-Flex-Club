@@ -6,3 +6,5 @@ abstract class TrainerProfileEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class TrainerProfileGetClientsEvent extends TrainerProfileEvent {}

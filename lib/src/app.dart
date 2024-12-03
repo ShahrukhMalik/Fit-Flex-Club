@@ -4,6 +4,7 @@ import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
               getIt<AuthenticationBloc>()..add(AuthenticateUserEvent()),
         ),
         BlocProvider(create: (context) => getIt<ClientProfileBloc>()),
+        BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
       ],
       child: localizations,
     );

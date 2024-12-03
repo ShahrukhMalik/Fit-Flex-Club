@@ -256,7 +256,7 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
 class WeightGraphPainter extends CustomPainter {
   final Color lineColor;
   final Color pointColor;
-  final List<ClientWeightEntity> entries;
+  final List<Map<String, dynamic>> entries;
 
   WeightGraphPainter({
     required this.lineColor,
@@ -286,10 +286,12 @@ class WeightGraphPainter extends CustomPainter {
     final path = Path();
 
     // Find min and max weights for scaling
-    double minWeight =
-        entries.map((e) => e.weight).reduce((a, b) => math.min(a, b));
-    double maxWeight =
-        entries.map((e) => e.weight).reduce((a, b) => math.max(a, b));
+    double minWeight = entries
+        .map((e) => (e['weight'] as double))
+        .reduce((a, b) => math.min(a, b));
+    double maxWeight = entries
+        .map((e) => (e['weight'] as double))
+        .reduce((a, b) => math.max(a, b));
 
     // Add some padding to min/max for better visualization
     final padding = (maxWeight - minWeight) * 0.1;
@@ -336,7 +338,7 @@ class WeightGraphPainter extends CustomPainter {
 
       // Draw weight label (alternating above/below)
       bool isAbove = index % 2 == 0;
-      drawWeightLabel(x, y, entries[index].weight, isAbove);
+      drawWeightLabel(x, y, entries[index]['weight'], isAbove);
 
       // Draw weight difference if not first point
       // if (index > 0) {
@@ -370,7 +372,7 @@ class WeightGraphPainter extends CustomPainter {
     for (int i = 0; i < entries.length; i++) {
       final double x = i * size.width / (entries.length - 1);
       final double y = size.height -
-          ((entries[i].weight - minWeight) / (maxWeight - minWeight)) *
+          ((entries[i]['weight'] - minWeight) / (maxWeight - minWeight)) *
               size.height;
 
       addPoint(x, y, path, i);
@@ -413,9 +415,9 @@ class WeightTrackerScreen extends StatelessWidget {
     // Sample weight data
     final weightData = [
       // ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
-      ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
-      ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
-      ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
+      // ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
+      // ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
+      // ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
     ];
 
     return Container(
@@ -511,15 +513,15 @@ class WeightTrackerScreen extends StatelessWidget {
           ),
 
           // Graph Section
-          Container(
-            height: 250,
-            padding: const EdgeInsets.all(16),
-            child: WeightTrackerGraph(
-              entries: weightData,
-              minWeight: 80.0,
-              maxWeight: 95.0,
-            ),
-          ),
+          // Container(
+          //   height: 250,
+          //   padding: const EdgeInsets.all(16),
+          //   child: WeightTrackerGraph(
+          //     entries: weightData,
+          //     minWeight: 80.0,
+          //     maxWeight: 95.0,
+          //   ),
+          // ),
 
           // Additional Stats
           // Container(
@@ -595,7 +597,11 @@ class WeightTrackerGraph extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: WeightGraphPainter(
-        entries: entries,
+        entries: entries
+            .map(
+              (e) => e.toMapforGraph(),
+            )
+            .toList(),
         lineColor: globalColorScheme.onPrimaryContainer,
         pointColor: primaryColor,
       ),
@@ -743,12 +749,12 @@ class FitFlexClientProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     final weightData = [
-      ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
-      ClientWeightEntity(date: DateTime(2023, 2, 1), weight: 89.5),
-      ClientWeightEntity(date: DateTime(2023, 3, 1), weight: 85.7),
-      ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
-      ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
-      ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
+      // ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
+      // ClientWeightEntity(date: DateTime(2023, 2, 1), weight: 89.5),
+      // ClientWeightEntity(date: DateTime(2023, 3, 1), weight: 85.7),
+      // ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
+      // ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
+      // ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
     ];
     return Scaffold(
       backgroundColor: globalColorScheme.surface,

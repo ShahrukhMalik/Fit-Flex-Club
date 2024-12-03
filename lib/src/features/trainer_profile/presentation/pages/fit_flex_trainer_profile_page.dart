@@ -1,8 +1,9 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FitFlexTrainerProfilePage extends StatelessWidget {
   static const String route = "/fit-flex-trainer-profile";
@@ -16,7 +17,7 @@ class FitFlexTrainerProfilePage extends StatelessWidget {
   }
 }
 
-class GymClientsDashboard extends StatelessWidget {
+class GymClientsDashboard extends StatefulWidget {
   final ColorScheme colorScheme;
 
   const GymClientsDashboard({
@@ -25,39 +26,23 @@ class GymClientsDashboard extends StatelessWidget {
   });
 
   @override
+  State<GymClientsDashboard> createState() => _GymClientsDashboardState();
+}
+
+class _GymClientsDashboardState extends State<GymClientsDashboard> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<TrainerProfileBloc>().add(TrainerProfileGetClientsEvent());
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Sample data with gender added
-    final clients = [
-      {
-        'name': 'John Doe',
-        'age': 28,
-        'weight': 75.0,
-        'gender': 'Male',
-        'program': 'Strength Training',
-        'isAssigned': true,
-      },
-      {
-        'name': 'Jane Smith',
-        'age': 32,
-        'weight': 62.0,
-        'gender': 'Female',
-        'program': 'Weight Loss',
-        'isAssigned': true,
-      },
-      {
-        'name': 'Mike Johnson',
-        'age': 45,
-        'weight': 88.0,
-        'gender': 'Male',
-        'program': null,
-        'isAssigned': false,
-      },
-    ];
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: widget.colorScheme.surface,
       appBar: PlatformAppbar.basicAppBar(
-        
         backgroundColor: globalColorScheme.onPrimaryContainer,
         title: "Client Profiles",
         context: context,
@@ -67,6 +52,7 @@ class GymClientsDashboard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Search Bar
               AppTextFields.searchTextField(),
@@ -74,145 +60,163 @@ class GymClientsDashboard extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Clients List
-              Expanded(
-                child: ListView.builder(
-                  itemCount: clients.length,
-                  itemBuilder: (context, index) {
-                    final client = clients[index];
-                    return Card(
-                      elevation: 2,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      color: colorScheme.inversePrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        side: BorderSide(color: colorScheme.outline),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Client Name and Gender
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    client['name'] as String,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: client['gender'] == 'Male'
-                                        ? colorScheme.tertiary.withOpacity(0.1)
-                                        : colorScheme.secondary
-                                            .withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+              BlocBuilder<TrainerProfileBloc, TrainerProfileState>(
+                builder: (context, state) {
+                  if (state is TrainerProfileComplete) {
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: state.entities.length,
+                        itemBuilder: (context, index) {
+                          final client = state.entities[index];
+                          return Card(
+                            elevation: 2,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            color: widget.colorScheme.inversePrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              side:
+                                  BorderSide(color: widget.colorScheme.outline),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Client Name and Gender
+                                  Row(
                                     children: [
-                                      Icon(
-                                        client['gender'] == 'Male'
-                                            ? Icons.male
-                                            : Icons.female,
-                                        size: 16,
-                                        color: client['gender'] == 'Male'
-                                            ? colorScheme.tertiary
-                                            : colorScheme.secondary,
+                                      Expanded(
+                                        child: Text(
+                                          client.username as String,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: widget.colorScheme.onSurface,
+                                          ),
+                                        ),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        client['gender'] as String,
-                                        style: TextStyle(
-                                          color: client['gender'] == 'Male'
-                                              ? colorScheme.tertiary
-                                              : colorScheme.secondary,
-                                          fontWeight: FontWeight.w500,
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: client.gender == 'Male'
+                                              ? widget.colorScheme.tertiary
+                                                  .withOpacity(0.1)
+                                              : widget.colorScheme.secondary
+                                                  .withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              client.gender == 'Male'
+                                                  ? Icons.male
+                                                  : Icons.female,
+                                              size: 16,
+                                              color: client.gender == 'Male'
+                                                  ? widget.colorScheme.tertiary
+                                                  : widget
+                                                      .colorScheme.secondary,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              client.gender ?? "",
+                                              style: TextStyle(
+                                                color: client.gender == 'Male'
+                                                    ? widget
+                                                        .colorScheme.tertiary
+                                                    : widget
+                                                        .colorScheme.secondary,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
+                                  const SizedBox(height: 12),
 
-                            // Client Details Row
-                            Row(
-                              children: [
-                                _buildDetailItem(
-                                  icon: Icons.calendar_today,
-                                  label: 'Age',
-                                  value: '${client['age']} years',
-                                  colorScheme: colorScheme,
-                                ),
-                                const SizedBox(width: 16),
-                                _buildDetailItem(
-                                  icon: Icons.monitor_weight,
-                                  label: 'Weight',
-                                  value: '${client['weight']} kg',
-                                  colorScheme: colorScheme,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
+                                  // Client Details Row
+                                  Row(
+                                    children: [
+                                      _buildDetailItem(
+                                        icon: Icons.calendar_today,
+                                        label: 'Age',
+                                        value: '${client.age} years',
+                                        colorScheme: widget.colorScheme,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      _buildDetailItem(
+                                        icon: Icons.monitor_weight,
+                                        label: 'Weight',
+                                        value: '${client.weight} kg',
+                                        colorScheme: widget.colorScheme,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
 
-                            // Program Status
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.fitness_center,
-                                  size: 20,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Program:',
-                                  style: TextStyle(
-                                    color: colorScheme.onSurfaceVariant,
+                                  // Program Status
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.fitness_center,
+                                        size: 20,
+                                        color:
+                                            widget.colorScheme.onSurfaceVariant,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Program:',
+                                        style: TextStyle(
+                                          color: widget
+                                              .colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: client.currentWorkoutId != null
+                                              ? widget.colorScheme.primary
+                                              : widget.colorScheme.secondary,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          client.currentWorkoutId != null
+                                              ? "Program Name"
+                                              : 'Not Assigned',
+                                          style: TextStyle(
+                                            color: client.currentWorkoutId !=
+                                                    null
+                                                ? widget.colorScheme.onPrimary
+                                                : widget
+                                                    .colorScheme.onSecondary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: client['isAssigned'] as bool
-                                        ? colorScheme.primary
-                                        : colorScheme.secondary,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    client['isAssigned'] as bool
-                                        ? client['program'] as String
-                                        : 'Not Assigned',
-                                    style: TextStyle(
-                                      color: client['isAssigned'] as bool
-                                          ? colorScheme.onPrimary
-                                          : colorScheme.onSecondary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     );
-                  },
-                ),
+                  }
+                  return Center(child: CircularProgressIndicator());
+                },
               ),
             ],
           ),
@@ -221,8 +225,9 @@ class GymClientsDashboard extends StatelessWidget {
       // FAB for quick actions
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: colorScheme.primaryContainer,
-        child: Icon(Icons.filter_list, color: colorScheme.onPrimaryContainer),
+        backgroundColor: widget.colorScheme.primaryContainer,
+        child: Icon(Icons.filter_list,
+            color: widget.colorScheme.onPrimaryContainer),
       ),
     );
   }

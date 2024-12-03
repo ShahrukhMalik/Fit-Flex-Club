@@ -20,6 +20,9 @@ abstract class ClientProfileRemoteDatasource {
 
   /// Check if client profile is created
   Future<bool> isClientProfileCreated();
+
+  ///
+  Future<List<ClientModel>?> getClients();
 }
 
 @Singleton(as: ClientProfileRemoteDatasource)
@@ -111,6 +114,32 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
       return data == null
           ? false
           : (data as Map<String, dynamic>)['isUserActive'] == true;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<List<ClientModel>?> getClients() async {
+    try {
+      final CollectionReference ref = db.collection('Users');
+
+      // Query to get clients who are not trainers
+      final QuerySnapshot querySnapshot =
+          await ref.where('isTrainer', isEqualTo: false).get();
+
+      // Map the QuerySnapshot documents to a List<ClientModel>
+      final List<ClientModel> clients = querySnapshot.docs.map((doc) {
+        return ClientModel.fromFirestore(
+          (doc as DocumentSnapshot<Map<String, dynamic>>),
+          null,
+        );
+      }).toList();
+
+      return clients;
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

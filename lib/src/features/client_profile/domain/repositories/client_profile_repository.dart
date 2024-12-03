@@ -18,7 +18,8 @@ abstract class ClientProfileRepository {
   ///Check if client is active
   Future<Either<Failures, bool?>>? isUserActive();
 
-
+  ///Get clients list for trainer
+  Future<Either<Failures, List<ClientEntity>?>>? getClients();
 
   /// Check if client profile is created
   Future<Either<Failures, bool>> isClientProfileCreated();

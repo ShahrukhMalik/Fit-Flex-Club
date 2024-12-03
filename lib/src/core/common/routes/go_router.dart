@@ -1,3 +1,4 @@
+import 'package:fit_flex_club/src/core/common/widgets/fit_flex_loader_page.dart';
 import 'package:fit_flex_club/src/core/common/widgets/transition_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
@@ -47,6 +48,13 @@ GoRouter goRouter(appState) {
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
           child: const FitFlexAuthLandingPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexLoaderPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexLoaderPage(),
         ),
       ),
       GoRoute(
@@ -210,7 +218,7 @@ GoRouter goRouter(appState) {
     redirect: (context, state) {
       // Handle loading state
       if (appState is AuthenticationLoading) {
-        return FitFlexAuthLandingPage.route;
+        return FitFlexLoaderPage.route;
       }
 
       // Handle authenticated state

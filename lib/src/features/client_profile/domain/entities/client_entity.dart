@@ -19,7 +19,7 @@ class ClientEntity extends Equatable {
   const ClientEntity({
     this.phone,
     this.email,
-    this.authId,
+     this.authId,
     this.age,
     this.gender,
     this.height,

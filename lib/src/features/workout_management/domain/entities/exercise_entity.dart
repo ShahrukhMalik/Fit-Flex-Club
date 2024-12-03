@@ -9,10 +9,10 @@ class Exercise extends ExerciseEntity {
     this.sets, {
     required this.id,
     required super.code,
-    super.equipment,
-    super.muscleGroup,
+     super.category,
+     super.muscleGroup,
     required super.name,
-    super.parameters,
+    required super.parameters,
   });
 
   @override
@@ -22,6 +22,7 @@ class Exercise extends ExerciseEntity {
         sets,
         parameters,
         code,
-        equipment,
+        category,
+        id,
       ];
 }
