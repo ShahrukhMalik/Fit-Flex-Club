@@ -11,7 +11,7 @@ class DayModel extends Day {
 
   factory DayModel.forEachElement(
     int dayNumber,
-    int id,
+    String id,
     List<ExerciseModel> exercises,
   ) {
     return DayModel(

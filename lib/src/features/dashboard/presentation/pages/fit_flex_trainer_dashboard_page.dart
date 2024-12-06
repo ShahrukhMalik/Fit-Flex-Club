@@ -1,5 +1,7 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class FitFlexTrainerDashboardPage extends StatefulWidget {
@@ -95,6 +97,9 @@ class _FitFlexTrainerDashboardPageState
     return GestureDetector(
       onTap: () {
         valueNotifier.value = index;
+        if (index == 1) {
+          context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+        }
         navigationShell.goBranch(
           index,
           initialLocation: index == navigationShell.currentIndex,

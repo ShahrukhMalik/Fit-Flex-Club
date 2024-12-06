@@ -8,7 +8,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/exerci
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 part 'workout_history_dao.g.dart';
 
-@DriftAccessor(tables: [WorkoutHistorySet, ExerciseSets, Exercises])
+@DriftAccessor(tables: [WorkoutHistorySet, ExerciseSets, WorkoutPlanExercise])
 class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
     with _$WorkoutHistoryDaoMixin {
   WorkoutHistoryDao(super.db);
@@ -16,7 +16,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
   Future<void> insertWorkoutHistorySet({
     required SetModel setModel,
     required String clientUid,
-    required int exerciseUid,
+    required String exerciseUid,
   }) async {
     await into(workoutHistorySet).insert(
       WorkoutHistorySetCompanion(
@@ -41,8 +41,8 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
         exerciseSets.id.equalsExp(workoutHistorySet.exerciseUid),
       ),
       innerJoin(
-        exercises,
-        exercises.id.equalsExp(exerciseSets.exerciseUid),
+        workoutPlanExercise,
+        workoutPlanExercise.id.equalsExp(exerciseSets.exerciseUid),
       ),
     ])
       ..where(workoutHistorySet.clientUid.equals(clientUid));
@@ -55,7 +55,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
 
     for (final row in results) {
       final workoutHistory = row.readTable(workoutHistorySet);
-      final exercise = row.readTable(exercises);
+      final exercise = row.readTable(workoutPlanExercise);
       final exerciseSet = row.readTable(exerciseSets);
 
       final workoutLogDate = DateTime.fromMillisecondsSinceEpoch(

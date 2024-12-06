@@ -1,7 +1,12 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 // abstract class WorkoutPlan {
 //   final String name;
@@ -37,7 +42,7 @@ import 'package:flutter/material.dart';
 //   }
 // }
 
-class WorkoutProgramsOverview extends StatelessWidget {
+class WorkoutProgramsOverview extends StatefulWidget {
   final List<WorkoutPlanModel> programs;
   final ColorScheme colorScheme;
 
@@ -46,6 +51,18 @@ class WorkoutProgramsOverview extends StatelessWidget {
     required this.programs,
     required this.colorScheme,
   });
+
+  @override
+  State<WorkoutProgramsOverview> createState() =>
+      _WorkoutProgramsOverviewState();
+}
+
+class _WorkoutProgramsOverviewState extends State<WorkoutProgramsOverview> {
+  @override
+  void initState() {
+    super.initState();
+    // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+  }
 
   // Helper method to build individual program item
   Widget _buildProgramItem(WorkoutPlanModel program) {
@@ -68,7 +85,7 @@ class WorkoutProgramsOverview extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
+                color: widget.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 12),
@@ -80,17 +97,17 @@ class WorkoutProgramsOverview extends StatelessWidget {
                 _buildCompactDetailItem(
                   icon: Icons.calendar_today,
                   label: '${program.weeks} Weeks',
-                  color: colorScheme.primary,
+                  color: widget.colorScheme.primary,
                 ),
                 _buildCompactDetailItem(
                   icon: Icons.fitness_center,
                   label: '${program.muscleBuildingExercises} Muscle',
-                  color: colorScheme.tertiary,
+                  color: widget.colorScheme.tertiary,
                 ),
                 _buildCompactDetailItem(
                   icon: Icons.run_circle,
                   label: '${program.cardioExercises} Cardio',
-                  color: colorScheme.secondary,
+                  color: widget.colorScheme.secondary,
                 ),
               ],
             ),
@@ -130,9 +147,9 @@ class WorkoutProgramsOverview extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      itemCount: programs.length,
+      itemCount: widget.programs.length,
       itemBuilder: (context, index) {
-        return _buildProgramItem(programs[index]);
+        return _buildProgramItem(widget.programs[index]);
       },
     );
   }
@@ -166,6 +183,17 @@ class FitFlexTrainerWorkoutPage extends StatelessWidget {
     ];
 
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'createWorkout',
+        splashColor: globalColorScheme.tertiary,
+        backgroundColor: globalColorScheme.primaryContainer,
+        onPressed: () => context.go(FitFlexClubCreateWorkoutPlanPage.route),
+        child: Icon(
+          Icons.add,
+          color: globalColorScheme.surface,
+        ),
+      ),
       backgroundColor: globalColorScheme.surface,
       appBar: PlatformAppbar.basicAppBar(
         backgroundColor: globalColorScheme.onPrimaryContainer,

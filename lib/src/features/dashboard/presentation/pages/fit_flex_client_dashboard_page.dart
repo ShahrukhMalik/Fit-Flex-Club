@@ -1,4 +1,5 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,10 +14,12 @@ class FitFlexClientDashboardPage extends StatefulWidget {
   });
 
   @override
-  State<FitFlexClientDashboardPage> createState() => _FitFlexClientDashboardPageState();
+  State<FitFlexClientDashboardPage> createState() =>
+      _FitFlexClientDashboardPageState();
 }
 
-class _FitFlexClientDashboardPageState extends State<FitFlexClientDashboardPage> {
+class _FitFlexClientDashboardPageState
+    extends State<FitFlexClientDashboardPage> {
   final ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
 
   @override
@@ -59,7 +62,8 @@ class _FitFlexClientDashboardPageState extends State<FitFlexClientDashboardPage>
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: globalColorScheme.surfaceContainer.withOpacity(0.2),
+                      color:
+                          globalColorScheme.surfaceContainer.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -70,9 +74,12 @@ class _FitFlexClientDashboardPageState extends State<FitFlexClientDashboardPage>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: [
-                _buildIcon(0, Icons.person, selectedIndex, widget.navigationShell),
-                _buildIcon(1, Icons.history_rounded, selectedIndex, widget.navigationShell),
-                _buildIcon(2, Icons.scale_outlined, selectedIndex, widget.navigationShell),
+                _buildIcon(
+                    0, Icons.person, selectedIndex, widget.navigationShell),
+                _buildIcon(1, Icons.history_rounded, selectedIndex,
+                    widget.navigationShell),
+                _buildIcon(2, Icons.scale_outlined, selectedIndex,
+                    widget.navigationShell),
               ],
             ),
           ],
@@ -94,6 +101,9 @@ class _FitFlexClientDashboardPageState extends State<FitFlexClientDashboardPage>
           index,
           initialLocation: index == navigationShell.currentIndex,
         );
+        if (index == 2) {
+          context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+        }
       },
       child: ValueListenableBuilder<int>(
         valueListenable: valueNotifier,
@@ -105,7 +115,8 @@ class _FitFlexClientDashboardPageState extends State<FitFlexClientDashboardPage>
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
               splashColor: globalColorScheme.tertiaryContainer.withOpacity(0.4),
-              highlightColor: globalColorScheme.surfaceContainer.withOpacity(0.2),
+              highlightColor:
+                  globalColorScheme.surfaceContainer.withOpacity(0.2),
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOut,

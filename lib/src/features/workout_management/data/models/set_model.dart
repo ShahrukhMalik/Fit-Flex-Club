@@ -46,4 +46,29 @@ class SetModel extends SetEntity {
       if (actualTime != null) 'actualTime': actualTime?.inSeconds,
     };
   }
+
+  // CopyWith method
+  SetModel copyWith({
+    int? targetReps,
+    double? targetWeight,
+    double? targetDistance,
+    Duration? targetTime,
+    int? actualReps,
+    double? actualWeight,
+    double? actualDistance,
+    Duration? actualTime,
+    String? id,
+  }) {
+    return SetModel(
+      targetReps: targetReps ?? this.targetReps,
+      targetWeight: targetWeight ?? this.targetWeight,
+      targetDistance: targetDistance ?? this.targetDistance,
+      targetTime: targetTime ?? this.targetTime,
+      actualReps: actualReps ?? this.actualReps,
+      actualWeight: actualWeight ?? this.actualWeight,
+      actualDistance: actualDistance ?? this.actualDistance,
+      actualTime: actualTime ?? this.actualTime,
+      id: id ?? this.id,
+    );
+  }
 }

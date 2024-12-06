@@ -5,7 +5,7 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/da
 class Week extends Equatable {
   final int weekNumber;
   final List<DayModel> days;
-  final int id;
+  final String id;
 
   const Week({
     required this.weekNumber,

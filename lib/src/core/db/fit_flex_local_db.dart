@@ -17,38 +17,88 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 import 'package:injectable/injectable.dart';
 part 'fit_flex_local_db.g.dart';
 
-@DriftDatabase(tables: [
-  WorkoutPlans,
-  Weeks,
-  Days,
-  Exercises,
-  ExerciseSets,
-  ExerciseBp,
-  Clients,
-  ClientWeight,
-  WorkoutHistorySet,
-  SyncQueue
-], daos: [
-  WorkoutPlanDao,
-  ClientsDao,
-  WorkoutHistoryDao,
-  SyncQueueDao
-])
+@DriftDatabase(
+  tables: [
+    WorkoutPlans,
+    Weeks,
+    Days,
+    WorkoutPlanExercise,
+    ExerciseSets,
+    BaseExercise,
+    Clients,
+    ClientWeight,
+    WorkoutHistorySet,
+    SyncQueue,
+  ],
+  daos: [
+    WorkoutPlanDao,
+    ClientsDao,
+    WorkoutHistoryDao,
+    SyncQueueDao,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  // You can handle database migration here
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          // This will be executed when the database is created for the first time.
+          await m.createTable(workoutPlans);
+          await m.createTable(weeks);
+          await m.createTable(days);
+          await m.createTable(workoutPlanExercise);
+          await m.createTable(exerciseSets);
+          await m.createTable(baseExercise);
+          await m.createTable(clients);
+          await m.createTable(clientWeight);
+          await m.createTable(workoutHistorySet);
+          await m.createTable(syncQueue);
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          // Handle schema version upgrades (when schemaVersion changes)
+
+          // Example for migrating from version 1 to version 2:
+          if (from == 2 && to == 3) {
+            await m.createTable(workoutPlans);
+            await m.createTable(weeks);
+            await m.createTable(days);
+            await m.createTable(workoutPlanExercise);
+            await m.createTable(exerciseSets);
+            await m.createTable(baseExercise);
+            await m.createTable(clients);
+            await m.createTable(clientWeight);
+            await m.createTable(workoutHistorySet);
+            await m.createTable(syncQueue);
+            // Handle schema migration from version 1 to version 2
+            // e.g., Add a new table, column, or index
+            // Example: Adding a new column or table
+
+            // You can add new tables or modify the existing schema like this:
+            // await m.addColumn(workoutPlans, workoutPlans.id);
+            // await m.createTable(weekTable); // Assuming you added new tables or need to recreate
+          }
+        },
+      );
+
+  // Other database methods and queries
   Future<void> deleteClients() async {
     await clients.deleteAll();
   }
+
   Future<void> deleteWorkoutPlans() async {
     await workoutPlans.deleteAll();
   }
 
+  Future<void> deleteExercises() async {
+    await baseExercise.deleteAll();
+  }
+
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 3;
+
   static QueryExecutor _openConnection() {
-    // `driftDatabase` from `package:drift_flutter` stores the database in
-    // `getApplicationDocumentsDirectory()`.
     return driftDatabase(name: 'fit_flex_club_db');
   }
 }

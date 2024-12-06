@@ -10,7 +10,7 @@ class WeekModel extends Week {
 
   factory WeekModel.forEachElement(
     int weekNumber,
-    int id,
+    String id,
     List<DayModel> days,
   ) {
     return WeekModel(

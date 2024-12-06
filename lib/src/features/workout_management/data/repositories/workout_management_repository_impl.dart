@@ -5,13 +5,16 @@ import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/workout_plan_management_localdatabase.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/remote/workout_plan_management_remotedatasource.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@Singleton(as: WorkoutManagementRepository)
 class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
   final NetworkInfo networkInfo;
-  final WorkoutPlanManagementLocaldatabaseImpl local;
-  final WorkoutPlanManagementRemotedatasourceImpl remote;
+  final WorkoutPlanManagementLocaldatasource local;
+  final WorkoutPlanManagementRemotedatasource remote;
 
   WorkoutManagementRepositoryImpl({
     required this.networkInfo,
@@ -61,5 +64,42 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
   ) {
     // TODO: implement createWorkoutPlan
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failures, List<ExerciseBpModel>?>?>? getExercises() async {
+ final isNetworkConnected = await networkInfo.isConnected;
+
+    try {
+      final cache = await local.getExercises();
+
+      return cache?.fold(
+        (l) async {
+          if (isNetworkConnected == null || !isNetworkConnected) {
+            return const Left(
+              NetworkFailure(message: 'No internet Connection'),
+            );
+          } else {
+            final remoteExercises = await remote.getExercises();
+            if (remoteExercises != null && remoteExercises.isNotEmpty) {
+              await local.insertExercises(remoteExercises);
+            }
+            return Right(
+              remoteExercises,
+            );
+          }
+        },
+        (r) {
+          return Right(r);
+        },
+      );
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 }

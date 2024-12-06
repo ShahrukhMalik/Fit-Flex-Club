@@ -20,9 +20,16 @@ class AppTextFields {
     BoxDecoration? boxDecoration,
     bool enabled = true,
     InputBorder? border,
+    String? initialValue,
+    UniqueKey? uniqueKey,
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
+        
+        key: uniqueKey,
+        initialValue: initialValue,
+        onChanged: onChanged,
+        textAlign: TextAlign.center,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         // key: formStateKey,
         inputFormatters: textInputFormatter,
@@ -60,6 +67,10 @@ class AppTextFields {
     }
 
     return TextFormField(
+      key: uniqueKey,
+      initialValue: initialValue,
+      
+      textAlign: TextAlign.center,
       inputFormatters: textInputFormatter,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       // key: formStateKey,

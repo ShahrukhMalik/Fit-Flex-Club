@@ -58,6 +58,7 @@ dependencies:
   drift_flutter: ^0.2.1
   path_provider: ^2.1.5
   uuid_v4: ^1.0.2
+  fluttertoast: ^8.2.8
   # flutter_splash_screen: ^3.0.0
 
 dev_dependencies:

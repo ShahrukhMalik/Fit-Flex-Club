@@ -4,7 +4,7 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/se
 
 class Exercise extends ExerciseEntity {
   final List<SetModel> sets;
-  final int id;
+  final String id;
   const Exercise(
     this.sets, {
     required this.id,

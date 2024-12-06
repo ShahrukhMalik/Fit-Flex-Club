@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
-import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:injectable/injectable.dart';
 
 abstract class WorkoutPlanManagementRemotedatasource {
   ///
@@ -11,8 +11,12 @@ abstract class WorkoutPlanManagementRemotedatasource {
 
   ///
   Future<void> createWorkoutPlan(WorkoutPlanModel workoutPlanModel);
+
+  ///
+  Future<List<ExerciseBpModel>?>? getExercises();
 }
 
+@Singleton(as: WorkoutPlanManagementRemotedatasource)
 class WorkoutPlanManagementRemotedatasourceImpl
     extends WorkoutPlanManagementRemotedatasource {
   final FirebaseAuth auth;
@@ -100,6 +104,31 @@ class WorkoutPlanManagementRemotedatasourceImpl
           );
         },
       );
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<List<ExerciseBpModel>?>? getExercises() async {
+    try {
+      final CollectionReference ref = db.collection('Exercises');
+      final documents = await ref.get();
+
+      // Using await in the map to ensure async calls complete
+      final List<ExerciseBpModel> exercises = documents.docs
+          .map(
+            (doc) => ExerciseBpModel.fromFirestore(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
+          .toList();
+
+      return exercises;
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/exercise_bp_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/day_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/exercise_table.dart';
@@ -11,13 +12,76 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:injectable/injectable.dart';
+import 'package:uuid_v4/uuid_v4.dart';
 part 'workout_plan_dao.g.dart';
 
-@DriftAccessor(
-    tables: [WorkoutPlans, Weeks, Days, Exercises, ExerciseSets, ExerciseBp])
+@DriftAccessor(tables: [
+  WorkoutPlans,
+  Weeks,
+  Days,
+  WorkoutPlanExercise,
+  ExerciseSets,
+  BaseExercise
+])
+@singleton
 class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
     with _$WorkoutPlanDaoMixin {
-  WorkoutPlanDao(super.db);
+  WorkoutPlanDao(super.attachedDatabase);
+  Future<List<int>> insertExerciseBps(List<ExerciseBpModel> exercisesBp) async {
+    final insertedIds = <int>[];
+
+    try {
+      for (final exercise in exercisesBp) {
+        // Ensure exerciseBp.parameters is not null, and provide a default empty map if it is.
+        final parameters = exercise.parameters ?? {};
+
+        // Extract values safely from the parameters map
+        final reps = parameters['reps'];
+        final duration = parameters['duration'];
+        final weight = parameters['weight'];
+
+        // Insert the exercise
+        final id = await into(baseExercise).insert(
+          BaseExerciseCompanion(
+            id: Value(exercise.id ?? UUIDv4().toString()),
+            code:
+                exercise.code == null ? Value.absent() : Value(exercise.code!),
+            category: exercise.category == null
+                ? Value.absent()
+                : Value(exercise.category!),
+            muscleGroup: exercise.muscleGroup == null
+                ? Value.absent()
+                : Value(exercise.muscleGroup!),
+            name:
+                exercise.name == null ? Value.absent() : Value(exercise.name!),
+            reps: reps == null ? Value.absent() : Value(reps),
+            duration: duration == null ? Value.absent() : Value(duration),
+            weight: weight == null ? Value.absent() : Value(weight),
+            createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+          ),
+        );
+
+        insertedIds.add(id);
+      }
+      return insertedIds;
+    } catch (e) {
+      print('Error inserting ExerciseBp: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<BaseExerciseData>> getAllExercises() async {
+    try {
+      // Fetch all exercises from the database
+      final exercisesList = await select(baseExercise).get();
+
+      return exercisesList;
+    } catch (e) {
+      print('Error fetching exercises: $e');
+      rethrow;
+    }
+  }
 
   //
   Future<List<int>> insertWorkoutPlans(
@@ -66,8 +130,8 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
 
         // Insert Exercises for each Day
         for (final exercise in day.exercises) {
-          final exerciseId = await into(exercises).insert(
-            ExercisesCompanion(
+          final exerciseId = await into(workoutPlanExercise).insert(
+            WorkoutPlanExerciseCompanion(
               dayUid: Value(day.id),
               code: Value(exercise.code!),
             ),
@@ -77,7 +141,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           for (final set in exercise.sets) {
             await into(exerciseSets).insert(
               ExerciseSetsCompanion(
-                exerciseUid: Value(exerciseId),
+                exerciseUid: Value(exercise.id),
                 targetReps: Value(set.targetReps),
                 targetWeight: Value(set.targetWeight),
                 targetDistance: Value(set.targetDistance),
@@ -105,13 +169,13 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
 
   //
   Future<int> updateExercise(ExerciseModel exerciseModel) async {
-    final updatedExercise = ExercisesCompanion(
+    final updatedExercise = WorkoutPlanExerciseCompanion(
       code: exerciseModel.code == null
           ? const Value.absent()
           : Value(exerciseModel.code!),
     );
 
-    return (update(exercises)
+    return (update(workoutPlanExercise)
           ..where(
             (exercise) => exercise.id.equals(
               exerciseModel.id,
@@ -163,19 +227,20 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
             .get();
 
         // Fetch all exercises and sets for these days in a single join query
-        final exercisesWithSets = await (select(exercises).join([
+        final exercisesWithSets = await (select(workoutPlanExercise).join([
           leftOuterJoin(
             exerciseSets,
-            exerciseSets.exerciseUid.equalsExp(exercises.id),
+            exerciseSets.exerciseUid.equalsExp(workoutPlanExercise.id),
           ),
         ])
-              ..where(exercises.dayUid.isIn(daysObj.map((day) => day.id))))
+              ..where(workoutPlanExercise.dayUid
+                  .isIn(daysObj.map((day) => day.id))))
             .get();
 
         // Group exercises and sets more efficiently
-        final exerciseGroups = <int, Map<String, dynamic>>{};
+        final exerciseGroups = <String, Map<String, dynamic>>{};
         for (final row in exercisesWithSets) {
-          final exercise = row.readTable(exercises);
+          final exercise = row.readTable(workoutPlanExercise);
           final exerciseSet = row.readTableOrNull(exerciseSets);
 
           if (!exerciseGroups.containsKey(exercise.id)) {

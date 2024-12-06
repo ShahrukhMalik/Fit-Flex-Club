@@ -15,7 +15,7 @@ class SetEntity extends Equatable {
   final Duration? actualTime;
 
   //
-  final int id;
+  final String id;
 
   const SetEntity({
     this.targetReps,

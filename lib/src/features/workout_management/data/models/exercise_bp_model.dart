@@ -7,16 +7,21 @@ class ExerciseBpModel extends ExerciseEntity {
     required super.muscleGroup,
     required super.name,
     required super.parameters,
+    required super.id,
   });
 
   // Factory constructor to create an instance from Firestore data
-  factory ExerciseBpModel.fromFirestore(Map<String, dynamic> data) {
+  factory ExerciseBpModel.fromFirestore(
+    Map<String, dynamic> data,
+    String id,
+  ) {
     return ExerciseBpModel(
-      code: data['code'] as int,
-      category: data['equipment'] as String,
-      muscleGroup: data['muscleGroup'] as String,
-      name: data['name'] as String,
-      parameters: Map<String, bool>.from(data['parameters'] as Map),
+      id: id,
+      code: data['code'],
+      category: data['category'],
+      muscleGroup: data['muscleGroup'],
+      name: data['name'],
+      parameters: data['parameters'],
     );
   }
 
@@ -28,6 +33,7 @@ class ExerciseBpModel extends ExerciseEntity {
       'muscleGroup': muscleGroup,
       'name': name,
       'parameters': parameters,
+      'id': id,
     };
   }
 }

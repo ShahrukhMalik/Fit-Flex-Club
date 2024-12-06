@@ -7,7 +7,8 @@ mixin _$WorkoutHistoryDaoMixin on DatabaseAccessor<AppDatabase> {
   $WorkoutPlansTable get workoutPlans => attachedDatabase.workoutPlans;
   $WeeksTable get weeks => attachedDatabase.weeks;
   $DaysTable get days => attachedDatabase.days;
-  $ExercisesTable get exercises => attachedDatabase.exercises;
+  $WorkoutPlanExerciseTable get workoutPlanExercise =>
+      attachedDatabase.workoutPlanExercise;
   $WorkoutHistorySetTable get workoutHistorySet =>
       attachedDatabase.workoutHistorySet;
   $ExerciseSetsTable get exerciseSets => attachedDatabase.exerciseSets;

@@ -62,6 +62,20 @@ import '../../../features/trainer_profile/domain/usecases/get_clients_usecase.da
     as _i781;
 import '../../../features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart'
     as _i812;
+import '../../../features/workout_management/data/datasources/local/daos/workout_plan_dao.dart'
+    as _i939;
+import '../../../features/workout_management/data/datasources/local/workout_plan_management_localdatabase.dart'
+    as _i415;
+import '../../../features/workout_management/data/datasources/remote/workout_plan_management_remotedatasource.dart'
+    as _i826;
+import '../../../features/workout_management/data/repositories/workout_management_repository_impl.dart'
+    as _i1071;
+import '../../../features/workout_management/domain/repositories/workout_management_repository.dart'
+    as _i530;
+import '../../../features/workout_management/domain/usecases/get_exercises_usecase.dart'
+    as _i139;
+import '../../../features/workout_management/presentation/bloc/workout_management_bloc.dart'
+    as _i41;
 import '../../db/fit_flex_local_db.dart' as _i987;
 import '../../util/module/register_module.dart' as _i19;
 import '../../util/network/network_info.dart' as _i228;
@@ -90,6 +104,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i974.FirebaseFirestore>(() => registerModule.db);
     gh.singleton<_i987.AppDatabase>(() => registerModule.localDb);
     gh.singleton<_i769.PlatformButton>(() => _i769.PlatformButton());
+    gh.singleton<_i826.WorkoutPlanManagementRemotedatasource>(
+        () => _i826.WorkoutPlanManagementRemotedatasourceImpl(
+              auth: gh<_i59.FirebaseAuth>(),
+              db: gh<_i974.FirebaseFirestore>(),
+            ));
     gh.singleton<_i878.SharedPrefsUtil>(
         () => _i878.SharedPrefsUtil(gh<_i460.SharedPreferences>()));
     gh.singleton<_i228.NetworkInfo>(() => _i228.NetworkInfoImpl(
@@ -101,6 +120,8 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.singleton<_i899.ClientsDao>(
         () => _i899.ClientsDao(gh<_i987.AppDatabase>()));
+    gh.singleton<_i939.WorkoutPlanDao>(
+        () => _i939.WorkoutPlanDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i648.ClientLocalDatasource>(
         () => _i648.ClientLocalDatasourceImpl(
               dao: gh<_i899.ClientsDao>(),
@@ -123,6 +144,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
         _i781.GetClientsUsecaseUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i415.WorkoutPlanManagementLocaldatasource>(
+        () => _i415.WorkoutPlanManagementLocaldatasourceImpl(
+              dao: gh<_i939.WorkoutPlanDao>(),
+              database: gh<_i987.AppDatabase>(),
+            ));
     gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
@@ -130,6 +156,16 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i878.SharedPrefsUtil>(),
           auth: gh<_i59.FirebaseAuth>(),
         ));
+    gh.singleton<_i530.WorkoutManagementRepository>(
+        () => _i1071.WorkoutManagementRepositoryImpl(
+              networkInfo: gh<_i228.NetworkInfo>(),
+              local: gh<_i415.WorkoutPlanManagementLocaldatasource>(),
+              remote: gh<_i826.WorkoutPlanManagementRemotedatasource>(),
+            ));
+    gh.singleton<_i139.GetExercisesUsecase>(() => _i139.GetExercisesUsecaseImpl(
+        workoutManagementRepository: gh<_i530.WorkoutManagementRepository>()));
+    gh.factory<_i41.WorkoutManagementBloc>(
+        () => _i41.WorkoutManagementBloc(gh<_i139.GetExercisesUsecase>()));
     gh.factory<_i812.TrainerProfileBloc>(
         () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
     gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(

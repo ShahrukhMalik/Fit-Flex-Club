@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
 
 class ExerciseEntity extends Equatable {
-  final int? code;
+  final String? id;
+  final String? code;
   final String? category;
   final String? muscleGroup;
   final String? name;
-  final Map<String, bool>? parameters;
+  final Map<String, dynamic>? parameters;
 
   const ExerciseEntity({
     required this.code,
@@ -13,14 +14,10 @@ class ExerciseEntity extends Equatable {
     required this.muscleGroup,
     required this.name,
     required this.parameters,
+    this.id,
   });
 
   @override
-  List<Object?> get props => [
-        code,
-        category,
-        muscleGroup,
-        name,
-        parameters,
-      ];
+  List<Object?> get props =>
+      [code, category, muscleGroup, name, parameters, id];
 }

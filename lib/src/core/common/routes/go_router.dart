@@ -17,6 +17,8 @@ import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_trainer_dashboard_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 // ... other imports remain the same
@@ -92,6 +94,20 @@ GoRouter goRouter(appState) {
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
           child: const FitFlexClientProfileSelectGenderPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexClubCreateWorkoutPlanPage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexClubCreateWorkoutPlanPage(),
+        ),
+      ),
+      GoRoute(
+        path: FitFlexClubSelectExercisePage.route,
+        pageBuilder: (context, state) => TransitionPage(
+          key: state.pageKey,
+          child: const FitFlexClubSelectExercisePage(),
         ),
       ),
       GoRoute(

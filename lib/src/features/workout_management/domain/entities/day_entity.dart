@@ -3,7 +3,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/exerci
 
 class Day extends Equatable {
   final int dayNumber;
-  final int id;
+  final String id;
   final List<ExerciseModel> exercises;
 
   const Day({
