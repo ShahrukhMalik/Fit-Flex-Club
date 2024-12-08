@@ -8,6 +8,7 @@ class Exercise extends ExerciseEntity {
   const Exercise(
     this.sets, {
     super.id,
+    super.exerciseOrder,
     required super.code,
     super.category,
     super.muscleGroup,

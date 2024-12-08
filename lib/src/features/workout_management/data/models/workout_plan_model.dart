@@ -8,27 +8,19 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/wo
 class WorkoutPlanModel extends WorkoutPlan {
   final int? createdAt;
   final int? updatedAt;
-  final int totalExercises;
-  final int muscleBuildingExercises;
-  final int cardioExercises;
+
 // Add the weeks to this model
 
   const WorkoutPlanModel({
     required super.name,
     required super.weeks,
     required super.uid,
-    required this.totalExercises,
-    required this.muscleBuildingExercises,
-    required this.cardioExercises,
     this.createdAt,
     this.updatedAt,
   });
 
   factory WorkoutPlanModel.fromMap(Map<String, dynamic> data) {
     return WorkoutPlanModel(
-      cardioExercises: data['cardioExercises'],
-      muscleBuildingExercises: data['muscleBuildingExercises'],
-      totalExercises: data['totalExercises'],
       name: data['name'],
       weeks: data['weeks'],
       uid: data['uid'],
@@ -37,35 +29,56 @@ class WorkoutPlanModel extends WorkoutPlan {
     );
   }
 
-  // Firestore to WorkoutPlanModel
   static Future<WorkoutPlanModel> fromFirestore(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot) async {
     final data = snapshot.data();
 
-    // Get weeks from Firestore subcollection
-    final weeksSnapshot = await snapshot.reference.collection('week').get();
+    // Get weeks from Firestore subcollection, ordered by weekNumber
+    final weeksSnapshot = await snapshot.reference
+        .collection('weeks')
+        .orderBy('weekNumber')
+        .get();
+
     final List<WeekModel> weeks =
         await Future.wait(weeksSnapshot.docs.map((weekDoc) async {
       final weekData = weekDoc.data();
-      final daysSnapshot = await weekDoc.reference.collection('days').get();
+      weekData['workoutPlanId'] = data['uid'];
+
+      // Get days from Firestore subcollection, ordered by dayNumber
+      final daysSnapshot =
+          await weekDoc.reference.collection('days').orderBy('dayNumber').get();
+
       final List<DayModel> days =
           await Future.wait(daysSnapshot.docs.map((dayDoc) async {
         final dayData = dayDoc.data();
-        final exercisesSnapshot =
-            await dayDoc.reference.collection('exercises').get();
+        dayData['weekId'] = weekData['id'];
+
+        // Get exercises from Firestore subcollection, ordered by exerciseOrder
+        final exercisesSnapshot = await dayDoc.reference
+            .collection('exercises')
+            .orderBy('exerciseOrder')
+            .get();
+
         final List<ExerciseModel> exercises =
             await Future.wait(exercisesSnapshot.docs.map((exerciseDoc) async {
           final exerciseData = exerciseDoc.data();
-          final setsSnapshot =
-              await exerciseDoc.reference.collection('sets').get();
-          final List<SetModel> sets = setsSnapshot.docs
-              .map((setDoc) => SetModel.fromMap(setDoc.data()))
-              .toList();
+          exerciseData['dayId'] = dayData['id'];
+
+          // Get sets from Firestore subcollection, ordered by setNumber
+          final setsSnapshot = await exerciseDoc.reference
+              .collection('sets')
+              .orderBy('setNumber')
+              .get();
+
+          final List<Map<String, dynamic>> sets =
+              setsSnapshot.docs.map((setDoc) => setDoc.data()).toList();
+
           return ExerciseModel.fromMap({
             ...exerciseData,
             'sets': sets,
           });
         }));
+
         return DayModel.forEachElement(
           dayData['dayNumber'],
           dayData['id'],
@@ -73,6 +86,7 @@ class WorkoutPlanModel extends WorkoutPlan {
           exercises,
         );
       }));
+
       return WeekModel.forEachElement(
         weekData['weekNumber'],
         weekData['id'],
@@ -82,9 +96,6 @@ class WorkoutPlanModel extends WorkoutPlan {
     }));
 
     return WorkoutPlanModel.fromMap({
-      'cardioExercises': data['cardioExercises'],
-      'muscleBuildingExercises': data['muscleBuildingExercises'],
-      'totalExercises': data['totalExercises'],
       'name': data['name'],
       'weeks': weeks,
       'uid': data['uid'],
@@ -97,9 +108,6 @@ class WorkoutPlanModel extends WorkoutPlan {
     String? name,
     List<WeekModel>? weeks,
     String? uid,
-    int? totalExercises,
-    int? muscleBuildingExercises,
-    int? cardioExercises,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -107,10 +115,6 @@ class WorkoutPlanModel extends WorkoutPlan {
       name: name ?? this.name,
       weeks: weeks ?? this.weeks,
       uid: uid ?? this.uid,
-      totalExercises: totalExercises ?? this.totalExercises,
-      muscleBuildingExercises:
-          muscleBuildingExercises ?? this.muscleBuildingExercises,
-      cardioExercises: cardioExercises ?? this.cardioExercises,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -120,9 +124,6 @@ class WorkoutPlanModel extends WorkoutPlan {
     return {
       'name': name,
       'uid': uid,
-      'totalExercises': totalExercises,
-      'muscleBuildingExercises': muscleBuildingExercises,
-      'cardioExercises': cardioExercises,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

@@ -55,20 +55,54 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
           code: error.errorCode,
         ),
       );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(message: error.errorMessage, code: error.errorCode),
+      );
     }
   }
 
   @override
   Future<Either<Failures, void>>? createWorkoutPlan(
-    List<WorkoutPlanModel> workoutPlans,
-  ) {
-    // TODO: implement createWorkoutPlan
-    throw UnimplementedError();
+    WorkoutPlanModel workoutPlan,
+  ) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.insertWorkoutPlan(workoutPlan);
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is not there!',
+          ),
+        );
+      } else {
+        return Right(
+          await remote.createWorkoutPlan(
+            workoutPlan,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 
   @override
   Future<Either<Failures, List<ExerciseBpModel>?>?>? getExercises() async {
- final isNetworkConnected = await networkInfo.isConnected;
+    final isNetworkConnected = await networkInfo.isConnected;
 
     try {
       final cache = await local.getExercises();
@@ -96,6 +130,46 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
     } on ServerException catch (error) {
       return Left(
         ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(message: error.errorMessage, code: error.errorCode),
+      );
+    }
+  }
+  
+  @override
+  Future<Either<Failures, void>>? updateWorkoutPlan(WorkoutPlanModel workoutPlan) async{
+  try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.updateWorkoutPlan(workoutPlan);
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is not there!',
+          ),
+        );
+      } else {
+        return Right(
+          await remote.updateWorkoutPlan(
+            workoutPlan,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
           message: error.errorMessage,
           code: error.errorCode,
         ),

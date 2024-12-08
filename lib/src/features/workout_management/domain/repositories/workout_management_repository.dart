@@ -15,5 +15,11 @@ abstract class WorkoutManagementRepository {
 
   ///
   Future<Either<Failures, void>>? createWorkoutPlan(
-      List<WorkoutPlanModel> workoutPlans);
+    WorkoutPlanModel workoutPlan,
+  );
+
+  ///
+  Future<Either<Failures, void>>? updateWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  );
 }

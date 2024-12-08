@@ -34,7 +34,10 @@ class _FitFlexTrainerDashboardPageState
       left: 0,
       right: 0,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: width * 0.3, vertical: 30),
+        margin: EdgeInsets.symmetric(
+          horizontal: width * 0.3,
+          vertical: 30,
+        ),
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: globalColorScheme.onPrimaryContainer,
@@ -75,11 +78,17 @@ class _FitFlexTrainerDashboardPageState
               mainAxisSize: MainAxisSize.max,
               children: [
                 _buildIcon(
-                    0, Icons.person, selectedIndex, widget.navigationShell),
-                _buildIcon(1, Icons.fitness_center, selectedIndex,
-                    widget.navigationShell),
-                // _buildIcon(2, Icons.scale_outlined, selectedIndex,
-                //     widget.navigationShell),
+                  0,
+                  Icons.person,
+                  selectedIndex,
+                  widget.navigationShell,
+                ),
+                _buildIcon(
+                  1,
+                  Icons.fitness_center,
+                  selectedIndex,
+                  widget.navigationShell,
+                ),
               ],
             ),
           ],
@@ -98,7 +107,8 @@ class _FitFlexTrainerDashboardPageState
       onTap: () {
         valueNotifier.value = index;
         if (index == 1) {
-          context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+          // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+          context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
         }
         navigationShell.goBranch(
           index,

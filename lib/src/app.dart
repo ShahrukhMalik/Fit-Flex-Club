@@ -50,7 +50,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(create: (context) => getIt<ClientProfileBloc>()),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
-        BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()),
+        BlocProvider(
+          create: (context) => getIt<WorkoutManagementBloc>()
+            ..add(
+              GetExercisesEvent(),
+            ),
+        ),
       ],
       child: localizations,
     );

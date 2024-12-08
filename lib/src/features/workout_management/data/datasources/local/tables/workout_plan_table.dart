@@ -5,10 +5,7 @@ class WorkoutPlans extends Table {
   TextColumn get name => text().withLength(min: 1, max: 255)(); // Plan name
   IntColumn get createdAt =>
       integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
-  IntColumn get totalExercises => integer()();
-  IntColumn get muscleBuildingExercises => integer()();
-  IntColumn get cardioExercises => integer()();
-  IntColumn get updatedAt => integer()();
+  IntColumn get updatedAt => integer().nullable()();
 
   @override
   Set<Column> get primaryKey => {uid};

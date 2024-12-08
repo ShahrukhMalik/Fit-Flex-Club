@@ -8,6 +8,7 @@ class ExerciseModel extends Exercise {
     super.sets, {
     required super.code,
     required super.id,
+    super.exerciseOrder,
     required super.name,
     super.category,
     required this.dayId,

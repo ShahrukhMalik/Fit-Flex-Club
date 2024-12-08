@@ -10,5 +10,5 @@ class Weeks extends Table {
   IntColumn get weekNumber => integer()(); // Week number (e.g., 1, 2, 3, ...)
   IntColumn get createdAt =>
       integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
-  IntColumn get updatedAt => integer()();
+  IntColumn get updatedAt => integer().nullable()(); // Nullable updated timestamp
 }

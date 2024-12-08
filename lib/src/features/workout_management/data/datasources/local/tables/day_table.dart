@@ -10,5 +10,5 @@ class Days extends Table {
   IntColumn get dayNumber => integer()(); // Day number within the week
   IntColumn get createdAt =>
       integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
-  IntColumn get updatedAt => integer()();
+  IntColumn get updatedAt => integer().nullable()();
 }

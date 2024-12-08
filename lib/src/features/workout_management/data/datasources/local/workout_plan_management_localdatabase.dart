@@ -15,7 +15,10 @@ abstract class WorkoutPlanManagementLocaldatasource {
   Future<void> insertWorkoutPlans(List<WorkoutPlanModel> workoutPlans);
 
   ///
-  Future<void> insertWorkoutPlan(WorkoutPlanModel workoutPlan);
+  Future<int> insertWorkoutPlan(WorkoutPlanModel workoutPlan);
+
+  ///
+  Future<void> updateWorkoutPlan(WorkoutPlanModel workoutPlan);
 
   ///
   Future<Either<bool, List<ExerciseBpModel>?>?> getExercises();
@@ -42,7 +45,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
         return Left(false);
       }
       if (isDataStale(
-        Duration(days: 1).inSeconds,
+        Duration(minutes: 30).inSeconds,
         workoutPlans.first.createdAt!,
         workoutPlans.first.updatedAt,
       )) {
@@ -70,10 +73,11 @@ class WorkoutPlanManagementLocaldatasourceImpl
   }
 
   @override
-  Future<void> insertWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+  Future<int> insertWorkoutPlan(WorkoutPlanModel workoutPlan) async {
     try {
       final result = await dao.insertWorkoutPlan(workoutPlan);
-      return Future.value(null);
+      // ignore: void_checks
+      return Future.value(result);
     } catch (err) {
       throw CacheException(
         errorMessage: err.toString(),
@@ -122,8 +126,18 @@ class WorkoutPlanManagementLocaldatasourceImpl
   @override
   Future<void> insertExercises(List<ExerciseBpModel> exercises) async {
     try {
-      final result = await dao.insertExerciseBps(exercises);
-      return Future.value(null);
+      return Future(() async => await dao.insertExerciseBps(exercises));
+    } catch (err) {
+      throw CacheException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<void> updateWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+    try {
+      return Future(() async => await dao.updateWorkoutPlan(workoutPlan));
     } catch (err) {
       throw CacheException(
         errorMessage: err.toString(),

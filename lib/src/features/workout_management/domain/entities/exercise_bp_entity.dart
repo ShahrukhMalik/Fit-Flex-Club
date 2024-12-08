@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class ExerciseEntity extends Equatable {
   final String? id;
+  final int? exerciseOrder;
   final String? code;
   final String? category;
   final String? muscleGroup;
@@ -15,9 +16,10 @@ class ExerciseEntity extends Equatable {
     required this.name,
     required this.parameters,
     this.id,
+    this.exerciseOrder,
   });
 
   @override
   List<Object?> get props =>
-      [code, category, muscleGroup, name, parameters, id];
+      [code, category, muscleGroup, name, parameters, id, exerciseOrder];
 }

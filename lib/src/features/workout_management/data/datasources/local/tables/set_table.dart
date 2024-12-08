@@ -14,5 +14,7 @@ class ExerciseSets extends Table {
   IntColumn get targetTime => integer().nullable()(); // Stored in seconds
   IntColumn get createdAt =>
       integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
-  IntColumn get updatedAt => integer()();
+  IntColumn get updatedAt =>
+      integer().nullable()(); // Nullable updated timestamp
+  IntColumn get setNumber => integer()();
 }

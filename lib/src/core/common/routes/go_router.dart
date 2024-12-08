@@ -98,10 +98,16 @@ GoRouter goRouter(appState) {
       ),
       GoRoute(
         path: FitFlexClubCreateWorkoutPlanPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexClubCreateWorkoutPlanPage(),
-        ),
+        pageBuilder: (context, state) {
+          final extraData = state.extra as Map<String, dynamic>?;
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexClubCreateWorkoutPlanPage(
+              update: extraData?['updateData'] ?? false,
+              workoutPlanModel: extraData?['workoutPlan'],
+            ),
+          );
+        },
       ),
       GoRoute(
         path: FitFlexClubSelectExercisePage.route,

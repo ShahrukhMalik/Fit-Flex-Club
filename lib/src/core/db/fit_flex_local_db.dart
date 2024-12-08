@@ -89,6 +89,10 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteWorkoutPlans() async {
     await workoutPlans.deleteAll();
+    await weeks.deleteAll();
+    await days.deleteAll();
+    await workoutPlanExercise.deleteAll();
+    await exerciseSets.deleteAll();
   }
 
   Future<void> deleteExercises() async {
