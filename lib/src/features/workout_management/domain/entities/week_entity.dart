@@ -6,13 +6,15 @@ class Week extends Equatable {
   final int weekNumber;
   final List<DayModel> days;
   final String id;
+  final String workoutPlanId;
 
   const Week({
     required this.weekNumber,
     required this.days,
     required this.id,
+    required this.workoutPlanId,
   });
 
   @override
-  List<Object?> get props => [weekNumber, days, id];
+  List<Object?> get props => [weekNumber, days, id, workoutPlanId];
 }

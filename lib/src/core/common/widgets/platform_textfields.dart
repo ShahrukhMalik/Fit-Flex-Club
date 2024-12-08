@@ -25,7 +25,6 @@ class AppTextFields {
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
-        
         key: uniqueKey,
         initialValue: initialValue,
         onChanged: onChanged,
@@ -69,7 +68,7 @@ class AppTextFields {
     return TextFormField(
       key: uniqueKey,
       initialValue: initialValue,
-      
+
       textAlign: TextAlign.center,
       inputFormatters: textInputFormatter,
       autovalidateMode: AutovalidateMode.onUserInteraction,

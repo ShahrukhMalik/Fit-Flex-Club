@@ -114,7 +114,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
     for (final week in workoutPlan.weeks) {
       await into(weeks).insert(
         WeeksCompanion(
-          workoutPlanUid: Value(workoutPlan.uid),
+          workoutPlanId: Value(workoutPlan.uid),
           weekNumber: Value(week.weekNumber),
         ),
       );
@@ -123,7 +123,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
       for (final day in week.days) {
         await into(days).insert(
           DaysCompanion(
-            weekUid: Value(week.id),
+            weekId: Value(week.id),
             dayNumber: Value(day.dayNumber),
           ),
         );
@@ -132,7 +132,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         for (final exercise in day.exercises) {
           final exerciseId = await into(workoutPlanExercise).insert(
             WorkoutPlanExerciseCompanion(
-              dayUid: Value(day.id),
+              dayId: Value(day.id),
               code: Value(exercise.code!),
             ),
           );
@@ -141,7 +141,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           for (final set in exercise.sets) {
             await into(exerciseSets).insert(
               ExerciseSetsCompanion(
-                exerciseUid: Value(exercise.id),
+                exerciseId: Value(exercise.id ?? ""),
                 targetReps: Value(set.targetReps),
                 targetWeight: Value(set.targetWeight),
                 targetDistance: Value(set.targetDistance),
@@ -178,7 +178,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
     return (update(workoutPlanExercise)
           ..where(
             (exercise) => exercise.id.equals(
-              exerciseModel.id,
+              exerciseModel.id ?? "",
             ),
           ))
         .write(updatedExercise);
@@ -217,23 +217,23 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
       return await Future.wait(workoutPlansObj.map((plan) async {
         // Fetch weeks for the workout plan efficiently
         final weeksObj = await (select(weeks)
-              ..where((week) => week.workoutPlanUid.equals(plan.uid)))
+              ..where((week) => week.workoutPlanId.equals(plan.uid)))
             .get();
 
         // Fetch all days for these weeks in a single query
         final daysObj = await (select(days)
               ..where(
-                  (day) => day.weekUid.isIn(weeksObj.map((week) => week.id))))
+                  (day) => day.weekId.isIn(weeksObj.map((week) => week.id))))
             .get();
 
         // Fetch all exercises and sets for these days in a single join query
         final exercisesWithSets = await (select(workoutPlanExercise).join([
           leftOuterJoin(
             exerciseSets,
-            exerciseSets.exerciseUid.equalsExp(workoutPlanExercise.id),
+            exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
           ),
         ])
-              ..where(workoutPlanExercise.dayUid
+              ..where(workoutPlanExercise.dayId
                   .isIn(daysObj.map((day) => day.id))))
             .get();
 
@@ -252,7 +252,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
 
           if (exerciseSet != null) {
             (exerciseGroups[exercise.id]!['sets'] as List<SetModel>).add(
-              SetModel.fromMap(exerciseSet.toColumns(false)),
+              SetModel.fromMap(exerciseSet.toJson()),
             );
           }
         }
@@ -261,6 +261,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         final exerciseModels = exerciseGroups.values.map((group) {
           final exercise = group['exercise'];
           return ExerciseModel(
+            dayId: exercise.dayId,
             id: exercise.id,
             code: exercise.code,
             name: exercise.name,
@@ -274,6 +275,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         // Group exercises into days
         final dayModels = daysObj.map((day) {
           return DayModel(
+            weekId: day.weekId,
             id: day.id,
             dayNumber: day.dayNumber,
             exercises: exerciseModels,
@@ -283,6 +285,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         // Group days into weeks
         final weekModels = weeksObj.map((week) {
           return WeekModel(
+            workoutPlanId: week.workoutPlanId,
             id: week.id,
             weekNumber: week.weekNumber,
             days: dayModels,

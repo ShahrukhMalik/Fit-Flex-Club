@@ -39,7 +39,7 @@ class WorkoutPlanModel extends WorkoutPlan {
 
   // Firestore to WorkoutPlanModel
   static Future<WorkoutPlanModel> fromFirestore(
-     QueryDocumentSnapshot<Map<String,dynamic>> snapshot) async {
+      QueryDocumentSnapshot<Map<String, dynamic>> snapshot) async {
     final data = snapshot.data();
 
     // Get weeks from Firestore subcollection
@@ -69,12 +69,14 @@ class WorkoutPlanModel extends WorkoutPlan {
         return DayModel.forEachElement(
           dayData['dayNumber'],
           dayData['id'],
+          dayData['weekId'],
           exercises,
         );
       }));
       return WeekModel.forEachElement(
         weekData['weekNumber'],
         weekData['id'],
+        weekData['workoutPlanId'],
         days,
       );
     }));
@@ -89,6 +91,29 @@ class WorkoutPlanModel extends WorkoutPlan {
       'createdAt': data['createdAt'],
       'updatedAt': data['updatedAt'],
     });
+  }
+
+  WorkoutPlanModel copyWith({
+    String? name,
+    List<WeekModel>? weeks,
+    String? uid,
+    int? totalExercises,
+    int? muscleBuildingExercises,
+    int? cardioExercises,
+    int? createdAt,
+    int? updatedAt,
+  }) {
+    return WorkoutPlanModel(
+      name: name ?? this.name,
+      weeks: weeks ?? this.weeks,
+      uid: uid ?? this.uid,
+      totalExercises: totalExercises ?? this.totalExercises,
+      muscleBuildingExercises:
+          muscleBuildingExercises ?? this.muscleBuildingExercises,
+      cardioExercises: cardioExercises ?? this.cardioExercises,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 
   Map<String, dynamic> toMap() {

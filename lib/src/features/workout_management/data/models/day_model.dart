@@ -7,14 +7,17 @@ class DayModel extends Day {
     required super.dayNumber,
     required super.exercises,
     required super.id,
+    required super.weekId,
   });
 
   factory DayModel.forEachElement(
     int dayNumber,
     String id,
+    String weekId,
     List<ExerciseModel> exercises,
   ) {
     return DayModel(
+      weekId: weekId,
       id: id,
       dayNumber: dayNumber,
       exercises: exercises,
@@ -26,5 +29,19 @@ class DayModel extends Day {
       'dayNumber': dayNumber,
       'id': id,
     };
+  }
+
+  DayModel copyWith({
+    int? dayNumber,
+    String? id,
+    String? weekId,
+    List<ExerciseModel>? exercises,
+  }) {
+    return DayModel(
+      dayNumber: dayNumber ?? this.dayNumber,
+      id: id ?? this.id,
+      weekId: weekId ?? this.weekId,
+      exercises: exercises ?? this.exercises,
+    );
   }
 }

@@ -5,7 +5,7 @@ class Weeks extends Table {
   TextColumn get id => text()(); // Auto-increment primary key
   @override
   Set<Column> get primaryKey => {id}; // Auto-increment primary key
-  TextColumn get workoutPlanUid =>
+  TextColumn get workoutPlanId =>
       text().references(WorkoutPlans, #uid)(); // Foreign key to WorkoutPlans
   IntColumn get weekNumber => integer()(); // Week number (e.g., 1, 2, 3, ...)
   IntColumn get createdAt =>

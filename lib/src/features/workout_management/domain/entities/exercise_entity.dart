@@ -4,13 +4,13 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/se
 
 class Exercise extends ExerciseEntity {
   final List<SetModel> sets;
-  final String id;
+
   const Exercise(
     this.sets, {
-    required this.id,
+    super.id,
     required super.code,
-     super.category,
-     super.muscleGroup,
+    super.category,
+    super.muscleGroup,
     required super.name,
     required super.parameters,
   });
@@ -24,5 +24,5 @@ class Exercise extends ExerciseEntity {
         code,
         category,
         id,
-      ];
+    ];
 }

@@ -3,8 +3,8 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 
 class WorkoutHistorySet extends Table {
   IntColumn get id => integer().autoIncrement()(); // Auto-increment primary key
-  TextColumn get clientUid => text()();
-  TextColumn get exerciseUid =>
+  TextColumn get clientId => text()();
+  TextColumn get exerciseId =>
       text().references(WorkoutPlanExercise, #id)(); // Foreign key to Exercises
   IntColumn get actualReps => integer().nullable()();
   RealColumn get actualWeight => real().nullable()();

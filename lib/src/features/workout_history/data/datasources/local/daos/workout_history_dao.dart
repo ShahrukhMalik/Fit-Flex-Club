@@ -20,8 +20,8 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
   }) async {
     await into(workoutHistorySet).insert(
       WorkoutHistorySetCompanion(
-        clientUid: Value(clientUid),
-        exerciseUid: Value(exerciseUid),
+        clientId: Value(clientUid),
+        exerciseId: Value(exerciseUid),
         actualReps: Value(setModel.actualReps),
         actualWeight: Value(setModel.actualWeight),
         actualDistance: Value(setModel.actualDistance),
@@ -38,14 +38,14 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
     final query = select(workoutHistorySet).join([
       innerJoin(
         exerciseSets,
-        exerciseSets.id.equalsExp(workoutHistorySet.exerciseUid),
+        exerciseSets.id.equalsExp(workoutHistorySet.exerciseId),
       ),
       innerJoin(
         workoutPlanExercise,
-        workoutPlanExercise.id.equalsExp(exerciseSets.exerciseUid),
+        workoutPlanExercise.id.equalsExp(exerciseSets.exerciseId),
       ),
     ])
-      ..where(workoutHistorySet.clientUid.equals(clientUid));
+      ..where(workoutHistorySet.clientId.equals(clientUid));
 
     // Execute query
     final results = await query.get();
@@ -81,6 +81,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
             .toList();
 
         return ExerciseModel(
+          dayId: exerciseData[''],
           sets,
           id: exerciseData['id'],
           name: exerciseData['name'],

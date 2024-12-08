@@ -16,10 +16,12 @@ class SetEntity extends Equatable {
 
   //
   final String id;
+  final String exerciseId;
 
-  const SetEntity({
+  const SetEntity( {
     this.targetReps,
     required this.id,
+    required this.exerciseId,
     this.targetWeight,
     this.targetDistance,
     this.targetTime,
@@ -27,6 +29,7 @@ class SetEntity extends Equatable {
     this.actualWeight,
     this.actualDistance,
     this.actualTime,
+
   });
 
   @override
@@ -39,6 +42,7 @@ class SetEntity extends Equatable {
         actualWeight,
         actualDistance,
         actualTime,
+        id,
       ];
 
   // A helper method to calculate progress for each field (if applicable)

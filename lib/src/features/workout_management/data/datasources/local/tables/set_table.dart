@@ -6,7 +6,7 @@ class ExerciseSets extends Table {
   TextColumn get id => text()(); // Auto-increment primary key
   @override
   Set<Column> get primaryKey => {id}; // Auto-increment primary key
-  TextColumn get exerciseUid =>
+  TextColumn get exerciseId =>
       text().references(WorkoutPlanExercise, #id)(); // Foreign key to Exercises
   IntColumn get targetReps => integer().nullable()();
   RealColumn get targetWeight => real().nullable()();

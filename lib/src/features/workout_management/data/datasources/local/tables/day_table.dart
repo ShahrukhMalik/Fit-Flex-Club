@@ -5,7 +5,7 @@ class Days extends Table {
   TextColumn get id => text()(); // Auto-increment primary key
   @override
   Set<Column> get primaryKey => {id};
-  TextColumn get weekUid =>
+  TextColumn get weekId =>
       text().references(Weeks, #id)(); // Foreign key to Weeks
   IntColumn get dayNumber => integer()(); // Day number within the week
   IntColumn get createdAt =>
