@@ -4,6 +4,7 @@ part of 'workout_history_dao.dart';
 
 // ignore_for_file: type=lint
 mixin _$WorkoutHistoryDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ClientsTable get clients => attachedDatabase.clients;
   $WorkoutPlansTable get workoutPlans => attachedDatabase.workoutPlans;
   $WeeksTable get weeks => attachedDatabase.weeks;
   $DaysTable get days => attachedDatabase.days;

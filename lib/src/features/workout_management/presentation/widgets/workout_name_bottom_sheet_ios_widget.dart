@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CupertinoWorkoutBottomSheet extends StatelessWidget {
   final TextEditingController controller;
 
-   const CupertinoWorkoutBottomSheet({super.key, required this.controller});
+  const CupertinoWorkoutBottomSheet({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +38,11 @@ class CupertinoWorkoutBottomSheet extends StatelessWidget {
               const SizedBox(height: 20),
               CupertinoButton.filled(
                 onPressed: () {
-                  // print("Workout Name: ${controller.text}");
-                  Navigator.of(context).pop();
+                  if (controller.text.isEmpty) {
+                    Fluttertoast.showToast(msg: 'Please enter the name.');
+                  } else {
+                    Navigator.pop(context);
+                  }
                 },
                 child: const Text("Save"),
               ),

@@ -15,6 +15,7 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_weight_page.dart';
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_client_dashboard_page.dart';
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_trainer_dashboard_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
@@ -124,6 +125,18 @@ GoRouter goRouter(appState) {
             key: state.pageKey,
             child: FitFlexClientProfileSelectAgePage(
               gender: extraData?['gender'] ?? "Unknown",
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: FitFlexTrainerClientDetailsPage.route,
+        pageBuilder: (context, state) {
+          final extraData = state.extra as Map<String, dynamic>?;
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexTrainerClientDetailsPage(
+              client: extraData?['client'] ?? "Unknown",
             ),
           );
         },

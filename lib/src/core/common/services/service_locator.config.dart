@@ -72,10 +72,14 @@ import '../../../features/workout_management/data/repositories/workout_managemen
     as _i1071;
 import '../../../features/workout_management/domain/repositories/workout_management_repository.dart'
     as _i530;
+import '../../../features/workout_management/domain/usecases/assign_workout_plan_usecase.dart'
+    as _i282;
 import '../../../features/workout_management/domain/usecases/create_workout_plan_usecase.dart'
     as _i853;
 import '../../../features/workout_management/domain/usecases/get_exercises_usecase.dart'
     as _i139;
+import '../../../features/workout_management/domain/usecases/get_workout_plan_for_client_usecase.dart'
+    as _i91;
 import '../../../features/workout_management/domain/usecases/get_workout_plans_usecase.dart'
     as _i120;
 import '../../../features/workout_management/domain/usecases/update_workout_plan_usecase.dart'
@@ -170,6 +174,14 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.singleton<_i139.GetExercisesUsecase>(() => _i139.GetExercisesUsecaseImpl(
         workoutManagementRepository: gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i282.AssignWorkoutPlanUsecase>(() =>
+        _i282.AssignWorkoutPlanUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i91.GetWorkoutPlansForClientUsecase>(() =>
+        _i91.GetWorkoutPlansForClientUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
     gh.factory<_i812.TrainerProfileBloc>(
         () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
     gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(
@@ -212,18 +224,20 @@ extension GetItInjectableX on _i174.GetIt {
         _i120.GetWorkoutPlansUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
-    gh.factory<_i41.WorkoutManagementBloc>(() => _i41.WorkoutManagementBloc(
-          gh<_i139.GetExercisesUsecase>(),
-          gh<_i853.CreateWorkoutPlanUsecase>(),
-          gh<_i120.GetWorkoutPlansUsecase>(),
-          gh<_i430.UpdateWorkoutPlanUsecase>(),
-        ));
     gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
           authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
           createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
           logInUsecase: gh<_i831.LogInUsecase>(),
           logOutUsecase: gh<_i447.LogOutUsecase>(),
           forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
+        ));
+    gh.factory<_i41.WorkoutManagementBloc>(() => _i41.WorkoutManagementBloc(
+          gh<_i139.GetExercisesUsecase>(),
+          gh<_i853.CreateWorkoutPlanUsecase>(),
+          gh<_i120.GetWorkoutPlansUsecase>(),
+          gh<_i430.UpdateWorkoutPlanUsecase>(),
+          gh<_i282.AssignWorkoutPlanUsecase>(),
+          gh<_i91.GetWorkoutPlansForClientUsecase>(),
         ));
     return this;
   }

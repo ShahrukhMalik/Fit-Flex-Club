@@ -1,4 +1,5 @@
 // lib/core/theme/loader_theme.dart
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
@@ -15,7 +16,7 @@ enum LoaderType {
 }
 
 class PlatformLoader {
-   Widget buildLoader({
+  Widget buildLoader({
     required LoaderType type,
     Color? color,
     double? size,
@@ -26,6 +27,9 @@ class PlatformLoader {
     Widget? child, // For custom loaders
     String? semanticsLabel, // Accessibility label
     String? semanticsValue, // Accessibility value
+        Color? baseColor,
+    Color? highlightColor,
+    double? height
   }) {
     switch (type) {
       case LoaderType.circular:
@@ -75,7 +79,9 @@ class PlatformLoader {
 
       case LoaderType.shimmer:
         return _buildShimmerLoader(
-          color: color,
+          baseColor: baseColor,
+          height: height,
+          highlightColor: highlightColor,
           child: child,
           duration: duration,
         );
@@ -250,18 +256,20 @@ class PlatformLoader {
 
   // 6. Shimmer Loader
   Widget _buildShimmerLoader({
-    Color? color,
+    Color? baseColor,
+    Color? highlightColor,
     Widget? child,
     Duration? duration,
+    double? height,
   }) {
     return ShimmerLoader(
-      baseColor: color ?? Colors.grey[300]!,
-      highlightColor: color?.withOpacity(0.7) ?? Colors.grey[100]!,
+      baseColor: baseColor ?? globalColorScheme.surface,
+      highlightColor: highlightColor?.withOpacity(0.7) ?? globalColorScheme.inversePrimary,
       duration: duration ?? const Duration(milliseconds: 1500),
       child: child ??
           Container(
             width: double.infinity,
-            height: 100,
+            height: height ?? 80,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),

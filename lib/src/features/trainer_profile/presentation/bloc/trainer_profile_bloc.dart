@@ -26,9 +26,15 @@ class TrainerProfileBloc
     TrainerProfileGetClientsEvent event,
     Emitter<TrainerProfileState> emit,
   ) async {
+    emit(TrainerProfileLoading());
     final result = await getClientsUsecaseUsecase(NoParams());
 
     if (result == null) {
+      emit(
+        TrainerProfileError(
+          failures: ServerFailure(message: "Something Went Wrong!"),
+        ),
+      );
     } else {
       result.fold(
         (l) {

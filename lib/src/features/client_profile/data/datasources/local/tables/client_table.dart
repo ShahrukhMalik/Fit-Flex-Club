@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 class Clients extends Table {
-  TextColumn get authId => text()();
+  TextColumn get id => text()();
   IntColumn get age => integer().nullable()();
   TextColumn get gender => text().nullable()();
   IntColumn get weight => integer().nullable()(); // Default value for weight
@@ -14,10 +14,10 @@ class Clients extends Table {
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
   TextColumn get phoneCountryCode => text().nullable()();
-  TextColumn get currentWorkoutId => text().nullable()();
+  TextColumn get currentWorkoutPlanName => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer().nullable()(); // Default value for updatedAt
 
   @override
-  Set<Column> get primaryKey => {authId};
+  Set<Column> get primaryKey => {id};
 }

@@ -46,6 +46,11 @@ import 'package:uuid_v4/uuid_v4.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 
+enum ConcludeEvent {
+  submit,
+  goback,
+}
+
 class FitFlexClubCreateWorkoutPlanPage extends StatefulWidget {
   static const String route = "/fit-club-create-workout-plan";
   final bool update;
@@ -367,11 +372,11 @@ class _FitFlexClubCreateWorkoutPlanPageState
         );
       },
     );
-    _exercises.addListener(
-      () {
-        isProgramEdited = true;
-      },
-    );
+    // _exercises.addListener(
+    //   () {
+    //     isProgramEdited = true;
+    //   },
+    // );
   }
 
   @override
@@ -438,6 +443,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
       weekId: week.id,
       dayId: day.id,
     );
+    if (edit) isProgramEdited = true;
   }
 
   bool _isFirstWeekValid(List<WeekModel> weeks) {
@@ -464,6 +470,125 @@ class _FitFlexClubCreateWorkoutPlanPageState
       }
     }
     return true; // All days have at least one exercise.
+  }
+
+  void _onSubmit(ConcludeEvent event) {
+    final bool isFirstWeekIsComplete = _isFirstWeekValid(_weeks.value);
+
+    if (isFirstWeekIsComplete) {
+      final bool isProgramReady =
+          _areAllDaysPopulatedWithExercises(_weeks.value);
+
+      if (isProgramReady) {
+        if (widget.update) {
+          if (isProgramEdited) {
+            context.read<WorkoutManagementBloc>().add(
+                  UpdateWorkoutPlanEvent(
+                    workoutPlan: _workoutPlanBp.value,
+                  ),
+                );
+          } else {
+            PlatformDialog.showAlertDialog(
+              context: context,
+              title: "Add Workout Plan",
+              message: "You haven't updated a program, you wish to cancel?",
+              cancelText: 'No',
+              confirmText: 'Yes',
+              onConfirm: () {
+                context.go(FitFlexTrainerWorkoutPage.route);
+                context
+                    .read<WorkoutManagementBloc>()
+                    .add(GetWorkoutPlansEvent());
+              },
+            );
+          }
+        } else {
+          _workoutPlanBp.value =
+              _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+          context.read<WorkoutManagementBloc>().add(
+                CreateWorkoutPlanEvent(
+                  workoutPlan: _workoutPlanBp.value,
+                ),
+              );
+        }
+      } else {
+        PlatformDialog.showAlertDialog(
+          context: context,
+          title: "Add Workout Plan",
+          message:
+              "You haven't added exercises for all the weeks, would you like to continue with 1st week program for all other weeks. If you cancel your progress will be lost",
+          cancelText: 'Cancel',
+          onCancel: () {
+            context.go(FitFlexTrainerWorkoutPage.route);
+            context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+          },
+          confirmText: 'Continue',
+          onConfirm: () {
+            final updatedWeeks = _copyExercisesFromFirstWeek(_weeks.value);
+            _weeks.value = updatedWeeks;
+            _workoutPlanBp.value =
+                _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+            if (widget.update) {
+              if (isProgramEdited) {
+                context.read<WorkoutManagementBloc>().add(
+                      UpdateWorkoutPlanEvent(
+                        workoutPlan: _workoutPlanBp.value,
+                      ),
+                    );
+              } else {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "You haven't updated a program, you wish to cancel?",
+                  cancelText: 'No',
+                  confirmText: 'Yes',
+                  onConfirm: () {
+                    context.go(FitFlexTrainerWorkoutPage.route);
+                    context
+                        .read<WorkoutManagementBloc>()
+                        .add(GetWorkoutPlansEvent());
+                  },
+                );
+              }
+            } else {
+              _workoutPlanBp.value =
+                  _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+              context.read<WorkoutManagementBloc>().add(
+                    CreateWorkoutPlanEvent(
+                      workoutPlan: _workoutPlanBp.value,
+                    ),
+                  );
+            }
+          },
+        );
+      }
+    } else {
+      PlatformDialog.showAlertDialog(
+        context: context,
+        title: "Add Workout Plan",
+        message: event == ConcludeEvent.submit
+            ? "You haven't completed setting up your workout program, if you cancel your progress will be lost."
+            : "You haven't completed setting up your workout program, if you continue your progress will be lost.",
+        cancelText: 'Cancel',
+        onCancel: () {
+          if (event == ConcludeEvent.submit) {
+            context.go(FitFlexTrainerWorkoutPage.route);
+            context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+          } else {
+            Navigator.pop(context);
+          }
+        },
+        confirmText: 'Continue',
+        onConfirm: () {
+          if (event == ConcludeEvent.goback) {
+            context.go(FitFlexTrainerWorkoutPage.route);
+            context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+          } else {
+            Navigator.pop(context);
+          }
+        },
+      );
+    }
   }
 
   @override
@@ -504,103 +629,14 @@ class _FitFlexClubCreateWorkoutPlanPageState
             title: "Workout Plan",
             context: context,
             backgroundColor: colorScheme.onPrimaryContainer,
-            onLeadingPressed: () {
-              if (isProgramEdited) {
-                final bool isFirstWeekIsComplete =
-                    _isFirstWeekValid(_weeks.value);
-
-                if (isFirstWeekIsComplete) {
-                  final bool isProgramReady =
-                      _areAllDaysPopulatedWithExercises(_weeks.value);
-
-                  if (isProgramReady) {
-                    _workoutPlanBp.value =
-                        _workoutPlanBp.value.copyWith(weeks: _weeks.value);
-                    context.read<WorkoutManagementBloc>().add(
-                          !widget.update
-                              ? CreateWorkoutPlanEvent(
-                                  workoutPlan: _workoutPlanBp.value,
-                                )
-                              : UpdateWorkoutPlanEvent(
-                                  workoutPlan: _workoutPlanBp.value,
-                                ),
-                        );
-
-                    context.go(FitFlexTrainerWorkoutPage.route);
-                    context
-                        .read<WorkoutManagementBloc>()
-                        .add(GetWorkoutPlansEvent());
-                  } else {
-                    PlatformDialog.showAlertDialog(
-                      context: context,
-                      title: "Add Workout Plan",
-                      message:
-                          "You haven't added exercises for all the weeks, would you like to continue with 1st week program for all other weeks. If you cancel your progress will be lost",
-                      cancelText: 'Cancel',
-                      onCancel: () {
-                        context.go(FitFlexTrainerWorkoutPage.route);
-                        context
-                            .read<WorkoutManagementBloc>()
-                            .add(GetWorkoutPlansEvent());
-                      },
-                      confirmText: 'Continue',
-                      onConfirm: () {
-                        final updatedWeeks =
-                            _copyExercisesFromFirstWeek(_weeks.value);
-                        _weeks.value = updatedWeeks;
-                        _workoutPlanBp.value =
-                            _workoutPlanBp.value.copyWith(weeks: _weeks.value);
-                        context.read<WorkoutManagementBloc>().add(
-                              !widget.update
-                                  ? CreateWorkoutPlanEvent(
-                                      workoutPlan: _workoutPlanBp.value,
-                                    )
-                                  : UpdateWorkoutPlanEvent(
-                                      workoutPlan: _workoutPlanBp.value,
-                                    ),
-                            );
-
-                        context.go(FitFlexTrainerWorkoutPage.route);
-                        context
-                            .read<WorkoutManagementBloc>()
-                            .add(GetWorkoutPlansEvent());
-                      },
-                    );
-                  }
-                } else {
-                  PlatformDialog.showAlertDialog(
-                      context: context,
-                      title: "Add Workout Plan",
-                      message:
-                          "You haven't completed setting up your workout program, if you continue your progress will be lost.",
-                      cancelText: 'Cancel',
-                      onCancel: () {
-                        context.go(FitFlexTrainerWorkoutPage.route);
-                        context
-                            .read<WorkoutManagementBloc>()
-                            .add(GetWorkoutPlansEvent());
-                      },
-                      confirmText: 'Continue',
-                      onConfirm: () {
-                        context.go(FitFlexTrainerWorkoutPage.route);
-                        context
-                            .read<WorkoutManagementBloc>()
-                            .add(GetWorkoutPlansEvent());
-                      });
-                }
-              } else {
-                context.go(FitFlexTrainerWorkoutPage.route);
-                context
-                    .read<WorkoutManagementBloc>()
-                    .add(GetWorkoutPlansEvent());
-              }
-            },
+            onLeadingPressed: () => _onSubmit(ConcludeEvent.goback),
           ),
           body: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
             listener: (context, state) {
               if (state is WorkoutManagementLoading) {
                 PlatformDialog.showLoadingDialog(
                   context: context,
+                  message: "Processing your request...",
                 );
               }
 
@@ -615,27 +651,29 @@ class _FitFlexClubCreateWorkoutPlanPageState
 
               if (state is CreateWorkoutComplete) {
                 PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message: "Workout Plan Created Successfully!",
-                    onConfirm: () {
-                      context.go(FitFlexTrainerWorkoutPage.route);
-                      context
-                          .read<WorkoutManagementBloc>()
-                          .add(GetWorkoutPlansEvent());
-                    });
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "Workout Plan Created Successfully!",
+                  onConfirm: () {
+                    context.go(FitFlexTrainerWorkoutPage.route);
+                    context
+                        .read<WorkoutManagementBloc>()
+                        .add(GetWorkoutPlansEvent());
+                  },
+                );
               }
               if (state is UpdateWorkoutComplete) {
                 PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message: "Workout Plan updated Successfully!",
-                    onConfirm: () {
-                      context.go(FitFlexTrainerWorkoutPage.route);
-                      context
-                          .read<WorkoutManagementBloc>()
-                          .add(GetWorkoutPlansEvent());
-                    });
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "Workout Plan updated Successfully!",
+                  onConfirm: () {
+                    context.go(FitFlexTrainerWorkoutPage.route);
+                    context
+                        .read<WorkoutManagementBloc>()
+                        .add(GetWorkoutPlansEvent());
+                  },
+                );
               }
             },
             child: _buildContent(context),
@@ -745,69 +783,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
               fontWeight: FontWeight.bold,
             ),
             text: "Submit",
-            onPressed: () {
-              final bool isFirstWeekIsComplete =
-                  _isFirstWeekValid(_weeks.value);
-
-              if (isFirstWeekIsComplete) {
-                final bool isProgramReady =
-                    _areAllDaysPopulatedWithExercises(_weeks.value);
-
-                if (isProgramReady) {
-                  _workoutPlanBp.value =
-                      _workoutPlanBp.value.copyWith(weeks: _weeks.value);
-                  context.read<WorkoutManagementBloc>().add(
-                        !widget.update
-                            ? CreateWorkoutPlanEvent(
-                                workoutPlan: _workoutPlanBp.value,
-                              )
-                            : UpdateWorkoutPlanEvent(
-                                workoutPlan: _workoutPlanBp.value,
-                              ),
-                      );
-                } else {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message:
-                        "You haven't added exercises for all the weeks, would you like to continue with 1st week program for all other weeks. If you cancel your progress will be lost",
-                    cancelText: 'Cancel',
-                    confirmText: 'Continue',
-                    onConfirm: () {
-                      final updatedWeeks =
-                          _copyExercisesFromFirstWeek(_weeks.value);
-                      _weeks.value = updatedWeeks;
-                      _workoutPlanBp.value =
-                          _workoutPlanBp.value.copyWith(weeks: _weeks.value);
-                      context.read<WorkoutManagementBloc>().add(
-                            !widget.update
-                                ? CreateWorkoutPlanEvent(
-                                    workoutPlan: _workoutPlanBp.value,
-                                  )
-                                : UpdateWorkoutPlanEvent(
-                                    workoutPlan: _workoutPlanBp.value,
-                                  ),
-                          );
-                    },
-                  );
-                }
-              } else {
-                PlatformDialog.showAlertDialog(
-                  context: context,
-                  title: "Add Workout Plan",
-                  message:
-                      "You haven't completed setting up your workout program, would you like to continue with the same ?",
-                  cancelText: 'No',
-                  confirmText: 'Yes',
-                  onCancel: () {
-                    context.go(FitFlexTrainerWorkoutPage.route);
-                    context
-                        .read<WorkoutManagementBloc>()
-                        .add(GetWorkoutPlansEvent());
-                  },
-                );
-              }
-            },
+            onPressed: () => _onSubmit(ConcludeEvent.submit),
           )!,
         ),
       ],

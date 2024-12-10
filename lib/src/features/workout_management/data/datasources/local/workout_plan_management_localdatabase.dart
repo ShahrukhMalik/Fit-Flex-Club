@@ -12,10 +12,17 @@ abstract class WorkoutPlanManagementLocaldatasource {
   Future<Either<bool, List<WorkoutPlanModel>>>? getWorkoutPlans();
 
   ///
+  Future<Either<bool, WorkoutPlanModel?>>? getWorkoutPlanForClient(
+      String clientId);
+
+  ///
   Future<void> insertWorkoutPlans(List<WorkoutPlanModel> workoutPlans);
 
   ///
   Future<int> insertWorkoutPlan(WorkoutPlanModel workoutPlan);
+
+  ///
+  Future<int> assignWorkoutPlan(WorkoutPlanModel workoutPlan);
 
   ///
   Future<void> updateWorkoutPlan(WorkoutPlanModel workoutPlan);
@@ -45,7 +52,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
         return Left(false);
       }
       if (isDataStale(
-        Duration(minutes: 30).inSeconds,
+        Duration(seconds: 1).inSeconds,
         workoutPlans.first.createdAt!,
         workoutPlans.first.updatedAt,
       )) {
@@ -138,6 +145,44 @@ class WorkoutPlanManagementLocaldatasourceImpl
   Future<void> updateWorkoutPlan(WorkoutPlanModel workoutPlan) async {
     try {
       return Future(() async => await dao.updateWorkoutPlan(workoutPlan));
+    } catch (err) {
+      throw CacheException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<int> assignWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+    try {
+      return Future(() async => await dao.assignWorkoutPlan(workoutPlan));
+    } catch (err) {
+      throw CacheException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<Either<bool, WorkoutPlanModel?>>? getWorkoutPlanForClient(
+    String clientId,
+  ) async {
+    try {
+      final workoutPlanModel = await dao.getWorkoutPlanForClient(clientId);
+
+      if (workoutPlanModel != null) {
+        if (isDataStale(
+          Duration(days: 1).inSeconds,
+          workoutPlanModel.createdAt!,
+          workoutPlanModel.updatedAt,
+        )) {
+          await database.deleteExercises();
+          return Left(true);
+        }
+        return Right(workoutPlanModel);
+      } else {
+        return Left(false);
+      }
     } catch (err) {
       throw CacheException(
         errorMessage: err.toString(),

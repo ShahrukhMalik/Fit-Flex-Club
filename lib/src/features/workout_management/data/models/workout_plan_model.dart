@@ -8,6 +8,7 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/wo
 class WorkoutPlanModel extends WorkoutPlan {
   final int? createdAt;
   final int? updatedAt;
+  final String? clientId;
 
 // Add the weeks to this model
 
@@ -17,6 +18,7 @@ class WorkoutPlanModel extends WorkoutPlan {
     required super.uid,
     this.createdAt,
     this.updatedAt,
+    this.clientId,
   });
 
   factory WorkoutPlanModel.fromMap(Map<String, dynamic> data) {
@@ -24,6 +26,7 @@ class WorkoutPlanModel extends WorkoutPlan {
       name: data['name'],
       weeks: data['weeks'],
       uid: data['uid'],
+      clientId: data['clientId'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
     );
@@ -108,10 +111,12 @@ class WorkoutPlanModel extends WorkoutPlan {
     String? name,
     List<WeekModel>? weeks,
     String? uid,
+    String? clientId,
     int? createdAt,
     int? updatedAt,
   }) {
     return WorkoutPlanModel(
+      clientId: clientId ?? this.clientId,
       name: name ?? this.name,
       weeks: weeks ?? this.weeks,
       uid: uid ?? this.uid,
@@ -124,6 +129,7 @@ class WorkoutPlanModel extends WorkoutPlan {
     return {
       'name': name,
       'uid': uid,
+      'clientId' : clientId,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

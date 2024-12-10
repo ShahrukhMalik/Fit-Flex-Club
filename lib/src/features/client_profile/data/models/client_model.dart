@@ -4,24 +4,24 @@ import 'package:fit_flex_club/src/features/client_profile/domain/entities/client
 
 class ClientModel extends ClientEntity {
   const ClientModel({
-    required super.authId,
-    required super.age,
-    required super.gender,
-    required super.weight,
-    required super.weightUnit,
-    required super.height,
-    required super.heightUnit,
-    required super.isTrainer,
-    required super.isUserActive,
-    required super.username,
-    required super.email,
-    required super.phone,
-    required super.currentWorkoutId,
+     super.id,
+     super.age,
+     super.gender,
+     super.weight,
+     super.weightUnit,
+     super.height,
+     super.heightUnit,
+     super.isTrainer,
+     super.isUserActive,
+     super.username,
+     super.email,
+     super.phone,
+     super.currentWorkoutPlanName,
   });
   @override
   List<Object?> get props {
     return [
-      authId,
+      id,
       age,
       gender,
       weight,
@@ -32,12 +32,12 @@ class ClientModel extends ClientEntity {
       isUserActive,
       username,
       phone,
-      currentWorkoutId
+      currentWorkoutPlanName
     ];
   }
 
   ClientModel copyWith({
-    String? authId,
+    String? id,
     int? age,
     String? gender,
     int? weight,
@@ -48,14 +48,14 @@ class ClientModel extends ClientEntity {
     bool? isUserActive,
     String? username,
     String? email,
-    String? currentWorkoutId,
+    String? currentWorkoutPlanName,
     Map<String, dynamic>? phone,
   }) {
     return ClientModel(
-      currentWorkoutId: currentWorkoutId ?? this.currentWorkoutId,
+      currentWorkoutPlanName: currentWorkoutPlanName ?? this.currentWorkoutPlanName,
       phone: phone ?? this.phone,
       email: email ?? this.email,
-      authId: authId ?? this.authId,
+      id: id ?? this.id,
       age: age ?? this.age,
       gender: gender ?? this.gender,
       weight: weight ?? this.weight,
@@ -70,7 +70,7 @@ class ClientModel extends ClientEntity {
 
   Map<String, dynamic> toMap() {
     return {
-      'authId': authId,
+      'id': id,
       'age': age,
       'gender': gender,
       'weight': weight,
@@ -85,13 +85,13 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
-      currentWorkoutId: map['currentWorkoutId'],
+      currentWorkoutPlanName: map['currentWorkoutPlanName'],
       phone: {
         'countryCode': map['phoneCountryCode'],
         'phone': map['phone'],
       },
       email: map['email'],
-      authId: map['authId'],
+      id: map['id'],
       age: map['age'],
       gender: map['gender'],
       weight: map['weight'],
@@ -110,10 +110,10 @@ class ClientModel extends ClientEntity {
   ) {
     final data = snapshot.data();
     return ClientModel(
-      currentWorkoutId: data?['currentWorkoutId'],
+      currentWorkoutPlanName: data?['currentWorkoutPlanName'],
       phone: data?['phone'],
       email: data?['email'],
-      authId: snapshot.id,
+      id: snapshot.id,
       age: data?['age'],
       gender: data?['gender'],
       weight: data?['weight'],
@@ -128,10 +128,10 @@ class ClientModel extends ClientEntity {
 
   factory ClientModel.fromClientEntity(ClientEntity clientEntity) {
     return ClientModel(
-      currentWorkoutId: clientEntity.currentWorkoutId,
+      currentWorkoutPlanName: clientEntity.currentWorkoutPlanName,
       phone: clientEntity.phone,
       email: clientEntity.email,
-      authId: clientEntity.authId,
+      id: clientEntity.id,
       age: clientEntity.age,
       gender: clientEntity.gender,
       weight: clientEntity.weight,
@@ -147,8 +147,8 @@ class ClientModel extends ClientEntity {
   Map<String, dynamic> toFirestore() {
     final data = <String, dynamic>{};
 
-    if (authId != null) data['authId'] = authId;
-    if (currentWorkoutId != null) data['currentWorkoutId'] = currentWorkoutId;
+    if (id != null) data['id'] = id;
+    if (currentWorkoutPlanName != null) data['currentWorkoutPlanName'] = currentWorkoutPlanName;
     if (age != null) data['age'] = age;
     if (gender != null) data['gender'] = gender;
     if (weightUnit != null && weightUnit == 'kg') data['weightInKg'] = weight;

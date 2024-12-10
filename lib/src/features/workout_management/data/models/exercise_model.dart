@@ -3,6 +3,7 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/ex
 import 'package:uuid_v4/uuid_v4.dart';
 
 class ExerciseModel extends Exercise {
+  final String? clientId;
   final String dayId;
   const ExerciseModel(
     super.sets, {
@@ -12,12 +13,14 @@ class ExerciseModel extends Exercise {
     required super.name,
     super.category,
     required this.dayId,
+    this.clientId,
     super.muscleGroup,
     super.parameters,
   });
 
   factory ExerciseModel.fromMap(Map<String, dynamic> data) {
     return ExerciseModel(
+      clientId: data['clientId'],
       dayId: data['dayId'],
       List.from(
         (data['sets'] as List).map(
@@ -41,6 +44,9 @@ class ExerciseModel extends Exercise {
       'code': code,
       'name': name,
       'id': id,
+      'clientId': clientId,
+      'exerciseOrder': exerciseOrder,
+      'dayId': dayId,
       'sets': sets.map((e) => e.toMap()).toList(),
     };
   }
@@ -50,6 +56,7 @@ class ExerciseModel extends Exercise {
     String? code,
     String? id,
     String? dayId,
+    String? clientId,
     String? name,
     String? category,
     String? muscleGroup,
@@ -57,6 +64,7 @@ class ExerciseModel extends Exercise {
   }) {
     return ExerciseModel(
       dayId: dayId ?? this.dayId, // Keep the same dayId as before.
+      clientId: clientId ?? this.clientId, // Keep the same dayId as before.
       sets ?? this.sets,
       code: code ?? this.code,
       id: id ?? this.id,
@@ -67,37 +75,6 @@ class ExerciseModel extends Exercise {
     );
   }
 
-  /// Adds a new set to the list if it doesn't exist (based on `id`).
-  /// The newly added set is placed at the top of the list.
-  /// Always appends a new empty `SetModel` at the end.
-  // ExerciseModel addSet(SetModel newSet) {
-  //   final oldList = sets;
-  //   final existingSet = sets.where((set) => set.id == newSet.id).toList()[0];
-  //   final updatedSet = existingSet.copyWith(
-  //     targetReps: newSet.targetReps,
-  //     targetWeight: newSet.targetWeight,
-  //   );
-  //   oldList.removeWhere(
-  //     (element) {
-  //       return element.id == newSet.id;
-  //     },
-  //   );
-
-  //   oldList.addAll(
-  //     [
-  //       ...oldList,
-  //       updatedSet,
-  //       SetModel(
-  //         id: UUIDv4().toString(),
-  //       ),
-  //     ],
-  //   );
-  //   print(oldList);
-
-  //   return copyWith(sets: oldList);
-  // }
-
-  /// Deletes a set from the list based on `id`.
   ExerciseModel deleteSet(String setId) {
     final updatedSets = sets.where((set) => set.id != setId).toList();
     return copyWith(sets: updatedSets);

@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 
 class ExerciseBpModel extends ExerciseEntity {
+    final String? clientId;
   const ExerciseBpModel({
     required super.code,
     required super.category,
@@ -8,6 +9,7 @@ class ExerciseBpModel extends ExerciseEntity {
     required super.name,
     required super.parameters,
     required super.id,
+    this.clientId,
   });
 
   // Factory constructor to create an instance from Firestore data
@@ -34,6 +36,7 @@ class ExerciseBpModel extends ExerciseEntity {
       'name': name,
       'parameters': parameters,
       'id': id,
+      'clientId': clientId,
     };
   }
 }

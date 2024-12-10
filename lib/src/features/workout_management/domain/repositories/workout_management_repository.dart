@@ -11,6 +11,11 @@ abstract class WorkoutManagementRepository {
   Future<Either<Failures, List<WorkoutPlanModel>?>?>? getWorkoutPlans();
 
   ///
+  Future<Either<Failures, WorkoutPlanModel?>?>? getWorkoutPlanForClient(
+    String clientId,
+  );
+
+  ///
   Future<Either<Failures, List<ExerciseEntity>?>?>? getExercises();
 
   ///
@@ -19,7 +24,16 @@ abstract class WorkoutManagementRepository {
   );
 
   ///
+  Future<Either<Failures, void>>? assignWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  );
+
+  ///
   Future<Either<Failures, void>>? updateWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  );
+  ///
+  Future<Either<Failures, void>>? updateAssignedWorkoutPlan(
     WorkoutPlanModel workoutPlan,
   );
 }

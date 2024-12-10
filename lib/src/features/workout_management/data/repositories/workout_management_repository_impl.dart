@@ -73,7 +73,7 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
         //TODO:OFFLINE SUPPORT
         return const Left(
           NetworkFailure(
-            message: 'Offline Support is not there!',
+            message: 'Offline Support is coming soon!',
           ),
         );
       } else {
@@ -140,22 +140,145 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       );
     }
   }
-  
+
   @override
-  Future<Either<Failures, void>>? updateWorkoutPlan(WorkoutPlanModel workoutPlan) async{
-  try {
+  Future<Either<Failures, void>>? updateWorkoutPlan(
+      WorkoutPlanModel workoutPlan) async {
+    try {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.updateWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
         //TODO:OFFLINE SUPPORT
         return const Left(
           NetworkFailure(
-            message: 'Offline Support is not there!',
+            message: 'Offline Support is coming soon!',
           ),
         );
       } else {
         return Right(
           await remote.updateWorkoutPlan(
+            workoutPlan,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, void>>? assignWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  ) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.assignWorkoutPlan(workoutPlan);
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is coming soon!',
+          ),
+        );
+      } else {
+        return Right(
+          await remote.assignWorkoutPlan(
+            workoutPlan,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, WorkoutPlanModel?>?>? getWorkoutPlanForClient(
+    String clientId,
+  ) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.getWorkoutPlanForClient(clientId);
+      return cache?.fold(
+        (l) async {
+          if (isNetworkConnected == null || !isNetworkConnected) {
+            return const Left(
+              NetworkFailure(message: 'No internet Connection'),
+            );
+          } else {
+            final remoteWorkoutPlan =
+                await remote.getWorkoutPlanforClient(clientId);
+            if (remoteWorkoutPlan != null) {
+              await local.assignWorkoutPlan(remoteWorkoutPlan);
+            }
+            return Right(
+              await remote.getWorkoutPlanforClient(
+                clientId,
+              ),
+            );
+          }
+        },
+        (r) {
+          return Right(r);
+        },
+      );
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, void>>? updateAssignedWorkoutPlan(
+      WorkoutPlanModel workoutPlan) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.updateWorkoutPlan(workoutPlan);
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is coming soon!',
+          ),
+        );
+      } else {
+        return Right(
+          await remote.updateAssignedWorkoutPlan(
             workoutPlan,
           ),
         );

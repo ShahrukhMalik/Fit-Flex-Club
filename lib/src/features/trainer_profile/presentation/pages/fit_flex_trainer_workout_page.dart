@@ -1,4 +1,5 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
@@ -68,71 +69,65 @@ class _WorkoutProgramsOverviewState extends State<WorkoutProgramsOverview> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Program Name
-                  Text(
-                    program.name,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: globalColorScheme.onPrimaryContainer, // Text color
-                    ),
-                    maxLines: 1,
-                    overflow:
-                        TextOverflow.ellipsis, // Handle long names gracefully
-                  ),
-                  // const SizedBox(height: 8),
 
-                  // Action Buttons
+                  // Program Status
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: widget.colorScheme.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            program.name,
+                            style: TextStyle(
+                              color: widget.colorScheme.onPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
                       // Edit Button
-                      TextButton.icon(
-                        onPressed: () {
-                          // Handle edit action
-                          context.go(
-                            FitFlexClubCreateWorkoutPlanPage.route,
-                            extra: {
-                              'updateData': true,
-                              "workoutPlan": program,
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              // Handle edit action
+                              context.go(
+                                FitFlexClubCreateWorkoutPlanPage.route,
+                                extra: {
+                                  'updateData': true,
+                                  "workoutPlan": program,
+                                },
+                              );
                             },
-                          );
-                        },
-                        icon: Icon(
-                          Icons.edit,
-                          color: globalColorScheme
-                              .secondaryContainer, // Primary color for edit
-                          size: 20,
-                        ),
-                        label: Text(
-                          "Edit",
-                          style: TextStyle(
-                            color: globalColorScheme
-                                .secondaryContainer, // Match button text color
-                            fontSize: 14,
+                            icon: Icon(
+                              Icons.edit,
+                              color: globalColorScheme
+                                  .secondaryContainer, // Primary color for edit
+                              size: 20,
+                            ),
                           ),
-                        ),
-                      ),
-                      const Spacer(), // Push the delete button to the right
-                      // Delete Button
-                      TextButton.icon(
-                        onPressed: () {
-                          // Handle delete action
-                        },
-                        icon: Icon(
-                          Icons.delete,
-                          color:
-                              globalColorScheme.error, // Error color for delete
-                          size: 20,
-                        ),
-                        label: Text(
-                          "Delete",
-                          style: TextStyle(
-                            color: globalColorScheme
-                                .error, // Match button text color
-                            fontSize: 14,
+                          // Delete Button
+                          IconButton(
+                            onPressed: () {
+                              // Handle delete action
+                            },
+                            icon: Icon(
+                              Icons.delete,
+                              color: globalColorScheme
+                                  .error, // Error color for delete
+                              size: 20,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
+                      // const Spacer(), // Push the delete button to the right
                     ],
                   ),
                 ],
@@ -193,8 +188,9 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
       ),
       backgroundColor: globalColorScheme.surface,
       appBar: PlatformAppbar.basicAppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: globalColorScheme.onPrimaryContainer,
-        title: "Workouts",
+        title: "Workout Programs",
         context: context,
       ),
       body: Padding(
@@ -206,7 +202,9 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                 context: context,
                 title: "Workout Plans",
                 message: state.failures.message ?? "Something Went Wrong!",
-                onConfirm: () => Navigator.pop(context),
+                onConfirm: () {
+                  context.go(FitFlexTrainerWorkoutPage.route);
+                },
               );
             }
           },
@@ -227,9 +225,19 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
               }
             }
 
-            if (state is WorkoutManagementLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
+            if (state is GetWorkoutPlansLoading) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: List.generate(
+                    8,
+                    (index) => Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: PlatformLoader().buildLoader(
+                        type: LoaderType.shimmer,
+                      ),
+                    ),
+                  ),
+                ),
               );
             }
 
@@ -241,8 +249,18 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                 ),
               );
             }
-            return Center(
-              child: CircularProgressIndicator(),
+            return SingleChildScrollView(
+              child: Column(
+                children: List.generate(
+                  8,
+                  (index) => Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: PlatformLoader().buildLoader(
+                      type: LoaderType.shimmer,
+                    ),
+                  ),
+                ),
+              ),
             );
           },
         ),

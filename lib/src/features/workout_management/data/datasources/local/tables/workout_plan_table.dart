@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 
 class WorkoutPlans extends Table {
   TextColumn get uid => text()(); // Primary key
@@ -6,20 +7,7 @@ class WorkoutPlans extends Table {
   IntColumn get createdAt =>
       integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
   IntColumn get updatedAt => integer().nullable()();
-
+  TextColumn get clientId => text().nullable().references(Clients, #id)();
   @override
   Set<Column> get primaryKey => {uid};
 }
-
-//    ├── tables/
-// │   │   ├── workout_plan_table.dart
-// │   │   ├── week_table.dart
-// │   │   ├── day_table.dart
-// │   │   ├── exercise_table.dart
-// │   │   └── set_table.dart
-// │   ├── daos/
-// │   │   ├── workout_plan_dao.dart
-// │   │   ├── week_dao.dart
-// │   │   ├── day_dao.dart
-// │   │   ├── exercise_dao.dart
-// │   │   └── set_dao.dart

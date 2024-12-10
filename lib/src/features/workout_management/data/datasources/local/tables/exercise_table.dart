@@ -1,8 +1,11 @@
 import 'package:drift/drift.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/day_table.dart';
 
 class WorkoutPlanExercise extends Table {
   TextColumn get id => text()(); // Auto-increment primary key
+
+  TextColumn get clientId => text().nullable().references(Clients, #id)();
   @override
   Set<Column> get primaryKey => {id}; // Auto-increment primary key
   TextColumn get dayId =>

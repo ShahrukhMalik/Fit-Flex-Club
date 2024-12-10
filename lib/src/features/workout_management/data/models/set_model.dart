@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/set_entity.dart';
 
 class SetModel extends SetEntity {
+    final String? clientId;
   const SetModel({
     super.targetReps,
     super.targetWeight,
@@ -12,6 +13,7 @@ class SetModel extends SetEntity {
     super.actualTime,
     required super.id,
     required super.exerciseId,
+    this.clientId,
   });
 
   // Convert a Map to a Set instance
@@ -19,6 +21,7 @@ class SetModel extends SetEntity {
     return SetModel(
       exerciseId: map['exerciseId'],
       id: map['id'],
+      clientId: map['clientId'],
       targetReps: map['targetReps'] as int?,
       targetWeight: (map['targetWeight'] as num?)?.toDouble(),
       targetDistance: (map['targetDistance'] as num?)?.toDouble(),
@@ -38,6 +41,7 @@ class SetModel extends SetEntity {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'clientId': clientId,
       'exerciseId': exerciseId,
       if (targetReps != null) 'targetReps': targetReps,
       if (targetWeight != null) 'targetWeight': targetWeight,
@@ -61,9 +65,11 @@ class SetModel extends SetEntity {
     double? actualDistance,
     Duration? actualTime,
     String? id,
+    String? clientId,
     String? exeriseId,
   }) {
     return SetModel(
+      clientId: clientId ?? this.clientId,
       exerciseId: exerciseId,
       targetReps: targetReps ?? this.targetReps,
       targetWeight: targetWeight ?? this.targetWeight,

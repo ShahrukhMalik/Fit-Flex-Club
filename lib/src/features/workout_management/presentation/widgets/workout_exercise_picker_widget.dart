@@ -355,15 +355,7 @@ class _ExercisePickerBottomSheetState extends State<ExercisePickerBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return
-        // Scaffold(
-        //   appBar: PlatformAppbar.basicAppBar(
-        //     backgroundColor: globalColorScheme.onPrimaryContainer,
-        //     title: "Select Exercises",
-        //     context: context,
-        //   ),
-        //   body:
-        Column(
+    return Column(
       children: [
         // Search Field with Filter Icon
         Padding(

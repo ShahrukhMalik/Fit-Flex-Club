@@ -59,13 +59,13 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
   }
 
   Future<void> assignWorkoutPlan(
-    String authId,
+    String id,
     String workoutPlanUid,
   ) async {
-    // Perform the update where the authId matches
-    await (update(clients)..where((tbl) => tbl.authId.equals(authId))).write(
+    // Perform the update where the id matches
+    await (update(clients)..where((tbl) => tbl.id.equals(id))).write(
       ClientsCompanion(
-        currentWorkoutId: Value(workoutPlanUid), // Update currentWorkoutId
+        currentWorkoutPlanName: Value(workoutPlanUid), // Update currentWorkoutPlanName
         updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
       ),
     );
@@ -94,7 +94,7 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
     // Map the ClientModel fields to the Clients table fields, with null checks
     final client = ClientsCompanion(
       createdAt: Value(DateTime.now().millisecondsSinceEpoch),
-      authId: Value(clientModel.authId!),
+      id: Value(clientModel.id!),
       age: clientModel.age != null ? Value(clientModel.age!) : Value.absent(),
       gender: clientModel.gender != null
           ? Value(clientModel.gender!)
@@ -129,8 +129,8 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
       phoneCountryCode: clientModel.phone?['countryCode'] != null
           ? Value(clientModel.phone!['countryCode']!)
           : Value.absent(),
-      currentWorkoutId: clientModel.currentWorkoutId != null
-          ? Value(clientModel.currentWorkoutId!)
+      currentWorkoutPlanName: clientModel.currentWorkoutPlanName != null
+          ? Value(clientModel.currentWorkoutPlanName!)
           : Value.absent(),
     );
 
@@ -146,7 +146,7 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
           clientsList.map(
             (clientModel) {
               return ClientsCompanion(
-                authId: Value(clientModel.authId!),
+                id: Value(clientModel.id!),
                 age: clientModel.age != null
                     ? Value(clientModel.age!)
                     : Value.absent(),
@@ -183,8 +183,8 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
                 phoneCountryCode: clientModel.phone?['countryCode'] != null
                     ? Value(clientModel.phone?['countryCode']!)
                     : Value.absent(),
-                currentWorkoutId: clientModel.currentWorkoutId != null
-                    ? Value(clientModel.currentWorkoutId!)
+                currentWorkoutPlanName: clientModel.currentWorkoutPlanName != null
+                    ? Value(clientModel.currentWorkoutPlanName!)
                     : Value.absent(),
                 createdAt: Value(DateTime.now().millisecondsSinceEpoch),
                 updatedAt: Value.absent()
@@ -204,16 +204,16 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
     );
   }
 
-  // Method to get a client by their primary key (authId)
-  Future<ClientModel?> getClientByAuthId(String authId) async {
+  // Method to get a client by their primary key (id)
+  Future<ClientModel?> getClientByid(String id) async {
     final clientRow = await (select(clients)
-          ..where((tbl) => tbl.authId.equals(authId)))
+          ..where((tbl) => tbl.id.equals(id)))
         .getSingleOrNull(); // Returns null if no client is found
 
     // Directly map fields from the clientRow to ClientModel constructor
     if (clientRow != null) {
       return ClientModel(
-        authId: clientRow.authId,
+        id: clientRow.id,
         age: clientRow.age,
         gender: clientRow.gender,
         weight: clientRow.weight,
@@ -228,7 +228,7 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
           "phoneNumber": clientRow.phone,
           "countryCode": clientRow.phoneCountryCode
         },
-        currentWorkoutId: clientRow.currentWorkoutId,
+        currentWorkoutPlanName: clientRow.currentWorkoutPlanName,
       );
     }
     return null; // Return null if no client is found

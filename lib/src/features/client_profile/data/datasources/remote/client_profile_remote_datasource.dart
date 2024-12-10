@@ -125,19 +125,41 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
   @override
   Future<List<ClientModel>?> getClients() async {
     try {
-      final CollectionReference ref = db.collection('Users');
+      final CollectionReference usersRef = db.collection('Users');
 
       // Query to get clients who are not trainers
       final QuerySnapshot querySnapshot =
-          await ref.where('isTrainer', isEqualTo: false).get();
+          await usersRef.where('isTrainer', isEqualTo: false).get();
 
       // Map the QuerySnapshot documents to a List<ClientModel>
-      final List<ClientModel> clients = querySnapshot.docs.map((doc) {
-        return ClientModel.fromFirestore(
-          (doc as DocumentSnapshot<Map<String, dynamic>>),
+      final List<ClientModel> clients =
+          await Future.wait(querySnapshot.docs.map((doc) async {
+        final client = ClientModel.fromFirestore(
+          doc as DocumentSnapshot<Map<String, dynamic>>,
           null,
         );
-      }).toList();
+
+        try {
+          // Access the workoutPlans sub-collection for this user
+          final CollectionReference workoutPlansRef =
+              doc.reference.collection('workoutPlans');
+          final QuerySnapshot workoutPlansSnapshot =
+              await workoutPlansRef.limit(1).get();
+
+          // Assign the name of the first workout plan to currentWorkoutPlanName, if available
+          if (workoutPlansSnapshot.docs.isNotEmpty) {
+            final firstPlan =
+                workoutPlansSnapshot.docs.first.data() as Map<String, dynamic>;
+            return client.copyWith(currentWorkoutPlanName: firstPlan['name']);
+          }
+        } catch (e) {
+          // If sub-collection does not exist or any other issue occurs, log the error (optional)
+          print('No workoutPlans sub-collection found for user ${doc.id}: $e');
+        }
+
+        // Return the client as is if no workout plan is found or sub-collection doesn't exist
+        return client;
+      }).toList());
 
       return clients;
     } on FirebaseException catch (err) {

@@ -4,12 +4,23 @@ abstract class WorkoutManagementState extends Equatable {
   const WorkoutManagementState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class WorkoutManagementInitial extends WorkoutManagementState {}
 
 class WorkoutManagementLoading extends WorkoutManagementState {}
+
+class GetExercisesLoading extends WorkoutManagementState {}
+class GetWorkoutPlansLoading extends WorkoutManagementState {}
+
+class CreateWorkoutLoading extends WorkoutManagementState {}
+
+class UpdateWorkoutLoading extends WorkoutManagementState {}
+
+class AssigneWorkoutPlanLoading extends WorkoutManagementState {}
+
+class GetWorkoutPlansForClientLoading extends WorkoutManagementState {}
 
 class GetWorkoutPlansComplete extends WorkoutManagementState {
   final List<WorkoutPlanModel> workoutPlans;
@@ -26,7 +37,18 @@ class GetExercisesComplete extends WorkoutManagementState {
 }
 
 class CreateWorkoutComplete extends WorkoutManagementState {}
+
 class UpdateWorkoutComplete extends WorkoutManagementState {}
+
+class AssignWorkoutComplete extends WorkoutManagementState {}
+
+class GetWorkoutPlansForClientComplete extends WorkoutManagementState {
+  final WorkoutPlanModel? workoutPlan;
+
+  const GetWorkoutPlansForClientComplete({required this.workoutPlan});
+    @override
+  List<Object?> get props => [workoutPlan];
+}
 
 class WorkoutManagementError extends WorkoutManagementState {
   final Failures failures;
