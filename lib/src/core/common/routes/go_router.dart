@@ -106,6 +106,7 @@ GoRouter goRouter(appState) {
             child: FitFlexClubCreateWorkoutPlanPage(
               update: extraData?['updateData'] ?? false,
               workoutPlanModel: extraData?['workoutPlan'],
+              clientEntity: extraData?['clientEntity'],
             ),
           );
         },

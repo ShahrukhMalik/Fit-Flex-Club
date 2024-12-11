@@ -15,6 +15,7 @@ class PlatformDialog {
   }) async {
     if (Platform.isIOS) {
       return showCupertinoDialog(
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
@@ -45,9 +46,11 @@ class PlatformDialog {
     }
 
     return showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          
           title: Text(title),
           content: Text(message),
           actions: [

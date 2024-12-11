@@ -5,19 +5,20 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/day_mo
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/week_entity.dart';
 
 class WeekModel extends Week {
-      final String? clientId;
+  final String? clientId;
   const WeekModel({
     required super.weekNumber,
     required super.days,
     required super.id,
     required super.workoutPlanId,
-   this.clientId,
+    this.clientId,
   });
 
   factory WeekModel.forEachElement(
     int weekNumber,
     String id,
     String workoutPlanId,
+    String? clientId,
     List<DayModel> days,
   ) {
     return WeekModel(
@@ -25,6 +26,7 @@ class WeekModel extends Week {
       workoutPlanId: workoutPlanId,
       weekNumber: weekNumber,
       days: days,
+      clientId: clientId,
     );
   }
 

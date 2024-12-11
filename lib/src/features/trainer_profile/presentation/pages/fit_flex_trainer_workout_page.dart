@@ -116,7 +116,11 @@ class _WorkoutProgramsOverviewState extends State<WorkoutProgramsOverview> {
                           // Delete Button
                           IconButton(
                             onPressed: () {
-                              // Handle delete action
+                              context.read<WorkoutManagementBloc>().add(
+                                    DeleteWorkoutPlanEvent(
+                                      workoutPlan: program,
+                                    ),
+                                  );
                             },
                             icon: Icon(
                               Icons.delete,
@@ -203,6 +207,20 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                 title: "Workout Plans",
                 message: state.failures.message ?? "Something Went Wrong!",
                 onConfirm: () {
+                  context.go(FitFlexTrainerWorkoutPage.route);
+                },
+              );
+            }
+
+            if (state is DeleteWorkoutComplete) {
+              PlatformDialog.showAlertDialog(
+                context: context,
+                title: "Workout Plans",
+                message: "Workout Deleted Successfully!",
+                onConfirm: () {
+                  context
+                      .read<WorkoutManagementBloc>()
+                      .add(GetWorkoutPlansEvent());
                   context.go(FitFlexTrainerWorkoutPage.route);
                 },
               );

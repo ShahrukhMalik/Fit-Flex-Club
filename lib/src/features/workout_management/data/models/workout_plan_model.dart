@@ -86,6 +86,7 @@ class WorkoutPlanModel extends WorkoutPlan {
           dayData['dayNumber'],
           dayData['id'],
           dayData['weekId'],
+          dayData['clientId'],
           exercises,
         );
       }));
@@ -94,6 +95,7 @@ class WorkoutPlanModel extends WorkoutPlan {
         weekData['weekNumber'],
         weekData['id'],
         weekData['workoutPlanId'],
+        weekData['clientId'],
         days,
       );
     }));
@@ -102,6 +104,7 @@ class WorkoutPlanModel extends WorkoutPlan {
       'name': data['name'],
       'weeks': weeks,
       'uid': data['uid'],
+      'clientId': data['clientId'],
       'createdAt': data['createdAt'],
       'updatedAt': data['updatedAt'],
     });
@@ -129,7 +132,7 @@ class WorkoutPlanModel extends WorkoutPlan {
     return {
       'name': name,
       'uid': uid,
-      'clientId' : clientId,
+      'clientId': clientId,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

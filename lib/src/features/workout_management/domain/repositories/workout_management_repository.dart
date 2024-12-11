@@ -29,9 +29,20 @@ abstract class WorkoutManagementRepository {
   );
 
   ///
+  Future<Either<Failures, void>>? deleteWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  );
+
+  ///
+  Future<Either<Failures, void>>? deleteAssignedWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  );
+
+  ///
   Future<Either<Failures, void>>? updateWorkoutPlan(
     WorkoutPlanModel workoutPlan,
   );
+
   ///
   Future<Either<Failures, void>>? updateAssignedWorkoutPlan(
     WorkoutPlanModel workoutPlan,

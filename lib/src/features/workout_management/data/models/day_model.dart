@@ -16,9 +16,11 @@ class DayModel extends Day {
     int dayNumber,
     String id,
     String weekId,
+    String? clientId,
     List<ExerciseModel> exercises,
   ) {
     return DayModel(
+      clientId: clientId,
       weekId: weekId,
       id: id,
       dayNumber: dayNumber,

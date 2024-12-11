@@ -28,6 +28,12 @@ abstract class WorkoutPlanManagementLocaldatasource {
   Future<void> updateWorkoutPlan(WorkoutPlanModel workoutPlan);
 
   ///
+  Future<void> deleteWorkoutPlan(WorkoutPlanModel workoutPlan);
+
+  ///
+  Future<void> deleteAssignedWorkoutPlan(WorkoutPlanModel workoutPlan);
+
+  ///
   Future<Either<bool, List<ExerciseBpModel>?>?> getExercises();
 
   ///
@@ -183,6 +189,28 @@ class WorkoutPlanManagementLocaldatasourceImpl
       } else {
         return Left(false);
       }
+    } catch (err) {
+      throw CacheException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteAssignedWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+    try {
+      return Future(() async => await dao.deleteWorkoutPlan(workoutPlan));
+    } catch (err) {
+      throw CacheException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+    try {
+      return Future(() async => await dao.deleteWorkoutPlan(workoutPlan));
     } catch (err) {
       throw CacheException(
         errorMessage: err.toString(),

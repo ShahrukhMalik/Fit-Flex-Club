@@ -12,6 +12,9 @@ class WorkoutManagementInitial extends WorkoutManagementState {}
 class WorkoutManagementLoading extends WorkoutManagementState {}
 
 class GetExercisesLoading extends WorkoutManagementState {}
+
+class DeleteWorkoutLoading extends WorkoutManagementState {}
+
 class GetWorkoutPlansLoading extends WorkoutManagementState {}
 
 class CreateWorkoutLoading extends WorkoutManagementState {}
@@ -40,13 +43,17 @@ class CreateWorkoutComplete extends WorkoutManagementState {}
 
 class UpdateWorkoutComplete extends WorkoutManagementState {}
 
+class UpdateAssignedWorkoutComplete extends WorkoutManagementState {}
+
 class AssignWorkoutComplete extends WorkoutManagementState {}
+
+class DeleteWorkoutComplete extends WorkoutManagementState {}
 
 class GetWorkoutPlansForClientComplete extends WorkoutManagementState {
   final WorkoutPlanModel? workoutPlan;
 
   const GetWorkoutPlansForClientComplete({required this.workoutPlan});
-    @override
+  @override
   List<Object?> get props => [workoutPlan];
 }
 

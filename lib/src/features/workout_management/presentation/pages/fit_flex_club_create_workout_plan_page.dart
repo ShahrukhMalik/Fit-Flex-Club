@@ -5,6 +5,8 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/day_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/set_table.dart';
@@ -55,10 +57,12 @@ class FitFlexClubCreateWorkoutPlanPage extends StatefulWidget {
   static const String route = "/fit-club-create-workout-plan";
   final bool update;
   final WorkoutPlanModel? workoutPlanModel;
+  final ClientEntity? clientEntity;
   const FitFlexClubCreateWorkoutPlanPage({
     super.key,
     required this.update,
     this.workoutPlanModel,
+    this.clientEntity,
   });
 
   @override
@@ -443,7 +447,10 @@ class _FitFlexClubCreateWorkoutPlanPageState
       weekId: week.id,
       dayId: day.id,
     );
-    if (edit) isProgramEdited = true;
+    _workoutPlanBp.value = _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+    if (widget.update ||
+        widget.clientEntity != null ||
+        widget.workoutPlanModel != null) isProgramEdited = true;
   }
 
   bool _isFirstWeekValid(List<WeekModel> weeks) {
@@ -482,11 +489,19 @@ class _FitFlexClubCreateWorkoutPlanPageState
       if (isProgramReady) {
         if (widget.update) {
           if (isProgramEdited) {
-            context.read<WorkoutManagementBloc>().add(
-                  UpdateWorkoutPlanEvent(
-                    workoutPlan: _workoutPlanBp.value,
-                  ),
-                );
+            if (widget.clientEntity == null) {
+              context.read<WorkoutManagementBloc>().add(
+                    UpdateWorkoutPlanEvent(
+                      workoutPlan: _workoutPlanBp.value,
+                    ),
+                  );
+            } else {
+              context.read<WorkoutManagementBloc>().add(
+                    UpdateAssignedPlanEvent(
+                      workoutPlan: _workoutPlanBp.value,
+                    ),
+                  );
+            }
           } else {
             PlatformDialog.showAlertDialog(
               context: context,
@@ -672,6 +687,22 @@ class _FitFlexClubCreateWorkoutPlanPageState
                     context
                         .read<WorkoutManagementBloc>()
                         .add(GetWorkoutPlansEvent());
+                  },
+                );
+              }
+
+              if (state is UpdateAssignedWorkoutComplete) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "Workout Plan updated Successfully!",
+                  onConfirm: () {
+                    context.go(
+                      FitFlexTrainerClientDetailsPage.route,
+                      extra: {
+                        'client': widget.clientEntity,
+                      },
+                    );
                   },
                 );
               }

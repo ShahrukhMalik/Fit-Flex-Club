@@ -6,6 +6,7 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
@@ -155,7 +156,21 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
               BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
                 builder: (context, state) {
                   if (state is WorkoutManagementLoading) {
-                    return CircularProgressIndicator();
+                    return Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: List.generate(
+                            8,
+                            (index) => Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: PlatformLoader().buildLoader(
+                                type: LoaderType.shimmer,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
                   }
                   if (state is GetWorkoutPlansComplete) {
                     final workoutPlans = state.workoutPlans;
@@ -178,7 +193,21 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
                       return Text('No workout plans found.');
                     }
                   }
-                  return CircularProgressIndicator();
+                  return Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: List.generate(
+                          8,
+                          (index) => Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: PlatformLoader().buildLoader(
+                              type: LoaderType.shimmer,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
                 },
               )
             ],
@@ -305,6 +334,7 @@ class _FitFlexTrainerClientDetailsPageState
         title: "Client Details Page",
         context: context,
         backgroundColor: globalColorScheme.onPrimaryContainer,
+        onLeadingPressed: () => context.go(FitFlexTrainerProfilePage.route),
       ),
       body: ClientEntityCompactWidget(
         isUserActive: isUserActive,
@@ -410,6 +440,22 @@ class ClientEntityCompactWidget extends StatelessWidget {
             message: state.failures.message ?? "Something Went Wrong!",
             onConfirm: () => Navigator.pop(context),
           );
+        }
+
+        if (state is DeleteWorkoutLoading) {
+          PlatformDialog.showLoadingDialog(
+            context: context,
+            message: "Deleting the workout plan...",
+          );
+        }
+
+        if (state is DeleteWorkoutComplete) {
+          Navigator.pop(context);
+          context.read<WorkoutManagementBloc>().add(
+                GetWorkoutPlansForClientEvent(
+                  clientId: client.id!,
+                ),
+              );
         }
 
         if (state is AssignWorkoutComplete) {
@@ -672,6 +718,7 @@ class ClientEntityCompactWidget extends StatelessWidget {
                                                   extra: {
                                                     'updateData': true,
                                                     "workoutPlan": workoutPlan,
+                                                    "clientEntity": client
                                                   },
                                                 );
                                               },
@@ -686,6 +733,15 @@ class ClientEntityCompactWidget extends StatelessWidget {
                                             IconButton(
                                               onPressed: () {
                                                 // Handle delete action
+                                                context
+                                                    .read<
+                                                        WorkoutManagementBloc>()
+                                                    .add(
+                                                      DeleteAssignedWorkoutPlanEvent(
+                                                        workoutPlan:
+                                                            workoutPlan,
+                                                      ),
+                                                    );
                                               },
                                               icon: Icon(
                                                 Icons.delete,

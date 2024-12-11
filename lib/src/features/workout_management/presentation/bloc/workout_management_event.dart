@@ -31,10 +31,37 @@ class UpdateWorkoutPlanEvent extends WorkoutManagementEvent {
   List<Object?> get props => [workoutPlan];
 }
 
+class DeleteWorkoutPlanEvent extends WorkoutManagementEvent {
+  final WorkoutPlanModel workoutPlan;
+
+  const DeleteWorkoutPlanEvent({required this.workoutPlan});
+
+  @override
+  List<Object?> get props => [workoutPlan];
+}
+
+class DeleteAssignedWorkoutPlanEvent extends WorkoutManagementEvent {
+  final WorkoutPlanModel workoutPlan;
+
+  const DeleteAssignedWorkoutPlanEvent({required this.workoutPlan});
+
+  @override
+  List<Object?> get props => [workoutPlan];
+}
+
 class AssignWorkoutPlanEvent extends WorkoutManagementEvent {
   final WorkoutPlanModel workoutPlan;
 
   const AssignWorkoutPlanEvent({required this.workoutPlan});
+
+  @override
+  List<Object?> get props => [workoutPlan];
+}
+
+class UpdateAssignedPlanEvent extends WorkoutManagementEvent {
+  final WorkoutPlanModel workoutPlan;
+
+  const UpdateAssignedPlanEvent({required this.workoutPlan});
 
   @override
   List<Object?> get props => [workoutPlan];

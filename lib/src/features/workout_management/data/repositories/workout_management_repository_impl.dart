@@ -299,4 +299,79 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       );
     }
   }
+
+  @override
+  Future<Either<Failures, void>>? deleteAssignedWorkoutPlan(
+    WorkoutPlanModel workoutPlan,
+  ) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.deleteAssignedWorkoutPlan(workoutPlan);
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is coming soon!',
+          ),
+        );
+      } else {
+        return Right(
+          await remote.deleteAssignedWorkoutPlan(
+            workoutPlan,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, void>>? deleteWorkoutPlan(
+      WorkoutPlanModel workoutPlan) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await local.deleteWorkoutPlan(workoutPlan);
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is coming soon!',
+          ),
+        );
+      } else {
+        return Right(
+          await remote.deleteWorkoutPlan(
+            workoutPlan,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
 }

@@ -26,6 +26,12 @@ abstract class WorkoutPlanManagementRemotedatasource {
 
   ///
   Future<List<ExerciseBpModel>?>? getExercises();
+
+  ///
+  Future<void>? deleteWorkoutPlan(WorkoutPlanModel workoutPlan);
+
+  ///
+  Future<void>? deleteAssignedWorkoutPlan(WorkoutPlanModel workoutPlan);
 }
 
 @Singleton(as: WorkoutPlanManagementRemotedatasource)
@@ -357,6 +363,34 @@ class WorkoutPlanManagementRemotedatasourceImpl
 
       // Commit all batched operations
       await mainBatch.commit();
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Failed to update workout plan",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<void>? deleteAssignedWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+    try {
+      final CollectionReference clientRef = db.collection('Users');
+      final CollectionReference workoutPlanRef =
+          clientRef.doc(workoutPlan.clientId).collection('workoutPlans');
+      await workoutPlanRef.doc(workoutPlan.uid).delete();
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Failed to update workout plan",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<void>? deleteWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+    try {
+      final CollectionReference workoutPlanRef = db.collection('WorkoutPlans');
+      await workoutPlanRef.doc(workoutPlan.uid).delete();
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Failed to update workout plan",

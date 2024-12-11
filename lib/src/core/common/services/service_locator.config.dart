@@ -76,12 +76,18 @@ import '../../../features/workout_management/domain/usecases/assign_workout_plan
     as _i282;
 import '../../../features/workout_management/domain/usecases/create_workout_plan_usecase.dart'
     as _i853;
+import '../../../features/workout_management/domain/usecases/delete_assigned_workout_plan_usecase.dart'
+    as _i175;
+import '../../../features/workout_management/domain/usecases/delete_workout_plan_usecase.dart'
+    as _i711;
 import '../../../features/workout_management/domain/usecases/get_exercises_usecase.dart'
     as _i139;
 import '../../../features/workout_management/domain/usecases/get_workout_plan_for_client_usecase.dart'
     as _i91;
 import '../../../features/workout_management/domain/usecases/get_workout_plans_usecase.dart'
     as _i120;
+import '../../../features/workout_management/domain/usecases/update_assigned_workout_plan_usecase.dart'
+    as _i661;
 import '../../../features/workout_management/domain/usecases/update_workout_plan_usecase.dart'
     as _i430;
 import '../../../features/workout_management/presentation/bloc/workout_management_bloc.dart'
@@ -172,6 +178,14 @@ extension GetItInjectableX on _i174.GetIt {
               local: gh<_i415.WorkoutPlanManagementLocaldatasource>(),
               remote: gh<_i826.WorkoutPlanManagementRemotedatasource>(),
             ));
+    gh.singleton<_i175.DeleteAssignedWorkoutPlanUsecase>(() =>
+        _i175.DeleteAssignedWorkoutPlanUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i711.DeleteWorkoutPlanUsecase>(() =>
+        _i711.DeleteWorkoutPlanUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
     gh.singleton<_i139.GetExercisesUsecase>(() => _i139.GetExercisesUsecaseImpl(
         workoutManagementRepository: gh<_i530.WorkoutManagementRepository>()));
     gh.singleton<_i282.AssignWorkoutPlanUsecase>(() =>
@@ -184,6 +198,10 @@ extension GetItInjectableX on _i174.GetIt {
                 gh<_i530.WorkoutManagementRepository>()));
     gh.factory<_i812.TrainerProfileBloc>(
         () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
+    gh.singleton<_i661.UpdateAssignedWorkoutPlanUsecase>(() =>
+        _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
     gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(
           remoteDatasource: gh<_i40.AuthRemoteDatasource>(),
           networkInfo: gh<_i228.NetworkInfo>(),
@@ -224,13 +242,6 @@ extension GetItInjectableX on _i174.GetIt {
         _i120.GetWorkoutPlansUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
-    gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
-          authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
-          createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
-          logInUsecase: gh<_i831.LogInUsecase>(),
-          logOutUsecase: gh<_i447.LogOutUsecase>(),
-          forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
-        ));
     gh.factory<_i41.WorkoutManagementBloc>(() => _i41.WorkoutManagementBloc(
           gh<_i139.GetExercisesUsecase>(),
           gh<_i853.CreateWorkoutPlanUsecase>(),
@@ -238,6 +249,16 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i430.UpdateWorkoutPlanUsecase>(),
           gh<_i282.AssignWorkoutPlanUsecase>(),
           gh<_i91.GetWorkoutPlansForClientUsecase>(),
+          gh<_i175.DeleteAssignedWorkoutPlanUsecase>(),
+          gh<_i711.DeleteWorkoutPlanUsecase>(),
+          gh<_i661.UpdateAssignedWorkoutPlanUsecase>(),
+        ));
+    gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
+          authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
+          createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
+          logInUsecase: gh<_i831.LogInUsecase>(),
+          logOutUsecase: gh<_i447.LogOutUsecase>(),
+          forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
         ));
     return this;
   }
