@@ -20,6 +20,7 @@ import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fi
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_picker_widget.dart';
+import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 // ... other imports remain the same
@@ -61,11 +62,31 @@ GoRouter goRouter(appState) {
         ),
       ),
       GoRoute(
+        path: FitFlexWorkoutTrackerPage.route,
+        pageBuilder: (context, state) {
+          final extraData = state.extra as Map<String, dynamic>?;
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexWorkoutTrackerPage(
+              exercise: extraData?['exercise'],
+              workoutPlan: extraData?['workoutPlan'],
+              week: extraData?['week'],
+              day: extraData?['day'],
+            ),
+          );
+        },
+      ),
+      GoRoute(
         path: FitFlexClientAssignedWorkoutPlanPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexClientAssignedWorkoutPlanPage(),
-        ),
+        pageBuilder: (context, state) {
+          final extraData = state.extra as Map<String, dynamic>?;
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexClientAssignedWorkoutPlanPage(
+              workoutPlanModel: extraData?['workoutPlan'],
+            ),
+          );
+        },
       ),
       GoRoute(
         path: FitFlexAuthLogInPage.route,
@@ -266,8 +287,8 @@ GoRouter goRouter(appState) {
           if (user?.isLoggedIn == true) {
             if (user?.isUserActive == true) {
               if (user?.isProfileCreated == true) {
-                // if (user?.isTrainer ?? false) {
-                if (true) {
+                if (user?.isTrainer ?? false) {
+                  // if (false) {
                   return FitFlexTrainerProfilePage.route;
                 } else {
                   return FitFlexClientProfilePage.route;

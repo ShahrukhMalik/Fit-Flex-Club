@@ -7,13 +7,13 @@ class ClientEntity extends Equatable {
   final Map<String, dynamic>? phone;
   final int? age;
   final String? gender;
-  final int? height;
-  final String? heightUnit;
+  final int? heightInFt;
+  final int? heightInCm;
   final bool? isTrainer;
   final bool? isUserActive;
   final String? username;
-  final int? weight;
-  final String? weightUnit;
+  final int? weightInKg;
+  final int? weightInLb;
   final String? currentWorkoutPlanName;
 
   const ClientEntity({
@@ -22,13 +22,13 @@ class ClientEntity extends Equatable {
      this.id,
     this.age,
     this.gender,
-    this.height,
-    this.heightUnit,
+    this.heightInFt,
+    this.heightInCm,
     this.isTrainer,
     this.isUserActive,
     this.username,
-    this.weight,
-    this.weightUnit,
+    this.weightInKg,
+    this.weightInLb,
     this.currentWorkoutPlanName,
   });
   @override
@@ -38,13 +38,13 @@ class ClientEntity extends Equatable {
       id,
       age,
       gender,
-      height,
-      heightUnit,
+      heightInFt,
+      heightInCm,
       isTrainer,
       isUserActive,
       username,
-      weight,
-      weightUnit,
+      weightInKg,
+      weightInLb,
       email,
       currentWorkoutPlanName
     ];

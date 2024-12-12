@@ -137,25 +137,26 @@ class _AddExerciseBottomSheetWidgetState
 
     return SafeArea(
       child: Container(
-        margin: EdgeInsets.only(top: 100),
-        padding: const EdgeInsets.all(16.0),
+        // margin: EdgeInsets.only(top: 100),
+        // padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
             color: globalColorScheme.surface,
             borderRadius: BorderRadius.all(Radius.circular(20))),
         constraints: BoxConstraints(
           minWidth: double.maxFinite,
-          minHeight: 400,
+          maxHeight: MediaQuery.of(context).size.height * 0.4,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
               child: Column(
-                // mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.min,
                 // mainAxisAlignment: MainAxisAlignment.start,
                 // crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.only(bottom: 20),
                     child: Text(
                       'Add Exercise',
                       style: TextStyle(
@@ -299,236 +300,245 @@ class _AddExerciseBottomSheetWidgetState
                           builder: (context, set, _) {
                             if (!widget.duration) {
                               // if (sets.value?.isNotEmpty ?? false) {
-                              return Table(
-                                defaultVerticalAlignment:
-                                    TableCellVerticalAlignment.middle,
-                                // border: TableBorder.all(color: Colors.grey),
-                                columnWidths: widget.weight
-                                    ? {
-                                        0: FlexColumnWidth(1), // Set #
-                                        1: FlexColumnWidth(2), // Reps
-                                        2: FlexColumnWidth(2), // Weight
-                                        3: FlexColumnWidth(1), // Actions
-                                      }
-                                    : {
-                                        0: FlexColumnWidth(1), // Set #
-                                        1: FlexColumnWidth(2), // Reps
-                                        2: FlexColumnWidth(1), // Weight
-                                      },
-                                children: [
-                                  // Table Header
-                                  TableRow(
-                                    // decoration: BoxDecoration(color: globalColorScheme.secondary),
-                                    children: [
-                                      Center(
-                                        child: Text(
-                                          'Set #',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      if (widget.reps)
-                                        Center(
-                                          child: Text(
-                                            'Reps',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      if (widget.weight)
-                                        Center(
-                                          child: Text(
-                                            'Weight',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      Center(
-                                        child: Text(
-                                          '',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  // Dynamic Rows
-                                  ...sets.value!.asMap().entries.map((entry) {
-                                    final index = entry.key;
-                                    final set = entry.value;
-
-                                    final TextEditingController repsController =
-                                        TextEditingController();
-                                    repsController.text = set.targetReps == null
-                                        ? ""
-                                        : set.targetReps.toString();
-                                    final TextEditingController
-                                        weightController =
-                                        TextEditingController();
-                                    weightController.text =
-                                        set.targetWeight == null
-                                            ? ""
-                                            : set.targetWeight.toString();
-                                    return TableRow(
+                              return SingleChildScrollView(
+                                child: Table(
+                                  defaultVerticalAlignment:
+                                      TableCellVerticalAlignment.middle,
+                                  // border: TableBorder.all(color: Colors.grey),
+                                  columnWidths: widget.weight
+                                      ? {
+                                          0: FlexColumnWidth(1), // Set #
+                                          1: FlexColumnWidth(2), // Reps
+                                          2: FlexColumnWidth(2), // Weight
+                                          3: FlexColumnWidth(1), // Actions
+                                        }
+                                      : {
+                                          0: FlexColumnWidth(1), // Set #
+                                          1: FlexColumnWidth(2), // Reps
+                                          2: FlexColumnWidth(1), // Weight
+                                        },
+                                  children: [
+                                    // Table Header
+                                    TableRow(
+                                      // decoration: BoxDecoration(color: globalColorScheme.secondary),
                                       children: [
-                                        // Set #
                                         Center(
-                                          child: Container(
-                                            padding: EdgeInsets.all(10),
-                                            decoration: ShapeDecoration(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(
-                                                    100,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              '${index + 1}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    globalColorScheme.onPrimary,
-                                              ),
-                                            ),
+                                          child: Text(
+                                            'Set #',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
                                           ),
                                         ),
-                                        // Reps
                                         if (widget.reps)
-                                          DebouncedTextField(
-                                            controller: repsController,
-                                            onChanged: (value) {
-                                              _editSet(
-                                                SetModel(
-                                                  exerciseId: set.exerciseId,
-                                                  id: set.id,
-                                                  targetReps:
-                                                      int.tryParse(value),
-                                                  targetWeight:
-                                                      set.targetWeight,
-                                                ),
-                                              );
-                                            },
+                                          Center(
+                                            child: Text(
+                                              'Reps',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           ),
-                                        // Weight
                                         if (widget.weight)
-                                          DebouncedTextField(
-                                            controller: weightController,
-                                            onChanged: (value) {
-                                              _editSet(
-                                                SetModel(
-                                                  exerciseId: set.id,
-                                                  id: set.id,
-                                                  targetReps: set.targetReps,
-                                                  targetWeight: double.tryParse(
-                                                    value,
-                                                  ),
-                                                ),
-                                              );
-                                            },
+                                          Center(
+                                            child: Text(
+                                              'Weight',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           ),
-
                                         Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Expanded(
-                                                child: IconButton(
-                                                  icon: Icon(
-                                                    Icons.add_box,
-                                                    color: globalColorScheme
-                                                        .primaryContainer,
-                                                  ),
-                                                  onPressed: () {
-                                                    if (widget.weight) {
-                                                      if (repsController
-                                                              .text.isEmpty ||
-                                                          weightController
-                                                              .text.isEmpty) {
-                                                        Fluttertoast.showToast(
-                                                          msg:
-                                                              "Please input all the fields before adding new set",
-                                                          backgroundColor:
-                                                              globalColorScheme
-                                                                  .onErrorContainer,
-                                                          textColor:
-                                                              globalColorScheme
-                                                                  .primary,
-                                                        );
-                                                      } else {
-                                                        _addSet(
-                                                          SetModel(
-                                                            exerciseId:
-                                                                set.exerciseId,
-                                                            id: set.id,
-                                                            targetReps:
-                                                                int.tryParse(
-                                                              repsController
-                                                                  .text,
-                                                            ),
-                                                            targetWeight:
-                                                                double.tryParse(
-                                                              weightController
-                                                                  .text,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    } else if (widget.reps &&
-                                                        !widget.weight) {
-                                                      if (repsController
-                                                          .text.isEmpty) {
-                                                        Fluttertoast.showToast(
-                                                          msg:
-                                                              "Please input all the fields before adding new set",
-                                                          backgroundColor:
-                                                              globalColorScheme
-                                                                  .onErrorContainer,
-                                                          textColor:
-                                                              globalColorScheme
-                                                                  .primary,
-                                                        );
-                                                      } else {
-                                                        _addSet(
-                                                          SetModel(
-                                                            exerciseId:
-                                                                set.exerciseId,
-                                                            id: set.id,
-                                                            targetReps:
-                                                                int.tryParse(
-                                                              repsController
-                                                                  .text,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                              if (sets.value!.length > 1)
-                                                Expanded(
-                                                  child: IconButton(
-                                                    icon: Icon(
-                                                      Icons.delete,
-                                                      color: globalColorScheme
-                                                          .onPrimaryContainer,
-                                                    ),
-                                                    onPressed: () {
-                                                      _deleteSet(set.id);
-                                                    },
-                                                  ),
-                                                ),
-                                            ],
+                                          child: Text(
+                                            '',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                       ],
-                                    );
-                                  }),
-                                ],
+                                    ),
+
+                                    // Dynamic Rows
+                                    ...sets.value!.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final set = entry.value;
+
+                                      final TextEditingController
+                                          repsController =
+                                          TextEditingController();
+                                      repsController.text =
+                                          set.targetReps == null
+                                              ? ""
+                                              : set.targetReps.toString();
+                                      final TextEditingController
+                                          weightController =
+                                          TextEditingController();
+                                      weightController.text =
+                                          set.targetWeight == null
+                                              ? ""
+                                              : set.targetWeight.toString();
+                                      return TableRow(
+                                        children: [
+                                          // Set #
+                                          Center(
+                                            child: Container(
+                                              padding: EdgeInsets.all(10),
+                                              decoration: ShapeDecoration(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(
+                                                      100,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                '${index + 1}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: globalColorScheme
+                                                      .onPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Reps
+                                          if (widget.reps)
+                                            DebouncedTextField(
+                                              controller: repsController,
+                                              onChanged: (value) {
+                                                _editSet(
+                                                  SetModel(
+                                                    exerciseId: set.exerciseId,
+                                                    id: set.id,
+                                                    targetReps:
+                                                        int.tryParse(value),
+                                                    targetWeight:
+                                                        set.targetWeight,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          // Weight
+                                          if (widget.weight)
+                                            DebouncedTextField(
+                                              controller: weightController,
+                                              onChanged: (value) {
+                                                _editSet(
+                                                  SetModel(
+                                                    exerciseId: set.id,
+                                                    id: set.id,
+                                                    targetReps: set.targetReps,
+                                                    targetWeight:
+                                                        double.tryParse(
+                                                      value,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+
+                                          Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: IconButton(
+                                                    icon: Icon(
+                                                      Icons.add_box,
+                                                      color: globalColorScheme
+                                                          .primaryContainer,
+                                                    ),
+                                                    onPressed: () {
+                                                      if (widget.weight) {
+                                                        if (repsController
+                                                                .text.isEmpty ||
+                                                            weightController
+                                                                .text.isEmpty) {
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg:
+                                                                "Please input all the fields before adding new set",
+                                                            backgroundColor:
+                                                                globalColorScheme
+                                                                    .onErrorContainer,
+                                                            textColor:
+                                                                globalColorScheme
+                                                                    .primary,
+                                                          );
+                                                        } else {
+                                                          _addSet(
+                                                            SetModel(
+                                                              exerciseId: set
+                                                                  .exerciseId,
+                                                              id: set.id,
+                                                              targetReps:
+                                                                  int.tryParse(
+                                                                repsController
+                                                                    .text,
+                                                              ),
+                                                              targetWeight:
+                                                                  double
+                                                                      .tryParse(
+                                                                weightController
+                                                                    .text,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }
+                                                      } else if (widget.reps &&
+                                                          !widget.weight) {
+                                                        if (repsController
+                                                            .text.isEmpty) {
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg:
+                                                                "Please input all the fields before adding new set",
+                                                            backgroundColor:
+                                                                globalColorScheme
+                                                                    .onErrorContainer,
+                                                            textColor:
+                                                                globalColorScheme
+                                                                    .primary,
+                                                          );
+                                                        } else {
+                                                          _addSet(
+                                                            SetModel(
+                                                              exerciseId: set
+                                                                  .exerciseId,
+                                                              id: set.id,
+                                                              targetReps:
+                                                                  int.tryParse(
+                                                                repsController
+                                                                    .text,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
+                                                if (sets.value!.length > 1)
+                                                  Expanded(
+                                                    child: IconButton(
+                                                      icon: Icon(
+                                                        Icons.delete,
+                                                        color: globalColorScheme
+                                                            .onPrimaryContainer,
+                                                      ),
+                                                      onPressed: () {
+                                                        _deleteSet(set.id);
+                                                      },
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ],
+                                ),
                               );
                               // }
                               // else {
@@ -575,18 +585,56 @@ class _AddExerciseBottomSheetWidgetState
               type: ButtonType.primary,
               text: 'Submit',
               onPressed: () {
-                if (widget.duration && durationController.text.isEmpty) {
-                  Fluttertoast.showToast(
+                if (widget.duration) {
+                  if (durationController.text.isEmpty) {
+                    Fluttertoast.showToast(
                       msg: "Duration is not entered",
                       backgroundColor: globalColorScheme.onErrorContainer,
-                      textColor: globalColorScheme.primary);
+                      textColor: globalColorScheme.primary,
+                    );
+                  } else {
+                    Navigator.pop(
+                      context,
+                      exerciseModel.value?.copyWith(
+                        sets: sets.value,
+                      ),
+                    );
+                  }
                 } else {
-                  Navigator.pop(
-                    context,
-                    exerciseModel.value?.copyWith(
-                      sets: sets.value,
-                    ),
-                  );
+                  if (widget.reps && !widget.weight) {
+                    if (sets.value?.first.targetReps == null) {
+                      Fluttertoast.showToast(
+                        msg: "Please input reps for the first set",
+                        backgroundColor: globalColorScheme.onErrorContainer,
+                        textColor: globalColorScheme.primary,
+                      );
+                    } else {
+                      Navigator.pop(
+                        context,
+                        exerciseModel.value?.copyWith(
+                          sets: sets.value,
+                        ),
+                      );
+                    }
+                  }
+
+                  if (widget.reps && widget.weight) {
+                    if (sets.value?.first.targetReps == null ||
+                        sets.value?.first.targetWeight == null) {
+                      Fluttertoast.showToast(
+                        msg: "Please input reps and sets for the first set",
+                        backgroundColor: globalColorScheme.onErrorContainer,
+                        textColor: globalColorScheme.primary,
+                      );
+                    } else {
+                      Navigator.pop(
+                        context,
+                        exerciseModel.value?.copyWith(
+                          sets: sets.value,
+                        ),
+                      );
+                    }
+                  }
                 }
               },
             )!

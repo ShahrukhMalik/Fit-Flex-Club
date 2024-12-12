@@ -4,7 +4,7 @@ abstract class ClientProfileEvent extends Equatable {
   const ClientProfileEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class AddUserClientProfileEvent extends ClientProfileEvent {
@@ -21,6 +21,14 @@ class UpdateUserClientProfileEvent extends ClientProfileEvent {
   const UpdateUserClientProfileEvent({required this.clientEntity});
   @override
   List<Object> get props => [clientEntity];
+}
+
+class GetClientByIdEvent extends ClientProfileEvent {
+  final String? clientId;
+
+  const GetClientByIdEvent({required this.clientId});
+  @override
+  List<Object?> get props => [clientId];
 }
 
 class CheckClientProfileExist extends ClientProfileEvent {}

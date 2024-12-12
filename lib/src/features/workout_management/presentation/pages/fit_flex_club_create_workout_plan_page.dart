@@ -116,53 +116,30 @@ class _FitFlexClubCreateWorkoutPlanPageState
     ExerciseBpModel? exercise,
     ExerciseModel? editExercise,
   ]) {
-    if (Platform.isIOS) {
-      return showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return AddExerciseBottomSheetWidget(
-            editExercise: editExercise,
-            dayId: _currentDay.value!.id,
-            reps: exercise?.parameters?['reps'] ??
-                editExercise?.parameters?['reps'] ??
-                false,
-            duration: exercise?.parameters?['duration'] ??
-                editExercise?.parameters?['duration'] ??
-                false,
-            exercise: exercise,
-            sets: exercise?.parameters?['sets'] ??
-                editExercise?.parameters?['sets'] ??
-                false,
-            weight: exercise?.parameters?['weight'] ??
-                editExercise?.parameters?['weight'] ??
-                false,
-          );
-        },
-      );
-    } else {
-      return showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return AddExerciseBottomSheetWidget(
-            editExercise: editExercise,
-            dayId: _currentDay.value!.id,
-            reps: exercise?.parameters?['reps'] ??
-                editExercise?.parameters?['reps'] ??
-                false,
-            duration: exercise?.parameters?['duration'] ??
-                editExercise?.parameters?['duration'] ??
-                false,
-            exercise: exercise,
-            sets: exercise?.parameters?['sets'] ??
-                editExercise?.parameters?['sets'] ??
-                false,
-            weight: exercise?.parameters?['weight'] ??
-                editExercise?.parameters?['weight'] ??
-                false,
-          );
-        },
-      );
-    }
+    // if (Platform.isIOS) {
+    return PlatformDialog.showCustomDialog(
+      barrierDismissible: false,
+      actions: [],
+      context: context,
+      title: 'Workout Plan',
+      content: AddExerciseBottomSheetWidget(
+        editExercise: editExercise,
+        dayId: _currentDay.value!.id,
+        reps: exercise?.parameters?['reps'] ??
+            editExercise?.parameters?['reps'] ??
+            false,
+        duration: exercise?.parameters?['duration'] ??
+            editExercise?.parameters?['duration'] ??
+            false,
+        exercise: exercise,
+        sets: exercise?.parameters?['sets'] ??
+            editExercise?.parameters?['sets'] ??
+            false,
+        weight: exercise?.parameters?['weight'] ??
+            editExercise?.parameters?['weight'] ??
+            false,
+      ),
+    );
   }
 
   void _updateDaysForCurrentWeek({
@@ -344,14 +321,33 @@ class _FitFlexClubCreateWorkoutPlanPageState
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        if (!widget.update) {
+          PlatformDialog.showCustomDialog(
+            barrierDismissible: false,
+            actions: [],
+            context: context,
+            title: 'Workout Plan',
+            content: Platform.isIOS
+                ? CupertinoWorkoutBottomSheet(
+                    controller: workoutProgramNameController,
+                  )
+                : MaterialWorkoutBottomSheet(
+                    controller: workoutProgramNameController,
+                  ),
+          );
+        }
+      },
+    );
     _createWorkOutBpObject();
     // _showAddNameDialog();
     context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        if (!widget.update) _show(context);
-      },
-    );
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) {
+    //     if (!widget.update) _show(context);
+    //   },
+    // );
     _currentWeek.value = _weeks.value.firstWhere(
       (element) => element.weekNumber == 1,
     );
@@ -510,10 +506,19 @@ class _FitFlexClubCreateWorkoutPlanPageState
               cancelText: 'No',
               confirmText: 'Yes',
               onConfirm: () {
-                context.go(FitFlexTrainerWorkoutPage.route);
-                context
-                    .read<WorkoutManagementBloc>()
-                    .add(GetWorkoutPlansEvent());
+                if (widget.clientEntity == null) {
+                  context.go(FitFlexTrainerWorkoutPage.route);
+                  context
+                      .read<WorkoutManagementBloc>()
+                      .add(GetWorkoutPlansEvent());
+                } else {
+                  context.go(
+                    FitFlexTrainerClientDetailsPage.route,
+                    extra: {
+                      'client': widget.clientEntity,
+                    },
+                  );
+                }
               },
             );
           }
@@ -587,19 +592,37 @@ class _FitFlexClubCreateWorkoutPlanPageState
         cancelText: 'Cancel',
         onCancel: () {
           if (event == ConcludeEvent.submit) {
-            context.go(FitFlexTrainerWorkoutPage.route);
-            context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+            if (widget.clientEntity == null) {
+              context.go(FitFlexTrainerWorkoutPage.route);
+              context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+            } else {
+              context.go(
+                FitFlexTrainerClientDetailsPage.route,
+                extra: {
+                  'client': widget.clientEntity,
+                },
+              );
+            }
           } else {
-            Navigator.pop(context);
+            context.go(FitFlexClubCreateWorkoutPlanPage.route);
           }
         },
         confirmText: 'Continue',
         onConfirm: () {
           if (event == ConcludeEvent.goback) {
-            context.go(FitFlexTrainerWorkoutPage.route);
-            context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+            if (widget.clientEntity == null) {
+              context.go(FitFlexTrainerWorkoutPage.route);
+              context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+            } else {
+              context.go(
+                FitFlexTrainerClientDetailsPage.route,
+                extra: {
+                  'client': widget.clientEntity,
+                },
+              );
+            }
           } else {
-            Navigator.pop(context);
+            context.go(FitFlexClubCreateWorkoutPlanPage.route);
           }
         },
       );
@@ -615,6 +638,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
         bottom: true,
         top: false,
         child: Scaffold(
+          resizeToAvoidBottomInset: true,
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           floatingActionButton: FloatingActionButton(
             heroTag: 'addWorkout',
@@ -648,6 +672,12 @@ class _FitFlexClubCreateWorkoutPlanPageState
           ),
           body: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
             listener: (context, state) {
+              if (state is UpdateWorkoutLoading) {
+                PlatformDialog.showLoadingDialog(
+                  context: context,
+                  message: "Processing your request...",
+                );
+              }
               if (state is WorkoutManagementLoading) {
                 PlatformDialog.showLoadingDialog(
                   context: context,

@@ -76,12 +76,13 @@ class PlatformDialog {
   }
 
   // Custom Content Dialog
-  static Future<void> showCustomDialog({
+  static Future<dynamic> showCustomDialog({
     required BuildContext context,
     required String title,
     required Widget content,
     List<Widget>? actions,
     bool barrierDismissible = true,
+
   }) async {
     if (Platform.isIOS) {
       return showCupertinoDialog(

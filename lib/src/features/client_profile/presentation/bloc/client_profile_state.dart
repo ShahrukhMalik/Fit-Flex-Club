@@ -11,13 +11,18 @@ class ClientProfileInitial extends ClientProfileState {}
 
 class ClientProfileLoading extends ClientProfileState {}
 
+class GetProfileComplete extends ClientProfileState {
+  final ClientEntity entity;
+  const GetProfileComplete({required this.entity});
+}
+
 class ClientProfileComplete extends ClientProfileState {
   final bool? isUserActive;
   final bool? clientProfileExist;
 
   const ClientProfileComplete({
-     this.isUserActive,
-     this.clientProfileExist,
+    this.isUserActive,
+    this.clientProfileExist,
   });
 }
 

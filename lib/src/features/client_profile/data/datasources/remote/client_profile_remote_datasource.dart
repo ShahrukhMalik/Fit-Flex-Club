@@ -1,3 +1,4 @@
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,6 +24,9 @@ abstract class ClientProfileRemoteDatasource {
 
   ///
   Future<List<ClientModel>?> getClients();
+
+  ///
+  Future<ClientModel?> getClientById([String? id]);
 }
 
 @Singleton(as: ClientProfileRemoteDatasource)
@@ -162,6 +166,48 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
       }).toList());
 
       return clients;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<ClientModel?> getClientById([String? id]) async {
+    try {
+      final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+      final CollectionReference usersRef = db.collection('Users');
+      final userDoc = await usersRef.doc(clientId).get();
+
+      if (!userDoc.exists) {
+        return null;
+      }
+      final user = ClientModel.fromFirestore(
+        userDoc as DocumentSnapshot<Map<String, dynamic>>,
+        null,
+      );
+
+      try {
+        // Access the workoutPlans sub-collection for this user
+        final CollectionReference workoutPlansRef =
+            userDoc.reference.collection('workoutPlans');
+        final QuerySnapshot workoutPlansSnapshot =
+            await workoutPlansRef.limit(1).get();
+
+        // Assign the name of the first workout plan to currentWorkoutPlanName, if available
+        if (workoutPlansSnapshot.docs.isNotEmpty) {
+          final firstPlan =
+              workoutPlansSnapshot.docs.first.data() as Map<String, dynamic>;
+          return user.copyWith(currentWorkoutPlanName: firstPlan['name']);
+        }
+      } catch (e) {
+        // If sub-collection does not exist or any other issue occurs, log the error (optional)
+        // print('No workoutPlans sub-collection found for user ${doc.id}: $e');
+      }
+
+      return user;
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

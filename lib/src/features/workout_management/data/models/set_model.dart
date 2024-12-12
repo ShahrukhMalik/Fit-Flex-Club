@@ -1,7 +1,7 @@
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/set_entity.dart';
 
 class SetModel extends SetEntity {
-    final String? clientId;
+  final String? clientId;
   const SetModel({
     super.targetReps,
     super.targetWeight,
@@ -32,7 +32,7 @@ class SetModel extends SetEntity {
       actualWeight: (map['actualWeight'] as num?)?.toDouble(),
       actualDistance: (map['actualDistance'] as num?)?.toDouble(),
       actualTime: map['actualTime'] != null
-          ? Duration(seconds: map['actualTime'] as int)
+          ? Duration(minutes: map['actualTime'] as int)
           : null,
     );
   }
@@ -50,7 +50,7 @@ class SetModel extends SetEntity {
       if (actualReps != null) 'actualReps': actualReps,
       if (actualWeight != null) 'actualWeight': actualWeight,
       if (actualDistance != null) 'actualDistance': actualDistance,
-      if (actualTime != null) 'actualTime': actualTime?.inSeconds,
+      if (actualTime != null) 'actualTime': actualTime?.inMinutes,
     };
   }
 

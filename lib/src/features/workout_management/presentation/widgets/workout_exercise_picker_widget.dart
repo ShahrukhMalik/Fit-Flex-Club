@@ -129,7 +129,7 @@ class _ExercisePickerBottomSheetState extends State<ExercisePickerBottomSheet> {
       showModalBottomSheet(
         context: context,
         builder: (_) {
-          return _buildMaterialFilterSheet();
+          return _buildFilterWidget();
         },
       );
     }

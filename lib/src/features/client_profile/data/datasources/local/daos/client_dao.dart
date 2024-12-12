@@ -65,7 +65,8 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
     // Perform the update where the id matches
     await (update(clients)..where((tbl) => tbl.id.equals(id))).write(
       ClientsCompanion(
-        currentWorkoutPlanName: Value(workoutPlanUid), // Update currentWorkoutPlanName
+        currentWorkoutPlanName:
+            Value(workoutPlanUid), // Update currentWorkoutPlanName
         updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
       ),
     );
@@ -99,17 +100,17 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
       gender: clientModel.gender != null
           ? Value(clientModel.gender!)
           : Value.absent(),
-      weight: clientModel.weight != null
-          ? Value(clientModel.weight!)
+      weightInKg: clientModel.weightInKg != null
+          ? Value(clientModel.weightInKg!)
           : Value.absent(),
-      weightUnit: clientModel.weightUnit != null
-          ? Value(clientModel.weightUnit!)
+      weightInLb: clientModel.weightInLb != null
+          ? Value(clientModel.weightInLb!)
           : Value.absent(),
-      height: clientModel.height != null
-          ? Value(clientModel.height!)
+      heightInCm: clientModel.heightInCm != null
+          ? Value(clientModel.heightInCm!)
           : Value.absent(),
-      heightUnit: clientModel.heightUnit != null
-          ? Value(clientModel.heightUnit!)
+      heightInFt: clientModel.heightInFt != null
+          ? Value(clientModel.heightInFt!)
           : Value.absent(),
       isTrainer: clientModel.isTrainer != null
           ? Value(clientModel.isTrainer!)
@@ -146,49 +147,49 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
           clientsList.map(
             (clientModel) {
               return ClientsCompanion(
-                id: Value(clientModel.id!),
-                age: clientModel.age != null
-                    ? Value(clientModel.age!)
-                    : Value.absent(),
-                gender: clientModel.gender != null
-                    ? Value(clientModel.gender!)
-                    : Value.absent(),
-                weight: clientModel.weight != null
-                    ? Value(clientModel.weight!)
-                    : Value.absent(),
-                weightUnit: clientModel.weightUnit != null
-                    ? Value(clientModel.weightUnit!)
-                    : Value.absent(),
-                height: clientModel.height != null
-                    ? Value(clientModel.height!)
-                    : Value.absent(),
-                heightUnit: clientModel.heightUnit != null
-                    ? Value(clientModel.heightUnit!)
-                    : Value.absent(),
-                isTrainer: clientModel.isTrainer != null
-                    ? Value(clientModel.isTrainer!)
-                    : Value.absent(),
-                isUserActive: clientModel.isUserActive != null
-                    ? Value(clientModel.isUserActive!)
-                    : Value.absent(),
-                username: clientModel.username != null
-                    ? Value(clientModel.username!)
-                    : Value.absent(),
-                email: clientModel.email != null
-                    ? Value(clientModel.email!)
-                    : Value.absent(),
-                phone: clientModel.phone?['phoneNumber'] != null
-                    ? Value(clientModel.phone?['phoneNumber']!)
-                    : Value.absent(),
-                phoneCountryCode: clientModel.phone?['countryCode'] != null
-                    ? Value(clientModel.phone?['countryCode']!)
-                    : Value.absent(),
-                currentWorkoutPlanName: clientModel.currentWorkoutPlanName != null
-                    ? Value(clientModel.currentWorkoutPlanName!)
-                    : Value.absent(),
-                createdAt: Value(DateTime.now().millisecondsSinceEpoch),
-                updatedAt: Value.absent()
-              );
+                  id: Value(clientModel.id!),
+                  age: clientModel.age != null
+                      ? Value(clientModel.age!)
+                      : Value.absent(),
+                  gender: clientModel.gender != null
+                      ? Value(clientModel.gender!)
+                      : Value.absent(),
+                  weightInKg: clientModel.weightInKg != null
+                      ? Value(clientModel.weightInKg!)
+                      : Value.absent(),
+                  weightInLb: clientModel.weightInLb != null
+                      ? Value(clientModel.weightInLb!)
+                      : Value.absent(),
+                  heightInCm: clientModel.heightInCm != null
+                      ? Value(clientModel.heightInCm!)
+                      : Value.absent(),
+                  heightInFt: clientModel.heightInFt != null
+                      ? Value(clientModel.heightInFt!)
+                      : Value.absent(),
+                  isTrainer: clientModel.isTrainer != null
+                      ? Value(clientModel.isTrainer!)
+                      : Value.absent(),
+                  isUserActive: clientModel.isUserActive != null
+                      ? Value(clientModel.isUserActive!)
+                      : Value.absent(),
+                  username: clientModel.username != null
+                      ? Value(clientModel.username!)
+                      : Value.absent(),
+                  email: clientModel.email != null
+                      ? Value(clientModel.email!)
+                      : Value.absent(),
+                  phone: clientModel.phone?['phoneNumber'] != null
+                      ? Value(clientModel.phone?['phoneNumber']!)
+                      : Value.absent(),
+                  phoneCountryCode: clientModel.phone?['countryCode'] != null
+                      ? Value(clientModel.phone?['countryCode']!)
+                      : Value.absent(),
+                  currentWorkoutPlanName:
+                      clientModel.currentWorkoutPlanName != null
+                          ? Value(clientModel.currentWorkoutPlanName!)
+                          : Value.absent(),
+                  createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+                  updatedAt: Value.absent());
             },
           ).toList(),
         );
@@ -205,33 +206,32 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
   }
 
   // Method to get a client by their primary key (id)
-  Future<ClientModel?> getClientByid(String id) async {
-    final clientRow = await (select(clients)
-          ..where((tbl) => tbl.id.equals(id)))
+  Future<Client?> getClientByid(String id) async {
+    final clientRow = await (select(clients)..where((tbl) => tbl.id.equals(id)))
         .getSingleOrNull(); // Returns null if no client is found
-
+    return clientRow;
     // Directly map fields from the clientRow to ClientModel constructor
-    if (clientRow != null) {
-      return ClientModel(
-        id: clientRow.id,
-        age: clientRow.age,
-        gender: clientRow.gender,
-        weight: clientRow.weight,
-        weightUnit: clientRow.weightUnit,
-        height: clientRow.height,
-        heightUnit: clientRow.heightUnit,
-        isTrainer: clientRow.isTrainer,
-        isUserActive: clientRow.isUserActive,
-        username: clientRow.username,
-        email: clientRow.email,
-        phone: {
-          "phoneNumber": clientRow.phone,
-          "countryCode": clientRow.phoneCountryCode
-        },
-        currentWorkoutPlanName: clientRow.currentWorkoutPlanName,
-      );
-    }
-    return null; // Return null if no client is found
+    // if (clientRow != null) {
+    //   return ClientModel(
+    //     id: clientRow.id,
+    //     age: clientRow.age,
+    //     gender: clientRow.gender,
+    //     weight: clientRow.weight,
+    //     weightUnit: clientRow.weightUnit,
+    //     height: clientRow.height,
+    //     heightUnit: clientRow.heightUnit,
+    //     isTrainer: clientRow.isTrainer,
+    //     isUserActive: clientRow.isUserActive,
+    //     username: clientRow.username,
+    //     email: clientRow.email,
+    //     phone: {
+    //       "phoneNumber": clientRow.phone,
+    //       "countryCode": clientRow.phoneCountryCode
+    //     },
+    //     currentWorkoutPlanName: clientRow.currentWorkoutPlanName,
+    //   );
+    // }
+    // return null; // Return null if no client is found
   }
 
   // Fetch all clients

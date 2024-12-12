@@ -6,8 +6,10 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/set_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
+import 'package:injectable/injectable.dart';
 part 'workout_history_dao.g.dart';
 
+@injectable
 @DriftAccessor(tables: [WorkoutHistorySet, ExerciseSets, WorkoutPlanExercise])
 class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
     with _$WorkoutHistoryDaoMixin {
@@ -20,6 +22,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
   }) async {
     await into(workoutHistorySet).insert(
       WorkoutHistorySetCompanion(
+        id: Value(setModel.id),
         clientId: Value(clientUid),
         exerciseId: Value(exerciseUid),
         actualReps: Value(setModel.actualReps),
@@ -28,6 +31,32 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
         actualTime: Value(setModel.actualTime?.inMilliseconds),
         createdAt: Value(DateTime.now().millisecondsSinceEpoch),
       ),
+    );
+  }
+
+  Future<void> insertWorkoutHistorySets({
+    required List<SetModel> setModel,
+    required String clientUid,
+    required String exerciseUid,
+  }) async {
+    return batch(
+      (batch) {
+        batch.insertAll(
+          workoutHistorySet,
+          setModel.map(
+            (setModel) => WorkoutHistorySetCompanion(
+                  id: Value(setModel.id),
+              clientId: Value(clientUid),
+              exerciseId: Value(exerciseUid),
+              actualReps: Value(setModel.actualReps),
+              actualWeight: Value(setModel.actualWeight),
+              actualDistance: Value(setModel.actualDistance),
+              actualTime: Value(setModel.actualTime?.inMilliseconds),
+              createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+            ),
+          ),
+        );
+      },
     );
   }
 

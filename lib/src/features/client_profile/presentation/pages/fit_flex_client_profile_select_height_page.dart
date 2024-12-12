@@ -2,6 +2,7 @@ import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
@@ -206,11 +207,30 @@ class _FitFlexClientProfileSelectHeightPageState
                                       isTrainer: false,
                                       age: int.tryParse(widget.age),
                                       gender: widget.gender,
-                                      weight: int.tryParse(widget.weight),
-                                      height:
-                                          int.tryParse(heightSelected.value),
-                                      heightUnit: metricSelected.value,
-                                      weightUnit: widget.weightUnit,
+                                      weightInKg:
+                                          widget.weightUnit.toLowerCase() ==
+                                                  'kg'
+                                              ? int.tryParse(widget.weight)
+                                              : convertLbToKg(
+                                                  int.tryParse(widget.weight)),
+                                      heightInCm: metricSelected.value
+                                                  .toLowerCase() ==
+                                              'ft'
+                                          ? int.tryParse(heightSelected.value)
+                                          : convertCmToFt(int.tryParse(
+                                              heightSelected.value)),
+                                      weightInLb:
+                                          widget.weightUnit.toLowerCase() ==
+                                                  'lb'
+                                              ? int.tryParse(widget.weight)
+                                              : convertKgToLb(
+                                                  int.tryParse(widget.weight)),
+                                      heightInFt: metricSelected.value
+                                                  .toLowerCase() ==
+                                              'ft'
+                                          ? int.tryParse(heightSelected.value)
+                                          : convertCmToFt(int.tryParse(
+                                              heightSelected.value)),
                                     ),
                                   ),
                                 );
@@ -231,7 +251,7 @@ class _FitFlexClientProfileSelectHeightPageState
               },
               listener: (context, state) {
                 if (state is ClientProfileComplete) {
-                  context.go('/profile');
+                  context.go(FitFlexClientProfilePage.route);
                 }
                 if (state is ClientProfileError) {
                   PlatformDialog.showAlertDialog(

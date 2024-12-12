@@ -2,13 +2,37 @@ import 'dart:io';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scroll_tabs_widget.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scrollweeks_widget.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_name_bottom_sheet_android.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_name_bottom_sheet_ios_widget.dart';
+import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:uuid_v4/uuid_v4.dart';
 
 class FitFlexClientAssignedWorkoutPlanPage extends StatefulWidget {
   static const String route = "/fit-flex-assigned-workout-plan";
-  const FitFlexClientAssignedWorkoutPlanPage({super.key});
+  final WorkoutPlanModel? workoutPlanModel;
+  const FitFlexClientAssignedWorkoutPlanPage({
+    super.key,
+    this.workoutPlanModel,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -19,19 +43,283 @@ class FitFlexClientAssignedWorkoutPlanPage extends StatefulWidget {
 class _FitFlexClientAssignedWorkoutPlanPageState
     extends State<FitFlexClientAssignedWorkoutPlanPage>
     with SingleTickerProviderStateMixin {
+  bool isProgramEdited = false;
+  late ValueNotifier<WorkoutPlanModel> _workoutPlanBp = ValueNotifier(
+    WorkoutPlanModel(name: "", weeks: [], uid: ''),
+  );
+  final ValueNotifier<List<DayModel>> _days = ValueNotifier([]);
+  final ValueNotifier<List<WeekModel>> _weeks = ValueNotifier([]);
+  final ValueNotifier<List<ExerciseModel>> _exercises = ValueNotifier([]);
+  final ValueNotifier<DayModel?> _currentDay = ValueNotifier(null);
+  final ValueNotifier<WeekModel?> _currentWeek = ValueNotifier(null);
+
+  final TextEditingController workoutProgramNameController =
+      TextEditingController();
+
+  // Future _showExerciseSetSheet(
+  //   BuildContext context, [
+  //   ExerciseBpModel? exercise,
+  //   ExerciseModel? editExercise,
+  // ]) {
+  //   // if (Platform.isIOS) {
+  //   return PlatformDialog.showCustomDialog(
+  //     barrierDismissible: false,
+  //     actions: [],
+  //     context: context,
+  //     title: 'Workout Plan',
+  //     content: AddExerciseBottomSheetWidget(
+  //       editExercise: editExercise,
+  //       dayId: _currentDay.value!.id,
+  //       reps: exercise?.parameters?['reps'] ??
+  //           editExercise?.parameters?['reps'] ??
+  //           false,
+  //       duration: exercise?.parameters?['duration'] ??
+  //           editExercise?.parameters?['duration'] ??
+  //           false,
+  //       exercise: exercise,
+  //       sets: exercise?.parameters?['sets'] ??
+  //           editExercise?.parameters?['sets'] ??
+  //           false,
+  //       weight: exercise?.parameters?['weight'] ??
+  //           editExercise?.parameters?['weight'] ??
+  //           false,
+  //     ),
+  //   );
+  // }
+
+  void _updateDaysForCurrentWeek({
+    required String weekId,
+  }) {
+    final getCurrentWeek = _weeks.value.firstWhere((week) => week.id == weekId);
+    final getDaysforCurrentWeek = getCurrentWeek.days;
+    _days.value = getDaysforCurrentWeek;
+    _currentDay.value = _days.value.first;
+  }
+
+  void _updateExerciseListView({
+    required String weekId,
+    String? dayId,
+  }) {
+    final getCurrentWeek = _weeks.value.firstWhere((week) => week.id == weekId);
+    final getCurrentDay = getCurrentWeek.days.firstWhere(
+      (day) => dayId != null ? day.id == dayId : day.dayNumber == 1,
+    );
+    final getExercisesForCurrentDay = getCurrentDay.exercises;
+    _exercises.value = getExercisesForCurrentDay
+        .map(
+          (e) => e,
+        )
+        .toList();
+  }
+
   int selectedWeek = 0;
   late TabController _tabController;
   int _currentTabIndex = 0;
 
+  // Future _showExerciseSheet(BuildContext context) {
+  //   if (Platform.isIOS) {
+  //     return showCupertinoModalPopup(
+  //       context: context,
+  //       builder: (context) {
+  //         return SafeArea(
+  //           child: BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
+  //             builder: (context, state) {
+  //               // if (state is SubjectFailed) {
+  //               //   return ErrorOutput(message: state.message);
+  //               // }
+  //               if (state is GetExercisesComplete) {
+  //                 return CupertinoScrollbar(
+  //                   child: ExercisePickerBottomSheet(
+  //                     exercises: state.exercises,
+  //                   ),
+  //                 );
+  //               }
+  //               return SizedBox();
+  //             },
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   } else {
+  //     return showModalBottomSheet(
+  //       context: context,
+  //       builder: (context) {
+  //         return SafeArea(
+  //           child: BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
+  //             builder: (context, state) {
+  //               // if (state is SubjectFailed) {
+  //               //   return ErrorOutput(message: state.message);
+  //               // }
+  //               if (state is GetExercisesComplete) {
+  //                 return ExercisePickerBottomSheet(
+  //                   exercises: state.exercises,
+  //                 );
+  //               }
+  //               return SizedBox();
+  //             },
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
+
+  // List<WeekModel> _copyExercisesFromFirstWeek(List<WeekModel> weeks) {
+  //   if (weeks.isEmpty || weeks.first.days.isEmpty) {
+  //     return weeks;
+  //   }
+
+  //   final firstWeek = weeks.first;
+
+  //   // Copy exercises from the first week to all other weeks
+  //   return weeks.map((week) {
+  //     // Skip the first week as it is the source
+  //     if (week == firstWeek) {
+  //       return week;
+  //     }
+
+  //     // Update each day in the current week based on the first week's days
+  //     final updatedDays = week.days.asMap().entries.map((entry) {
+  //       final dayIndex = entry.key;
+  //       final targetDay = entry.value;
+
+  //       // Skip if the source week doesn't have a corresponding day
+  //       if (dayIndex >= firstWeek.days.length) {
+  //         return targetDay;
+  //       }
+
+  //       final sourceDay = firstWeek.days[dayIndex];
+
+  //       // Create new exercises with unique IDs and sets
+  //       final copiedExercises = sourceDay.exercises.map((exercise) {
+  //         final newExerciseId = UUIDv4().toString();
+  //         return ExerciseModel(
+  //           id: newExerciseId,
+  //           code: exercise.code,
+  //           name: exercise.name,
+  //           category: exercise.category,
+  //           muscleGroup: exercise.muscleGroup,
+  //           parameters: exercise.parameters,
+  //           dayId: targetDay.id, // Assign to the target day
+  //           exercise.sets.map((set) {
+  //             return SetModel(
+  //               id: UUIDv4().toString(),
+  //               targetReps: set.targetReps,
+  //               targetWeight: set.targetWeight,
+  //               exerciseId: newExerciseId, // Link to the new exercise
+  //             );
+  //           }).toList(),
+  //         );
+  //       }).toList();
+
+  //       // Return the updated day with new exercises
+  //       return targetDay.copyWith(exercises: copiedExercises);
+  //     }).toList();
+
+  //     // Return the updated week with new days
+  //     return week.copyWith(days: updatedDays);
+  //   }).toList();
+  // }
+
+  _createWorkOutBpObject() {
+    final workoutPlanModel = widget.workoutPlanModel;
+    if (workoutPlanModel == null) {
+      final workoutPlanId = UUIDv4().toString();
+      final weeks = List<WeekModel>.generate(
+        5,
+        (index) {
+          final weekId = UUIDv4().toString();
+          final days = List<DayModel>.generate(
+            5,
+            (dayIndex) {
+              return DayModel(
+                weekId: weekId,
+                dayNumber: dayIndex + 1,
+                exercises: [],
+                id: UUIDv4().toString(),
+              );
+            },
+          );
+          return WeekModel(
+            workoutPlanId: workoutPlanId,
+            weekNumber: index + 1,
+            days: days,
+            id: weekId,
+          );
+        },
+      );
+      _weeks.value = weeks;
+      _workoutPlanBp = ValueNotifier(
+        WorkoutPlanModel(
+          name: '',
+          weeks: weeks,
+          uid: workoutPlanId,
+        ),
+      );
+    } else {
+      _workoutPlanBp.value = workoutPlanModel;
+      _weeks.value = workoutPlanModel.weeks;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) {
+    //     PlatformDialog.showCustomDialog(
+    //       barrierDismissible: false,
+    //       actions: [],
+    //       context: context,
+    //       title: 'Workout Plan',
+    //       content: Platform.isIOS
+    //           ? CupertinoWorkoutBottomSheet(
+    //               controller: workoutProgramNameController,
+    //             )
+    //           : MaterialWorkoutBottomSheet(
+    //               controller: workoutProgramNameController,
+    //             ),
+    //     );
+    //   },
+    // );
+    _createWorkOutBpObject();
+    // _showAddNameDialog();
+    // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+    // WidgetsBinding.instance.addPostFrameCallback(
+    //   (timeStamp) {
+    //     if (!widget.update) _show(context);
+    //   },
+    // );
+    _currentWeek.value = _weeks.value.firstWhere(
+      (element) => element.weekNumber == 1,
+    );
+    _currentDay.value = _currentWeek.value?.days.firstWhere(
+      (element) => element.dayNumber == 1,
+    );
+    _days.value = _currentWeek.value!.days;
+    _exercises.value = _weeks.value
+        .firstWhere(
+          (element) => element.weekNumber == 1,
+        )
+        .days
+        .firstWhere(
+          (element) => element.dayNumber == 1,
+        )
+        .exercises;
     _tabController = TabController(length: 6, vsync: this);
-    _tabController.addListener(() {
-      setState(() {
-        _currentTabIndex = _tabController.index;
-      });
-    });
+    workoutProgramNameController.addListener(
+      () {
+        _workoutPlanBp.value = _workoutPlanBp.value.copyWith(
+          name: workoutProgramNameController.text,
+        );
+      },
+    );
+    // _exercises.addListener(
+    //   () {
+    //     isProgramEdited = true;
+    //   },
+    // );
   }
 
   @override
@@ -40,463 +328,460 @@ class _FitFlexClientAssignedWorkoutPlanPageState
     super.dispose();
   }
 
-  // Platform-specific Tab Bar
-  Widget _buildTabBar(BuildContext context) {
-    final colorScheme = globalColorScheme;
-    final ScrollController horizontalScrollController = ScrollController();
-    final List<GlobalKey> tabKeys = List.generate(6, (_) => GlobalKey());
+  // _updateExercises(
+  //   ExerciseModel exercise, [
+  //   bool edit = false,
+  //   bool delete = false,
+  // ]) async {
+  //   final day = _currentDay.value!;
 
-    return Theme.of(context).platform == TargetPlatform.iOS
-        ? Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: SingleChildScrollView(
-              controller: horizontalScrollController,
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(6, (index) {
-                  bool isSelected = _currentTabIndex == index;
-                  return GestureDetector(
-                    onTap: () {
-                      _tabController.animateTo(index);
-                      // Dynamic scrolling logic
+  //   final week = _weeks.value.firstWhere(
+  //     (element) => element.id == day.weekId,
+  //   );
 
-                      // Get the total width of the scroll view
-                      final RenderBox? renderBox =
-                            context.findRenderObject() as RenderBox?;
-                      if (renderBox == null) return;
+  //   final deletedExeciseList = day.exercises
+  //       .where(
+  //         (element) => element.id != exercise.id,
+  //       )
+  //       .toList();
 
-                      // Available viewport width
-                      final viewportWidth = renderBox.constraints.maxWidth;
+  //   final newExerciseList = day.exercises.map(
+  //     (e) {
+  //       if (e.id == exercise.id) {
+  //         return e.copyWith(sets: exercise.sets);
+  //       } else {
+  //         return e;
+  //       }
+  //     },
+  //   ).toList();
 
-                      // Rough estimate of each tab's width (adjust if needed)
-                      const tabWidth =
-                          120.0; // Estimated tab width including margins
+  //   if (!edit) newExerciseList.add(exercise);
 
-                      // Calculate scroll offset based on index and viewport
-                      double scrollOffset = index * tabWidth -
-                          (viewportWidth / 2) +
-                          (tabWidth / 2);
+  //   final updatedDay = day.copyWith(
+  //     exercises: delete ? deletedExeciseList : newExerciseList,
+  //   );
 
-                      // Ensure scroll offset is within bounds
-                      scrollOffset = scrollOffset.clamp(0.0,
-                          horizontalScrollController.position.maxScrollExtent);
+  //   _currentDay.value = updatedDay;
 
-                      // Animate to the calculated scroll position
-                      horizontalScrollController.animateTo(
-                        scrollOffset,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    child: Container(
-                      key: tabKeys[index],
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.shadow,
-                            blurRadius: 6,
-                            offset: const Offset(2, 2),
-                          ),
-                        ],
-                        color: isSelected
-                            ? globalColorScheme.tertiary
-                            : CupertinoColors.systemGrey5,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          'Day ${index + 1}',
-                          style: TextStyle(
-                            backgroundColor: Colors.transparent,
-                            color: isSelected
-                                ? CupertinoColors.white
-                                : CupertinoColors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          )
-        : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow,
-                    blurRadius: 6,
-                    offset: const Offset(2, 2),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                tabAlignment: TabAlignment.start,
-                dividerColor: colorScheme.secondary,
-                controller: _tabController,
-                isScrollable: true,
-                indicatorSize: TabBarIndicatorSize.label,
-                indicator: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  color: colorScheme.secondary,
-                ),
-                labelColor: colorScheme.onSecondary,
-                unselectedLabelColor: colorScheme.onTertiary,
-                tabs: List.generate(
-                  6,
-                  (index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Tab(
-                      text: 'Day ${index + 1}',
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-  }
+  //   final updatedWeeksList = _weeks.value.map(
+  //     (weekElement) {
+  //       if (weekElement.id == week.id) {
+  //         return week.copyWith(
+  //           days: week.days.map(
+  //             (dayElement) {
+  //               if (dayElement.id == updatedDay.id) {
+  //                 return updatedDay;
+  //               }
+  //               return dayElement;
+  //             },
+  //           ).toList(),
+  //         );
+  //       }
+  //       return weekElement;
+  //     },
+  //   ).toList();
+  //   _weeks.value = updatedWeeksList;
+  //   await Future.delayed(Duration(seconds: 0));
+  //   _updateExerciseListView(
+  //     weekId: week.id,
+  //     dayId: day.id,
+  //   );
+  //   _workoutPlanBp.value = _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+  //   if (widget.update ||
+  //       widget.clientEntity != null ||
+  //       widget.workoutPlanModel != null) isProgramEdited = true;
+  // }
 
-  // Platform-specific Tab Bar View
-  Widget _buildTabBarView(BuildContext context) {
-    return Theme.of(context).platform == TargetPlatform.iOS
-        ? CupertinoTabView(
-            builder: (context) {
-              return Column(
-                children: [
-                  Expanded(
-                    child: _buildDayWorkouts(_currentTabIndex),
-                  ),
-                ],
-              );
-            },
-          )
-        : TabBarView(
-            controller: _tabController,
-            children: List.generate(
-              6,
-              (dayIndex) {
-                return _buildDayWorkouts(dayIndex);
-              },
-            ),
-          );
-  }
+  // bool _isFirstWeekValid(List<WeekModel> weeks) {
+  //   if (weeks.isEmpty) {
+  //     return false; // No weeks available.
+  //   }
 
-  // Shared method to build workouts for a specific day
-  Widget _buildDayWorkouts(int dayIndex) {
-    return Container(
-      color: globalColorScheme.surface,
-      child: ListView.builder(
-        itemCount: 5,
-        itemBuilder: (context, workoutIndex) {
-          return WorkoutTile(
-            workoutName: 'Workout ${workoutIndex + 1}',
-            difficulty: 'Intermediate',
-            sets: 3 + workoutIndex,
-            progress: workoutIndex == 2 ? 0 : (workoutIndex + 1) * 15,
-            isCompleted: workoutIndex == 2 ? true : false,
-          );
-        },
-      ),
-    );
-  }
+  //   final firstWeek = weeks.first;
+
+  //   for (final day in firstWeek.days) {
+  //     if (day.exercises.isEmpty) {
+  //       return false; // Found a day in the first week with no exercises.
+  //     }
+  //   }
+  //   return true; // All days in the first week have at least one exercise.
+  // }
+
+  // bool _areAllDaysPopulatedWithExercises(List<WeekModel> weeks) {
+  //   for (final week in weeks) {
+  //     for (final day in week.days) {
+  //       if (day.exercises.isEmpty) {
+  //         return false; // Found a day with no exercises.
+  //       }
+  //     }
+  //   }
+  //   return true; // All days have at least one exercise.
+  // }
+
+  // void _onSubmit(ConcludeEvent event) {
+  //   final bool isFirstWeekIsComplete = _isFirstWeekValid(_weeks.value);
+
+  //   if (isFirstWeekIsComplete) {
+  //     final bool isProgramReady =
+  //         _areAllDaysPopulatedWithExercises(_weeks.value);
+
+  //     if (isProgramReady) {
+  //       if (widget.update) {
+  //         if (isProgramEdited) {
+  //           if (widget.clientEntity == null) {
+  //             context.read<WorkoutManagementBloc>().add(
+  //                   UpdateWorkoutPlanEvent(
+  //                     workoutPlan: _workoutPlanBp.value,
+  //                   ),
+  //                 );
+  //           } else {
+  //             context.read<WorkoutManagementBloc>().add(
+  //                   UpdateAssignedPlanEvent(
+  //                     workoutPlan: _workoutPlanBp.value,
+  //                   ),
+  //                 );
+  //           }
+  //         } else {
+  //           PlatformDialog.showAlertDialog(
+  //             context: context,
+  //             title: "Add Workout Plan",
+  //             message: "You haven't updated a program, you wish to cancel?",
+  //             cancelText: 'No',
+  //             confirmText: 'Yes',
+  //             onConfirm: () {
+  //               if (widget.clientEntity == null) {
+  //                 context.go(FitFlexTrainerWorkoutPage.route);
+  //                 context
+  //                     .read<WorkoutManagementBloc>()
+  //                     .add(GetWorkoutPlansEvent());
+  //               } else {
+  //                 context.go(
+  //                   FitFlexTrainerClientDetailsPage.route,
+  //                   extra: {
+  //                     'client': widget.clientEntity,
+  //                   },
+  //                 );
+  //               }
+  //             },
+  //           );
+  //         }
+  //       } else {
+  //         _workoutPlanBp.value =
+  //             _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+  //         context.read<WorkoutManagementBloc>().add(
+  //               CreateWorkoutPlanEvent(
+  //                 workoutPlan: _workoutPlanBp.value,
+  //               ),
+  //             );
+  //       }
+  //     } else {
+  //       PlatformDialog.showAlertDialog(
+  //         context: context,
+  //         title: "Add Workout Plan",
+  //         message:
+  //             "You haven't added exercises for all the weeks, would you like to continue with 1st week program for all other weeks. If you cancel your progress will be lost",
+  //         cancelText: 'Cancel',
+  //         onCancel: () {
+  //           context.go(FitFlexTrainerWorkoutPage.route);
+  //           context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+  //         },
+  //         confirmText: 'Continue',
+  //         onConfirm: () {
+  //           final updatedWeeks = _copyExercisesFromFirstWeek(_weeks.value);
+  //           _weeks.value = updatedWeeks;
+  //           _workoutPlanBp.value =
+  //               _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+  //           if (widget.update) {
+  //             if (isProgramEdited) {
+  //               context.read<WorkoutManagementBloc>().add(
+  //                     UpdateWorkoutPlanEvent(
+  //                       workoutPlan: _workoutPlanBp.value,
+  //                     ),
+  //                   );
+  //             } else {
+  //               PlatformDialog.showAlertDialog(
+  //                 context: context,
+  //                 title: "Add Workout Plan",
+  //                 message: "You haven't updated a program, you wish to cancel?",
+  //                 cancelText: 'No',
+  //                 confirmText: 'Yes',
+  //                 onConfirm: () {
+  //                   context.go(FitFlexTrainerWorkoutPage.route);
+  //                   context
+  //                       .read<WorkoutManagementBloc>()
+  //                       .add(GetWorkoutPlansEvent());
+  //                 },
+  //               );
+  //             }
+  //           } else {
+  //             _workoutPlanBp.value =
+  //                 _workoutPlanBp.value.copyWith(weeks: _weeks.value);
+  //             context.read<WorkoutManagementBloc>().add(
+  //                   CreateWorkoutPlanEvent(
+  //                     workoutPlan: _workoutPlanBp.value,
+  //                   ),
+  //                 );
+  //           }
+  //         },
+  //       );
+  //     }
+  //   } else {
+  //     PlatformDialog.showAlertDialog(
+  //       context: context,
+  //       title: "Add Workout Plan",
+  //       message: event == ConcludeEvent.submit
+  //           ? "You haven't completed setting up your workout program, if you cancel your progress will be lost."
+  //           : "You haven't completed setting up your workout program, if you continue your progress will be lost.",
+  //       cancelText: 'Cancel',
+  //       onCancel: () {
+  //         if (event == ConcludeEvent.submit) {
+  //           if (widget.clientEntity == null) {
+  //             context.go(FitFlexTrainerWorkoutPage.route);
+  //             context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+  //           } else {
+  //             context.go(
+  //               FitFlexTrainerClientDetailsPage.route,
+  //               extra: {
+  //                 'client': widget.clientEntity,
+  //               },
+  //             );
+  //           }
+  //         } else {
+  //           context.go(FitFlexClubCreateWorkoutPlanPage.route);
+  //         }
+  //       },
+  //       confirmText: 'Continue',
+  //       onConfirm: () {
+  //         if (event == ConcludeEvent.goback) {
+  //           if (widget.clientEntity == null) {
+  //             context.go(FitFlexTrainerWorkoutPage.route);
+  //             context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+  //           } else {
+  //             context.go(
+  //               FitFlexTrainerClientDetailsPage.route,
+  //               extra: {
+  //                 'client': widget.clientEntity,
+  //               },
+  //             );
+  //           }
+  //         } else {
+  //           context.go(FitFlexClubCreateWorkoutPlanPage.route);
+  //         }
+  //       },
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = globalColorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: PlatformAppbar.basicAppBar(
-          title: "Workout Plan",
-          context: context,
-          backgroundColor: colorScheme.onPrimaryContainer),
-      body: _buildContent(context),
+    return PopScope(
+      child: SafeArea(
+        bottom: true,
+        top: false,
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          // floatingActionButton: FloatingActionButton(
+          //   heroTag: 'addWorkout',
+          //   splashColor: globalColorScheme.tertiary,
+          //   backgroundColor: globalColorScheme.primaryContainer,
+          //   onPressed: () async {
+          //     final result = await _showExerciseSheet(context);
+          //     if (result != null) {
+          //       // ignore: use_build_context_synchronously
+          //       if (result != null) {
+          //         _showExerciseSetSheet(context, result).then(
+          //           (value) async {
+          //             await _updateExercises(
+          //               value,
+          //             );
+          //           },
+          //         );
+          //       }
+          //     }
+          //   },
+          //   child: Icon(
+          //     Icons.add,
+          //     color: globalColorScheme.surface,
+          //   ),
+          // ),
+          appBar: PlatformAppbar.basicAppBar(
+            title: "Workout Plan",
+            context: context,
+            backgroundColor: colorScheme.onPrimaryContainer,
+            onLeadingPressed: () => context.go(FitFlexClientProfilePage.route),
+          ),
+          body: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
+            listener: (context, state) {
+              // if (state is UpdateWorkoutLoading) {
+              //   PlatformDialog.showLoadingDialog(
+              //     context: context,
+              //     message: "Processing your request...",
+              //   );
+              // }
+              // if (state is WorkoutManagementLoading) {
+              //   PlatformDialog.showLoadingDialog(
+              //     context: context,
+              //     message: "Processing your request...",
+              //   );
+              // }
+
+              // if (state is WorkoutManagementError) {
+              //   PlatformDialog.showAlertDialog(
+              //     context: context,
+              //     title: "Add Workout Plan",
+              //     message: state.failures.message ?? "Something Went Wrong!",
+              //     onConfirm: () => Navigator.pop(context),
+              //   );
+              // }
+
+              // if (state is CreateWorkoutComplete) {
+              //   PlatformDialog.showAlertDialog(
+              //     context: context,
+              //     title: "Add Workout Plan",
+              //     message: "Workout Plan Created Successfully!",
+              //     onConfirm: () {
+              //       context.go(FitFlexTrainerWorkoutPage.route);
+              //       context
+              //           .read<WorkoutManagementBloc>()
+              //           .add(GetWorkoutPlansEvent());
+              //     },
+              //   );
+              // }
+              // if (state is UpdateWorkoutComplete) {
+              //   PlatformDialog.showAlertDialog(
+              //     context: context,
+              //     title: "Add Workout Plan",
+              //     message: "Workout Plan updated Successfully!",
+              //     onConfirm: () {
+              //       context.go(FitFlexTrainerWorkoutPage.route);
+              //       context
+              //           .read<WorkoutManagementBloc>()
+              //           .add(GetWorkoutPlansEvent());
+              //     },
+              //   );
+              // }
+
+              // if (state is UpdateAssignedWorkoutComplete) {
+              //   PlatformDialog.showAlertDialog(
+              //     context: context,
+              //     title: "Add Workout Plan",
+              //     message: "Workout Plan updated Successfully!",
+              //     onConfirm: () {
+              //       context.go(
+              //         FitFlexTrainerClientDetailsPage.route,
+              //         extra: {
+              //           'client': widget.clientEntity,
+              //         },
+              //       );
+              //     },
+              //   );
+              // }
+            },
+            child: _buildContent(context),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildContent(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       children: [
-        // Week Selector
-        SizedBox(
-          // padding: const EdgeInsets.all(10),
-          // margin: const EdgeInsets.all(10),
-          height: 150,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 5, // Number of weeks
-            padding: EdgeInsets.all(10),
-            itemBuilder: (context, index) {
-              return WeekTile(weekNumber: index + 1);
-            },
-          ),
-        ),
-        // Day Tabs
-        _buildTabBar(context),
-
-        // Workouts List
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: _buildTabBarView(context),
-          ),
-        ),
-      ],
-    );
-  }
-}
+          child: Column(
+            children: [
+              // Workout Program Header
+              ValueListenableBuilder(
+                valueListenable: _workoutPlanBp,
+                builder: (context, workoutPlan, _) {
+                  return workoutPlan.name.isEmpty
+                      ? SizedBox()
+                      : Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(
+                                10,
+                              ),
+                            ),
+                            border: Border.all(
+                              width: 2,
+                              color: globalColorScheme.primary,
+                            ),
+                          ),
+                          child: Text(
+                            workoutPlan.name,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: globalColorScheme.onPrimaryContainer,
+                                ),
+                          ),
+                        );
+                },
+              ),
 
-class WeekTile extends StatelessWidget {
-  final int weekNumber;
+              // Week Selector
+              AutoScrollWeeksWidget(
+                weeks: _weeks,
+                currentWeek: _currentWeek,
+                updateDays: _updateDaysForCurrentWeek,
+                updateExercises: _updateExerciseListView,
+              ),
 
-  const WeekTile({
-    super.key,
-    required this.weekNumber,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const String startDate = 'Nov 15';
-    const String endDate = 'Nov 21';
-    final double progress = (weekNumber * 0.2); // Example progress
-    const int totalWorkouts = 5;
-    final int completedWorkouts =
-        (weekNumber * 1); // Example number of completed workouts
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        width: 150,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              globalColorScheme.inversePrimary,
-              globalColorScheme.primary,
-              globalColorScheme.primaryContainer,
-              globalColorScheme.tertiary,
+              // Day Tabs
+              ValueListenableBuilder(
+                valueListenable: _days,
+                builder: (context, days, _) {
+                  return AutoScrollTabsWidget(
+                    workoutPlan: _workoutPlanBp.value,
+                    isClientSideView: true,
+                    onDrag: (editExercise, edit, delete) => {},
+                    key: UniqueKey(),
+                    currentDay: _currentDay,
+                    currentWeek: _currentWeek,
+                    days: _days,
+                    exercises: _exercises,
+                    weeks: _weeks,
+                    onDayTap: (index) {
+                      _updateDaysForCurrentWeek(
+                        weekId: _currentWeek.value!.id,
+                      );
+                      _updateExerciseListView(
+                        weekId: _currentWeek.value!.id,
+                        dayId: _days.value[index].id,
+                      );
+                      _currentDay.value = _days.value[index];
+                    },
+                  );
+                },
+              ),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(15),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Week $weekNumber',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: globalColorScheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: const Color(0xFFE0E0E0),
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(globalColorScheme.secondary),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Workouts: $completedWorkouts/$totalWorkouts',
-              style: TextStyle(
-                fontSize: 14,
-                color: globalColorScheme.surface,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class CupertinoChip extends StatelessWidget {
-  final String label;
-  final Color backgroundColor;
-  final Color textColor;
-
-  const CupertinoChip({
-    Key? key,
-    required this.label,
-    this.backgroundColor = const Color(0xFFEFEFF4), // iOS-like gray
-    this.textColor = const Color(0xFF007AFF), // iOS system blue
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-}
-
-class WorkoutTile extends StatelessWidget {
-  final String workoutName;
-  final String difficulty;
-  final int sets;
-  final int progress; // Progress in percentage (0-100)
-  final bool isCompleted; // Indicates workout status
-
-  const WorkoutTile({
-    super.key,
-    required this.workoutName,
-    required this.difficulty,
-    required this.sets,
-    required this.progress,
-    required this.isCompleted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = globalColorScheme;
-
-    return Card(
-      color: colorScheme.inversePrimary,
-      elevation: 6,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Workout Name and Status Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  workoutName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: isCompleted
-                        ? globalColorScheme.surface.withOpacity(0.8)
-                        : globalColorScheme.secondary.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    isCompleted ? "Completed" : "Pending",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isCompleted
-                          ? globalColorScheme.primaryContainer
-                          : globalColorScheme.tertiaryContainer,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // Difficulty and Sets Information
-            Row(
-              children: [
-                const SizedBox(width: 8),
-                Platform.isIOS
-                    ? CupertinoChip(
-                        label: 'Sets: $sets',
-                        backgroundColor: colorScheme.secondary.withOpacity(0.5),
-                        textColor: colorScheme.onPrimaryContainer,
-                      )
-                    : Chip(
-                        label: Text(
-                          'Sets: $sets',
-                          style: TextStyle(color: colorScheme.onSurface),
-                        ),
-                        backgroundColor: colorScheme.secondary.withOpacity(0.5),
-                      ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Progress Bar
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Progress",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: colorScheme.onSurface.withOpacity(0.8),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: progress / 100,
-                    minHeight: 10,
-                    color: isCompleted ? Colors.green : colorScheme.primary,
-                    backgroundColor: colorScheme.onSurface.withOpacity(0.1),
-                  ),
-                ),
-                if (progress < 100)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      "$progress% Completed",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
+        // Padding(
+        //   padding: const EdgeInsets.all(10),
+        //   child: PlatformButton().buildButton(
+        //     context: context,
+        //     type: ButtonType.primary,
+        //     backgroundColor: globalColorScheme.primaryContainer,
+        //     foregroundColor: globalColorScheme.surface,
+        //     textStyle: TextStyle(
+        //       color: globalColorScheme.surface,
+        //       fontWeight: FontWeight.bold,
+        //     ),
+        //     text: "Submit",
+        //     onPressed: () => _onSubmit(ConcludeEvent.submit),
+        //   )!,
+        // ),
+      ],
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
+import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_set_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/exercise_bp_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
@@ -25,6 +26,7 @@ part 'workout_plan_dao.g.dart';
   ExerciseSets,
   BaseExercise,
   Clients,
+  WorkoutHistorySet
 ])
 @singleton
 class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
@@ -232,6 +234,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
   //
   Future<int> insertWorkoutPlan(WorkoutPlanModel workoutPlan) async {
     // Insert the WorkoutPlan into the workoutPlans table
+
     final workoutPlanId = await into(workoutPlans).insert(
       WorkoutPlansCompanion(
         uid: Value(workoutPlan.uid),
@@ -302,8 +305,16 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
   Future<void> deleteWorkoutPlan(WorkoutPlanModel workoutPlan) async {
     try {
       final workoutPlanId = workoutPlan.uid;
+
       await transaction(() async {
-        final deleteWorkoutPlan = await (delete(workoutPlans)
+        await (update(clients)
+              ..where((tbl) => tbl.id.equals(workoutPlan.clientId!)))
+            .write(
+          ClientsCompanion(
+            currentWorkoutPlanName: Value.absent(),
+          ),
+        );
+        await (delete(workoutPlans)
               ..where((tbl) => tbl.uid.equals(workoutPlanId)))
             .go();
 
@@ -547,6 +558,10 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
             exerciseSets,
             exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
           ),
+          leftOuterJoin(
+            workoutHistorySet,
+            exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
+          ),
         ])
                   ..where(
                     workoutPlanExercise.dayId
@@ -640,7 +655,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
 
         // Create and return the final workout plan model
         return WorkoutPlanModel(
-          clientId:  workoutPlansList[0].clientId,
+          clientId: workoutPlansList[0].clientId,
           createdAt: workoutPlansList[0].createdAt,
           updatedAt: workoutPlansList[0].updatedAt,
           name: workoutPlansList[0].name,

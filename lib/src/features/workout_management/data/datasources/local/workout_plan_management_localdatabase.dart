@@ -58,7 +58,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
         return Left(false);
       }
       if (isDataStale(
-        Duration(seconds: 1).inSeconds,
+        Duration(days: 1).inSeconds,
         workoutPlans.first.createdAt!,
         workoutPlans.first.updatedAt,
       )) {
@@ -178,11 +178,11 @@ class WorkoutPlanManagementLocaldatasourceImpl
 
       if (workoutPlanModel != null) {
         if (isDataStale(
-          Duration(days: 1).inSeconds,
+          Duration(seconds: 1).inSeconds,
           workoutPlanModel.createdAt!,
           workoutPlanModel.updatedAt,
         )) {
-          await database.deleteExercises();
+          await database.deleteWorkoutPlans();
           return Left(true);
         }
         return Right(workoutPlanModel);

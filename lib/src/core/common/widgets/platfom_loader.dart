@@ -16,21 +16,21 @@ enum LoaderType {
 }
 
 class PlatformLoader {
-  Widget buildLoader({
-    required LoaderType type,
-    Color? color,
-    double? size,
-    double? value, // For determinate progress (0.0 to 1.0)
-    double? strokeWidth, // Width of the loader stroke
-    Duration? duration, // Animation duration
-    bool isAnimating = true, // Control animation state
-    Widget? child, // For custom loaders
-    String? semanticsLabel, // Accessibility label
-    String? semanticsValue, // Accessibility value
-        Color? baseColor,
-    Color? highlightColor,
-    double? height
-  }) {
+  Widget buildLoader(
+      {required LoaderType type,
+      Color? color,
+      double? size,
+      double? value, // For determinate progress (0.0 to 1.0)
+      double? strokeWidth, // Width of the loader stroke
+      Duration? duration, // Animation duration
+      bool isAnimating = true, // Control animation state
+      Widget? child, // For custom loaders
+      String? semanticsLabel, // Accessibility label
+      String? semanticsValue, // Accessibility value
+      Color? baseColor,
+      Color? highlightColor,
+      double? height,
+      double? containerRadius}) {
     switch (type) {
       case LoaderType.circular:
         return _buildCircularLoader(
@@ -79,12 +79,12 @@ class PlatformLoader {
 
       case LoaderType.shimmer:
         return _buildShimmerLoader(
-          baseColor: baseColor,
-          height: height,
-          highlightColor: highlightColor,
-          child: child,
-          duration: duration,
-        );
+            baseColor: baseColor,
+            height: height,
+            highlightColor: highlightColor,
+            child: child,
+            duration: duration,
+            containerRadius: containerRadius);
 
       case LoaderType.custom:
         return _buildCustomLoader(
@@ -261,10 +261,12 @@ class PlatformLoader {
     Widget? child,
     Duration? duration,
     double? height,
+    double? containerRadius,
   }) {
     return ShimmerLoader(
       baseColor: baseColor ?? globalColorScheme.surface,
-      highlightColor: highlightColor?.withOpacity(0.7) ?? globalColorScheme.inversePrimary,
+      highlightColor:
+          highlightColor?.withOpacity(0.7) ?? globalColorScheme.inversePrimary,
       duration: duration ?? const Duration(milliseconds: 1500),
       child: child ??
           Container(
@@ -272,7 +274,7 @@ class PlatformLoader {
             height: height ?? 80,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(containerRadius ?? 8),
             ),
           ),
     );

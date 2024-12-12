@@ -1,15 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' as intl;
 
 // class FitFlexClientProfilePage extends StatefulWidget {
 //   static const String route = "/fit-flex-client-profile";
@@ -43,158 +50,89 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: globalColorScheme.primary,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: globalColorScheme.secondary.withOpacity(0.4),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Your Current Workout Program",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: globalColorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Fat Loss",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: globalColorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: globalColorScheme.secondary,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '60%',
-                      style: TextStyle(
-                        color: globalColorScheme.surface,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Dropdown Toggle Button
-            // GestureDetector(
-            //   onTap: () {
-            //     setState(() {
-            //       _isDetailsVisible = !_isDetailsVisible; // Toggle visibility
-            //     });
-            //   },
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       const Text(
-            //         "Workout Details",
-            //         style: TextStyle(
-            //           fontSize: 16,
-            //           fontWeight: FontWeight.bold,
-            //           color: deepNavyBlue,
-            //         ),
-            //       ),
-            //       Icon(
-            //         _isDetailsVisible
-            //             ? Icons.keyboard_arrow_up
-            //             : Icons.keyboard_arrow_down,
-            //         color: deepNavyBlue,
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // const SizedBox(height: 10),
-
-            // // Conditional Visibility of Details
-            // if (_isDetailsVisible)
-            //   Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       _buildWorkoutDetail(
-            //         icon: Icons.timer,
-            //         title: "Duration",
-            //         value: "45 mins",
-            //         color: coolTeal,
-            //       ),
-            //       _buildWorkoutDetail(
-            //         icon: Icons.fireplace,
-            //         title: "Calories",
-            //         value: "350 kcal",
-            //         color: vibrantCoral,
-            //       ),
-            //       _buildWorkoutDetail(
-            //         icon: Icons.fitness_center,
-            //         title: "Exercises",
-            //         value: "8",
-            //         color: goldenYellow,
-            //       ),
-            //     ],
-            //   ),
-            // const SizedBox(height: 20),
-
-            // Progress Bar Section
-            Text(
-              "Today's Progress",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: globalColorScheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Stack(
-              children: [
-                Container(
-                  height: 10,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
+      child: BlocBuilder<ClientProfileBloc, ClientProfileState>(
+        // bloc: context.read<ClientProfileBloc>().add(event),
+        builder: (context, state) {
+          if (state is ClientProfileLoading) {
+            return PlatformLoader().buildLoader(
+              type: LoaderType.shimmer,
+              highlightColor: globalColorScheme.primary,
+              containerRadius: 30,
+              height: 100,
+            );
+          }
+          if (state is GetProfileComplete) {
+            final client = state.entity;
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: globalColorScheme.primary,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
                     color: globalColorScheme.secondary.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(5),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
                   ),
-                ),
-                Container(
-                  height: 10,
-                  width:
-                      MediaQuery.of(context).size.width * 0.6, // 60% progress
-                  decoration: BoxDecoration(
-                    color: globalColorScheme.tertiaryContainer,
-                    borderRadius: BorderRadius.circular(5),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Your Current Workout Program",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: globalColorScheme.onPrimaryContainer,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          client.currentWorkoutPlanName ??
+                              "No Program Assigned",
+                          style: TextStyle(
+                            fontSize:
+                                client.currentWorkoutPlanName != null ? 22 : 18,
+                            fontWeight: FontWeight.bold,
+                            color: globalColorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ),
+                      if (client.currentWorkoutPlanName != null)
+                        PlatformButton().buildButton(
+                          context: context,
+                          type: ButtonType.iconText,
+                          icon: Icons.arrow_forward_ios,
+                          text: "Get Started",
+                          foregroundColor: globalColorScheme.tertiary,
+                          textStyle: TextStyle(
+                            color: globalColorScheme.tertiary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          onPressed: () =>
+                              context.read<WorkoutManagementBloc>().add(
+                                    GetWorkoutPlansForClientEvent(
+                                      clientId: getIt<FirebaseAuth>()
+                                          .currentUser!
+                                          .uid,
+                                    ),
+                                  ),
+                        )!
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }
+          return PlatformLoader().buildLoader(
+            type: LoaderType.shimmer,
+            containerRadius: 30,
+            height: 100,
+          );
+        },
       ),
     );
   }
@@ -719,12 +657,26 @@ class _WorkoutActionButtonState extends State<WorkoutActionButton>
   }
 }
 
-class FitFlexClientProfilePage extends StatelessWidget {
+class FitFlexClientProfilePage extends StatefulWidget {
   static const String route = "/fit-flex-client-profile";
-// On Surface
-  final Color darkerTeal =
-      const Color(0xFF006F6F); // Darker Secondary (For contrast)
 
+  const FitFlexClientProfilePage({super.key});
+
+  @override
+  State<FitFlexClientProfilePage> createState() =>
+      _FitFlexClientProfilePageState();
+}
+
+class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
+  }
+
+// On Surface
+  final Color darkerTeal = const Color(0xFF006F6F);
+  // Darker Secondary (For contrast)
   final ColorScheme customColorScheme = const ColorScheme(
     brightness: Brightness.light,
     primary: Color(0xFFFFCD7C),
@@ -742,8 +694,6 @@ class FitFlexClientProfilePage extends StatelessWidget {
     tertiary: Color(0xFF8BB7D9),
     onTertiary: Color(0xFF1A2A3D),
   );
-
-  const FitFlexClientProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -827,18 +777,26 @@ class FitFlexClientProfilePage extends StatelessWidget {
                           ),
                           SizedBox(height: height * .1),
                           Text(
-                            "May 27, 2023",
+                            intl.DateFormat.MMMEd().format(DateTime.now()),
                             style: TextStyle(
                                 color: Colors.grey[400], fontSize: 14),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            "Hi, Hassan",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          BlocBuilder<ClientProfileBloc, ClientProfileState>(
+                            builder: (context, state) {
+                              if (state is GetProfileComplete) {
+                                final client = state.entity;
+                                return Text(
+                                  client.username ?? "User",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              }
+                              return Text('');
+                            },
                           ),
                         ],
                       ),
@@ -856,10 +814,35 @@ class FitFlexClientProfilePage extends StatelessWidget {
             ),
             // Workout Plan Tile
 
-            InkWell(
-              onTap: () => context.go(
-                FitFlexClientAssignedWorkoutPlanPage.route,
-              ),
+            BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
+              listener: (context, state) {
+                if (state is GetWorkoutPlansForClientLoading) {
+                  PlatformDialog.showLoadingDialog(
+                    context: context,
+                    message: "Fetching workout plan details for you...",
+                  );
+                }
+
+                if (state is GetWorkoutPlansForClientComplete) {
+                  context.go(
+                    FitFlexClientAssignedWorkoutPlanPage.route,
+                    extra: {
+                      'workoutPlan': state.workoutPlan,
+                    },
+                  );
+                }
+                // if (state is SubjectLoading) {
+                //   showLoadingDialog(context);
+                //   return;
+                // }
+                // Navigator.of(context, rootNavigator: true).pop();
+                // if (state is SubjectFailed) {
+                //   showErrorDialog(context);
+                // }
+                // if (state is SubjectSuccess) {
+                //   showSuccessDialog(context);
+                // }
+              },
               child: const WorkoutPlanWidget(),
             )
             // Padding(
@@ -989,7 +972,18 @@ class FitFlexClientProfilePage extends StatelessWidget {
             //   ),
             // )
             ,
-            const WeightTrackerScreen()
+
+            Container(
+              height: 200,
+              width: double.maxFinite,
+              decoration: BoxDecoration(),
+              child: Center(
+                child: Text(
+                  'Weight Tracker Comming Soon..',
+                ),
+              ),
+            ),
+            // const WeightTrackerScreen()
           ],
         ),
       ),

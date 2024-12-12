@@ -4,19 +4,19 @@ import 'package:fit_flex_club/src/features/client_profile/domain/entities/client
 
 class ClientModel extends ClientEntity {
   const ClientModel({
-     super.id,
-     super.age,
-     super.gender,
-     super.weight,
-     super.weightUnit,
-     super.height,
-     super.heightUnit,
-     super.isTrainer,
-     super.isUserActive,
-     super.username,
-     super.email,
-     super.phone,
-     super.currentWorkoutPlanName,
+    super.id,
+    super.age,
+    super.gender,
+    super.weightInKg,
+    super.weightInLb,
+    super.heightInCm,
+    super.heightInFt,
+    super.isTrainer,
+    super.isUserActive,
+    super.username,
+    super.email,
+    super.phone,
+    super.currentWorkoutPlanName,
   });
   @override
   List<Object?> get props {
@@ -24,10 +24,10 @@ class ClientModel extends ClientEntity {
       id,
       age,
       gender,
-      weight,
-      weightUnit,
-      height,
-      heightUnit,
+      weightInKg,
+      weightInLb,
+      heightInCm,
+      heightInFt,
       isTrainer,
       isUserActive,
       username,
@@ -40,10 +40,10 @@ class ClientModel extends ClientEntity {
     String? id,
     int? age,
     String? gender,
-    int? weight,
-    String? weightUnit,
-    int? height,
-    String? heightUnit,
+    int? weightInKg,
+    int? weightInLb,
+    int? heightInCm,
+    int? heightInFt,
     bool? isTrainer,
     bool? isUserActive,
     String? username,
@@ -52,16 +52,17 @@ class ClientModel extends ClientEntity {
     Map<String, dynamic>? phone,
   }) {
     return ClientModel(
-      currentWorkoutPlanName: currentWorkoutPlanName ?? this.currentWorkoutPlanName,
+      currentWorkoutPlanName:
+          currentWorkoutPlanName ?? this.currentWorkoutPlanName,
       phone: phone ?? this.phone,
       email: email ?? this.email,
       id: id ?? this.id,
       age: age ?? this.age,
       gender: gender ?? this.gender,
-      weight: weight ?? this.weight,
-      weightUnit: weightUnit ?? this.weightUnit,
-      height: height ?? this.height,
-      heightUnit: heightUnit ?? this.heightUnit,
+      weightInKg: weightInKg ?? this.weightInKg,
+      weightInLb: weightInLb ?? this.weightInLb,
+      heightInCm: heightInCm ?? this.heightInCm,
+      heightInFt: heightInFt ?? this.heightInFt,
       isTrainer: isTrainer ?? this.isTrainer,
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
@@ -73,10 +74,10 @@ class ClientModel extends ClientEntity {
       'id': id,
       'age': age,
       'gender': gender,
-      'weight': weight,
-      'weightUnit': weightUnit,
-      'height': height,
-      'heightUnit': heightUnit,
+      'weightInKg': weightInKg,
+      'weightInLb': weightInLb,
+      'heightInCm': heightInCm,
+      'heightInFt': heightInFt,
       'isTrainer': isTrainer,
       'isUserActive': isUserActive,
       'username': username,
@@ -94,10 +95,10 @@ class ClientModel extends ClientEntity {
       id: map['id'],
       age: map['age'],
       gender: map['gender'],
-      weight: map['weight'],
-      weightUnit: map['weightUnit'],
-      height: map['height'],
-      heightUnit: map['heightUnit'],
+      weightInKg: map['weightInKg'],
+      weightInLb: map['weightInLb'],
+      heightInCm: map['heightInCm'],
+      heightInFt: map['heightInFt'],
       isTrainer: map['isTrainer'],
       isUserActive: map['isUserActive'],
       username: map['username'],
@@ -116,10 +117,10 @@ class ClientModel extends ClientEntity {
       id: snapshot.id,
       age: data?['age'],
       gender: data?['gender'],
-      weight: data?['weight'],
-      weightUnit: data?['weightUnit'],
-      height: data?['height'],
-      heightUnit: data?['heightUnit'],
+      weightInKg: data?['weightInKg'],
+      weightInLb: data?['weightInLb'],
+      heightInCm: data?['heightInCm'],
+      heightInFt: data?['heightInFt'],
       isTrainer: data?['isTrainer'],
       isUserActive: data?['isUserActive'],
       username: data?['username'],
@@ -134,10 +135,10 @@ class ClientModel extends ClientEntity {
       id: clientEntity.id,
       age: clientEntity.age,
       gender: clientEntity.gender,
-      weight: clientEntity.weight,
-      weightUnit: clientEntity.weightUnit,
-      height: clientEntity.height,
-      heightUnit: clientEntity.heightUnit,
+      weightInKg: clientEntity.weightInKg,
+      weightInLb: clientEntity.weightInLb,
+      heightInCm: clientEntity.heightInCm,
+      heightInFt: clientEntity.heightInFt,
       isTrainer: clientEntity.isTrainer,
       isUserActive: clientEntity.isUserActive,
       username: clientEntity.username,
@@ -148,29 +149,17 @@ class ClientModel extends ClientEntity {
     final data = <String, dynamic>{};
 
     if (id != null) data['id'] = id;
-    if (currentWorkoutPlanName != null) data['currentWorkoutPlanName'] = currentWorkoutPlanName;
+    if (currentWorkoutPlanName != null) {
+      data['currentWorkoutPlanName'] = currentWorkoutPlanName;
+    }
     if (age != null) data['age'] = age;
     if (gender != null) data['gender'] = gender;
-    if (weightUnit != null && weightUnit == 'kg') data['weightInKg'] = weight;
-    if (weightUnit != null && weightUnit == 'lb') data['weightInLb'] = weight;
-    if (weightUnit != null) {
-      if (weightUnit == 'kg') {
-        data['weightInLb'] = convertKgToLb(weight!);
-      }
-      if (weightUnit == 'lb') {
-        data['weightInKg'] = convertLbToKg(weight!);
-      }
-    }
-    if (heightUnit != null && heightUnit == 'cm') data['heightInCm'] = height;
-    if (heightUnit != null && heightUnit == 'ft') data['heightInFt'] = height;
-    if (heightUnit != null) {
-      if (heightUnit == 'cm') {
-        data['heightInFt'] = convertCmToFt(height!);
-      }
-      if (heightUnit == 'ft') {
-        data['heightInCm'] = convertFtToCm(height!);
-      }
-    }
+    if (weightInKg != null) data['weightInKg'] = weightInKg;
+    if (weightInLb != null) data['weightInLb'] = weightInLb;
+
+    if (heightInCm != null) data['heightInCm'] = heightInCm;
+    if (heightInFt != null) data['heightInFt'] = heightInFt;
+
     if (isTrainer != null) data['isTrainer'] = isTrainer;
     if (isUserActive != null) data['isUserActive'] = isUserActive;
     if (username != null) data['username'] = username;

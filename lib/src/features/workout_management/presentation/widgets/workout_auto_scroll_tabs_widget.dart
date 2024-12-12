@@ -1,13 +1,20 @@
+import 'dart:math';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_tile_widget.dart';
+import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:go_router/go_router.dart';
 
 class AutoScrollTabsWidget extends StatefulWidget {
+  final bool isClientSideView;
+
   final ValueNotifier<List<DayModel>> days;
   final ValueNotifier<List<WeekModel>> weeks;
   final ValueNotifier<List<ExerciseModel>> exercises;
@@ -15,6 +22,8 @@ class AutoScrollTabsWidget extends StatefulWidget {
   final ValueNotifier<WeekModel?> currentWeek;
   final Function(int) onDayTap;
   final Function(ExerciseModel editExercise, bool edit, bool delete) onDrag;
+
+  final WorkoutPlanModel? workoutPlan;
 
   const AutoScrollTabsWidget({
     super.key,
@@ -25,6 +34,8 @@ class AutoScrollTabsWidget extends StatefulWidget {
     required this.currentWeek,
     required this.onDayTap,
     required this.onDrag,
+    this.workoutPlan,
+    this.isClientSideView = false,
   });
 
   @override
@@ -151,37 +162,55 @@ class _AutoScrollTabsWidgetState extends State<AutoScrollTabsWidget> {
                         child: ListView.builder(
                           itemCount: exercises.length,
                           itemBuilder: (context, index) {
-                            return Slidable(
-                              key: UniqueKey(),
-                              startActionPane: ActionPane(
-                                extentRatio: 0.25,
-                                motion: const ScrollMotion(),
-                                children: [
-                                  SlidableAction(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: (context) => widget.onDrag(
-                                        exercises[index], true, false),
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor:
-                                        globalColorScheme.onPrimaryContainer,
-                                    icon: Icons.edit_note,
-                                  ),
-                                  SlidableAction(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: (context) => widget.onDrag(
-                                        exercises[index], false, true),
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor:
-                                        globalColorScheme.onErrorContainer,
-                                    icon: Icons.delete,
-                                  ),
-                                ],
-                              ),
-                              child: ExerciseTileWidget(
-                                index: index,
-                                exercise: exercises[index],
-                              ),
-                            );
+                            if (!widget.isClientSideView) {
+                              return Slidable(
+                                key: UniqueKey(),
+                                startActionPane: ActionPane(
+                                  extentRatio: 0.25,
+                                  motion: const ScrollMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: (context) => widget.onDrag(
+                                          exercises[index], true, false),
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor:
+                                          globalColorScheme.onPrimaryContainer,
+                                      icon: Icons.edit_note,
+                                    ),
+                                    SlidableAction(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: (context) => widget.onDrag(
+                                          exercises[index], false, true),
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor:
+                                          globalColorScheme.onErrorContainer,
+                                      icon: Icons.delete,
+                                    ),
+                                  ],
+                                ),
+                                child: ExerciseTileWidget(
+                                  index: index,
+                                  exercise: exercises[index],
+                                ),
+                              );
+                            } else {
+                              return GestureDetector(
+                                onTap: () => context.go(
+                                  FitFlexWorkoutTrackerPage.route,
+                                  extra: {
+                                    'exercise': exercises[index],
+                                    'workoutPlan': widget.workoutPlan,
+                                    'week': widget.currentWeek.value,
+                                    'day': widget.currentDay.value,
+                                  },
+                                ),
+                                child: ExerciseTileWidget(
+                                  index: index,
+                                  exercise: exercises[index],
+                                ),
+                              );
+                            }
                           },
                         ),
                       );

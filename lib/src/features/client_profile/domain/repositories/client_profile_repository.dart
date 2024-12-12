@@ -21,6 +21,9 @@ abstract class ClientProfileRepository {
   ///Get clients list for trainer
   Future<Either<Failures, List<ClientEntity>?>>? getClients();
 
+  ///Get client details
+  Future<Either<Failures, ClientEntity?>>? getClientById([String? id]);
+
   /// Check if client profile is created
   Future<Either<Failures, bool>> isClientProfileCreated();
 }

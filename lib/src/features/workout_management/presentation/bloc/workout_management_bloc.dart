@@ -200,7 +200,7 @@ class WorkoutManagementBloc
     UpdateWorkoutPlanEvent event,
     Emitter<WorkoutManagementState> emit,
   ) async {
-    emit(WorkoutManagementLoading());
+    emit(UpdateWorkoutLoading());
     final result = await updateWorkoutPlanUsecase(
       update.Params(
         workoutPlan: event.workoutPlan,

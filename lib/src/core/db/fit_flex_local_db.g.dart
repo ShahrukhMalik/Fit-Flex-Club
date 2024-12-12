@@ -23,28 +23,30 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
   late final GeneratedColumn<String> gender = GeneratedColumn<String>(
       'gender', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _weightMeta = const VerificationMeta('weight');
+  static const VerificationMeta _weightInKgMeta =
+      const VerificationMeta('weightInKg');
   @override
-  late final GeneratedColumn<int> weight = GeneratedColumn<int>(
-      'weight', aliasedName, true,
+  late final GeneratedColumn<int> weightInKg = GeneratedColumn<int>(
+      'weight_in_kg', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _weightUnitMeta =
-      const VerificationMeta('weightUnit');
+  static const VerificationMeta _weightInLbMeta =
+      const VerificationMeta('weightInLb');
   @override
-  late final GeneratedColumn<String> weightUnit = GeneratedColumn<String>(
-      'weight_unit', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _heightMeta = const VerificationMeta('height');
-  @override
-  late final GeneratedColumn<int> height = GeneratedColumn<int>(
-      'height', aliasedName, true,
+  late final GeneratedColumn<int> weightInLb = GeneratedColumn<int>(
+      'weight_in_lb', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _heightUnitMeta =
-      const VerificationMeta('heightUnit');
+  static const VerificationMeta _heightInFtMeta =
+      const VerificationMeta('heightInFt');
   @override
-  late final GeneratedColumn<String> heightUnit = GeneratedColumn<String>(
-      'height_unit', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+  late final GeneratedColumn<int> heightInFt = GeneratedColumn<int>(
+      'height_in_ft', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _heightInCmMeta =
+      const VerificationMeta('heightInCm');
+  @override
+  late final GeneratedColumn<int> heightInCm = GeneratedColumn<int>(
+      'height_in_cm', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _isTrainerMeta =
       const VerificationMeta('isTrainer');
   @override
@@ -108,10 +110,10 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
         id,
         age,
         gender,
-        weight,
-        weightUnit,
-        height,
-        heightUnit,
+        weightInKg,
+        weightInLb,
+        heightInFt,
+        heightInCm,
         isTrainer,
         isUserActive,
         username,
@@ -145,25 +147,29 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
       context.handle(_genderMeta,
           gender.isAcceptableOrUnknown(data['gender']!, _genderMeta));
     }
-    if (data.containsKey('weight')) {
-      context.handle(_weightMeta,
-          weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
-    }
-    if (data.containsKey('weight_unit')) {
+    if (data.containsKey('weight_in_kg')) {
       context.handle(
-          _weightUnitMeta,
-          weightUnit.isAcceptableOrUnknown(
-              data['weight_unit']!, _weightUnitMeta));
+          _weightInKgMeta,
+          weightInKg.isAcceptableOrUnknown(
+              data['weight_in_kg']!, _weightInKgMeta));
     }
-    if (data.containsKey('height')) {
-      context.handle(_heightMeta,
-          height.isAcceptableOrUnknown(data['height']!, _heightMeta));
-    }
-    if (data.containsKey('height_unit')) {
+    if (data.containsKey('weight_in_lb')) {
       context.handle(
-          _heightUnitMeta,
-          heightUnit.isAcceptableOrUnknown(
-              data['height_unit']!, _heightUnitMeta));
+          _weightInLbMeta,
+          weightInLb.isAcceptableOrUnknown(
+              data['weight_in_lb']!, _weightInLbMeta));
+    }
+    if (data.containsKey('height_in_ft')) {
+      context.handle(
+          _heightInFtMeta,
+          heightInFt.isAcceptableOrUnknown(
+              data['height_in_ft']!, _heightInFtMeta));
+    }
+    if (data.containsKey('height_in_cm')) {
+      context.handle(
+          _heightInCmMeta,
+          heightInCm.isAcceptableOrUnknown(
+              data['height_in_cm']!, _heightInCmMeta));
     }
     if (data.containsKey('is_trainer')) {
       context.handle(_isTrainerMeta,
@@ -230,14 +236,14 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
           .read(DriftSqlType.int, data['${effectivePrefix}age']),
       gender: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}gender']),
-      weight: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}weight']),
-      weightUnit: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}weight_unit']),
-      height: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}height']),
-      heightUnit: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}height_unit']),
+      weightInKg: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}weight_in_kg']),
+      weightInLb: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}weight_in_lb']),
+      heightInFt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}height_in_ft']),
+      heightInCm: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}height_in_cm']),
       isTrainer: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_trainer'])!,
       isUserActive: attachedDatabase.typeMapping
@@ -270,10 +276,10 @@ class Client extends DataClass implements Insertable<Client> {
   final String id;
   final int? age;
   final String? gender;
-  final int? weight;
-  final String? weightUnit;
-  final int? height;
-  final String? heightUnit;
+  final int? weightInKg;
+  final int? weightInLb;
+  final int? heightInFt;
+  final int? heightInCm;
   final bool isTrainer;
   final bool isUserActive;
   final String username;
@@ -287,10 +293,10 @@ class Client extends DataClass implements Insertable<Client> {
       {required this.id,
       this.age,
       this.gender,
-      this.weight,
-      this.weightUnit,
-      this.height,
-      this.heightUnit,
+      this.weightInKg,
+      this.weightInLb,
+      this.heightInFt,
+      this.heightInCm,
       required this.isTrainer,
       required this.isUserActive,
       required this.username,
@@ -310,17 +316,17 @@ class Client extends DataClass implements Insertable<Client> {
     if (!nullToAbsent || gender != null) {
       map['gender'] = Variable<String>(gender);
     }
-    if (!nullToAbsent || weight != null) {
-      map['weight'] = Variable<int>(weight);
+    if (!nullToAbsent || weightInKg != null) {
+      map['weight_in_kg'] = Variable<int>(weightInKg);
     }
-    if (!nullToAbsent || weightUnit != null) {
-      map['weight_unit'] = Variable<String>(weightUnit);
+    if (!nullToAbsent || weightInLb != null) {
+      map['weight_in_lb'] = Variable<int>(weightInLb);
     }
-    if (!nullToAbsent || height != null) {
-      map['height'] = Variable<int>(height);
+    if (!nullToAbsent || heightInFt != null) {
+      map['height_in_ft'] = Variable<int>(heightInFt);
     }
-    if (!nullToAbsent || heightUnit != null) {
-      map['height_unit'] = Variable<String>(heightUnit);
+    if (!nullToAbsent || heightInCm != null) {
+      map['height_in_cm'] = Variable<int>(heightInCm);
     }
     map['is_trainer'] = Variable<bool>(isTrainer);
     map['is_user_active'] = Variable<bool>(isUserActive);
@@ -351,16 +357,18 @@ class Client extends DataClass implements Insertable<Client> {
       age: age == null && nullToAbsent ? const Value.absent() : Value(age),
       gender:
           gender == null && nullToAbsent ? const Value.absent() : Value(gender),
-      weight:
-          weight == null && nullToAbsent ? const Value.absent() : Value(weight),
-      weightUnit: weightUnit == null && nullToAbsent
+      weightInKg: weightInKg == null && nullToAbsent
           ? const Value.absent()
-          : Value(weightUnit),
-      height:
-          height == null && nullToAbsent ? const Value.absent() : Value(height),
-      heightUnit: heightUnit == null && nullToAbsent
+          : Value(weightInKg),
+      weightInLb: weightInLb == null && nullToAbsent
           ? const Value.absent()
-          : Value(heightUnit),
+          : Value(weightInLb),
+      heightInFt: heightInFt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(heightInFt),
+      heightInCm: heightInCm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(heightInCm),
       isTrainer: Value(isTrainer),
       isUserActive: Value(isUserActive),
       username: Value(username),
@@ -388,10 +396,10 @@ class Client extends DataClass implements Insertable<Client> {
       id: serializer.fromJson<String>(json['id']),
       age: serializer.fromJson<int?>(json['age']),
       gender: serializer.fromJson<String?>(json['gender']),
-      weight: serializer.fromJson<int?>(json['weight']),
-      weightUnit: serializer.fromJson<String?>(json['weightUnit']),
-      height: serializer.fromJson<int?>(json['height']),
-      heightUnit: serializer.fromJson<String?>(json['heightUnit']),
+      weightInKg: serializer.fromJson<int?>(json['weightInKg']),
+      weightInLb: serializer.fromJson<int?>(json['weightInLb']),
+      heightInFt: serializer.fromJson<int?>(json['heightInFt']),
+      heightInCm: serializer.fromJson<int?>(json['heightInCm']),
       isTrainer: serializer.fromJson<bool>(json['isTrainer']),
       isUserActive: serializer.fromJson<bool>(json['isUserActive']),
       username: serializer.fromJson<String>(json['username']),
@@ -411,10 +419,10 @@ class Client extends DataClass implements Insertable<Client> {
       'id': serializer.toJson<String>(id),
       'age': serializer.toJson<int?>(age),
       'gender': serializer.toJson<String?>(gender),
-      'weight': serializer.toJson<int?>(weight),
-      'weightUnit': serializer.toJson<String?>(weightUnit),
-      'height': serializer.toJson<int?>(height),
-      'heightUnit': serializer.toJson<String?>(heightUnit),
+      'weightInKg': serializer.toJson<int?>(weightInKg),
+      'weightInLb': serializer.toJson<int?>(weightInLb),
+      'heightInFt': serializer.toJson<int?>(heightInFt),
+      'heightInCm': serializer.toJson<int?>(heightInCm),
       'isTrainer': serializer.toJson<bool>(isTrainer),
       'isUserActive': serializer.toJson<bool>(isUserActive),
       'username': serializer.toJson<String>(username),
@@ -432,10 +440,10 @@ class Client extends DataClass implements Insertable<Client> {
           {String? id,
           Value<int?> age = const Value.absent(),
           Value<String?> gender = const Value.absent(),
-          Value<int?> weight = const Value.absent(),
-          Value<String?> weightUnit = const Value.absent(),
-          Value<int?> height = const Value.absent(),
-          Value<String?> heightUnit = const Value.absent(),
+          Value<int?> weightInKg = const Value.absent(),
+          Value<int?> weightInLb = const Value.absent(),
+          Value<int?> heightInFt = const Value.absent(),
+          Value<int?> heightInCm = const Value.absent(),
           bool? isTrainer,
           bool? isUserActive,
           String? username,
@@ -449,10 +457,10 @@ class Client extends DataClass implements Insertable<Client> {
         id: id ?? this.id,
         age: age.present ? age.value : this.age,
         gender: gender.present ? gender.value : this.gender,
-        weight: weight.present ? weight.value : this.weight,
-        weightUnit: weightUnit.present ? weightUnit.value : this.weightUnit,
-        height: height.present ? height.value : this.height,
-        heightUnit: heightUnit.present ? heightUnit.value : this.heightUnit,
+        weightInKg: weightInKg.present ? weightInKg.value : this.weightInKg,
+        weightInLb: weightInLb.present ? weightInLb.value : this.weightInLb,
+        heightInFt: heightInFt.present ? heightInFt.value : this.heightInFt,
+        heightInCm: heightInCm.present ? heightInCm.value : this.heightInCm,
         isTrainer: isTrainer ?? this.isTrainer,
         isUserActive: isUserActive ?? this.isUserActive,
         username: username ?? this.username,
@@ -472,12 +480,14 @@ class Client extends DataClass implements Insertable<Client> {
       id: data.id.present ? data.id.value : this.id,
       age: data.age.present ? data.age.value : this.age,
       gender: data.gender.present ? data.gender.value : this.gender,
-      weight: data.weight.present ? data.weight.value : this.weight,
-      weightUnit:
-          data.weightUnit.present ? data.weightUnit.value : this.weightUnit,
-      height: data.height.present ? data.height.value : this.height,
-      heightUnit:
-          data.heightUnit.present ? data.heightUnit.value : this.heightUnit,
+      weightInKg:
+          data.weightInKg.present ? data.weightInKg.value : this.weightInKg,
+      weightInLb:
+          data.weightInLb.present ? data.weightInLb.value : this.weightInLb,
+      heightInFt:
+          data.heightInFt.present ? data.heightInFt.value : this.heightInFt,
+      heightInCm:
+          data.heightInCm.present ? data.heightInCm.value : this.heightInCm,
       isTrainer: data.isTrainer.present ? data.isTrainer.value : this.isTrainer,
       isUserActive: data.isUserActive.present
           ? data.isUserActive.value
@@ -502,10 +512,10 @@ class Client extends DataClass implements Insertable<Client> {
           ..write('id: $id, ')
           ..write('age: $age, ')
           ..write('gender: $gender, ')
-          ..write('weight: $weight, ')
-          ..write('weightUnit: $weightUnit, ')
-          ..write('height: $height, ')
-          ..write('heightUnit: $heightUnit, ')
+          ..write('weightInKg: $weightInKg, ')
+          ..write('weightInLb: $weightInLb, ')
+          ..write('heightInFt: $heightInFt, ')
+          ..write('heightInCm: $heightInCm, ')
           ..write('isTrainer: $isTrainer, ')
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
@@ -524,10 +534,10 @@ class Client extends DataClass implements Insertable<Client> {
       id,
       age,
       gender,
-      weight,
-      weightUnit,
-      height,
-      heightUnit,
+      weightInKg,
+      weightInLb,
+      heightInFt,
+      heightInCm,
       isTrainer,
       isUserActive,
       username,
@@ -544,10 +554,10 @@ class Client extends DataClass implements Insertable<Client> {
           other.id == this.id &&
           other.age == this.age &&
           other.gender == this.gender &&
-          other.weight == this.weight &&
-          other.weightUnit == this.weightUnit &&
-          other.height == this.height &&
-          other.heightUnit == this.heightUnit &&
+          other.weightInKg == this.weightInKg &&
+          other.weightInLb == this.weightInLb &&
+          other.heightInFt == this.heightInFt &&
+          other.heightInCm == this.heightInCm &&
           other.isTrainer == this.isTrainer &&
           other.isUserActive == this.isUserActive &&
           other.username == this.username &&
@@ -563,10 +573,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
   final Value<String> id;
   final Value<int?> age;
   final Value<String?> gender;
-  final Value<int?> weight;
-  final Value<String?> weightUnit;
-  final Value<int?> height;
-  final Value<String?> heightUnit;
+  final Value<int?> weightInKg;
+  final Value<int?> weightInLb;
+  final Value<int?> heightInFt;
+  final Value<int?> heightInCm;
   final Value<bool> isTrainer;
   final Value<bool> isUserActive;
   final Value<String> username;
@@ -581,10 +591,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     this.id = const Value.absent(),
     this.age = const Value.absent(),
     this.gender = const Value.absent(),
-    this.weight = const Value.absent(),
-    this.weightUnit = const Value.absent(),
-    this.height = const Value.absent(),
-    this.heightUnit = const Value.absent(),
+    this.weightInKg = const Value.absent(),
+    this.weightInLb = const Value.absent(),
+    this.heightInFt = const Value.absent(),
+    this.heightInCm = const Value.absent(),
     this.isTrainer = const Value.absent(),
     this.isUserActive = const Value.absent(),
     this.username = const Value.absent(),
@@ -600,10 +610,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     required String id,
     this.age = const Value.absent(),
     this.gender = const Value.absent(),
-    this.weight = const Value.absent(),
-    this.weightUnit = const Value.absent(),
-    this.height = const Value.absent(),
-    this.heightUnit = const Value.absent(),
+    this.weightInKg = const Value.absent(),
+    this.weightInLb = const Value.absent(),
+    this.heightInFt = const Value.absent(),
+    this.heightInCm = const Value.absent(),
     required bool isTrainer,
     required bool isUserActive,
     required String username,
@@ -623,10 +633,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     Expression<String>? id,
     Expression<int>? age,
     Expression<String>? gender,
-    Expression<int>? weight,
-    Expression<String>? weightUnit,
-    Expression<int>? height,
-    Expression<String>? heightUnit,
+    Expression<int>? weightInKg,
+    Expression<int>? weightInLb,
+    Expression<int>? heightInFt,
+    Expression<int>? heightInCm,
     Expression<bool>? isTrainer,
     Expression<bool>? isUserActive,
     Expression<String>? username,
@@ -642,10 +652,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       if (id != null) 'id': id,
       if (age != null) 'age': age,
       if (gender != null) 'gender': gender,
-      if (weight != null) 'weight': weight,
-      if (weightUnit != null) 'weight_unit': weightUnit,
-      if (height != null) 'height': height,
-      if (heightUnit != null) 'height_unit': heightUnit,
+      if (weightInKg != null) 'weight_in_kg': weightInKg,
+      if (weightInLb != null) 'weight_in_lb': weightInLb,
+      if (heightInFt != null) 'height_in_ft': heightInFt,
+      if (heightInCm != null) 'height_in_cm': heightInCm,
       if (isTrainer != null) 'is_trainer': isTrainer,
       if (isUserActive != null) 'is_user_active': isUserActive,
       if (username != null) 'username': username,
@@ -664,10 +674,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       {Value<String>? id,
       Value<int?>? age,
       Value<String?>? gender,
-      Value<int?>? weight,
-      Value<String?>? weightUnit,
-      Value<int?>? height,
-      Value<String?>? heightUnit,
+      Value<int?>? weightInKg,
+      Value<int?>? weightInLb,
+      Value<int?>? heightInFt,
+      Value<int?>? heightInCm,
       Value<bool>? isTrainer,
       Value<bool>? isUserActive,
       Value<String>? username,
@@ -682,10 +692,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       id: id ?? this.id,
       age: age ?? this.age,
       gender: gender ?? this.gender,
-      weight: weight ?? this.weight,
-      weightUnit: weightUnit ?? this.weightUnit,
-      height: height ?? this.height,
-      heightUnit: heightUnit ?? this.heightUnit,
+      weightInKg: weightInKg ?? this.weightInKg,
+      weightInLb: weightInLb ?? this.weightInLb,
+      heightInFt: heightInFt ?? this.heightInFt,
+      heightInCm: heightInCm ?? this.heightInCm,
       isTrainer: isTrainer ?? this.isTrainer,
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
@@ -712,17 +722,17 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     if (gender.present) {
       map['gender'] = Variable<String>(gender.value);
     }
-    if (weight.present) {
-      map['weight'] = Variable<int>(weight.value);
+    if (weightInKg.present) {
+      map['weight_in_kg'] = Variable<int>(weightInKg.value);
     }
-    if (weightUnit.present) {
-      map['weight_unit'] = Variable<String>(weightUnit.value);
+    if (weightInLb.present) {
+      map['weight_in_lb'] = Variable<int>(weightInLb.value);
     }
-    if (height.present) {
-      map['height'] = Variable<int>(height.value);
+    if (heightInFt.present) {
+      map['height_in_ft'] = Variable<int>(heightInFt.value);
     }
-    if (heightUnit.present) {
-      map['height_unit'] = Variable<String>(heightUnit.value);
+    if (heightInCm.present) {
+      map['height_in_cm'] = Variable<int>(heightInCm.value);
     }
     if (isTrainer.present) {
       map['is_trainer'] = Variable<bool>(isTrainer.value);
@@ -764,10 +774,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
           ..write('id: $id, ')
           ..write('age: $age, ')
           ..write('gender: $gender, ')
-          ..write('weight: $weight, ')
-          ..write('weightUnit: $weightUnit, ')
-          ..write('height: $height, ')
-          ..write('heightUnit: $heightUnit, ')
+          ..write('weightInKg: $weightInKg, ')
+          ..write('weightInLb: $weightInLb, ')
+          ..write('heightInFt: $heightInFt, ')
+          ..write('heightInCm: $heightInCm, ')
           ..write('isTrainer: $isTrainer, ')
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
@@ -3599,13 +3609,9 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
   $WorkoutHistorySetTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _clientIdMeta =
       const VerificationMeta('clientId');
   @override
@@ -3657,8 +3663,8 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
       const VerificationMeta('updatedAt');
   @override
   late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      'updated_at', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -3684,6 +3690,8 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('client_id')) {
       context.handle(_clientIdMeta,
@@ -3730,8 +3738,6 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
-    } else if (isInserting) {
-      context.missing(_updatedAtMeta);
     }
     return context;
   }
@@ -3743,7 +3749,7 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return WorkoutHistorySetData(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       clientId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}client_id'])!,
       exerciseId: attachedDatabase.typeMapping
@@ -3759,7 +3765,7 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}updated_at']),
     );
   }
 
@@ -3771,7 +3777,7 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
 
 class WorkoutHistorySetData extends DataClass
     implements Insertable<WorkoutHistorySetData> {
-  final int id;
+  final String id;
   final String clientId;
   final String exerciseId;
   final int? actualReps;
@@ -3779,7 +3785,7 @@ class WorkoutHistorySetData extends DataClass
   final double? actualDistance;
   final int? actualTime;
   final int createdAt;
-  final int updatedAt;
+  final int? updatedAt;
   const WorkoutHistorySetData(
       {required this.id,
       required this.clientId,
@@ -3789,11 +3795,11 @@ class WorkoutHistorySetData extends DataClass
       this.actualDistance,
       this.actualTime,
       required this.createdAt,
-      required this.updatedAt});
+      this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['client_id'] = Variable<String>(clientId);
     map['exercise_id'] = Variable<String>(exerciseId);
     if (!nullToAbsent || actualReps != null) {
@@ -3809,7 +3815,9 @@ class WorkoutHistorySetData extends DataClass
       map['actual_time'] = Variable<int>(actualTime);
     }
     map['created_at'] = Variable<int>(createdAt);
-    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<int>(updatedAt);
+    }
     return map;
   }
 
@@ -3831,7 +3839,9 @@ class WorkoutHistorySetData extends DataClass
           ? const Value.absent()
           : Value(actualTime),
       createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
     );
   }
 
@@ -3839,7 +3849,7 @@ class WorkoutHistorySetData extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return WorkoutHistorySetData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       clientId: serializer.fromJson<String>(json['clientId']),
       exerciseId: serializer.fromJson<String>(json['exerciseId']),
       actualReps: serializer.fromJson<int?>(json['actualReps']),
@@ -3847,14 +3857,14 @@ class WorkoutHistorySetData extends DataClass
       actualDistance: serializer.fromJson<double?>(json['actualDistance']),
       actualTime: serializer.fromJson<int?>(json['actualTime']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
-      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      updatedAt: serializer.fromJson<int?>(json['updatedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'clientId': serializer.toJson<String>(clientId),
       'exerciseId': serializer.toJson<String>(exerciseId),
       'actualReps': serializer.toJson<int?>(actualReps),
@@ -3862,12 +3872,12 @@ class WorkoutHistorySetData extends DataClass
       'actualDistance': serializer.toJson<double?>(actualDistance),
       'actualTime': serializer.toJson<int?>(actualTime),
       'createdAt': serializer.toJson<int>(createdAt),
-      'updatedAt': serializer.toJson<int>(updatedAt),
+      'updatedAt': serializer.toJson<int?>(updatedAt),
     };
   }
 
   WorkoutHistorySetData copyWith(
-          {int? id,
+          {String? id,
           String? clientId,
           String? exerciseId,
           Value<int?> actualReps = const Value.absent(),
@@ -3875,7 +3885,7 @@ class WorkoutHistorySetData extends DataClass
           Value<double?> actualDistance = const Value.absent(),
           Value<int?> actualTime = const Value.absent(),
           int? createdAt,
-          int? updatedAt}) =>
+          Value<int?> updatedAt = const Value.absent()}) =>
       WorkoutHistorySetData(
         id: id ?? this.id,
         clientId: clientId ?? this.clientId,
@@ -3887,7 +3897,7 @@ class WorkoutHistorySetData extends DataClass
             actualDistance.present ? actualDistance.value : this.actualDistance,
         actualTime: actualTime.present ? actualTime.value : this.actualTime,
         createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
+        updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
       );
   WorkoutHistorySetData copyWithCompanion(WorkoutHistorySetCompanion data) {
     return WorkoutHistorySetData(
@@ -3946,7 +3956,7 @@ class WorkoutHistorySetData extends DataClass
 
 class WorkoutHistorySetCompanion
     extends UpdateCompanion<WorkoutHistorySetData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> clientId;
   final Value<String> exerciseId;
   final Value<int?> actualReps;
@@ -3954,7 +3964,8 @@ class WorkoutHistorySetCompanion
   final Value<double?> actualDistance;
   final Value<int?> actualTime;
   final Value<int> createdAt;
-  final Value<int> updatedAt;
+  final Value<int?> updatedAt;
+  final Value<int> rowid;
   const WorkoutHistorySetCompanion({
     this.id = const Value.absent(),
     this.clientId = const Value.absent(),
@@ -3965,9 +3976,10 @@ class WorkoutHistorySetCompanion
     this.actualTime = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   WorkoutHistorySetCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String clientId,
     required String exerciseId,
     this.actualReps = const Value.absent(),
@@ -3975,12 +3987,13 @@ class WorkoutHistorySetCompanion
     this.actualDistance = const Value.absent(),
     this.actualTime = const Value.absent(),
     this.createdAt = const Value.absent(),
-    required int updatedAt,
-  })  : clientId = Value(clientId),
-        exerciseId = Value(exerciseId),
-        updatedAt = Value(updatedAt);
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        clientId = Value(clientId),
+        exerciseId = Value(exerciseId);
   static Insertable<WorkoutHistorySetData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? clientId,
     Expression<String>? exerciseId,
     Expression<int>? actualReps,
@@ -3989,6 +4002,7 @@ class WorkoutHistorySetCompanion
     Expression<int>? actualTime,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4000,11 +4014,12 @@ class WorkoutHistorySetCompanion
       if (actualTime != null) 'actual_time': actualTime,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   WorkoutHistorySetCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? clientId,
       Value<String>? exerciseId,
       Value<int?>? actualReps,
@@ -4012,7 +4027,8 @@ class WorkoutHistorySetCompanion
       Value<double?>? actualDistance,
       Value<int?>? actualTime,
       Value<int>? createdAt,
-      Value<int>? updatedAt}) {
+      Value<int?>? updatedAt,
+      Value<int>? rowid}) {
     return WorkoutHistorySetCompanion(
       id: id ?? this.id,
       clientId: clientId ?? this.clientId,
@@ -4023,6 +4039,7 @@ class WorkoutHistorySetCompanion
       actualTime: actualTime ?? this.actualTime,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -4030,7 +4047,7 @@ class WorkoutHistorySetCompanion
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (clientId.present) {
       map['client_id'] = Variable<String>(clientId.value);
@@ -4056,6 +4073,9 @@ class WorkoutHistorySetCompanion
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -4070,7 +4090,8 @@ class WorkoutHistorySetCompanion
           ..write('actualDistance: $actualDistance, ')
           ..write('actualTime: $actualTime, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -4454,10 +4475,10 @@ typedef $$ClientsTableCreateCompanionBuilder = ClientsCompanion Function({
   required String id,
   Value<int?> age,
   Value<String?> gender,
-  Value<int?> weight,
-  Value<String?> weightUnit,
-  Value<int?> height,
-  Value<String?> heightUnit,
+  Value<int?> weightInKg,
+  Value<int?> weightInLb,
+  Value<int?> heightInFt,
+  Value<int?> heightInCm,
   required bool isTrainer,
   required bool isUserActive,
   required String username,
@@ -4473,10 +4494,10 @@ typedef $$ClientsTableUpdateCompanionBuilder = ClientsCompanion Function({
   Value<String> id,
   Value<int?> age,
   Value<String?> gender,
-  Value<int?> weight,
-  Value<String?> weightUnit,
-  Value<int?> height,
-  Value<String?> heightUnit,
+  Value<int?> weightInKg,
+  Value<int?> weightInLb,
+  Value<int?> heightInFt,
+  Value<int?> heightInCm,
   Value<bool> isTrainer,
   Value<bool> isUserActive,
   Value<String> username,
@@ -4603,17 +4624,17 @@ class $$ClientsTableFilterComposer
   ColumnFilters<String> get gender => $composableBuilder(
       column: $table.gender, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get weight => $composableBuilder(
-      column: $table.weight, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get weightInKg => $composableBuilder(
+      column: $table.weightInKg, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get weightUnit => $composableBuilder(
-      column: $table.weightUnit, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get weightInLb => $composableBuilder(
+      column: $table.weightInLb, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get height => $composableBuilder(
-      column: $table.height, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get heightInFt => $composableBuilder(
+      column: $table.heightInFt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get heightUnit => $composableBuilder(
-      column: $table.heightUnit, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get heightInCm => $composableBuilder(
+      column: $table.heightInCm, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get isTrainer => $composableBuilder(
       column: $table.isTrainer, builder: (column) => ColumnFilters(column));
@@ -4789,17 +4810,17 @@ class $$ClientsTableOrderingComposer
   ColumnOrderings<String> get gender => $composableBuilder(
       column: $table.gender, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get weight => $composableBuilder(
-      column: $table.weight, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get weightInKg => $composableBuilder(
+      column: $table.weightInKg, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get weightUnit => $composableBuilder(
-      column: $table.weightUnit, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get weightInLb => $composableBuilder(
+      column: $table.weightInLb, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get height => $composableBuilder(
-      column: $table.height, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get heightInFt => $composableBuilder(
+      column: $table.heightInFt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get heightUnit => $composableBuilder(
-      column: $table.heightUnit, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get heightInCm => $composableBuilder(
+      column: $table.heightInCm, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get isTrainer => $composableBuilder(
       column: $table.isTrainer, builder: (column) => ColumnOrderings(column));
@@ -4850,17 +4871,17 @@ class $$ClientsTableAnnotationComposer
   GeneratedColumn<String> get gender =>
       $composableBuilder(column: $table.gender, builder: (column) => column);
 
-  GeneratedColumn<int> get weight =>
-      $composableBuilder(column: $table.weight, builder: (column) => column);
+  GeneratedColumn<int> get weightInKg => $composableBuilder(
+      column: $table.weightInKg, builder: (column) => column);
 
-  GeneratedColumn<String> get weightUnit => $composableBuilder(
-      column: $table.weightUnit, builder: (column) => column);
+  GeneratedColumn<int> get weightInLb => $composableBuilder(
+      column: $table.weightInLb, builder: (column) => column);
 
-  GeneratedColumn<int> get height =>
-      $composableBuilder(column: $table.height, builder: (column) => column);
+  GeneratedColumn<int> get heightInFt => $composableBuilder(
+      column: $table.heightInFt, builder: (column) => column);
 
-  GeneratedColumn<String> get heightUnit => $composableBuilder(
-      column: $table.heightUnit, builder: (column) => column);
+  GeneratedColumn<int> get heightInCm => $composableBuilder(
+      column: $table.heightInCm, builder: (column) => column);
 
   GeneratedColumn<bool> get isTrainer =>
       $composableBuilder(column: $table.isTrainer, builder: (column) => column);
@@ -5050,10 +5071,10 @@ class $$ClientsTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<int?> age = const Value.absent(),
             Value<String?> gender = const Value.absent(),
-            Value<int?> weight = const Value.absent(),
-            Value<String?> weightUnit = const Value.absent(),
-            Value<int?> height = const Value.absent(),
-            Value<String?> heightUnit = const Value.absent(),
+            Value<int?> weightInKg = const Value.absent(),
+            Value<int?> weightInLb = const Value.absent(),
+            Value<int?> heightInFt = const Value.absent(),
+            Value<int?> heightInCm = const Value.absent(),
             Value<bool> isTrainer = const Value.absent(),
             Value<bool> isUserActive = const Value.absent(),
             Value<String> username = const Value.absent(),
@@ -5069,10 +5090,10 @@ class $$ClientsTableTableManager extends RootTableManager<
             id: id,
             age: age,
             gender: gender,
-            weight: weight,
-            weightUnit: weightUnit,
-            height: height,
-            heightUnit: heightUnit,
+            weightInKg: weightInKg,
+            weightInLb: weightInLb,
+            heightInFt: heightInFt,
+            heightInCm: heightInCm,
             isTrainer: isTrainer,
             isUserActive: isUserActive,
             username: username,
@@ -5088,10 +5109,10 @@ class $$ClientsTableTableManager extends RootTableManager<
             required String id,
             Value<int?> age = const Value.absent(),
             Value<String?> gender = const Value.absent(),
-            Value<int?> weight = const Value.absent(),
-            Value<String?> weightUnit = const Value.absent(),
-            Value<int?> height = const Value.absent(),
-            Value<String?> heightUnit = const Value.absent(),
+            Value<int?> weightInKg = const Value.absent(),
+            Value<int?> weightInLb = const Value.absent(),
+            Value<int?> heightInFt = const Value.absent(),
+            Value<int?> heightInCm = const Value.absent(),
             required bool isTrainer,
             required bool isUserActive,
             required String username,
@@ -5107,10 +5128,10 @@ class $$ClientsTableTableManager extends RootTableManager<
             id: id,
             age: age,
             gender: gender,
-            weight: weight,
-            weightUnit: weightUnit,
-            height: height,
-            heightUnit: heightUnit,
+            weightInKg: weightInKg,
+            weightInLb: weightInLb,
+            heightInFt: heightInFt,
+            heightInCm: heightInCm,
             isTrainer: isTrainer,
             isUserActive: isUserActive,
             username: username,
@@ -7943,7 +7964,7 @@ typedef $$ClientWeightTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$WorkoutHistorySetTableCreateCompanionBuilder
     = WorkoutHistorySetCompanion Function({
-  Value<int> id,
+  required String id,
   required String clientId,
   required String exerciseId,
   Value<int?> actualReps,
@@ -7951,11 +7972,12 @@ typedef $$WorkoutHistorySetTableCreateCompanionBuilder
   Value<double?> actualDistance,
   Value<int?> actualTime,
   Value<int> createdAt,
-  required int updatedAt,
+  Value<int?> updatedAt,
+  Value<int> rowid,
 });
 typedef $$WorkoutHistorySetTableUpdateCompanionBuilder
     = WorkoutHistorySetCompanion Function({
-  Value<int> id,
+  Value<String> id,
   Value<String> clientId,
   Value<String> exerciseId,
   Value<int?> actualReps,
@@ -7963,7 +7985,8 @@ typedef $$WorkoutHistorySetTableUpdateCompanionBuilder
   Value<double?> actualDistance,
   Value<int?> actualTime,
   Value<int> createdAt,
-  Value<int> updatedAt,
+  Value<int?> updatedAt,
+  Value<int> rowid,
 });
 
 final class $$WorkoutHistorySetTableReferences extends BaseReferences<
@@ -7996,7 +8019,7 @@ class $$WorkoutHistorySetTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get clientId => $composableBuilder(
@@ -8051,7 +8074,7 @@ class $$WorkoutHistorySetTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get clientId => $composableBuilder(
@@ -8108,7 +8131,7 @@ class $$WorkoutHistorySetTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get clientId =>
@@ -8179,7 +8202,7 @@ class $$WorkoutHistorySetTableTableManager extends RootTableManager<
               $$WorkoutHistorySetTableAnnotationComposer(
                   $db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String> clientId = const Value.absent(),
             Value<String> exerciseId = const Value.absent(),
             Value<int?> actualReps = const Value.absent(),
@@ -8187,7 +8210,8 @@ class $$WorkoutHistorySetTableTableManager extends RootTableManager<
             Value<double?> actualDistance = const Value.absent(),
             Value<int?> actualTime = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
-            Value<int> updatedAt = const Value.absent(),
+            Value<int?> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               WorkoutHistorySetCompanion(
             id: id,
@@ -8199,9 +8223,10 @@ class $$WorkoutHistorySetTableTableManager extends RootTableManager<
             actualTime: actualTime,
             createdAt: createdAt,
             updatedAt: updatedAt,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
+            required String id,
             required String clientId,
             required String exerciseId,
             Value<int?> actualReps = const Value.absent(),
@@ -8209,7 +8234,8 @@ class $$WorkoutHistorySetTableTableManager extends RootTableManager<
             Value<double?> actualDistance = const Value.absent(),
             Value<int?> actualTime = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
-            required int updatedAt,
+            Value<int?> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               WorkoutHistorySetCompanion.insert(
             id: id,
@@ -8221,6 +8247,7 @@ class $$WorkoutHistorySetTableTableManager extends RootTableManager<
             actualTime: actualTime,
             createdAt: createdAt,
             updatedAt: updatedAt,
+            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

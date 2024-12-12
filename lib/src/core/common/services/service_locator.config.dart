@@ -50,6 +50,8 @@ import '../../../features/client_profile/domain/repositories/client_profile_repo
     as _i627;
 import '../../../features/client_profile/domain/usecases/add_user_usecase.dart'
     as _i541;
+import '../../../features/client_profile/domain/usecases/get_client_by_id_usecase.dart'
+    as _i841;
 import '../../../features/client_profile/domain/usecases/is_client_profile_created_usecase.dart'
     as _i617;
 import '../../../features/client_profile/domain/usecases/is_user_active_usecase.dart'
@@ -62,6 +64,20 @@ import '../../../features/trainer_profile/domain/usecases/get_clients_usecase.da
     as _i781;
 import '../../../features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart'
     as _i812;
+import '../../../features/workout_history/data/datasources/local/daos/workout_history_dao.dart'
+    as _i593;
+import '../../../features/workout_history/data/datasources/local/workout_history_local_data_source.dart'
+    as _i615;
+import '../../../features/workout_history/data/datasources/remote/workout_history_remote_data_source.dart'
+    as _i352;
+import '../../../features/workout_history/data/repositories/workout_history_repository.dart'
+    as _i473;
+import '../../../features/workout_history/domain/repositories/workout_history_repository.dart'
+    as _i198;
+import '../../../features/workout_history/domain/usecases/log_workout_history_usecase.dart'
+    as _i208;
+import '../../../features/workout_history/presentation/bloc/workout_history_bloc.dart'
+    as _i942;
 import '../../../features/workout_management/data/datasources/local/daos/workout_plan_dao.dart'
     as _i939;
 import '../../../features/workout_management/data/datasources/local/workout_plan_management_localdatabase.dart'
@@ -129,6 +145,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i878.SharedPrefsUtil(gh<_i460.SharedPreferences>()));
     gh.singleton<_i228.NetworkInfo>(() => _i228.NetworkInfoImpl(
         connectionChecker: gh<_i973.InternetConnectionChecker>()));
+    gh.factory<_i593.WorkoutHistoryDao>(
+        () => _i593.WorkoutHistoryDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i588.ClientProfileRemoteDatasource>(
         () => _i588.ClientProfileRemoteDatasourceImpl(
               auth: gh<_i59.FirebaseAuth>(),
@@ -160,6 +178,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
         _i781.GetClientsUsecaseUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i352.WorkoutHistoryRemoteDataSource>(() =>
+        _i352.WorkoutHistoryRemoteDataSourceImpl(
+            db: gh<_i974.FirebaseFirestore>()));
     gh.singleton<_i415.WorkoutPlanManagementLocaldatasource>(
         () => _i415.WorkoutPlanManagementLocaldatasourceImpl(
               dao: gh<_i939.WorkoutPlanDao>(),
@@ -167,6 +188,14 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i615.WorkoutHistoryLocalDataSource>(
+        () => _i615.WorkoutHistoryLocalDataSourceImpl(
+              dao: gh<_i593.WorkoutHistoryDao>(),
+              database: gh<_i987.AppDatabase>(),
+            ));
+    gh.singleton<_i841.GetClientByIdUsecase>(() =>
+        _i841.GetClientByIdUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
           gh<_i974.FirebaseFirestore>(),
           gh<_i878.SharedPrefsUtil>(),
@@ -188,6 +217,13 @@ extension GetItInjectableX on _i174.GetIt {
                 gh<_i530.WorkoutManagementRepository>()));
     gh.singleton<_i139.GetExercisesUsecase>(() => _i139.GetExercisesUsecaseImpl(
         workoutManagementRepository: gh<_i530.WorkoutManagementRepository>()));
+    gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
+          gh<_i541.AddUserUsecase>(),
+          gh<_i864.UpdateUserUsecase>(),
+          gh<_i617.IsClientProfileCreatedActiveUsecase>(),
+          gh<_i899.IsUserActiveUsecase>(),
+          gh<_i841.GetClientByIdUsecase>(),
+        ));
     gh.singleton<_i282.AssignWorkoutPlanUsecase>(() =>
         _i282.AssignWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -228,12 +264,12 @@ extension GetItInjectableX on _i174.GetIt {
             authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i447.LogOutUsecase>(() =>
         _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
-    gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
-          gh<_i541.AddUserUsecase>(),
-          gh<_i864.UpdateUserUsecase>(),
-          gh<_i617.IsClientProfileCreatedActiveUsecase>(),
-          gh<_i899.IsUserActiveUsecase>(),
-        ));
+    gh.singleton<_i198.WorkoutHistoryRepository>(
+        () => _i473.WorkoutHistoryRepositoryImpl(
+              networkInfo: gh<_i228.NetworkInfo>(),
+              local: gh<_i615.WorkoutHistoryLocalDataSource>(),
+              remote: gh<_i352.WorkoutHistoryRemoteDataSource>(),
+            ));
     gh.singleton<_i853.CreateWorkoutPlanUsecase>(() =>
         _i853.CreateWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -242,6 +278,9 @@ extension GetItInjectableX on _i174.GetIt {
         _i120.GetWorkoutPlansUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i208.LogWorkoutHistoryUsecase>(() =>
+        _i208.LogWorkoutHistoryUsecaseImpl(
+            workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
     gh.factory<_i41.WorkoutManagementBloc>(() => _i41.WorkoutManagementBloc(
           gh<_i139.GetExercisesUsecase>(),
           gh<_i853.CreateWorkoutPlanUsecase>(),
@@ -260,6 +299,8 @@ extension GetItInjectableX on _i174.GetIt {
           logOutUsecase: gh<_i447.LogOutUsecase>(),
           forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
         ));
+    gh.factory<_i942.WorkoutHistoryBloc>(
+        () => _i942.WorkoutHistoryBloc(gh<_i208.LogWorkoutHistoryUsecase>()));
     return this;
   }
 }

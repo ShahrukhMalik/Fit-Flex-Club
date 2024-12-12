@@ -1,7 +1,9 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
@@ -196,6 +198,16 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
         backgroundColor: globalColorScheme.onPrimaryContainer,
         title: "Workout Programs",
         context: context,
+        trailing: PlatformButton().buildButton(
+          foregroundColor: globalColorScheme.primary,
+          context: context,
+          type: ButtonType.icon,
+          icon: Icons.logout,
+          text: "",
+          onPressed: () => context
+              .read<AuthenticationBloc>()
+              .add(LogOutAuthenticationEvent()),
+        )!,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

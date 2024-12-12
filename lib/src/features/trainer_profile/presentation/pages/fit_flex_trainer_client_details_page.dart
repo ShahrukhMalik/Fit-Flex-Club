@@ -390,26 +390,23 @@ class ClientEntityCompactWidget extends StatelessWidget {
   Widget _buildDetailItem(String title, String? value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      // mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 12,
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 4),
-        Expanded(
-          child: Text(
-            value ?? 'N/A',
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
+        Text(
+          value ?? 'N/A',
+          style: TextStyle(
+            fontSize: 14,
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -426,6 +423,7 @@ class ClientEntityCompactWidget extends StatelessWidget {
             message: "Processing your request...",
           );
         }
+
         if (state is GetWorkoutPlansForClientLoading) {
           PlatformDialog.showLoadingDialog(
             context: context,
@@ -483,115 +481,188 @@ class ClientEntityCompactWidget extends StatelessWidget {
       },
       child: Column(
         children: [
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(16), // Slightly rounded corners
-              side: BorderSide(
-                color: globalColorScheme.outline,
-              ), // Soft border
-            ),
-            color: colorScheme.inversePrimary,
-            margin: EdgeInsets.all(10),
-            elevation: 4,
-            shadowColor: colorScheme.shadow,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Section with Name and Active Status
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.35,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(16), // Slightly rounded corners
+                side: BorderSide(
+                  color: globalColorScheme.outline,
+                ), // Soft border
+              ),
+              color: colorScheme.inversePrimary,
+              margin: EdgeInsets.all(10),
+              elevation: 4,
+              shadowColor: colorScheme.shadow,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Section with Name and Active Status
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: colorScheme.primaryContainer,
+                              child: Icon(
+                                Icons.person,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  client.username ?? 'Unknown User',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                ValueListenableBuilder(
+                                  valueListenable: isUserActive,
+                                  builder: (context, isUserActive, _) {
+                                    return Text(
+                                      isUserActive ? 'Active' : 'Inactive',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isUserActive
+                                            ? colorScheme.secondary
+                                            : colorScheme.error,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        // Switch Button
+                        ValueListenableBuilder(
+                          valueListenable: isUserActive,
+                          builder: (context, isUserActive, _) {
+                            return Switch(
+                              value: isUserActive,
+                              onChanged: (value) {
+                                print(value);
+                                onUserActiveToggle(value);
+                              },
+                              activeColor: colorScheme.primaryContainer,
+                              activeTrackColor: colorScheme.secondary,
+                              inactiveThumbColor:
+                                  colorScheme.onPrimaryContainer,
+                              inactiveTrackColor: colorScheme.errorContainer,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 20, color: Colors.grey),
+                    // Details Grid Section
+
+                    Expanded(
+                      child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: colorScheme.primaryContainer,
-                            child: Icon(
-                              Icons.person,
-                              color: colorScheme.onPrimaryContainer,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildDetailItem(
+                                    'Email',
+                                    client.email,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: _buildDetailItem(
+                                    'Phone',
+                                    '${client.phone?['countryCode']}'
+                                        '-'
+                                        '${client.phone?['phoneNumber']}',
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                client.username ?? 'Unknown User',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onSurface,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildDetailItem(
+                                      'Age', client.age?.toString()),
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              ValueListenableBuilder(
-                                valueListenable: isUserActive,
-                                builder: (context, isUserActive, _) {
-                                  return Text(
-                                    isUserActive ? 'Active' : 'Inactive',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: isUserActive
-                                          ? colorScheme.secondary
-                                          : colorScheme.error,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child:
+                                      _buildDetailItem('Gender', client.gender),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildDetailItem('Height',
+                                      '${client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: _buildDetailItem('Weight',
+                                      '${client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      // Switch Button
-                      ValueListenableBuilder(
-                        valueListenable: isUserActive,
-                        builder: (context, isUserActive, _) {
-                          return Switch(
-                            value: isUserActive,
-                            onChanged: (value) {
-                              print(value);
-                              onUserActiveToggle(value);
-                            },
-                            activeColor: colorScheme.primaryContainer,
-                            activeTrackColor: colorScheme.secondary,
-                            inactiveThumbColor: colorScheme.onPrimaryContainer,
-                            inactiveTrackColor: colorScheme.errorContainer,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 20, color: Colors.grey),
-                  // Details Grid Section
-                  GridView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 3.5,
-                    ),
-                    children: [
-                      _buildDetailItem('Email', client.email),
-                      _buildDetailItem('Phone', client.phone?['number']),
-                      _buildDetailItem('Age', client.age?.toString()),
-                      _buildDetailItem('Gender', client.gender),
-                      _buildDetailItem('Height',
-                          '${client.height ?? 'N/A'} ${client.heightUnit ?? ''}'),
-                      _buildDetailItem('Weight',
-                          '${client.weight ?? 'N/A'} ${client.weightUnit ?? ''}'),
-                    ],
-                  ),
+                    )
+                    // GridView(
+                    //   shrinkWrap: true,
 
-                  //
-                ],
+                    //   physics: const NeverScrollableScrollPhysics(),
+                    //   gridDelegate:
+                    //       const SliverGridDelegateWithFixedCrossAxisCount(
+                    //     crossAxisCount: 2,
+                    //     mainAxisSpacing: 12,
+                    //     crossAxisSpacing: 16,
+                    //     childAspectRatio: 3.5,
+                    //   ),
+                    //   children: [
+                    //     _buildDetailItem('Email', client.email),
+                    //     _buildDetailItem(
+                    //         'Phone',
+                    //         '${client.phone?['countryCode']}'
+                    //             '-'
+                    //             '${client.phone?['phoneNumber']}'),
+                    //     _buildDetailItem('Age', client.age?.toString()),
+                    //     _buildDetailItem('Gender', client.gender),
+                    //     _buildDetailItem('Height',
+                    //         '${client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
+                    //     _buildDetailItem('Weight',
+                    //         '${client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
+                    //   ],
+                    // ),
+
+                    //
+                  ],
+                ),
               ),
             ),
           ),
@@ -767,6 +838,16 @@ class ClientEntityCompactWidget extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+            ),
+          ),
+          Container(
+            height: 200,
+            width: double.maxFinite,
+            decoration: BoxDecoration(),
+            child: Center(
+              child: Text(
+                'Workout History Comming Soon..',
               ),
             ),
           ),

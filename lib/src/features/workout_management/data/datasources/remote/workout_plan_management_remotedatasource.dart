@@ -229,21 +229,21 @@ class WorkoutPlanManagementRemotedatasourceImpl
           .collection('workoutPlans')
           .doc(workoutPlanModel.uid);
 
-      batch.set(clientRef, workoutPlanModel.toMap());
+      batch.set(clientRef, workoutPlanModel.toMap(), SetOptions(merge: true));
 
       // Iterate through weeks
       for (var week in workoutPlanModel.weeks) {
         // Save week
         DocumentReference weekRef =
             clientRef.collection('weeks').doc(week.id.toString());
-        batch.set(weekRef, week.toMap());
+        batch.set(weekRef, week.toMap(), SetOptions(merge: true));
 
         // Iterate through days
         for (var day in week.days) {
           // Save day
           DocumentReference dayRef =
               weekRef.collection('days').doc(day.id.toString());
-          batch.set(dayRef, day.toMap());
+          batch.set(dayRef, day.toMap(), SetOptions(merge: true));
 
           // Iterate through exercises
           for (var exercise in day.exercises) {
@@ -252,7 +252,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
             exerciseMap['exerciseOrder'] = day.exercises.indexOf(exercise) + 1;
             DocumentReference exerciseRef =
                 dayRef.collection('exercises').doc(exercise.id.toString());
-            batch.set(exerciseRef, exerciseMap);
+            batch.set(exerciseRef, exerciseMap, SetOptions(merge: true));
 
             // Iterate through sets
             for (var set in exercise.sets) {
@@ -261,7 +261,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
               setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
               DocumentReference setRef =
                   exerciseRef.collection('sets').doc(set.id.toString());
-              batch.set(setRef, setMap);
+              batch.set(setRef, setMap, SetOptions(merge: true));
             }
           }
         }
@@ -342,7 +342,9 @@ class WorkoutPlanManagementRemotedatasourceImpl
             // Add or update sets
             for (var set in exercise.sets) {
               DocumentReference setRef = setsRef.doc(set.id.toString());
-              mainBatch.set(setRef, set.toMap(), SetOptions(merge: true));
+              final setMap = set.toMap();
+              setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
+              mainBatch.set(setRef, setMap, SetOptions(merge: true));
             }
 
             // Batch delete obsolete sets
