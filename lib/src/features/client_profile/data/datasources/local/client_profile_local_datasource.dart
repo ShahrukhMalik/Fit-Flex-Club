@@ -41,7 +41,7 @@ class ClientLocalDatasourceImpl extends ClientLocalDatasource {
       }
 
       if (isDataStale(
-        Duration(seconds: 1).inSeconds,
+        Duration(minutes: 5).inSeconds,
         clients.first.createdAt,
         clients.first.updatedAt,
       )) {
@@ -88,7 +88,7 @@ class ClientLocalDatasourceImpl extends ClientLocalDatasource {
         }
 
         if (isDataStale(
-          Duration(seconds: 1).inSeconds,
+          Duration(days: 1).inSeconds,
           client.createdAt,
           client.updatedAt,
         )) {

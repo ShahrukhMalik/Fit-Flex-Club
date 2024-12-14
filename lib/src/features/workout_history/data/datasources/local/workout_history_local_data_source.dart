@@ -74,7 +74,7 @@ class WorkoutHistoryLocalDataSourceImpl
 
       if (workoutHistorySets.isNotEmpty) {
         if (isDataStale(
-          Duration(minutes: 30).inSeconds,
+          Duration(minutes: 5).inSeconds,
           workoutHistorySets.first.exerciseModels.first.sets.first.createdAt!,
           workoutHistorySets.first.exerciseModels.first.updatedAt!,
         )) {

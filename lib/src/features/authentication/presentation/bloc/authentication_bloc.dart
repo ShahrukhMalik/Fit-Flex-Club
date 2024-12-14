@@ -312,6 +312,7 @@ class AuthenticationBloc
                       'isListendAlready': true,
                     }, SetOptions(merge: true));
                     localDb.deleteWorkoutPlans();
+                    localDb.deleteClients();
                     add(AuthenticateUserEvent());
                   }
                 } else {
