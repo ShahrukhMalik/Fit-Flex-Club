@@ -150,7 +150,9 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                     },
                     child: Expanded(
                       child: SetTrakerWidget(
+                        
                         onSubmit: (sets) {
+                          print(sets);
                           context.read<WorkoutHistoryBloc>().add(
                                 LogWorkoutHistoryEvent(
                                   sets: sets,

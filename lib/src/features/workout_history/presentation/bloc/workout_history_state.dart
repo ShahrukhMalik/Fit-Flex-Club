@@ -16,4 +16,11 @@ class WorkoutHistoryError extends WorkoutHistoryState {
 
 class LogWorkoutHistoryLoading extends WorkoutHistoryState {}
 
+class GetWorkoutHistoryLoading extends WorkoutHistoryState {}
+
 class LogWorkoutHistoryComplete extends WorkoutHistoryState {}
+
+class GetWorkoutHistoryComplete extends WorkoutHistoryState {
+  final List<WorkoutHistoryModel?>? workoutHistory;
+  const GetWorkoutHistoryComplete({required this.workoutHistory});
+}

@@ -190,22 +190,29 @@ class _AutoScrollTabsWidgetState extends State<AutoScrollTabsWidget> {
                                   ],
                                 ),
                                 child: ExerciseTileWidget(
+                                  isClientSideView: widget.isClientSideView,
                                   index: index,
                                   exercise: exercises[index],
                                 ),
                               );
                             } else {
                               return GestureDetector(
-                                onTap: () => context.go(
-                                  FitFlexWorkoutTrackerPage.route,
-                                  extra: {
-                                    'exercise': exercises[index],
-                                    'workoutPlan': widget.workoutPlan,
-                                    'week': widget.currentWeek.value,
-                                    'day': widget.currentDay.value,
-                                  },
-                                ),
+                                onTap: () {
+                                  if (exercises[index].completed ?? false) {
+                                  } else {
+                                    context.go(
+                                      FitFlexWorkoutTrackerPage.route,
+                                      extra: {
+                                        'exercise': exercises[index],
+                                        'workoutPlan': widget.workoutPlan,
+                                        'week': widget.currentWeek.value,
+                                        'day': widget.currentDay.value,
+                                      },
+                                    );
+                                  }
+                                },
                                 child: ExerciseTileWidget(
+                                  isClientSideView: widget.isClientSideView,
                                   index: index,
                                   exercise: exercises[index],
                                 ),

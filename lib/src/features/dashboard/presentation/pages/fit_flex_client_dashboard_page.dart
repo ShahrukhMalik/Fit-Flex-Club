@@ -1,4 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/bloc/listen_bloc.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
+import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +42,7 @@ class _FitFlexClientDashboardPageState
       left: 0,
       right: 0,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: width * 0.17, vertical: 30),
+        margin: EdgeInsets.symmetric(horizontal: width * 0.3, vertical: 30),
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: globalColorScheme.onPrimaryContainer,
@@ -78,8 +86,8 @@ class _FitFlexClientDashboardPageState
                     0, Icons.person, selectedIndex, widget.navigationShell),
                 _buildIcon(1, Icons.history_rounded, selectedIndex,
                     widget.navigationShell),
-                _buildIcon(2, Icons.scale_outlined, selectedIndex,
-                    widget.navigationShell),
+                // _buildIcon(2, Icons.scale_outlined, selectedIndex,
+                //     widget.navigationShell),
               ],
             ),
           ],
@@ -101,8 +109,16 @@ class _FitFlexClientDashboardPageState
           index,
           initialLocation: index == navigationShell.currentIndex,
         );
-        if (index == 2) {
-          context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+        if (index == 0) {
+          context.read<WorkoutManagementBloc>().add(
+                GetWorkoutPlansForClientEvent(
+                  clientId: getIt<FirebaseAuth>().currentUser!.uid,
+                ),
+              );
+        }
+        if (index == 1) {
+          context.read<WorkoutHistoryBloc>().add(GetWorkoutHistoryEvent(
+              cliendId: getIt<FirebaseAuth>().currentUser?.uid));
         }
       },
       child: ValueListenableBuilder<int>(

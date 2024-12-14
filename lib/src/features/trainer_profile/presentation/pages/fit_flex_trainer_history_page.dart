@@ -1,25 +1,38 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class FitFlexClientWorkoutHistoryPage extends StatefulWidget {
-  static const String route = '/fit-flex-client-history';
+class FitFlexTrainerHistoryPage extends StatefulWidget {
+  static const String route = '/fit-flex-trainer-history';
 
-  const FitFlexClientWorkoutHistoryPage({super.key});
+  final List<WorkoutHistoryModel> histories;
+  final ClientEntity client;
+
+  const FitFlexTrainerHistoryPage({
+    super.key,
+    required this.histories,
+    required this.client,
+  });
   @override
   _FitFlexClientWorkoutHistoryPageState createState() =>
       _FitFlexClientWorkoutHistoryPageState();
 }
 
 class _FitFlexClientWorkoutHistoryPageState
-    extends State<FitFlexClientWorkoutHistoryPage> {
+    extends State<FitFlexTrainerHistoryPage> {
   late PageController _dateController;
   final ValueNotifier<DateTime?> _selectedDate = ValueNotifier(null);
 
@@ -67,6 +80,8 @@ class _FitFlexClientWorkoutHistoryPageState
   void initState() {
     super.initState();
     _selectedDate.value = DateTime.now();
+    originalWorkoutHistoryModels = widget.histories;
+    _updateWorkoutHistory(_selectedDate.value);
     _dateController = PageController(
       initialPage: 0,
       viewportFraction: 0.2,
@@ -79,16 +94,20 @@ class _FitFlexClientWorkoutHistoryPageState
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: globalColorScheme.surface,
-      appBar: PreferredSize(
-        preferredSize: Size(
-          width,
-          height * 0.2,
-        ),
-        child: _buildDateSelector(),
-      ),
+      appBar: PlatformAppbar.basicAppBar(
+          title: 'Workout History',
+          context: context,
+          onLeadingPressed: () => context.go(
+                FitFlexTrainerClientDetailsPage.route,
+                extra: {
+                  'client': widget.client,
+                },
+              ),
+          backgroundColor: globalColorScheme.onPrimaryContainer),
       body: Column(
         children: [
           // ,
+          _buildDateSelector(),
           Expanded(
             child: _buildWorkoutList(),
           ),
@@ -99,7 +118,7 @@ class _FitFlexClientWorkoutHistoryPageState
 
   Widget _buildDateSelector() {
     return Container(
-      padding: EdgeInsets.only(top: 60, bottom: 10, left: 20, right: 20),
+      padding: EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
       // margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),
       decoration: BoxDecoration(
         color: globalColorScheme.onPrimaryContainer,

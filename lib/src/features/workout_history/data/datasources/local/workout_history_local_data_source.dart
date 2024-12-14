@@ -19,10 +19,15 @@ abstract class WorkoutHistoryLocalDataSource {
   });
 
   ///
+  Future<void> insertWorkoutHistorySetFromRemote({
+    required List<WorkoutHistoryModel> historyList,
+  });
+
+  ///
   Future<Either<bool, List<WorkoutHistoryModel>>> getWorkoutHistorySets(
-    String? clientUid,
-    String isTrainer,
-  );
+    String? clientUid, [
+    String? isTrainer,
+  ]);
 }
 
 @Singleton(as: WorkoutHistoryLocalDataSource)
@@ -59,9 +64,9 @@ class WorkoutHistoryLocalDataSourceImpl
 
   @override
   Future<Either<bool, List<WorkoutHistoryModel>>> getWorkoutHistorySets(
-    String? clientUid,
-    String isTrainer,
-  ) async {
+    String? clientUid, [
+    String? isTrainer,
+  ]) async {
     try {
       final clientId = getIt<FirebaseAuth>().currentUser?.uid;
       final workoutHistorySets =
@@ -69,17 +74,33 @@ class WorkoutHistoryLocalDataSourceImpl
 
       if (workoutHistorySets.isNotEmpty) {
         if (isDataStale(
-          Duration(seconds: 1).inSeconds,
-          workoutHistorySets.first.workoutLogDate.millisecondsSinceEpoch,
-          workoutHistorySets.first.workoutLogDate.millisecondsSinceEpoch,
+          Duration(minutes: 30).inSeconds,
+          workoutHistorySets.first.exerciseModels.first.sets.first.createdAt!,
+          workoutHistorySets.first.exerciseModels.first.updatedAt!,
         )) {
-          await database.deleteWorkoutPlans();
+          await database.deleteWorkoutHistorySets();
           return Left(true);
         }
         return Right(workoutHistorySets);
       } else {
         return Left(false);
       }
+    } catch (err) {
+      throw CacheException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<void> insertWorkoutHistorySetFromRemote(
+      {required List<WorkoutHistoryModel> historyList}) async {
+    try {
+      return Future(
+        () async => await dao.insertWorkoutHistorySetFromRemote(
+          historyList: historyList,
+        ),
+      );
     } catch (err) {
       throw CacheException(
         errorMessage: err.toString(),

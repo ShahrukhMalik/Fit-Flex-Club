@@ -4,6 +4,14 @@ abstract class WorkoutHistoryEvent extends Equatable {
   const WorkoutHistoryEvent();
 }
 
+class GetWorkoutHistoryEvent extends WorkoutHistoryEvent {
+  final String? cliendId;
+
+  const GetWorkoutHistoryEvent({this.cliendId});
+  @override
+  List<Object?> get props => [cliendId];
+}
+
 class LogWorkoutHistoryEvent extends WorkoutHistoryEvent {
   final String? clientId;
   final List<SetModel> sets;
@@ -13,7 +21,7 @@ class LogWorkoutHistoryEvent extends WorkoutHistoryEvent {
   final String workoutPlanId;
 
   const LogWorkoutHistoryEvent({
-     this.clientId,
+    this.clientId,
     required this.sets,
     required this.exerciseId,
     required this.dayId,

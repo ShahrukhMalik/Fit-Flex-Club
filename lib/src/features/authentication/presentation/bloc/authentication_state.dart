@@ -31,8 +31,15 @@ class AuthenticationError extends AuthenticationState {
   final Failures failures;
 
   const AuthenticationError(super.rebuild, this.failures);
-  
 
   @override
   List<Object?> get props => [failures, rebuild];
+}
+
+class ListenEventComplete extends AuthenticationState {
+  final ListenerEvents? events;
+
+  const ListenEventComplete(this.events, [super.rebuild]);
+  @override
+  List<Object?> get props => [events, rebuild];
 }

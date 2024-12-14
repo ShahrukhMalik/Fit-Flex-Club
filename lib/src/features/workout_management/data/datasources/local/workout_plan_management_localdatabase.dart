@@ -178,7 +178,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
 
       if (workoutPlanModel != null) {
         if (isDataStale(
-          Duration(seconds: 1).inSeconds,
+          Duration(days: 1).inSeconds,
           workoutPlanModel.createdAt!,
           workoutPlanModel.updatedAt,
         )) {

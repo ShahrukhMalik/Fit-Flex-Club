@@ -11,7 +11,7 @@ class Weeks extends Table {
   TextColumn get clientId => text().nullable().references(Clients, #id)();
   IntColumn get weekNumber => integer()(); // Week number (e.g., 1, 2, 3, ...)
   IntColumn get createdAt =>
-      integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
+      integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get updatedAt =>
       integer().nullable()(); // Nullable updated timestamp
 }

@@ -5,6 +5,7 @@ import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/authentication/data/datasources/auth_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @Singleton(as: AuthRepository)
@@ -218,6 +219,31 @@ class AuthRepositoryImpl implements AuthRepository {
       try {
         return Right(
           await remoteDatasource.authenticateUser(),
+        );
+      } on ServerException catch (error) {
+        return Left(
+          ServerFailure(
+            message: error.errorMessage,
+            code: error.errorCode,
+          ),
+        );
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: 'No Internet Connection',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, Stream<Map<String,dynamic>?>?>> listenToEvents() async {
+    final isNetworkConnected = await networkInfo.isConnected;
+    if (isNetworkConnected!) {
+      try {
+        return Right(
+          await remoteDatasource.listenToEvents(),
         );
       } on ServerException catch (error) {
         return Left(

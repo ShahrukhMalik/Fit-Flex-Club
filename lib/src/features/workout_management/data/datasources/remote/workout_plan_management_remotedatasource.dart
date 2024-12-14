@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uuid_v4/uuid_v4.dart';
 
 abstract class WorkoutPlanManagementRemotedatasource {
   ///
@@ -312,7 +317,8 @@ class WorkoutPlanManagementRemotedatasourceImpl
           db.collection('Users').doc(workoutPlanModel.clientId);
       final DocumentReference workoutPlanRef =
           userRef.collection('workoutPlans').doc(workoutPlanModel.uid);
-
+      final listenerRef = db.collection('ListenerEvents');
+      // .add({'clientId': workoutPlanModel.clientId, 'eventType': ListenerEvents.updateAssignedWorkoutPlan.name,},);
       // Start a batch for main document and nested updates
       WriteBatch mainBatch = db.batch();
 
@@ -364,6 +370,13 @@ class WorkoutPlanManagementRemotedatasourceImpl
       }
 
       // Commit all batched operations
+      mainBatch.set(
+        listenerRef.doc(UUIDv4().toString()),
+        {
+          'clientId': workoutPlanModel.clientId,
+          'eventType': ListenerEvents.updateAssignedWorkoutPlan.name,
+        },
+      );
       await mainBatch.commit();
     } on FirebaseException catch (err) {
       throw ServerException(

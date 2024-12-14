@@ -250,6 +250,8 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
     for (final week in workoutPlan.weeks) {
       await into(weeks).insert(
         WeeksCompanion(
+          clientId:
+              week.clientId != null ? Value(week.clientId) : Value.absent(),
           workoutPlanId: Value(workoutPlan.uid),
           weekNumber: Value(week.weekNumber),
           id: Value(week.id),
@@ -260,6 +262,8 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
       for (final day in week.days) {
         await into(days).insert(
           DaysCompanion(
+            clientId:
+                day.clientId != null ? Value(day.clientId) : Value.absent(),
             weekId: Value(week.id),
             dayNumber: Value(day.dayNumber),
             id: Value(day.id),
@@ -270,6 +274,11 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         for (final exercise in day.exercises) {
           final exerciseId = await into(workoutPlanExercise).insert(
             WorkoutPlanExerciseCompanion(
+              clientId: exercise.clientId != null
+                  ? Value(exercise.clientId)
+                  : Value.absent(),
+              completed: Value(exercise.completed ?? false),
+              updatedAt: Value(exercise.updatedAt),
               exerciseOrder: Value(day.exercises.indexOf(exercise) + 1),
               dayId: Value(day.id),
               code: Value(exercise.code!),
@@ -283,6 +292,8 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           for (final set in exercise.sets) {
             await into(exerciseSets).insert(
               ExerciseSetsCompanion(
+                clientId:
+                    set.clientId != null ? Value(set.clientId) : Value.absent(),
                 exerciseId: Value(exercise.id!),
                 targetReps: Value(set.targetReps),
                 targetWeight: Value(set.targetWeight),
@@ -350,50 +361,6 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
             },
           ),
         );
-        // // Step 1: Delete exercise sets associated with the workout plan
-        // final exercises = await (select(workoutPlanExercise)
-        //       ..where((tbl) => tbl.dayId.isInQuery(
-        //             select(days)
-        //               ..where((tbl) => tbl.weekId.isInQuery(
-        //                     select(weeks)
-        //                       ..where((tbl) =>
-        //                           tbl.workoutPlanId.equals(workoutPlanId)),
-        //                   )),
-        //           )))
-        //     .get();
-
-        // for (final exercise in exercises) {
-        //   await (delete(exerciseSets)
-        //         ..where((tbl) => tbl.exerciseId.equals(exercise.id)))
-        //       .go();
-        // }
-
-        // // Step 2: Delete exercises associated with the workout plan
-        // await (delete(workoutPlanExercise)
-        //       ..where((tbl) => tbl.dayId.isInQuery(
-        //             select(days)
-        //               ..where((tbl) => tbl.weekId.isInQuery(
-        //                     select(weeks)
-        //                       ..where((tbl) =>
-        //                           tbl.workoutPlanId.equals(workoutPlanId)),
-        //                   )),
-        //           )))
-        //     .go();
-
-        // // Step 3: Delete days associated with the workout plan
-        // await (delete(days)
-        //       ..where((tbl) => tbl.weekId.isInQuery(
-        //             select(weeks)
-        //               ..where((tbl) => tbl.workoutPlanId.equals(workoutPlanId)),
-        //           )))
-        //     .go();
-
-        // // Step 4: Delete weeks associated with the workout plan
-        // await (delete(weeks)
-        //       ..where((tbl) => tbl.workoutPlanId.equals(workoutPlanId)))
-        //     .go();
-
-        // // Step 5: Delete the workout plan itself
       });
     } catch (err) {
       print(err);
@@ -450,7 +417,11 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         for (final exercise in day.exercises) {
           final exerciseId = await into(workoutPlanExercise).insert(
             WorkoutPlanExerciseCompanion(
-              clientId: Value(exercise.clientId),
+              clientId: exercise.clientId != null
+                  ? Value(exercise.clientId)
+                  : Value.absent(),
+              completed: Value(exercise.completed ?? false),
+              updatedAt: Value(exercise.updatedAt),
               exerciseOrder: Value(day.exercises.indexOf(exercise) + 1),
               dayId: Value(day.id),
               code: Value(exercise.code!),
@@ -592,6 +563,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           if (!exerciseGroups.containsKey(workoutExercise.id)) {
             exerciseGroups[workoutExercise.id] = {
               'exercise': ExerciseModel(
+                completed: workoutExercise.completed,
                 clientId: workoutExercise.clientId,
                 dayId: workoutExercise.dayId,
                 id: workoutExercise.id,
@@ -734,6 +706,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           if (!exerciseGroups.containsKey(workoutExercise.id)) {
             exerciseGroups[workoutExercise.id] = {
               'exercise': ExerciseModel(
+                completed: workoutExercise.completed,
                 dayId: workoutExercise.dayId,
                 id: workoutExercise.id,
                 code: base.code,

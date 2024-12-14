@@ -47,4 +47,11 @@ abstract class WorkoutManagementRepository {
   Future<Either<Failures, void>>? updateAssignedWorkoutPlan(
     WorkoutPlanModel workoutPlan,
   );
+
+
+}
+
+enum ListenerEvents {
+  updateAssignedWorkoutPlan,
+  deactivateUser,
 }

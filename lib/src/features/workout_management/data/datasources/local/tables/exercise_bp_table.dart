@@ -19,8 +19,7 @@ class BaseExercise extends Table {
   BoolColumn get weight =>
       boolean().withDefault(Constant(false))(); // Defaults to true
 
-  IntColumn get createdAt => integer().withDefault(
-      Constant(DateTime.now().millisecondsSinceEpoch))(); // Creation timestamp
+  IntColumn get createdAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
   IntColumn get updatedAt =>
       integer().nullable()(); // Nullable updated timestamp
 }

@@ -1,7 +1,7 @@
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 
 class ExerciseBpModel extends ExerciseEntity {
-    final String? clientId;
+  final String? clientId;
   const ExerciseBpModel({
     required super.code,
     required super.category,

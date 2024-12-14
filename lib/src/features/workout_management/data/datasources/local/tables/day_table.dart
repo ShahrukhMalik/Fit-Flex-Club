@@ -12,6 +12,6 @@ class Days extends Table {
       text().nullable().references(Clients, #id)(); // Foreign key to Weeks
   IntColumn get dayNumber => integer()(); // Day number within the week
   IntColumn get createdAt =>
-      integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
+      integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get updatedAt => integer().nullable()();
 }

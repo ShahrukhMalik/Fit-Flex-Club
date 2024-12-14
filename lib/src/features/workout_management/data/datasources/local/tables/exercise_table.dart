@@ -12,8 +12,8 @@ class WorkoutPlanExercise extends Table {
       text().references(Days, #id)(); // Foreign key to Days/ Exercise name
   TextColumn get code => text()(); // Exercise code
   IntColumn get exerciseOrder => integer()();
-  IntColumn get createdAt => integer().withDefault(
-      Constant(DateTime.now().millisecondsSinceEpoch))(); // Creation timestamp
+  BoolColumn get completed => boolean().withDefault(Constant(false))();
+  IntColumn get createdAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
   IntColumn get updatedAt =>
       integer().nullable()(); // Nullable updated timestamp
 }

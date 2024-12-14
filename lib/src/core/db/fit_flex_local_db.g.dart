@@ -98,7 +98,9 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
   @override
   late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -214,8 +216,6 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
@@ -621,14 +621,13 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     this.phone = const Value.absent(),
     this.phoneCountryCode = const Value.absent(),
     this.currentWorkoutPlanName = const Value.absent(),
-    required int createdAt,
+    this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         isTrainer = Value(isTrainer),
         isUserActive = Value(isUserActive),
-        username = Value(username),
-        createdAt = Value(createdAt);
+        username = Value(username);
   static Insertable<Client> custom({
     Expression<String>? id,
     Expression<int>? age,
@@ -819,7 +818,7 @@ class $WorkoutPlansTable extends WorkoutPlans
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -1150,7 +1149,7 @@ class $WeeksTable extends Weeks with TableInfo<$WeeksTable, Week> {
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -1509,7 +1508,7 @@ class $DaysTable extends Days with TableInfo<$DaysTable, Day> {
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -1860,6 +1859,16 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
   late final GeneratedColumn<int> exerciseOrder = GeneratedColumn<int>(
       'exercise_order', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _completedMeta =
+      const VerificationMeta('completed');
+  @override
+  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
+      'completed', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
+      defaultValue: Constant(false));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -1867,7 +1876,7 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -1875,8 +1884,16 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
       'updated_at', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, clientId, dayId, code, exerciseOrder, createdAt, updatedAt];
+  List<GeneratedColumn> get $columns => [
+        id,
+        clientId,
+        dayId,
+        code,
+        exerciseOrder,
+        completed,
+        createdAt,
+        updatedAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1917,6 +1934,10 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
     } else if (isInserting) {
       context.missing(_exerciseOrderMeta);
     }
+    if (data.containsKey('completed')) {
+      context.handle(_completedMeta,
+          completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -1945,6 +1966,8 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
           .read(DriftSqlType.string, data['${effectivePrefix}code'])!,
       exerciseOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}exercise_order'])!,
+      completed: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -1965,6 +1988,7 @@ class WorkoutPlanExerciseData extends DataClass
   final String dayId;
   final String code;
   final int exerciseOrder;
+  final bool completed;
   final int createdAt;
   final int? updatedAt;
   const WorkoutPlanExerciseData(
@@ -1973,6 +1997,7 @@ class WorkoutPlanExerciseData extends DataClass
       required this.dayId,
       required this.code,
       required this.exerciseOrder,
+      required this.completed,
       required this.createdAt,
       this.updatedAt});
   @override
@@ -1985,6 +2010,7 @@ class WorkoutPlanExerciseData extends DataClass
     map['day_id'] = Variable<String>(dayId);
     map['code'] = Variable<String>(code);
     map['exercise_order'] = Variable<int>(exerciseOrder);
+    map['completed'] = Variable<bool>(completed);
     map['created_at'] = Variable<int>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<int>(updatedAt);
@@ -2001,6 +2027,7 @@ class WorkoutPlanExerciseData extends DataClass
       dayId: Value(dayId),
       code: Value(code),
       exerciseOrder: Value(exerciseOrder),
+      completed: Value(completed),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -2017,6 +2044,7 @@ class WorkoutPlanExerciseData extends DataClass
       dayId: serializer.fromJson<String>(json['dayId']),
       code: serializer.fromJson<String>(json['code']),
       exerciseOrder: serializer.fromJson<int>(json['exerciseOrder']),
+      completed: serializer.fromJson<bool>(json['completed']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int?>(json['updatedAt']),
     );
@@ -2030,6 +2058,7 @@ class WorkoutPlanExerciseData extends DataClass
       'dayId': serializer.toJson<String>(dayId),
       'code': serializer.toJson<String>(code),
       'exerciseOrder': serializer.toJson<int>(exerciseOrder),
+      'completed': serializer.toJson<bool>(completed),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int?>(updatedAt),
     };
@@ -2041,6 +2070,7 @@ class WorkoutPlanExerciseData extends DataClass
           String? dayId,
           String? code,
           int? exerciseOrder,
+          bool? completed,
           int? createdAt,
           Value<int?> updatedAt = const Value.absent()}) =>
       WorkoutPlanExerciseData(
@@ -2049,6 +2079,7 @@ class WorkoutPlanExerciseData extends DataClass
         dayId: dayId ?? this.dayId,
         code: code ?? this.code,
         exerciseOrder: exerciseOrder ?? this.exerciseOrder,
+        completed: completed ?? this.completed,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
       );
@@ -2061,6 +2092,7 @@ class WorkoutPlanExerciseData extends DataClass
       exerciseOrder: data.exerciseOrder.present
           ? data.exerciseOrder.value
           : this.exerciseOrder,
+      completed: data.completed.present ? data.completed.value : this.completed,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -2074,6 +2106,7 @@ class WorkoutPlanExerciseData extends DataClass
           ..write('dayId: $dayId, ')
           ..write('code: $code, ')
           ..write('exerciseOrder: $exerciseOrder, ')
+          ..write('completed: $completed, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -2081,8 +2114,8 @@ class WorkoutPlanExerciseData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, clientId, dayId, code, exerciseOrder, createdAt, updatedAt);
+  int get hashCode => Object.hash(id, clientId, dayId, code, exerciseOrder,
+      completed, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2092,6 +2125,7 @@ class WorkoutPlanExerciseData extends DataClass
           other.dayId == this.dayId &&
           other.code == this.code &&
           other.exerciseOrder == this.exerciseOrder &&
+          other.completed == this.completed &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -2103,6 +2137,7 @@ class WorkoutPlanExerciseCompanion
   final Value<String> dayId;
   final Value<String> code;
   final Value<int> exerciseOrder;
+  final Value<bool> completed;
   final Value<int> createdAt;
   final Value<int?> updatedAt;
   final Value<int> rowid;
@@ -2112,6 +2147,7 @@ class WorkoutPlanExerciseCompanion
     this.dayId = const Value.absent(),
     this.code = const Value.absent(),
     this.exerciseOrder = const Value.absent(),
+    this.completed = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -2122,6 +2158,7 @@ class WorkoutPlanExerciseCompanion
     required String dayId,
     required String code,
     required int exerciseOrder,
+    this.completed = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -2135,6 +2172,7 @@ class WorkoutPlanExerciseCompanion
     Expression<String>? dayId,
     Expression<String>? code,
     Expression<int>? exerciseOrder,
+    Expression<bool>? completed,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
@@ -2145,6 +2183,7 @@ class WorkoutPlanExerciseCompanion
       if (dayId != null) 'day_id': dayId,
       if (code != null) 'code': code,
       if (exerciseOrder != null) 'exercise_order': exerciseOrder,
+      if (completed != null) 'completed': completed,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -2157,6 +2196,7 @@ class WorkoutPlanExerciseCompanion
       Value<String>? dayId,
       Value<String>? code,
       Value<int>? exerciseOrder,
+      Value<bool>? completed,
       Value<int>? createdAt,
       Value<int?>? updatedAt,
       Value<int>? rowid}) {
@@ -2166,6 +2206,7 @@ class WorkoutPlanExerciseCompanion
       dayId: dayId ?? this.dayId,
       code: code ?? this.code,
       exerciseOrder: exerciseOrder ?? this.exerciseOrder,
+      completed: completed ?? this.completed,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -2190,6 +2231,9 @@ class WorkoutPlanExerciseCompanion
     if (exerciseOrder.present) {
       map['exercise_order'] = Variable<int>(exerciseOrder.value);
     }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
     }
@@ -2210,6 +2254,7 @@ class WorkoutPlanExerciseCompanion
           ..write('dayId: $dayId, ')
           ..write('code: $code, ')
           ..write('exerciseOrder: $exerciseOrder, ')
+          ..write('completed: $completed, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -2278,7 +2323,7 @@ class $ExerciseSetsTable extends ExerciseSets
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -2845,7 +2890,7 @@ class $BaseExerciseTable extends BaseExercise
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -3658,7 +3703,7 @@ class $WorkoutHistorySetTable extends WorkoutHistorySet
       'created_at', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultValue: Constant(DateTime.now().millisecondsSinceEpoch));
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -4486,7 +4531,7 @@ typedef $$ClientsTableCreateCompanionBuilder = ClientsCompanion Function({
   Value<String?> phone,
   Value<String?> phoneCountryCode,
   Value<String?> currentWorkoutPlanName,
-  required int createdAt,
+  Value<int> createdAt,
   Value<int?> updatedAt,
   Value<int> rowid,
 });
@@ -5120,7 +5165,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             Value<String?> phone = const Value.absent(),
             Value<String?> phoneCountryCode = const Value.absent(),
             Value<String?> currentWorkoutPlanName = const Value.absent(),
-            required int createdAt,
+            Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -6475,6 +6520,7 @@ typedef $$WorkoutPlanExerciseTableCreateCompanionBuilder
   required String dayId,
   required String code,
   required int exerciseOrder,
+  Value<bool> completed,
   Value<int> createdAt,
   Value<int?> updatedAt,
   Value<int> rowid,
@@ -6486,6 +6532,7 @@ typedef $$WorkoutPlanExerciseTableUpdateCompanionBuilder
   Value<String> dayId,
   Value<String> code,
   Value<int> exerciseOrder,
+  Value<bool> completed,
   Value<int> createdAt,
   Value<int?> updatedAt,
   Value<int> rowid,
@@ -6574,6 +6621,9 @@ class $$WorkoutPlanExerciseTableFilterComposer
 
   ColumnFilters<int> get exerciseOrder => $composableBuilder(
       column: $table.exerciseOrder, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -6683,6 +6733,9 @@ class $$WorkoutPlanExerciseTableOrderingComposer
       column: $table.exerciseOrder,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get completed => $composableBuilder(
+      column: $table.completed, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -6747,6 +6800,9 @@ class $$WorkoutPlanExerciseTableAnnotationComposer
 
   GeneratedColumn<int> get exerciseOrder => $composableBuilder(
       column: $table.exerciseOrder, builder: (column) => column);
+
+  GeneratedColumn<bool> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
 
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -6873,6 +6929,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             Value<String> dayId = const Value.absent(),
             Value<String> code = const Value.absent(),
             Value<int> exerciseOrder = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -6883,6 +6940,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             dayId: dayId,
             code: code,
             exerciseOrder: exerciseOrder,
+            completed: completed,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -6893,6 +6951,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             required String dayId,
             required String code,
             required int exerciseOrder,
+            Value<bool> completed = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -6903,6 +6962,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             dayId: dayId,
             code: code,
             exerciseOrder: exerciseOrder,
+            completed: completed,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,

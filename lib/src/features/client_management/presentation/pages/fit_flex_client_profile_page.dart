@@ -9,6 +9,7 @@ import 'package:fit_flex_club/src/features/authentication/presentation/bloc/auth
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
@@ -37,7 +38,8 @@ import 'package:intl/intl.dart' as intl;
 // }
 
 class WorkoutPlanWidget extends StatefulWidget {
-  const WorkoutPlanWidget({super.key});
+  final WorkoutPlanModel? workoutPlan;
+  const WorkoutPlanWidget({super.key, this.workoutPlan});
 
   @override
   _WorkoutPlanWidgetState createState() => _WorkoutPlanWidgetState();
@@ -112,14 +114,14 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
                             color: globalColorScheme.tertiary,
                             fontWeight: FontWeight.bold,
                           ),
-                          onPressed: () =>
-                              context.read<WorkoutManagementBloc>().add(
-                                    GetWorkoutPlansForClientEvent(
-                                      clientId: getIt<FirebaseAuth>()
-                                          .currentUser!
-                                          .uid,
-                                    ),
-                                  ),
+                          onPressed: () {
+                            if (widget.workoutPlan != null) {
+                              context.go(
+                                FitFlexClientAssignedWorkoutPlanPage.route,
+                                extra: {'workoutPlan': widget.workoutPlan},
+                              );
+                            } else {}
+                          },
                         )!
                     ],
                   ),
@@ -668,10 +670,16 @@ class FitFlexClientProfilePage extends StatefulWidget {
 }
 
 class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
+  ValueNotifier<WorkoutPlanModel?> workoutPlanModel = ValueNotifier(null);
   @override
   void initState() {
     super.initState();
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
+    context.read<WorkoutManagementBloc>().add(
+          GetWorkoutPlansForClientEvent(
+            clientId: getIt<FirebaseAuth>().currentUser!.uid,
+          ),
+        );
   }
 
 // On Surface
@@ -824,26 +832,18 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                 }
 
                 if (state is GetWorkoutPlansForClientComplete) {
-                  context.go(
-                    FitFlexClientAssignedWorkoutPlanPage.route,
-                    extra: {
-                      'workoutPlan': state.workoutPlan,
-                    },
-                  );
+                  workoutPlanModel.value = state.workoutPlan;
+                  context.pop();
                 }
-                // if (state is SubjectLoading) {
-                //   showLoadingDialog(context);
-                //   return;
-                // }
-                // Navigator.of(context, rootNavigator: true).pop();
-                // if (state is SubjectFailed) {
-                //   showErrorDialog(context);
-                // }
-                // if (state is SubjectSuccess) {
-                //   showSuccessDialog(context);
-                // }
               },
-              child: const WorkoutPlanWidget(),
+              child: ValueListenableBuilder(
+                valueListenable: workoutPlanModel,
+                builder: (context, workoutPlan, _) {
+                  return WorkoutPlanWidget(
+                    workoutPlan: workoutPlan,
+                  );
+                },
+              ),
             )
             // Padding(
             //   padding: const EdgeInsets.all(16.0),

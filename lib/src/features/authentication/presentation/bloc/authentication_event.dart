@@ -7,6 +7,8 @@ abstract class AuthenticationEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class ListenToEvents extends AuthenticationEvent {}
+
 class CreateAccountAuthenticationEvent extends AuthenticationEvent {
   final String email;
   final String password;
@@ -51,5 +53,11 @@ class LogOutAuthenticationEvent extends AuthenticationEvent {}
 class CheckClientProfileExist extends AuthenticationEvent {}
 
 class CheckIfUserActive extends AuthenticationEvent {}
+
+class UpdateUserEvent extends AuthenticationEvent {
+  final ListenerEvents? event;
+
+  const UpdateUserEvent({required this.event});
+}
 
 class AuthenticateUserEvent extends AuthenticationEvent {}

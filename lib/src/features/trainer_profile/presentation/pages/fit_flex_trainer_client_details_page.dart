@@ -3,11 +3,15 @@ import 'dart:io';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_workout_history_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_history_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
+import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
@@ -666,84 +670,78 @@ class ClientEntityCompactWidget extends StatelessWidget {
               ),
             ),
           ),
-          Card(
-            elevation: 4, // Subtle shadow for a cleaner look
-            margin: const EdgeInsets.all(10),
-            color: globalColorScheme
-                .inversePrimary, // Surface color for a professional look
-            shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(16), // Slightly rounded corners
-              side: BorderSide(
-                color: globalColorScheme.outline,
-              ), // Soft border
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Current Assigned Program',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+          BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
+            listener: (context, state) {
+              if (state is GetWorkoutPlansForClientComplete) {
+                Navigator.pop(context);
+              }
+
+              if (state is WorkoutManagementError) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Client Details",
+                  message: state.failures.message ?? "Something Went Wrong",
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state is WorkoutManagementError) {
+                return Text(
+                  state.failures.message ?? "Something went wrong!",
+                );
+              }
+              if (state is GetWorkoutPlansForClientComplete) {
+                final workoutPlan = state.workoutPlan;
+                return Card(
+                  elevation: 4, // Subtle shadow for a cleaner look
+                  margin: const EdgeInsets.all(10),
+                  color: globalColorScheme
+                      .inversePrimary, // Surface color for a professional look
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(16), // Slightly rounded corners
+                    side: BorderSide(
+                      color: globalColorScheme.outline,
+                    ), // Soft border
                   ),
-                  Row(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Center align elements
-                    children: [
-                      // Leading Icon
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: globalColorScheme
-                            .primaryContainer, // Subtle background
-                        child: Icon(
-                          Icons.fitness_center,
-                          color: globalColorScheme
-                              .onPrimaryContainer, // Contrasting icon color
-                          size: 24,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Current Assigned Program',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-
-                      // Program name and actions
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment
+                              .center, // Center align elements
                           children: [
-                            // Program Name
+                            // Leading Icon
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: globalColorScheme
+                                  .primaryContainer, // Subtle background
+                              child: Icon(
+                                Icons.fitness_center,
+                                color: globalColorScheme
+                                    .onPrimaryContainer, // Contrasting icon color
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
 
-                            // Program Status
-                            BlocConsumer<WorkoutManagementBloc,
-                                WorkoutManagementState>(
-                              listener: (context, state) {
-                                if (state is GetWorkoutPlansForClientComplete) {
-                                  Navigator.pop(context);
-                                }
-
-                                if (state is WorkoutManagementError) {
-                                  PlatformDialog.showAlertDialog(
-                                    context: context,
-                                    title: "Client Details",
-                                    message: state.failures.message ??
-                                        "Something Went Wrong",
-                                  );
-                                }
-                              },
-                              builder: (context, state) {
-                                if (state is WorkoutManagementError) {
-                                  return Text(
-                                    state.failures.message ??
-                                        "Something went wrong!",
-                                  );
-                                }
-                                if (state is GetWorkoutPlansForClientComplete) {
-                                  final workoutPlan = state.workoutPlan;
-                                  return Row(
+                            // Program name and actions
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
                                       Expanded(
                                         child: Container(
@@ -777,80 +775,138 @@ class ClientEntityCompactWidget extends StatelessWidget {
                                             Icons.add,
                                           ),
                                         )
-                                      else
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                // Handle edit action
-                                                context.go(
-                                                  FitFlexClubCreateWorkoutPlanPage
-                                                      .route,
-                                                  extra: {
-                                                    'updateData': true,
-                                                    "workoutPlan": workoutPlan,
-                                                    "clientEntity": client
-                                                  },
-                                                );
-                                              },
-                                              icon: Icon(
-                                                Icons.edit,
-                                                color: globalColorScheme
-                                                    .secondaryContainer, // Primary color for edit
-                                                size: 20,
-                                              ),
-                                            ),
-                                            // Delete Button
-                                            IconButton(
-                                              onPressed: () {
-                                                // Handle delete action
-                                                context
-                                                    .read<
-                                                        WorkoutManagementBloc>()
-                                                    .add(
-                                                      DeleteAssignedWorkoutPlanEvent(
-                                                        workoutPlan:
-                                                            workoutPlan,
-                                                      ),
-                                                    );
-                                              },
-                                              icon: Icon(
-                                                Icons.delete,
-                                                color: globalColorScheme
-                                                    .error, // Error color for delete
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                     ],
-                                  );
-                                }
-                                return PlatformLoader().buildLoader(
-                                  type: LoaderType.shimmer,
-                                  height: 40,
-                                );
-                              },
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        if (workoutPlan != null)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    PlatformButton().buildButton(
+                                      context: context,
+                                      type: ButtonType.icon,
+                                      icon: Icons.edit_document,
+                                      foregroundColor:
+                                          globalColorScheme.onPrimaryContainer,
+                                      text: '',
+                                      onPressed: () {
+                                        context.go(
+                                          FitFlexClubCreateWorkoutPlanPage
+                                              .route,
+                                          extra: {
+                                            'updateData': true,
+                                            "workoutPlan": workoutPlan,
+                                            "clientEntity": client
+                                          },
+                                        );
+                                      },
+                                    )!,
+                                    Text('Edit'),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    PlatformButton().buildButton(
+                                      context: context,
+                                      type: ButtonType.icon,
+                                      icon: Icons.delete,
+                                      foregroundColor:
+                                          globalColorScheme.tertiaryContainer,
+                                      text: '',
+                                      onPressed: () {
+                                        context
+                                            .read<WorkoutManagementBloc>()
+                                            .add(
+                                              DeleteAssignedWorkoutPlanEvent(
+                                                workoutPlan: workoutPlan,
+                                              ),
+                                            );
+                                      },
+                                    )!,
+                                    Text('Delete'),
+                                  ],
+                                ),
+                              ),
+                              BlocListener<WorkoutHistoryBloc,
+                                  WorkoutHistoryState>(
+                                listener: (context, state) {
+                                  if (state is GetWorkoutHistoryLoading) {
+                                    PlatformDialog.showLoadingDialog(
+                                      context: context,
+                                      message: "Fetching Workout History!....",
+                                    );
+                                  }
+
+                                  if (state is GetWorkoutHistoryComplete) {
+                                    context.go(
+                                      FitFlexTrainerHistoryPage.route,
+                                      extra: {
+                                        'histories': state.workoutHistory,
+                                        'client': client,
+                                      },
+                                    );
+                                  }
+                                },
+                                child: Expanded(
+                                  child: Column(
+                                    children: [
+                                      PlatformButton().buildButton(
+                                        context: context,
+                                        type: ButtonType.icon,
+                                        icon: Icons.history_toggle_off,
+                                        foregroundColor:
+                                            globalColorScheme.secondary,
+                                        text: '',
+                                        onPressed: () {
+                                          context
+                                              .read<WorkoutHistoryBloc>()
+                                              .add(
+                                                GetWorkoutHistoryEvent(
+                                                  cliendId:
+                                                      client.id,
+                                                ),
+                                              );
+                                        },
+                                      )!,
+                                      Text('View History'),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: PlatformLoader().buildLoader(
+                  type: LoaderType.shimmer,
+                  height: 200,
+                ),
+              );
+            },
           ),
-          Container(
-            height: 200,
-            width: double.maxFinite,
-            decoration: BoxDecoration(),
-            child: Center(
-              child: Text(
-                'Workout History Comming Soon..',
-              ),
-            ),
-          ),
+          // Container(
+          //   height: 200,
+          //   width: double.maxFinite,
+          //   decoration: BoxDecoration(),
+          //   child: Center(
+          //     child: Text(
+          //       'Workout History Comming Soon..',
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

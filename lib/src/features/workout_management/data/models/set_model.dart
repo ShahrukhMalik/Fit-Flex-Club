@@ -2,6 +2,7 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/se
 
 class SetModel extends SetEntity {
   final String? clientId;
+  final int? createdAt;
   const SetModel({
     super.targetReps,
     super.targetWeight,
@@ -14,12 +15,14 @@ class SetModel extends SetEntity {
     required super.id,
     required super.exerciseId,
     this.clientId,
+    this.createdAt,
   });
 
   // Convert a Map to a Set instance
   factory SetModel.fromMap(Map<String, dynamic> map) {
     return SetModel(
       exerciseId: map['exerciseId'],
+      createdAt: map['createdAt'],
       id: map['id'],
       clientId: map['clientId'],
       targetReps: map['targetReps'] as int?,
@@ -44,6 +47,7 @@ class SetModel extends SetEntity {
       'clientId': clientId,
       'exerciseId': exerciseId,
       if (targetReps != null) 'targetReps': targetReps,
+      if (createdAt != null) 'createdAt': createdAt,
       if (targetWeight != null) 'targetWeight': targetWeight,
       if (targetDistance != null) 'targetDistance': targetDistance,
       if (targetTime != null) 'targetTime': targetTime?.inSeconds,
@@ -61,6 +65,7 @@ class SetModel extends SetEntity {
     double? targetDistance,
     Duration? targetTime,
     int? actualReps,
+    int? createdAt,
     double? actualWeight,
     double? actualDistance,
     Duration? actualTime,
@@ -70,6 +75,7 @@ class SetModel extends SetEntity {
   }) {
     return SetModel(
       clientId: clientId ?? this.clientId,
+      createdAt: createdAt ?? this.createdAt,
       exerciseId: exerciseId,
       targetReps: targetReps ?? this.targetReps,
       targetWeight: targetWeight ?? this.targetWeight,

@@ -1,5 +1,9 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
+import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
@@ -13,11 +17,13 @@ import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_cli
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_client_profile_created_usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_user_active_usecase.dart'
     as userActive;
+import 'package:fit_flex_club/src/features/authentication/domain/usecases/listen_to_events_usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/login_usecase.dart'
     as login;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/logout_usecase.dart'
     as logout;
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
 
 part 'authentication_event.dart';
@@ -30,6 +36,7 @@ class AuthenticationBloc
   final login.LogInUsecase logInUsecase;
   final logout.LogOutUsecase logOutUsecase;
   final AuthenticateUserUsecase authenticateUserUsecase;
+  final ListenToEventsUsecase listenToEventsUsecase;
   // final client.IsClientProfileCreatedActiveUsecase
   //     isClientProfileCreatedActiveUsecase;
   // final userActive.IsUserActiveUsecase isUserActiveUsecase;
@@ -42,6 +49,7 @@ class AuthenticationBloc
     required this.logInUsecase,
     required this.logOutUsecase,
     required this.forgotPasswordUsecase,
+    required this.listenToEventsUsecase,
   }) : super(AuthenticationInitial(false)) {
     on<AuthenticationEvent>((event, emit) async {
       if (event is CreateAccountAuthenticationEvent) {
@@ -61,6 +69,12 @@ class AuthenticationBloc
       if (event is ForgotPasswordAuthenticationEvent) {
         await _forgotPassword(event: event, emit: emit);
       }
+      if (event is ListenToEvents) {
+        await _listenToEvents(event: event, emit: emit);
+      }
+      // if (event is UpdateUserEvent) {
+      //   await _updateUser(event: event, emit: emit);
+      // }
     });
   }
 
@@ -251,5 +265,78 @@ class AuthenticationBloc
         },
       );
     }
+  }
+
+  _listenToEvents({
+    required ListenToEvents event,
+    required Emitter<AuthenticationState> emit,
+  }) async {
+    emit(AuthenticationLoading(true));
+    final result = await listenToEventsUsecase(NoParams());
+
+    if (result == null) {
+      emit(
+        AuthenticationError(
+          true,
+          ServerFailure(
+            message: "Something went wrong!",
+          ),
+        ),
+      );
+    } else {
+      result.fold(
+        (l) => emit(AuthenticationError(true, l)),
+        (r) {
+          r?.listen(
+            (event) async {
+              try {
+                if (event != null) {
+                  final remotedb = getIt<FirebaseFirestore>();
+                  final localDb = getIt<AppDatabase>();
+                  final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+                  final listenRefCollection =
+                      remotedb.collection('ListenerEvents');
+
+                  final listenDocRef = await listenRefCollection
+                      .where('clientId', isEqualTo: clientId)
+                      .get();
+                  final listenDoc = listenDocRef.docs.first.reference;
+
+                  if (listenDocRef.docs.first.data()['isListendAlready'] ??
+                      false) {
+                    add(AuthenticateUserEvent());
+                    // await listenDoc
+                    //     .set({'isListendAlready': true}, SetOptions(merge: true));
+                  } else {
+                    await listenDoc.set({
+                      'isListendAlready': true,
+                    }, SetOptions(merge: true));
+                    localDb.deleteWorkoutPlans();
+                    add(AuthenticateUserEvent());
+                  }
+                } else {
+                  add(AuthenticateUserEvent());
+                }
+              } catch (err) {
+                print(err);
+              }
+            },
+          );
+        },
+      );
+    }
+  }
+
+  _updateUser({
+    required UpdateUserEvent event,
+    required Emitter<AuthenticationState> emit,
+  }) async {
+    emit(AuthenticationLoading(true));
+    await Future.delayed(
+      Duration(milliseconds: 300),
+      () {
+        emit(ListenEventComplete(event.event));
+      },
+    );
   }
 }

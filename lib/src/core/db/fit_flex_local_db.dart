@@ -40,6 +40,19 @@ part 'fit_flex_local_db.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  Future<void> deleteAllTables() async {
+    Future.wait([
+      clients.deleteAll(),
+      workoutPlans.deleteAll(),
+      weeks.deleteAll(),
+      days.deleteAll(),
+      workoutPlanExercise.deleteAll(),
+      exerciseSets.deleteAll(),
+      baseExercise.deleteAll(),
+      workoutHistorySet.deleteAll()
+    ]);
+  }
+
   // You can handle database migration here
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -88,7 +101,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<void> deleteWorkoutPlans() async {
-   final deleteIds= await Future.wait([
+    final deleteIds = await Future.wait([
       workoutPlans.deleteAll(),
       weeks.deleteAll(),
       days.deleteAll(),
@@ -100,6 +113,10 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteExercises() async {
     await baseExercise.deleteAll();
+  }
+
+  Future<void> deleteWorkoutHistorySets() async {
+    await workoutHistorySet.deleteAll();
   }
 
   @override

@@ -16,6 +16,7 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_client_dashboard_page.dart';
 import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_trainer_dashboard_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_history_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
@@ -39,7 +40,7 @@ final _shellNavigatorTWKey =
 
 GoRouter goRouter(appState) {
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: GlobalKey<NavigatorState>(),
     initialLocation: '/',
     routes: [
       // Auth and onboarding routes
@@ -177,6 +178,21 @@ GoRouter goRouter(appState) {
         },
       ),
       GoRoute(
+        path: FitFlexTrainerHistoryPage.route,
+        pageBuilder: (context, state) {
+          final extraData = state.extra as Map<String, dynamic>?;
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexTrainerHistoryPage(
+              histories: extraData?['histories'] ?? [],
+              client: extraData?['client'],
+              // gender: extraData?['gender'] ?? "Unknown",
+              // age: extraData?['age'] ?? "Unknown",
+            ),
+          );
+        },
+      ),
+      GoRoute(
         path: FitFlexClientProfileSelectHeightPage.route,
         pageBuilder: (context, state) {
           final extraData = state.extra as Map<String, dynamic>?;
@@ -200,7 +216,7 @@ GoRouter goRouter(appState) {
         },
         branches: [
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorTPKey,
+            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'trainerProfile'),
             routes: [
               GoRoute(
                 path: FitFlexTrainerProfilePage.route,
@@ -212,7 +228,7 @@ GoRouter goRouter(appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorTWKey,
+            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'trainerWorkout'),
             routes: [
               GoRoute(
                 path: FitFlexTrainerWorkoutPage.route,
@@ -234,7 +250,7 @@ GoRouter goRouter(appState) {
         },
         branches: [
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorAKey,
+            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'clientProfile'),
             routes: [
               GoRoute(
                 path: FitFlexClientProfilePage.route,
@@ -246,7 +262,7 @@ GoRouter goRouter(appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorCKey,
+            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'clientMeasurement'),
             routes: [
               GoRoute(
                 path: FitFlexClientWorkoutHistoryPage.route,
@@ -258,7 +274,7 @@ GoRouter goRouter(appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorBKey,
+            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'clientHistory'),
             routes: [
               GoRoute(
                 path: FitFlexClientMeasurePage.route,

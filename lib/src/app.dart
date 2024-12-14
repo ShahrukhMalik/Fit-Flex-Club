@@ -1,16 +1,23 @@
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/bloc/listen_bloc.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 ///Widget that configures the application
 class MyApp extends StatelessWidget {
@@ -47,17 +54,24 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) =>
-              getIt<AuthenticationBloc>()..add(AuthenticateUserEvent()),
+              getIt<AuthenticationBloc>()..add(ListenToEvents()),
         ),
         BlocProvider(create: (context) => getIt<ClientProfileBloc>()),
+        // BlocProvider(
+        //     create: (context) => getIt<ListenBloc>()..add(ListenToEvent())),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
-        BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
         BlocProvider(
           create: (context) => getIt<WorkoutManagementBloc>()
             ..add(
               GetExercisesEvent(),
-            ),
+            )
+            // ..add(
+            //   GetWorkoutPlansForClientEvent(
+            //     clientId: getIt<FirebaseAuth>().currentUser!.uid,
+            //   ),
+            // ),
         ),
+        BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],
       child: localizations,
     );

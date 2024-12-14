@@ -5,7 +5,7 @@ class WorkoutPlans extends Table {
   TextColumn get uid => text()(); // Primary key
   TextColumn get name => text().withLength(min: 1, max: 255)(); // Plan name
   IntColumn get createdAt =>
-      integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
+      integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get updatedAt => integer().nullable()();
   TextColumn get clientId => text().nullable().references(Clients, #id)();
   @override

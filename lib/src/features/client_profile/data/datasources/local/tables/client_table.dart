@@ -15,7 +15,7 @@ class Clients extends Table {
   TextColumn get phone => text().nullable()();
   TextColumn get phoneCountryCode => text().nullable()();
   TextColumn get currentWorkoutPlanName => text().nullable()();
-  IntColumn get createdAt => integer()();
+  IntColumn get createdAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get updatedAt => integer().nullable()(); // Default value for updatedAt
 
   @override

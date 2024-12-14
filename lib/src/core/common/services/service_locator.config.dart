@@ -32,6 +32,8 @@ import '../../../features/authentication/domain/usecases/is_client_profile_creat
     as _i98;
 import '../../../features/authentication/domain/usecases/is_user_active_usecase.dart'
     as _i374;
+import '../../../features/authentication/domain/usecases/listen_to_events_usecase.dart'
+    as _i645;
 import '../../../features/authentication/domain/usecases/login_usecase.dart'
     as _i831;
 import '../../../features/authentication/domain/usecases/logout_usecase.dart'
@@ -74,6 +76,8 @@ import '../../../features/workout_history/data/repositories/workout_history_repo
     as _i473;
 import '../../../features/workout_history/domain/repositories/workout_history_repository.dart'
     as _i198;
+import '../../../features/workout_history/domain/usecases/get_workout_history_models_usecase.dart'
+    as _i119;
 import '../../../features/workout_history/domain/usecases/log_workout_history_usecase.dart'
     as _i208;
 import '../../../features/workout_history/presentation/bloc/workout_history_bloc.dart'
@@ -147,6 +151,12 @@ extension GetItInjectableX on _i174.GetIt {
         connectionChecker: gh<_i973.InternetConnectionChecker>()));
     gh.factory<_i593.WorkoutHistoryDao>(
         () => _i593.WorkoutHistoryDao(gh<_i987.AppDatabase>()));
+    gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
+          gh<_i878.SharedPrefsUtil>(),
+          gh<_i974.FirebaseFirestore>(),
+          gh<_i987.AppDatabase>(),
+          auth: gh<_i59.FirebaseAuth>(),
+        ));
     gh.singleton<_i588.ClientProfileRemoteDatasource>(
         () => _i588.ClientProfileRemoteDatasourceImpl(
               auth: gh<_i59.FirebaseAuth>(),
@@ -156,6 +166,10 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i899.ClientsDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i939.WorkoutPlanDao>(
         () => _i939.WorkoutPlanDao(gh<_i987.AppDatabase>()));
+    gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(
+          remoteDatasource: gh<_i40.AuthRemoteDatasource>(),
+          networkInfo: gh<_i228.NetworkInfo>(),
+        ));
     gh.singleton<_i648.ClientLocalDatasource>(
         () => _i648.ClientLocalDatasourceImpl(
               dao: gh<_i899.ClientsDao>(),
@@ -168,9 +182,27 @@ extension GetItInjectableX on _i174.GetIt {
                   gh<_i588.ClientProfileRemoteDatasource>(),
               clientProfileLocalDatasource: gh<_i648.ClientLocalDatasource>(),
             ));
+    gh.singleton<_i98.IsClientProfileCreatedActiveUsecase>(() =>
+        _i98.IsClientProfileCreatedActiveUsecaseImpl(
+            clientProfileRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i374.IsUserActiveUsecase>(() => _i374.IsUserActiveUsecaseImpl(
+        clientProfileRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i831.LogInUsecase>(() =>
+        _i831.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i988.ForgotPasswordUsecase>(() =>
+        _i988.ForgotPasswordUsecaseImpl(
+            authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
         _i617.IsClientProfileCreatedActiveUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i645.ListenToEventsUsecase>(() =>
+        _i645.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i949.AuthenticateUserUsecase>(() =>
+        _i949.AuthenticateUserUsecaseImpl(
+            authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i955.CreateAccountUsecase>(() =>
+        _i955.CreateAccountUsecaseImpl(
+            authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
@@ -181,6 +213,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i352.WorkoutHistoryRemoteDataSource>(() =>
         _i352.WorkoutHistoryRemoteDataSourceImpl(
             db: gh<_i974.FirebaseFirestore>()));
+    gh.singleton<_i447.LogOutUsecase>(() =>
+        _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i415.WorkoutPlanManagementLocaldatasource>(
         () => _i415.WorkoutPlanManagementLocaldatasourceImpl(
               dao: gh<_i939.WorkoutPlanDao>(),
@@ -196,11 +230,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i841.GetClientByIdUsecase>(() =>
         _i841.GetClientByIdUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
-          gh<_i974.FirebaseFirestore>(),
-          gh<_i878.SharedPrefsUtil>(),
-          auth: gh<_i59.FirebaseAuth>(),
-        ));
     gh.singleton<_i530.WorkoutManagementRepository>(
         () => _i1071.WorkoutManagementRepositoryImpl(
               networkInfo: gh<_i228.NetworkInfo>(),
@@ -238,38 +267,27 @@ extension GetItInjectableX on _i174.GetIt {
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
-    gh.singleton<_i20.AuthRepository>(() => _i441.AuthRepositoryImpl(
-          remoteDatasource: gh<_i40.AuthRemoteDatasource>(),
-          networkInfo: gh<_i228.NetworkInfo>(),
-        ));
     gh.singleton<_i430.UpdateWorkoutPlanUsecase>(() =>
         _i430.UpdateWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
-    gh.singleton<_i98.IsClientProfileCreatedActiveUsecase>(() =>
-        _i98.IsClientProfileCreatedActiveUsecaseImpl(
-            clientProfileRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i374.IsUserActiveUsecase>(() => _i374.IsUserActiveUsecaseImpl(
-        clientProfileRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i831.LogInUsecase>(() =>
-        _i831.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i988.ForgotPasswordUsecase>(() =>
-        _i988.ForgotPasswordUsecaseImpl(
-            authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i949.AuthenticateUserUsecase>(() =>
-        _i949.AuthenticateUserUsecaseImpl(
-            authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i955.CreateAccountUsecase>(() =>
-        _i955.CreateAccountUsecaseImpl(
-            authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i447.LogOutUsecase>(() =>
-        _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
+          authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
+          createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
+          logInUsecase: gh<_i831.LogInUsecase>(),
+          logOutUsecase: gh<_i447.LogOutUsecase>(),
+          forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
+          listenToEventsUsecase: gh<_i645.ListenToEventsUsecase>(),
+        ));
     gh.singleton<_i198.WorkoutHistoryRepository>(
         () => _i473.WorkoutHistoryRepositoryImpl(
               networkInfo: gh<_i228.NetworkInfo>(),
               local: gh<_i615.WorkoutHistoryLocalDataSource>(),
               remote: gh<_i352.WorkoutHistoryRemoteDataSource>(),
             ));
+    gh.singleton<_i119.GetWorkoutHistoryUsecase>(() =>
+        _i119.GetWorkoutHistoryUsecaseImpl(
+            workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
     gh.singleton<_i853.CreateWorkoutPlanUsecase>(() =>
         _i853.CreateWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -292,15 +310,10 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i711.DeleteWorkoutPlanUsecase>(),
           gh<_i661.UpdateAssignedWorkoutPlanUsecase>(),
         ));
-    gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
-          authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
-          createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
-          logInUsecase: gh<_i831.LogInUsecase>(),
-          logOutUsecase: gh<_i447.LogOutUsecase>(),
-          forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
+    gh.factory<_i942.WorkoutHistoryBloc>(() => _i942.WorkoutHistoryBloc(
+          gh<_i208.LogWorkoutHistoryUsecase>(),
+          gh<_i119.GetWorkoutHistoryUsecase>(),
         ));
-    gh.factory<_i942.WorkoutHistoryBloc>(
-        () => _i942.WorkoutHistoryBloc(gh<_i208.LogWorkoutHistoryUsecase>()));
     return this;
   }
 }

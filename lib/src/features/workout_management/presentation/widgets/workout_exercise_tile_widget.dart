@@ -3,6 +3,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/exerci
 import 'package:flutter/material.dart';
 
 class ExerciseTileWidget extends StatelessWidget {
+  final bool isClientSideView;
   final ExerciseModel exercise;
   final int index;
 
@@ -10,6 +11,7 @@ class ExerciseTileWidget extends StatelessWidget {
     super.key,
     required this.exercise,
     required this.index,
+    required this.isClientSideView,
   });
 
   @override
@@ -18,7 +20,9 @@ class ExerciseTileWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: globalColorScheme.surface,
+        color: (exercise.completed ?? false) && isClientSideView
+            ? globalColorScheme.outlineVariant
+            : globalColorScheme.surface,
         borderRadius: BorderRadius.all(
           Radius.circular(
             10,

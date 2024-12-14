@@ -13,4 +13,5 @@ mixin _$WorkoutHistoryDaoMixin on DatabaseAccessor<AppDatabase> {
   $WorkoutHistorySetTable get workoutHistorySet =>
       attachedDatabase.workoutHistorySet;
   $ExerciseSetsTable get exerciseSets => attachedDatabase.exerciseSets;
+  $BaseExerciseTable get baseExercise => attachedDatabase.baseExercise;
 }

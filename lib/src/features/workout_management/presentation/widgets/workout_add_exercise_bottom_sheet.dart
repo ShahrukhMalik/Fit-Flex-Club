@@ -120,6 +120,7 @@ class _AddExerciseBottomSheetWidgetState
     // Add an empty set at the end
     updatedSets.add(
       SetModel(
+        clientId: newSet.clientId,
         exerciseId: newSet.exerciseId,
         id: UUIDv4().toString(),
       ),
@@ -468,6 +469,8 @@ class _AddExerciseBottomSheetWidgetState
                                                         } else {
                                                           _addSet(
                                                             SetModel(
+                                                              clientId:
+                                                                  set.clientId,
                                                               exerciseId: set
                                                                   .exerciseId,
                                                               id: set.id,
@@ -503,6 +506,8 @@ class _AddExerciseBottomSheetWidgetState
                                                         } else {
                                                           _addSet(
                                                             SetModel(
+                                                              clientId:
+                                                                  set.clientId,
                                                               exerciseId: set
                                                                   .exerciseId,
                                                               id: set.id,

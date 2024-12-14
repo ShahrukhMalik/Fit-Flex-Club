@@ -13,6 +13,6 @@ class WorkoutHistorySet extends Table {
   RealColumn get actualDistance => real().nullable()();
   IntColumn get actualTime => integer().nullable()(); // Stored in seconds
   IntColumn get createdAt =>
-      integer().withDefault(Constant(DateTime.now().millisecondsSinceEpoch))();
+      integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get updatedAt => integer().nullable()();
 }
