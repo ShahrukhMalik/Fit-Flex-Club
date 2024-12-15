@@ -453,7 +453,7 @@ class _FitFlexClientWorkoutHistoryPageState
                                         ),
                                         Center(
                                           child: Text(
-                                            '${(((set.actualReps ?? 0) / set.targetReps!) * 100).toStringAsFixed(2)} %',
+                                            '${(((set.actualReps ?? 0) / (set.targetReps ?? 0)) * 100).toStringAsFixed(2)} %',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color:
@@ -490,7 +490,7 @@ class _FitFlexClientWorkoutHistoryPageState
                                         ),
                                         Center(
                                           child: Text(
-                                            '${(((set.actualWeight ?? 0) / set.targetWeight!) * 100).toStringAsFixed(2)} %',
+                                            '${(((set.actualWeight ?? 0) / (set.targetWeight ?? 0)) * 100).toStringAsFixed(2)} %',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color:

@@ -41,7 +41,12 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
         title: "Workout Plan",
         context: context,
         backgroundColor: globalColorScheme.onPrimaryContainer,
-        // onLeadingPressed: () => context.go(FitFlexClientProfilePage.route),
+        onLeadingPressed: () => context.go(
+          FitFlexClientAssignedWorkoutPlanPage.route,
+          extra: {
+            'workoutPlan': workoutPlan,
+          },
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -150,7 +155,6 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                     },
                     child: Expanded(
                       child: SetTrakerWidget(
-                        
                         onSubmit: (sets) {
                           print(sets);
                           context.read<WorkoutHistoryBloc>().add(
@@ -512,13 +516,14 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                                 _updateSets(
                                                   sets![index]!.copyWith(
                                                     actualTime: Duration(
-                                                      minutes: (sets[index]
-                                                                      .actualTime ??
-                                                                  Duration(
-                                                                    minutes: 0,
-                                                                  ))
-                                                              .inMinutes +
-                                                          1,
+                                                      minutes:
+                                                          (sets[index].actualTime ??
+                                                                      Duration(
+                                                                        minutes:
+                                                                            0,
+                                                                      ))
+                                                                  .inMinutes +
+                                                              1,
                                                     ),
                                                   ),
                                                 );
