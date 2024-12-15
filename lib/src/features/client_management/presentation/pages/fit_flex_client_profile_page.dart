@@ -674,6 +674,8 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
   @override
   void initState() {
     super.initState();
+
+    context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
     context.read<WorkoutManagementBloc>().add(
           GetWorkoutPlansForClientEvent(
@@ -776,6 +778,8 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                                 context: context,
                                 type: ButtonType.icon,
                                 icon: Icons.logout,
+                                foregroundColor:
+                                    globalColorScheme.inversePrimary,
                                 text: "",
                                 onPressed: () => context
                                     .read<AuthenticationBloc>()

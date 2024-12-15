@@ -242,6 +242,7 @@ class _FitFlexTrainerClientDetailsPageState
     super.initState();
     isUserActive.value = widget.client.isUserActive ?? false;
     client = ClientModel.fromClientEntity(widget.client);
+    context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     context.read<WorkoutManagementBloc>().add(
           GetWorkoutPlansForClientEvent(
             clientId: widget.client.id!,
@@ -870,8 +871,7 @@ class ClientEntityCompactWidget extends StatelessWidget {
                                               .read<WorkoutHistoryBloc>()
                                               .add(
                                                 GetWorkoutHistoryEvent(
-                                                  cliendId:
-                                                      client.id,
+                                                  cliendId: client.id,
                                                 ),
                                               );
                                         },

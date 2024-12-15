@@ -36,6 +36,6 @@ class GetWorkoutHistoryUsecaseImpl extends GetWorkoutHistoryUsecase {
 
   @override
   Future<Either<Failures, List<WorkoutHistoryModel?>?>?> call(Params params) {
-    return workoutHistoryRepository.getWorkoutHistorySets(params.cliendId!);
+    return workoutHistoryRepository.getWorkoutHistorySets(params.cliendId);
   }
 }

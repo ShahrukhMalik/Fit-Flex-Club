@@ -65,11 +65,11 @@ class MyApp extends StatelessWidget {
             ..add(
               GetExercisesEvent(),
             )
-            // ..add(
-            //   GetWorkoutPlansForClientEvent(
-            //     clientId: getIt<FirebaseAuth>().currentUser!.uid,
-            //   ),
-            // ),
+            ..add(
+              GetWorkoutPlansForClientEvent(
+                clientId: getIt<FirebaseAuth>().currentUser!.uid,
+              ),
+            ),
         ),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],

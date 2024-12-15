@@ -117,8 +117,11 @@ class _FitFlexClientDashboardPageState
               );
         }
         if (index == 1) {
-          context.read<WorkoutHistoryBloc>().add(GetWorkoutHistoryEvent(
-              cliendId: getIt<FirebaseAuth>().currentUser?.uid));
+          context.read<WorkoutHistoryBloc>().add(
+                GetWorkoutHistoryEvent(
+                  cliendId: getIt<FirebaseAuth>().currentUser?.uid,
+                ),
+              );
         }
       },
       child: ValueListenableBuilder<int>(

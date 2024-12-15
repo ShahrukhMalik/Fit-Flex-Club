@@ -434,7 +434,7 @@ class _FitFlexClientWorkoutHistoryPageState
                                         ),
                                         Center(
                                           child: Text(
-                                            '${(((set.actualReps ?? 0) / set.targetReps!) * 100).toStringAsFixed(2)} %',
+                                            '${(((set.actualReps ?? 0) / (set.targetReps ?? 0)) * 100).toStringAsFixed(2)} %',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color:
@@ -464,14 +464,15 @@ class _FitFlexClientWorkoutHistoryPageState
                                                 ? set.actualWeight.toString()
                                                 : "0",
                                             style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: globalColorScheme
-                                                    .secondaryContainer),
+                                              fontWeight: FontWeight.bold,
+                                              color: globalColorScheme
+                                                  .secondaryContainer,
+                                            ),
                                           ),
                                         ),
                                         Center(
                                           child: Text(
-                                            '${(((set.actualWeight ?? 0) / set.targetWeight!) * 100).toStringAsFixed(2)} %',
+                                            '${(((set.actualWeight ?? 0) / (set.targetWeight ?? 0)) * 100).toStringAsFixed(2)} %',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color:
@@ -779,8 +780,10 @@ class WorkoutSet {
   final int reps; // Actual reps done
   final int targetReps; // Target reps to be performed
   final double? weight;
-
-  WorkoutSet({required this.reps, required this.targetReps, this.weight});
-
+  WorkoutSet({
+    required this.reps,
+    required this.targetReps,
+    this.weight,
+  });
   double get completionPercentage => (reps / targetReps) * 100;
 }

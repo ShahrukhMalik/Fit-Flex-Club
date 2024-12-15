@@ -529,10 +529,10 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
             exerciseSets,
             exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
           ),
-          leftOuterJoin(
-            workoutHistorySet,
-            exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
-          ),
+          // leftOuterJoin(
+          //   workoutHistorySet,
+          //   exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
+          // ),
         ])
                   ..where(
                     workoutPlanExercise.dayId
