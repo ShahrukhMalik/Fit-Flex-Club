@@ -741,6 +741,19 @@ class _FitFlexClientAssignedWorkoutPlanPageState
                 valueListenable: _days,
                 builder: (context, days, _) {
                   return AutoScrollTabsWidget(
+                    onEditSets: (exercise) {
+                      final existingExercises = _exercises.value;
+                      _exercises.value = existingExercises.map(
+                        (e) {
+                          if (e.id == exercise.id) {
+                            return e.copyWith(
+                              completed: exercise.completed,
+                            );
+                          }
+                          return e;
+                        },
+                      ).toList();
+                    },
                     workoutPlan: _workoutPlanBp.value,
                     isClientSideView: true,
                     onDrag: (editExercise, edit, delete) => {},

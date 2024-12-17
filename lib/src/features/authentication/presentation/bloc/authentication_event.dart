@@ -60,4 +60,10 @@ class UpdateUserEvent extends AuthenticationEvent {
   const UpdateUserEvent({required this.event});
 }
 
-class AuthenticateUserEvent extends AuthenticationEvent {}
+class AuthenticateUserEvent extends AuthenticationEvent {
+  final String? message;
+
+  const AuthenticateUserEvent({
+    this.message,
+  });
+}

@@ -23,6 +23,7 @@ class AutoScrollTabsWidget extends StatefulWidget {
   final ValueNotifier<WeekModel?> currentWeek;
   final Function(int) onDayTap;
   final Function(ExerciseModel editExercise, bool edit, bool delete) onDrag;
+  final Function(ExerciseModel completedExercise)? onEditSets;
 
   final WorkoutPlanModel? workoutPlan;
 
@@ -34,6 +35,7 @@ class AutoScrollTabsWidget extends StatefulWidget {
     required this.currentDay,
     required this.currentWeek,
     required this.onDayTap,
+    this.onEditSets,
     required this.onDrag,
     this.workoutPlan,
     this.isClientSideView = false,
@@ -198,10 +200,10 @@ class _AutoScrollTabsWidgetState extends State<AutoScrollTabsWidget> {
                               );
                             } else {
                               return GestureDetector(
-                                onTap: () {
+                                onTap: () async {
                                   if (exercises[index].completed ?? false) {
                                   } else {
-                                    context.go(
+                                    final result = await context.push(
                                       '${FitFlexClientAssignedWorkoutPlanPage.route}/${FitFlexWorkoutTrackerPage.route}',
                                       extra: {
                                         'exercise': exercises[index],
@@ -210,6 +212,13 @@ class _AutoScrollTabsWidgetState extends State<AutoScrollTabsWidget> {
                                         'day': widget.currentDay.value,
                                       },
                                     );
+
+                                    if (result != null &&
+                                        widget.isClientSideView) {
+                                      widget
+                                          .onEditSets!(result as ExerciseModel);
+                                      // print(result.toString());
+                                    }
                                   }
                                 },
                                 child: ExerciseTileWidget(

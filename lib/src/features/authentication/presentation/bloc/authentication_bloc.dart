@@ -299,20 +299,28 @@ class AuthenticationBloc
 
                   final listenDocRef = await listenRefCollection
                       .where('clientId', isEqualTo: clientId)
+                      .orderBy('timestamp', descending: true)
                       .get();
-                  final listenDoc = listenDocRef.docs.first.reference;
+                  final listenDocs = listenDocRef.docs;
 
-                  if (listenDocRef.docs.first.data()['isListendAlready'] ??
-                      false) {
-                    add(AuthenticateUserEvent());
-                    // await listenDoc
-                    //     .set({'isListendAlready': true}, SetOptions(merge: true));
+                  if (listenDocs.isNotEmpty) {
+                    final listenDoc = listenDocs.first.reference;
+                    if (listenDocs.first.data()['isListendAlready'] ??
+                        false) {
+                      add(AuthenticateUserEvent());
+                    } else {
+                      await listenDoc.set(
+                        {
+                          'isListendAlready': true,
+                        },
+                        SetOptions(
+                          merge: true,
+                        ),
+                      );
+                      localDb.deleteAllTables();
+                      add(AuthenticateUserEvent());
+                    }
                   } else {
-                    await listenDoc.set({
-                      'isListendAlready': true,
-                    }, SetOptions(merge: true));
-                    localDb.deleteWorkoutPlans();
-                    localDb.deleteClients();
                     add(AuthenticateUserEvent());
                   }
                 } else {

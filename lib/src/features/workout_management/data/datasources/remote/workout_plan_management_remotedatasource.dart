@@ -226,6 +226,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
   Future<void> assignWorkoutPlan(WorkoutPlanModel workoutPlanModel) async {
     try {
       final CollectionReference ref = db.collection('Users');
+      final listenerRef = db.collection('ListenerEvents');
       WriteBatch batch = db.batch(); // Initialize batch write
 
       // Save the workout plan model
@@ -273,6 +274,14 @@ class WorkoutPlanManagementRemotedatasourceImpl
       }
 
       // Commit the batch to execute all operations at once
+      batch.set(
+        listenerRef.doc(UUIDv4().toString()),
+        {
+          'clientId': workoutPlanModel.clientId,
+          'eventType': ListenerEvents.addAssignedWorkoutPlan.name,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
       await batch.commit();
     } on FirebaseException catch (err) {
       throw ServerException(
@@ -375,6 +384,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
         {
           'clientId': workoutPlanModel.clientId,
           'eventType': ListenerEvents.updateAssignedWorkoutPlan.name,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
         },
       );
       await mainBatch.commit();
@@ -392,7 +402,14 @@ class WorkoutPlanManagementRemotedatasourceImpl
       final CollectionReference clientRef = db.collection('Users');
       final CollectionReference workoutPlanRef =
           clientRef.doc(workoutPlan.clientId).collection('workoutPlans');
+      final listenerRef = db.collection('ListenerEvents');
+
       await workoutPlanRef.doc(workoutPlan.uid).delete();
+      await listenerRef.add({
+        'clientId': workoutPlan.clientId,
+        'eventType': ListenerEvents.deleteAssignedWorkoutPlan.name,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      });
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Failed to update workout plan",
