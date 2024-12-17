@@ -54,7 +54,7 @@ class AppTextFields {
               color: Color.fromARGB(152, 255, 205, 124),
             ),
         placeholder: labelText ?? hintText,
-        padding: const EdgeInsets.all(12),
+        // padding: const EdgeInsets.all(12),
         keyboardType: keyboardType,
         enabled: enabled,
         decoration: boxDecoration ??

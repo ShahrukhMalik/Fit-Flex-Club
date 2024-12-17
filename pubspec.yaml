@@ -40,7 +40,7 @@ dependencies:
   injectable: ^2.5.0
   equatable: ^2.0.5
   dartz: ^0.10.1
-  internet_connection_checker: ^1.0.0+1
+  internet_connection_checker: ^3.0.1
   shared_preferences: ^2.3.2
   firebase_auth: ^5.3.2
   cloud_firestore: ^5.4.5
@@ -59,7 +59,7 @@ dependencies:
   path_provider: ^2.1.5
   uuid_v4: ^1.0.2
   fluttertoast: ^8.2.8
-  flutter_slidable: ^3.1.1
+  flutter_slidable: ^3.1.2
   bloc_concurrency: ^0.2.5
   # flutter_splash_screen: ^3.0.0
 

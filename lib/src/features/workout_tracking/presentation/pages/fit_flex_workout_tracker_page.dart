@@ -260,20 +260,24 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    Center(
-                                      child: AppTextFields.basicTextField(
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (p0) => _updateSets(
-                                            sets![index].copyWith(
-                                                actualWeight:
-                                                    double.tryParse(p0))),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          borderSide: BorderSide(
-                                            color: globalColorScheme
-                                                .primaryContainer,
-                                            width: 1,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Center(
+                                        child: AppTextFields.basicTextField(
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (p0) => _updateSets(
+                                              sets![index].copyWith(
+                                                  actualWeight:
+                                                      double.tryParse(p0))),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            borderSide: BorderSide(
+                                              color: globalColorScheme
+                                                  .primaryContainer,
+                                              width: 1,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -289,25 +293,34 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                 ),
                               ),
                             if (widget.showReps)
+                              SizedBox(
+                                width: 10,
+                              ),
+                            if (widget.showReps)
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text('Reps',
                                         style: TextStyle(fontSize: 16)),
-                                    Center(
-                                      child: AppTextFields.basicTextField(
-                                        onChanged: (p0) => _updateSets(
-                                            sets![index].copyWith(
-                                                actualReps: int.tryParse(p0))),
-                                        keyboardType: TextInputType.number,
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          borderSide: BorderSide(
-                                            color: globalColorScheme
-                                                .primaryContainer,
-                                            width: 1,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Center(
+                                        child: AppTextFields.basicTextField(
+                                          onChanged: (p0) => _updateSets(
+                                              sets![index].copyWith(
+                                                  actualReps:
+                                                      int.tryParse(p0))),
+                                          keyboardType: TextInputType.number,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            borderSide: BorderSide(
+                                              color: globalColorScheme
+                                                  .primaryContainer,
+                                              width: 1,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -329,21 +342,26 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                   children: [
                                     Text('Duration (in mins)',
                                         style: TextStyle(fontSize: 16)),
-                                    Center(
-                                      child: AppTextFields.basicTextField(
-                                        onChanged: (p0) => _updateSets(
-                                            sets![index].copyWith(
-                                                actualTime: Duration(
-                                                    minutes: int.tryParse(p0) ??
-                                                        0))),
-                                        keyboardType: TextInputType.number,
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          borderSide: BorderSide(
-                                            color: globalColorScheme
-                                                .primaryContainer,
-                                            width: 1,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Center(
+                                        child: AppTextFields.basicTextField(
+                                          onChanged: (p0) => _updateSets(
+                                              sets![index].copyWith(
+                                                  actualTime: Duration(
+                                                      minutes:
+                                                          int.tryParse(p0) ??
+                                                              0))),
+                                          keyboardType: TextInputType.number,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            borderSide: BorderSide(
+                                              color: globalColorScheme
+                                                  .primaryContainer,
+                                              width: 1,
+                                            ),
                                           ),
                                         ),
                                       ),

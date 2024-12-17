@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 @module
 abstract class RegisterModule {
   InternetConnectionChecker get internetConnectionChecker =>
-      InternetConnectionChecker();
+      InternetConnectionChecker.instance;
   @preResolve
   Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
   // http.Client get httpClient => http.Client();
