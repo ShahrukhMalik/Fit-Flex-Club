@@ -281,7 +281,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
     if (workoutPlanModel == null) {
       final workoutPlanId = UUIDv4().toString();
       final weeks = List<WeekModel>.generate(
-        5,
+        4,
         (index) {
           final weekId = UUIDv4().toString();
           final days = List<DayModel>.generate(
