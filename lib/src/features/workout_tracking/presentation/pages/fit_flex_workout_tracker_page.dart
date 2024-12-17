@@ -5,9 +5,6 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
-import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
-import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
-import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/daos/workout_history_dao.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
@@ -15,13 +12,12 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/set_mo
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
-import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class FitFlexWorkoutTrackerPage extends StatelessWidget {
-  static const route = "/fit-flex-workout-tracker";
+  static const route = "workout-tracker";
   final ExerciseModel exercise;
   final WeekModel week;
   final DayModel day;
@@ -41,12 +37,7 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
         title: "Workout Plan",
         context: context,
         backgroundColor: globalColorScheme.onPrimaryContainer,
-        onLeadingPressed: () => context.go(
-          FitFlexClientAssignedWorkoutPlanPage.route,
-          extra: {
-            'workoutPlan': workoutPlan,
-          },
-        ),
+        onLeadingPressed: () => context.pop(),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -110,34 +101,11 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                         context.go(FitFlexClientAssignedWorkoutPlanPage.route,
                             extra: {'workoutPlan': state.workoutPlan});
                       }
-                      // if (state is SubjectLoading) {
-                      //   showLoadingDialog(context);
-                      //   return;
-                      // }
-                      // Navigator.of(context, rootNavigator: true).pop();
-                      // if (state is SubjectFailed) {
-                      //   showErrorDialog(context);
-                      // }
-                      // if (state is SubjectSuccess) {
-                      //   showSuccessDialog(context);
-                      // }
                     },
                     child: SizedBox(height: 10),
                   ),
                   BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
                     listener: (context, state) {
-                      // if (state is SubjectLoading) {
-                      //   showLoadingDialog(context);
-                      //   return;
-                      // }
-                      // Navigator.of(context, rootNavigator: true).pop();
-                      // if (state is SubjectFailed) {
-                      //   showErrorDialog(context);
-                      // }
-                      // if (state is SubjectSuccess) {
-                      //   showSuccessDialog(context);
-                      // }
-
                       if (state is LogWorkoutHistoryLoading) {
                         PlatformDialog.showLoadingDialog(
                           context: context,

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
@@ -201,7 +202,7 @@ class _AutoScrollTabsWidgetState extends State<AutoScrollTabsWidget> {
                                   if (exercises[index].completed ?? false) {
                                   } else {
                                     context.go(
-                                      FitFlexWorkoutTrackerPage.route,
+                                      '${FitFlexClientAssignedWorkoutPlanPage.route}/${FitFlexWorkoutTrackerPage.route}',
                                       extra: {
                                         'exercise': exercises[index],
                                         'workoutPlan': widget.workoutPlan,

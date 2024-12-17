@@ -62,23 +62,26 @@ GoRouter goRouter(appState) {
           child: const FitFlexLoaderPage(),
         ),
       ),
-      GoRoute(
-        path: FitFlexWorkoutTrackerPage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexWorkoutTrackerPage(
-              exercise: extraData?['exercise'],
-              workoutPlan: extraData?['workoutPlan'],
-              week: extraData?['week'],
-              day: extraData?['day'],
-            ),
-          );
-        },
-      ),
+
       GoRoute(
         path: FitFlexClientAssignedWorkoutPlanPage.route,
+        routes: [
+          GoRoute(
+            path: FitFlexWorkoutTrackerPage.route,
+            pageBuilder: (context, state) {
+              final extraData = state.extra as Map<String, dynamic>?;
+              return TransitionPage(
+                key: state.pageKey,
+                child: FitFlexWorkoutTrackerPage(
+                  exercise: extraData?['exercise'],
+                  workoutPlan: extraData?['workoutPlan'],
+                  week: extraData?['week'],
+                  day: extraData?['day'],
+                ),
+              );
+            },
+          ),
+        ],
         pageBuilder: (context, state) {
           final extraData = state.extra as Map<String, dynamic>?;
           return TransitionPage(
@@ -216,7 +219,8 @@ GoRouter goRouter(appState) {
         },
         branches: [
           StatefulShellBranch(
-            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'trainerProfile'),
+            navigatorKey:
+                GlobalKey<NavigatorState>(debugLabel: 'trainerProfile'),
             routes: [
               GoRoute(
                 path: FitFlexTrainerProfilePage.route,
@@ -228,7 +232,8 @@ GoRouter goRouter(appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'trainerWorkout'),
+            navigatorKey:
+                GlobalKey<NavigatorState>(debugLabel: 'trainerWorkout'),
             routes: [
               GoRoute(
                 path: FitFlexTrainerWorkoutPage.route,
@@ -250,7 +255,8 @@ GoRouter goRouter(appState) {
         },
         branches: [
           StatefulShellBranch(
-            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'clientProfile'),
+            navigatorKey:
+                GlobalKey<NavigatorState>(debugLabel: 'clientProfile'),
             routes: [
               GoRoute(
                 path: FitFlexClientProfilePage.route,
@@ -262,7 +268,8 @@ GoRouter goRouter(appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'clientMeasurement'),
+            navigatorKey:
+                GlobalKey<NavigatorState>(debugLabel: 'clientMeasurement'),
             routes: [
               GoRoute(
                 path: FitFlexClientWorkoutHistoryPage.route,
@@ -274,7 +281,8 @@ GoRouter goRouter(appState) {
             ],
           ),
           StatefulShellBranch(
-            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'clientHistory'),
+            navigatorKey:
+                GlobalKey<NavigatorState>(debugLabel: 'clientHistory'),
             routes: [
               GoRoute(
                 path: FitFlexClientMeasurePage.route,
