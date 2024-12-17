@@ -5,7 +5,6 @@ import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/functions/is_data_stale.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/daos/workout_history_dao.dart';
-import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_set_table.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:injectable/injectable.dart';

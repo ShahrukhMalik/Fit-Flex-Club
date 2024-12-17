@@ -12,17 +12,11 @@ import 'package:fit_flex_club/src/features/authentication/domain/usecases/create
     as signup;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/forgot_password_usecase.dart'
     as forgot;
-import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_client_profile_created_usecase.dart'
-    as client;
-import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_client_profile_created_usecase.dart';
-import 'package:fit_flex_club/src/features/authentication/domain/usecases/is_user_active_usecase.dart'
-    as userActive;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/listen_to_events_usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/login_usecase.dart'
     as login;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/logout_usecase.dart'
     as logout;
-import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
 

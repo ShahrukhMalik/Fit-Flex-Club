@@ -14,7 +14,6 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/set_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/week_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/workout_plan_table.dart';
-import 'package:injectable/injectable.dart';
 part 'fit_flex_local_db.g.dart';
 
 @DriftDatabase(

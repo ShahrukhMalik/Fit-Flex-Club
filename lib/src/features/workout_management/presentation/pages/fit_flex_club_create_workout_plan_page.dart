@@ -1,25 +1,16 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
-import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/day_table.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/set_table.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/week_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/entities/day_entity.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_add_exercise_bottom_sheet.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scroll_tabs_widget.dart';
@@ -27,7 +18,6 @@ import 'package:fit_flex_club/src/features/workout_management/presentation/widge
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_picker_widget.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_name_bottom_sheet_android.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_name_bottom_sheet_ios_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:io';
@@ -35,18 +25,11 @@ import 'dart:io';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:uuid_v4/uuid_v4.dart';
 
-import 'package:flutter/material.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 
 enum ConcludeEvent {
   submit,
@@ -169,7 +152,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
 
   int selectedWeek = 0;
   late TabController _tabController;
-  int _currentTabIndex = 0;
+  final int _currentTabIndex = 0;
 
   Future _showExerciseSheet(BuildContext context) {
     if (Platform.isIOS) {

@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
@@ -6,7 +5,6 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/day_mo
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_tile_widget.dart';
 import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
 import 'package:flutter/material.dart';

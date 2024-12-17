@@ -440,12 +440,12 @@ class CountdownLoader extends StatefulWidget {
   final double strokeWidth;
 
   const CountdownLoader({
-    Key? key,
+    super.key,
     required this.duration,
     required this.color,
     required this.size,
     required this.strokeWidth,
-  }) : super(key: key);
+  });
 
   @override
   State<CountdownLoader> createState() => _CountdownLoaderState();

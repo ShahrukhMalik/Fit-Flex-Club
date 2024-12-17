@@ -1,6 +1,5 @@
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
-import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_weight.dart';
 
 class ClientWeightModel extends ClientWeightEntity {
   const ClientWeightModel({

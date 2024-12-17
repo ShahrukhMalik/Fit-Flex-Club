@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'dart:io' show Platform;
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 final Color primaryColor = Color(0xFFFFCD7C);
@@ -77,14 +76,10 @@ final ColorScheme globalColorScheme = ColorScheme(
   error: Color(0xFFB71C1C), // Deep red for errors
   onError: Colors.white, // Text on error
   errorContainer: Color(0xFFFFEBEE), // Light error background
-  onErrorContainer: Color(0xFF932121), // Dark error text
-
-  // Neutral Colors
-  background: Color(0xFFFFFBF7), // Warm white background
-  onBackground: Color(0xFF2D3142), // Text on background
+  onErrorContainer: Color(0xFF932121), // Text on background
   surface: Color(0xFFFFF4E6), // Surface color
   onSurface: Color(0xFF2D3142), // Text on surface
-  surfaceVariant: Color(0xFFFFF4E6), // Slightly peachy surface
+  surfaceContainerHighest: Color(0xFFFFF4E6), // Slightly peachy surface
   onSurfaceVariant: Color(0xFF6C6F80), // Secondary text
 
   // Additional Colors
@@ -290,7 +285,7 @@ class PlatformApp extends StatelessWidget {
 
 ///Basic Theme for the application
 ThemeData basicTheme() {
-  TextTheme _basicTextTheme(TextTheme base) {
+  TextTheme basicTextTheme(TextTheme base) {
     return base.copyWith(
       displayLarge: base.displayLarge!.copyWith(
         fontFamily: "Roboto",
@@ -400,7 +395,7 @@ ThemeData basicTheme() {
   return ThemeData(
     //Giving colorscheme to themeData here
     //To access all predefined colors through Theme.of(context).colorScheme
-    textTheme: _basicTextTheme(base.textTheme),
+    textTheme: basicTextTheme(base.textTheme),
     // primarySwatch: MaterialColor(1, {1: Color.fromARGB(255, 39, 150, 52)}),
     primaryColor: Colors.greenAccent,
 
@@ -432,19 +427,19 @@ ThemeData basicTheme() {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(100),
             ),
           ),
         ),
-        foregroundColor: MaterialStateProperty.all(const Color(0xFF6BCC7D)),
-        backgroundColor: MaterialStateProperty.all(Colors.white),
-        minimumSize: MaterialStateProperty.all<Size>(const Size(150, 36)),
+        foregroundColor: WidgetStateProperty.all(const Color(0xFF6BCC7D)),
+        backgroundColor: WidgetStateProperty.all(Colors.white),
+        minimumSize: WidgetStateProperty.all<Size>(const Size(150, 36)),
         shadowColor:
-            MaterialStateProperty.all(const Color.fromARGB(255, 29, 131, 48)),
-        elevation: MaterialStateProperty.all<double>(8),
+            WidgetStateProperty.all(const Color.fromARGB(255, 29, 131, 48)),
+        elevation: WidgetStateProperty.all<double>(8),
       ),
     ),
     colorScheme: const ColorScheme(
@@ -455,10 +450,8 @@ ThemeData basicTheme() {
       secondary: Color.fromARGB(255, 39, 150, 52),
       error: Colors.redAccent,
       onError: Colors.greenAccent,
-      background: Color.fromARGB(255, 242, 246, 242),
-      onBackground: Color.fromARGB(255, 201, 246, 206),
       surface: Colors.white,
       onSurface: Colors.black,
-    ).copyWith(background: Colors.white),
+    ).copyWith(surface: Colors.white),
   );
 }

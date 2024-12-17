@@ -1,13 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
-import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_history/domain/usecases/get_workout_history_models_usecase.dart';
 import 'package:fit_flex_club/src/features/workout_history/domain/usecases/log_workout_history_usecase.dart'
     as log;
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 part 'workout_history_event.dart';

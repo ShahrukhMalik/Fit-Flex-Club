@@ -1,6 +1,4 @@
-import 'dart:io';
 
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
@@ -9,15 +7,12 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_phone_field.dart'
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
-import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_gender_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 class FitFlexAuthSignUpPage extends StatefulWidget {
   static const String route = '/sign_up_page';
@@ -116,6 +111,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                           keyboardType: TextInputType.number,
                           onCountrySelect: (p0) {
                             _codeController.text = p0.toString();
+                            return null;
                           },
                           controller: _phoneController,
                           boxDecoration: BoxDecoration(

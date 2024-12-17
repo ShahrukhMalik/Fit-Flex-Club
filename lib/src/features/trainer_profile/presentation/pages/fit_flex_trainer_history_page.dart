@@ -1,7 +1,4 @@
-import 'dart:io';
-import 'dart:math';
 
-import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
@@ -180,7 +177,7 @@ class _FitFlexClientWorkoutHistoryPageState
                 ),
                 titleCentered: true,
                 titleTextStyle: TextStyle(
-                  color: globalColorScheme.onBackground,
+                  color: globalColorScheme.onSurface,
                   fontSize: 20,
                 ),
                 decoration: BoxDecoration(

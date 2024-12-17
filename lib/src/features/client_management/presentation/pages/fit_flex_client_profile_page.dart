@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
@@ -46,7 +45,7 @@ class WorkoutPlanWidget extends StatefulWidget {
 }
 
 class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
-  bool _isDetailsVisible = false; // To toggle dropdown visibility
+  final bool _isDetailsVisible = false; // To toggle dropdown visibility
 
   @override
   Widget build(BuildContext context) {
@@ -554,9 +553,9 @@ class WorkoutActionButton extends StatefulWidget {
   final VoidCallback onTap;
 
   const WorkoutActionButton({
-    Key? key,
+    super.key,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<WorkoutActionButton> createState() => _WorkoutActionButtonState();
@@ -695,8 +694,6 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
     onSecondary: Colors.white,
     surface: Color(0xFFF4F4F4),
     onSurface: Color(0xFF1A2A3D),
-    background: Color(0xFFF1E6D4),
-    onBackground: Color(0xFF1A2A3D),
     error: Color(0xFFFF6F61),
     onError: Colors.white,
     outline: Color(0xFFFFBC00),

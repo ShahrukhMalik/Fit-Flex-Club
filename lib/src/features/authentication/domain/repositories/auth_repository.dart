@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 
 ///[Marker Interface] abstraction of auth repository
 abstract class AuthRepository {

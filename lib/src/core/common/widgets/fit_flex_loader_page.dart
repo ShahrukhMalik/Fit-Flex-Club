@@ -1,5 +1,4 @@
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class FitFlexLoaderPage extends StatelessWidget {

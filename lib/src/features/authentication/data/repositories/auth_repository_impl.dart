@@ -5,7 +5,6 @@ import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/authentication/data/datasources/auth_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @Singleton(as: AuthRepository)

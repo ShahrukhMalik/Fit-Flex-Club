@@ -1,12 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
-import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
-import 'package:fit_flex_club/src/features/authentication/presentation/bloc/bloc/listen_bloc.dart';
-import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
