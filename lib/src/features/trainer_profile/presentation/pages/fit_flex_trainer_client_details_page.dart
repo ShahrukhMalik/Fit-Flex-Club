@@ -550,23 +550,23 @@ class ClientEntityCompactWidget extends StatelessWidget {
                           ],
                         ),
                         // Switch Button
-                        ValueListenableBuilder(
-                          valueListenable: isUserActive,
-                          builder: (context, isUserActive, _) {
-                            return Switch(
-                              value: isUserActive,
-                              onChanged: (value) {
-                                print(value);
-                                onUserActiveToggle(value);
-                              },
-                              activeColor: colorScheme.primaryContainer,
-                              activeTrackColor: colorScheme.secondary,
-                              inactiveThumbColor:
-                                  colorScheme.onPrimaryContainer,
-                              inactiveTrackColor: colorScheme.errorContainer,
-                            );
-                          },
-                        ),
+                        // ValueListenableBuilder(
+                        //   valueListenable: isUserActive,
+                        //   builder: (context, isUserActive, _) {
+                        //     return Switch(
+                        //       value: isUserActive,
+                        //       onChanged: (value) {
+                        //         print(value);
+                        //         onUserActiveToggle(value);
+                        //       },
+                        //       activeColor: colorScheme.primaryContainer,
+                        //       activeTrackColor: colorScheme.secondary,
+                        //       inactiveThumbColor:
+                        //           colorScheme.onPrimaryContainer,
+                        //       inactiveTrackColor: colorScheme.errorContainer,
+                        //     );
+                        //   },
+                        // ),
                       ],
                     ),
                     const Divider(height: 20, color: Colors.grey),
@@ -592,7 +592,7 @@ class ClientEntityCompactWidget extends StatelessWidget {
                                     'Phone',
                                     '${client.phone?['countryCode']}'
                                         '-'
-                                        '${client.phone?['phoneNumber']}',
+                                        '${client.phone?['phone']}',
                                   ),
                                 ),
                               ],

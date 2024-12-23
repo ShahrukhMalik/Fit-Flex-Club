@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_gender_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_weight_page.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/widgets/fit_flex_single_wheel_scroll_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -81,7 +82,7 @@ class _FitFlexClientProfileSelectAgePageState
                       ),
                       SizedBox(
                         height: height * 0.4,
-                        child: FitFlexScrollWheelWidget(
+                        child: FitFlexSingleWheelScrollWidget(
                           controller: fixedExtentScrollController,
                           selectedValue: ageSelected,
                           maxCount: 149,

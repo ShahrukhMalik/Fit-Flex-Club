@@ -167,6 +167,7 @@ class FitFlexTrainerWorkoutPage extends StatefulWidget {
 }
 
 class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
+  final ValueNotifier<bool> showFAB = ValueNotifier(false);
   @override
   void initState() {
     super.initState();
@@ -183,19 +184,26 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
       },
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton(
-          heroTag: 'createWorkout',
-          splashColor: globalColorScheme.tertiary,
-          backgroundColor: globalColorScheme.primaryContainer,
-          onPressed: () {
-            context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
-            context.go(FitFlexClubCreateWorkoutPlanPage.route);
-          },
-          child: Icon(
-            Icons.add,
-            color: globalColorScheme.surface,
-          ),
-        ),
+        floatingActionButton: ValueListenableBuilder(
+            valueListenable: showFAB,
+            builder: (context, showButton, _) {
+              if (showButton) {
+                return FloatingActionButton(
+                  heroTag: 'createWorkout',
+                  splashColor: globalColorScheme.tertiary,
+                  backgroundColor: globalColorScheme.primaryContainer,
+                  onPressed: () {
+                    context.go(FitFlexClubCreateWorkoutPlanPage.route);
+                  },
+                  child: Icon(
+                    Icons.add,
+                    color: globalColorScheme.surface,
+                  ),
+                );
+              } else {
+                return SizedBox();
+              }
+            }),
         backgroundColor: globalColorScheme.surface,
         appBar: PlatformAppbar.basicAppBar(
           automaticallyImplyLeading: false,
@@ -217,6 +225,9 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
           padding: const EdgeInsets.all(16.0),
           child: BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
             listener: (context, state) {
+              if (state is GetWorkoutPlansComplete) {
+                showFAB.value = true;
+              }
               if (state is WorkoutManagementError) {
                 PlatformDialog.showAlertDialog(
                   context: context,
@@ -227,7 +238,7 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                   },
                 );
               }
-      
+
               if (state is DeleteWorkoutComplete) {
                 PlatformDialog.showAlertDialog(
                   context: context,
@@ -258,7 +269,7 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                   );
                 }
               }
-      
+
               if (state is GetWorkoutPlansLoading) {
                 return SingleChildScrollView(
                   child: Column(
@@ -274,7 +285,7 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                   ),
                 );
               }
-      
+
               if (state is WorkoutManagementError) {
                 final error = state.failures;
                 return Center(

@@ -53,7 +53,7 @@ class ClientLocalDatasourceImpl extends ClientLocalDatasource {
       }
 
       if (isDataStale(
-        Duration(minutes: 5).inSeconds,
+        Duration(minutes: 30).inSeconds,
         clients.first.createdAt,
         clients.first.updatedAt,
       )) {

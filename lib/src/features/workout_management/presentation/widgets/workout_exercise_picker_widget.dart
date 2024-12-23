@@ -357,7 +357,7 @@ class _ExercisePickerBottomSheetState extends State<ExercisePickerBottomSheet> {
       children: [
         // Search Field with Filter Icon
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(20),
           child: Platform.isIOS
               ? CupertinoSearchTextField(
                   suffixMode: OverlayVisibilityMode.always,
@@ -389,9 +389,8 @@ class _ExercisePickerBottomSheetState extends State<ExercisePickerBottomSheet> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
-                    // setState(() {
-                    //   searchQuery = value;
-                    // });
+                    searchQuery.value = value;
+                    filterExercises();
                   },
                 ),
         ),

@@ -2,6 +2,7 @@ import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:injectable/injectable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,14 +59,6 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
 
     try {
       await ref.doc(auth.currentUser?.uid).set(clientModel.toFirestore());
-      await weightTrakerRef.add(
-        ClientWeightModel(
-          timeStamp: DateTime.now().millisecondsSinceEpoch,
-          weightInKg: clientModel.weightInKg?.toDouble() ?? 0,
-          weightInLb: clientModel.weightInLb?.toDouble() ?? 0,
-          clientId: auth.currentUser?.uid,
-        ),
-      );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -79,8 +72,32 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
     required ClientModel clientModel,
   }) async {
     final CollectionReference ref = db.collection('Users');
+    final CollectionReference weightTrakerRef = db
+        .collection('Users')
+        .doc(auth.currentUser?.uid)
+        .collection('weightTracker');
+    final listenerRef = db.collection('ListenerEvents');
     try {
       await ref.doc(auth.currentUser?.uid).update(clientModel.toFirestore());
+      await weightTrakerRef.add(
+        ClientWeightModel(
+          timeStamp: DateTime.now().millisecondsSinceEpoch,
+          weightInKg: clientModel.weightInKg?.toDouble() ?? 0,
+          weightInLb: clientModel.weightInLb?.toDouble() ?? 0,
+          clientId: auth.currentUser?.uid,
+        ).toMap(),
+      );
+
+      final trainers = await ref.where('isTrainer', isEqualTo: true).get();
+      for (final trainer in trainers.docs) {
+        await listenerRef.add(
+          {
+            'clientId': trainer.id,
+            'eventType': ListenerEvents.addNewClient.name,
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+          },
+        );
+      }
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

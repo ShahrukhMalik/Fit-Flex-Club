@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
@@ -138,11 +140,13 @@ class _AddExerciseBottomSheetWidgetState
       child: Container(
         // margin: EdgeInsets.only(top: 100),
         // padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-            color: globalColorScheme.surface,
-            borderRadius: BorderRadius.all(Radius.circular(20))),
+        decoration: Platform.isIOS
+            ? null
+            : BoxDecoration(
+                color: globalColorScheme.surface,
+                borderRadius: BorderRadius.all(Radius.circular(20))),
         constraints: BoxConstraints(
-          minWidth: double.maxFinite,
+          minWidth: MediaQuery.of(context).size.width,
           maxHeight: MediaQuery.of(context).size.height * 0.4,
         ),
         child: Column(
@@ -307,9 +311,9 @@ class _AddExerciseBottomSheetWidgetState
                                   columnWidths: widget.weight
                                       ? {
                                           0: FlexColumnWidth(1), // Set #
-                                          1: FlexColumnWidth(2), // Reps
-                                          2: FlexColumnWidth(2), // Weight
-                                          3: FlexColumnWidth(1), // Actions
+                                          1: FlexColumnWidth(3), // Reps
+                                          2: FlexColumnWidth(3), // Weight
+                                          3: FlexColumnWidth(2), // Actions
                                         }
                                       : {
                                           0: FlexColumnWidth(1), // Set #
@@ -323,7 +327,7 @@ class _AddExerciseBottomSheetWidgetState
                                       children: [
                                         Center(
                                           child: Text(
-                                            'Set #',
+                                            'Set',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -586,6 +590,11 @@ class _AddExerciseBottomSheetWidgetState
             PlatformButton().buildButton(
               context: context,
               type: ButtonType.primary,
+              // foregroundColor: ,
+              backgroundColor: globalColorScheme.primary,
+              textStyle: TextStyle(
+                color: globalColorScheme.onPrimaryContainer
+              ),
               text: 'Submit',
               onPressed: () {
                 if (widget.duration) {

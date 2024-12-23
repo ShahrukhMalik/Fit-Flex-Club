@@ -40,10 +40,10 @@ class ClientModel extends ClientEntity {
     String? id,
     int? age,
     String? gender,
-    int? weightInKg,
-    int? weightInLb,
-    int? heightInCm,
-    int? heightInFt,
+    double? weightInKg,
+    double? weightInLb,
+    double? heightInCm,
+    double? heightInFt,
     bool? isTrainer,
     bool? isUserActive,
     String? username,
@@ -117,10 +117,10 @@ class ClientModel extends ClientEntity {
       id: snapshot.id,
       age: data?['age'],
       gender: data?['gender'],
-      weightInKg: data?['weightInKg'],
-      weightInLb: data?['weightInLb'],
-      heightInCm: data?['heightInCm'],
-      heightInFt: data?['heightInFt'],
+      weightInKg: (data?['weightInKg']).toDouble(),
+      weightInLb: (data?['weightInLb']).toDouble(),
+      heightInCm: data?['heightInCm'].toDouble(),
+      heightInFt: data?['heightInFt'].toDouble(),
       isTrainer: data?['isTrainer'],
       isUserActive: data?['isUserActive'],
       username: data?['username'],
@@ -178,7 +178,9 @@ class ClientModel extends ClientEntity {
 // Helper conversion methods
 int convertKgToLb(int? kg) => kg != null ? (kg * 2.205).floor() : 0;
 int convertLbToKg(int? lb) => lb != null ? (lb / 2.205).floor() : 0;
-double convertLbToKgDouble(double? lb) =>
-    lb != null ? double.parse((lb / 2.205).toStringAsFixed(2)) : 0;
+double convertLbToKgDouble(double? lb) => lb != null ? (lb / 2.205) : 0;
+double convertKgToLbDouble(double? kg) => kg != null ? (kg * 2.205) : 0;
 int convertFtToCm(int? ft) => ft != null ? (ft * 30.48).floor() : 0;
 int convertCmToFt(int? cm) => cm != null ? (cm / 30.48).floor() : 0;
+double convertFtToCmD(double? ft) => ft != null ? (ft * 30.48) : 0;
+double convertCmToFtD(double? cm) => cm != null ? (cm / 30.48) : 0;

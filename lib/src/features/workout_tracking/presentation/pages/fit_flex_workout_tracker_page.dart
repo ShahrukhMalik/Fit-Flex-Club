@@ -38,16 +38,17 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        PlatformDialog.showAlertDialog(
-          context: context,
-          title: "Workout Tracker",
-          message:
-              "Progress is not saved, if you continue your progress will be lost.",
-          cancelText: 'Cancel',
-          confirmText: 'Continue',
-          // onCancel: () => context.pop(),
-          onConfirm: () => context.pop(),
-        );
+        if (!didPop) {
+          PlatformDialog.showAlertDialog(
+            context: context,
+            title: "Workout Tracker",
+            message:
+                "Progress is not saved, if you continue your progress will be lost.",
+            cancelText: 'Cancel',
+            confirmText: 'Continue',
+            onConfirm: () => context.pop(),
+          );
+        }
       },
       child: Scaffold(
         // resizeToAvoidBottomInset: true,

@@ -321,13 +321,15 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
       final workoutPlanId = workoutPlan.uid;
 
       await transaction(() async {
-        await (update(clients)
-              ..where((tbl) => tbl.id.equals(workoutPlan.clientId!)))
-            .write(
-          ClientsCompanion(
-            currentWorkoutPlanName: Value(null),
-          ),
-        );
+        if (workoutPlan.clientId != null) {
+          await (update(clients)
+                ..where((tbl) => tbl.id.equals(workoutPlan.clientId!)))
+              .write(
+            ClientsCompanion(
+              currentWorkoutPlanName: Value(null),
+            ),
+          );
+        }
         await (delete(workoutPlans)
               ..where((tbl) => tbl.uid.equals(workoutPlanId)))
             .go();
@@ -366,7 +368,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         );
       });
     } catch (err) {
-      print(err);
+      rethrow;
     }
   }
 
@@ -568,8 +570,6 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
       rethrow;
     }
   }
-
-
 
   Future<List<WorkoutPlanModel>> getWorkoutPlans() async {
     try {

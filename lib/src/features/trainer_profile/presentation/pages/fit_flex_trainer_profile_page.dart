@@ -106,9 +106,9 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                   //   hintText: 'Search by Name',
                   // ),
                 ),
-      
+
                 const SizedBox(height: 16),
-      
+
                 // Clients List
                 BlocBuilder<TrainerProfileBloc, TrainerProfileState>(
                   builder: (context, state) {
@@ -137,6 +137,13 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                         child: ValueListenableBuilder(
                             valueListenable: clients,
                             builder: (context, clients, _) {
+                              if (clients?.isEmpty ?? false) {
+                                return Center(
+                                  child: Text(
+                                    "No Clients Added Yet",
+                                  ),
+                                );
+                              }
                               return ListView.builder(
                                 itemCount: clients?.length,
                                 itemBuilder: (context, index) {
@@ -168,29 +175,31 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                     client?.username ?? "",
                                                     style: TextStyle(
                                                       fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: widget
-                                                          .colorScheme.onSurface,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: widget.colorScheme
+                                                          .onSurface,
                                                     ),
                                                   ),
                                                 ),
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 12,
                                                     vertical: 4,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        client?.gender == 'Male'
-                                                            ? widget.colorScheme
-                                                                .tertiary
-                                                                .withOpacity(0.1)
-                                                            : widget.colorScheme
-                                                                .secondary
-                                                                .withOpacity(0.1),
+                                                    color: client?.gender ==
+                                                            'Male'
+                                                        ? widget.colorScheme
+                                                            .tertiary
+                                                            .withOpacity(0.1)
+                                                        : widget.colorScheme
+                                                            .secondary
+                                                            .withOpacity(0.1),
                                                     borderRadius:
-                                                        BorderRadius.circular(50),
+                                                        BorderRadius.circular(
+                                                            50),
                                                   ),
                                                   child: Row(
                                                     mainAxisSize:
@@ -212,11 +221,14 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                       Text(
                                                         client?.gender ?? "",
                                                         style: TextStyle(
-                                                          color: client?.gender ==
+                                                          color: client
+                                                                      ?.gender ==
                                                                   'Male'
-                                                              ? widget.colorScheme
+                                                              ? widget
+                                                                  .colorScheme
                                                                   .tertiary
-                                                              : widget.colorScheme
+                                                              : widget
+                                                                  .colorScheme
                                                                   .secondary,
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -228,7 +240,7 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                               ],
                                             ),
                                             const SizedBox(height: 12),
-      
+
                                             // Client Details Row
                                             Row(
                                               children: [
@@ -236,7 +248,8 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                   icon: Icons.calendar_today,
                                                   label: 'Age',
                                                   value: '${client?.age} years',
-                                                  colorScheme: widget.colorScheme,
+                                                  colorScheme:
+                                                      widget.colorScheme,
                                                 ),
                                                 const SizedBox(width: 16),
                                                 _buildDetailItem(
@@ -244,12 +257,13 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                   label: 'Weight',
                                                   value:
                                                       '${client?.weightInKg} kg',
-                                                  colorScheme: widget.colorScheme,
+                                                  colorScheme:
+                                                      widget.colorScheme,
                                                 ),
                                               ],
                                             ),
                                             const SizedBox(height: 12),
-      
+
                                             // Program Status
                                             Row(
                                               children: [
@@ -269,8 +283,8 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 12,
                                                     vertical: 6,
                                                   ),
@@ -283,7 +297,8 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                             : widget.colorScheme
                                                                 .secondary,
                                                     borderRadius:
-                                                        BorderRadius.circular(20),
+                                                        BorderRadius.circular(
+                                                            20),
                                                   ),
                                                   child: Text(
                                                     client?.currentWorkoutPlanName !=
@@ -295,11 +310,14 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                       color:
                                                           client?.currentWorkoutPlanName !=
                                                                   null
-                                                              ? widget.colorScheme
+                                                              ? widget
+                                                                  .colorScheme
                                                                   .onPrimary
-                                                              : widget.colorScheme
+                                                              : widget
+                                                                  .colorScheme
                                                                   .onSecondary,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ),
@@ -338,12 +356,12 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
           ),
         ),
         // FAB for quick actions
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: widget.colorScheme.primaryContainer,
-          child: Icon(Icons.filter_list,
-              color: widget.colorScheme.onPrimaryContainer),
-        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {},
+        //   backgroundColor: widget.colorScheme.primaryContainer,
+        //   child: Icon(Icons.filter_list,
+        //       color: widget.colorScheme.onPrimaryContainer),
+        // ),
       ),
     );
   }

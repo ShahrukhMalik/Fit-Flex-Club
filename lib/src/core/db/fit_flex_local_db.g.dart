@@ -26,27 +26,27 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
   static const VerificationMeta _weightInKgMeta =
       const VerificationMeta('weightInKg');
   @override
-  late final GeneratedColumn<int> weightInKg = GeneratedColumn<int>(
+  late final GeneratedColumn<double> weightInKg = GeneratedColumn<double>(
       'weight_in_kg', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _weightInLbMeta =
       const VerificationMeta('weightInLb');
   @override
-  late final GeneratedColumn<int> weightInLb = GeneratedColumn<int>(
+  late final GeneratedColumn<double> weightInLb = GeneratedColumn<double>(
       'weight_in_lb', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _heightInFtMeta =
       const VerificationMeta('heightInFt');
   @override
-  late final GeneratedColumn<int> heightInFt = GeneratedColumn<int>(
+  late final GeneratedColumn<double> heightInFt = GeneratedColumn<double>(
       'height_in_ft', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _heightInCmMeta =
       const VerificationMeta('heightInCm');
   @override
-  late final GeneratedColumn<int> heightInCm = GeneratedColumn<int>(
+  late final GeneratedColumn<double> heightInCm = GeneratedColumn<double>(
       'height_in_cm', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _isTrainerMeta =
       const VerificationMeta('isTrainer');
   @override
@@ -237,13 +237,13 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
       gender: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}gender']),
       weightInKg: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}weight_in_kg']),
+          .read(DriftSqlType.double, data['${effectivePrefix}weight_in_kg']),
       weightInLb: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}weight_in_lb']),
+          .read(DriftSqlType.double, data['${effectivePrefix}weight_in_lb']),
       heightInFt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}height_in_ft']),
+          .read(DriftSqlType.double, data['${effectivePrefix}height_in_ft']),
       heightInCm: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}height_in_cm']),
+          .read(DriftSqlType.double, data['${effectivePrefix}height_in_cm']),
       isTrainer: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_trainer'])!,
       isUserActive: attachedDatabase.typeMapping
@@ -276,10 +276,10 @@ class Client extends DataClass implements Insertable<Client> {
   final String id;
   final int? age;
   final String? gender;
-  final int? weightInKg;
-  final int? weightInLb;
-  final int? heightInFt;
-  final int? heightInCm;
+  final double? weightInKg;
+  final double? weightInLb;
+  final double? heightInFt;
+  final double? heightInCm;
   final bool isTrainer;
   final bool isUserActive;
   final String username;
@@ -317,16 +317,16 @@ class Client extends DataClass implements Insertable<Client> {
       map['gender'] = Variable<String>(gender);
     }
     if (!nullToAbsent || weightInKg != null) {
-      map['weight_in_kg'] = Variable<int>(weightInKg);
+      map['weight_in_kg'] = Variable<double>(weightInKg);
     }
     if (!nullToAbsent || weightInLb != null) {
-      map['weight_in_lb'] = Variable<int>(weightInLb);
+      map['weight_in_lb'] = Variable<double>(weightInLb);
     }
     if (!nullToAbsent || heightInFt != null) {
-      map['height_in_ft'] = Variable<int>(heightInFt);
+      map['height_in_ft'] = Variable<double>(heightInFt);
     }
     if (!nullToAbsent || heightInCm != null) {
-      map['height_in_cm'] = Variable<int>(heightInCm);
+      map['height_in_cm'] = Variable<double>(heightInCm);
     }
     map['is_trainer'] = Variable<bool>(isTrainer);
     map['is_user_active'] = Variable<bool>(isUserActive);
@@ -396,10 +396,10 @@ class Client extends DataClass implements Insertable<Client> {
       id: serializer.fromJson<String>(json['id']),
       age: serializer.fromJson<int?>(json['age']),
       gender: serializer.fromJson<String?>(json['gender']),
-      weightInKg: serializer.fromJson<int?>(json['weightInKg']),
-      weightInLb: serializer.fromJson<int?>(json['weightInLb']),
-      heightInFt: serializer.fromJson<int?>(json['heightInFt']),
-      heightInCm: serializer.fromJson<int?>(json['heightInCm']),
+      weightInKg: serializer.fromJson<double?>(json['weightInKg']),
+      weightInLb: serializer.fromJson<double?>(json['weightInLb']),
+      heightInFt: serializer.fromJson<double?>(json['heightInFt']),
+      heightInCm: serializer.fromJson<double?>(json['heightInCm']),
       isTrainer: serializer.fromJson<bool>(json['isTrainer']),
       isUserActive: serializer.fromJson<bool>(json['isUserActive']),
       username: serializer.fromJson<String>(json['username']),
@@ -419,10 +419,10 @@ class Client extends DataClass implements Insertable<Client> {
       'id': serializer.toJson<String>(id),
       'age': serializer.toJson<int?>(age),
       'gender': serializer.toJson<String?>(gender),
-      'weightInKg': serializer.toJson<int?>(weightInKg),
-      'weightInLb': serializer.toJson<int?>(weightInLb),
-      'heightInFt': serializer.toJson<int?>(heightInFt),
-      'heightInCm': serializer.toJson<int?>(heightInCm),
+      'weightInKg': serializer.toJson<double?>(weightInKg),
+      'weightInLb': serializer.toJson<double?>(weightInLb),
+      'heightInFt': serializer.toJson<double?>(heightInFt),
+      'heightInCm': serializer.toJson<double?>(heightInCm),
       'isTrainer': serializer.toJson<bool>(isTrainer),
       'isUserActive': serializer.toJson<bool>(isUserActive),
       'username': serializer.toJson<String>(username),
@@ -440,10 +440,10 @@ class Client extends DataClass implements Insertable<Client> {
           {String? id,
           Value<int?> age = const Value.absent(),
           Value<String?> gender = const Value.absent(),
-          Value<int?> weightInKg = const Value.absent(),
-          Value<int?> weightInLb = const Value.absent(),
-          Value<int?> heightInFt = const Value.absent(),
-          Value<int?> heightInCm = const Value.absent(),
+          Value<double?> weightInKg = const Value.absent(),
+          Value<double?> weightInLb = const Value.absent(),
+          Value<double?> heightInFt = const Value.absent(),
+          Value<double?> heightInCm = const Value.absent(),
           bool? isTrainer,
           bool? isUserActive,
           String? username,
@@ -573,10 +573,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
   final Value<String> id;
   final Value<int?> age;
   final Value<String?> gender;
-  final Value<int?> weightInKg;
-  final Value<int?> weightInLb;
-  final Value<int?> heightInFt;
-  final Value<int?> heightInCm;
+  final Value<double?> weightInKg;
+  final Value<double?> weightInLb;
+  final Value<double?> heightInFt;
+  final Value<double?> heightInCm;
   final Value<bool> isTrainer;
   final Value<bool> isUserActive;
   final Value<String> username;
@@ -632,10 +632,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     Expression<String>? id,
     Expression<int>? age,
     Expression<String>? gender,
-    Expression<int>? weightInKg,
-    Expression<int>? weightInLb,
-    Expression<int>? heightInFt,
-    Expression<int>? heightInCm,
+    Expression<double>? weightInKg,
+    Expression<double>? weightInLb,
+    Expression<double>? heightInFt,
+    Expression<double>? heightInCm,
     Expression<bool>? isTrainer,
     Expression<bool>? isUserActive,
     Expression<String>? username,
@@ -673,10 +673,10 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       {Value<String>? id,
       Value<int?>? age,
       Value<String?>? gender,
-      Value<int?>? weightInKg,
-      Value<int?>? weightInLb,
-      Value<int?>? heightInFt,
-      Value<int?>? heightInCm,
+      Value<double?>? weightInKg,
+      Value<double?>? weightInLb,
+      Value<double?>? heightInFt,
+      Value<double?>? heightInCm,
       Value<bool>? isTrainer,
       Value<bool>? isUserActive,
       Value<String>? username,
@@ -722,16 +722,16 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       map['gender'] = Variable<String>(gender.value);
     }
     if (weightInKg.present) {
-      map['weight_in_kg'] = Variable<int>(weightInKg.value);
+      map['weight_in_kg'] = Variable<double>(weightInKg.value);
     }
     if (weightInLb.present) {
-      map['weight_in_lb'] = Variable<int>(weightInLb.value);
+      map['weight_in_lb'] = Variable<double>(weightInLb.value);
     }
     if (heightInFt.present) {
-      map['height_in_ft'] = Variable<int>(heightInFt.value);
+      map['height_in_ft'] = Variable<double>(heightInFt.value);
     }
     if (heightInCm.present) {
-      map['height_in_cm'] = Variable<int>(heightInCm.value);
+      map['height_in_cm'] = Variable<double>(heightInCm.value);
     }
     if (isTrainer.present) {
       map['is_trainer'] = Variable<bool>(isTrainer.value);
@@ -4595,10 +4595,10 @@ typedef $$ClientsTableCreateCompanionBuilder = ClientsCompanion Function({
   required String id,
   Value<int?> age,
   Value<String?> gender,
-  Value<int?> weightInKg,
-  Value<int?> weightInLb,
-  Value<int?> heightInFt,
-  Value<int?> heightInCm,
+  Value<double?> weightInKg,
+  Value<double?> weightInLb,
+  Value<double?> heightInFt,
+  Value<double?> heightInCm,
   required bool isTrainer,
   required bool isUserActive,
   required String username,
@@ -4614,10 +4614,10 @@ typedef $$ClientsTableUpdateCompanionBuilder = ClientsCompanion Function({
   Value<String> id,
   Value<int?> age,
   Value<String?> gender,
-  Value<int?> weightInKg,
-  Value<int?> weightInLb,
-  Value<int?> heightInFt,
-  Value<int?> heightInCm,
+  Value<double?> weightInKg,
+  Value<double?> weightInLb,
+  Value<double?> heightInFt,
+  Value<double?> heightInCm,
   Value<bool> isTrainer,
   Value<bool> isUserActive,
   Value<String> username,
@@ -4744,16 +4744,16 @@ class $$ClientsTableFilterComposer
   ColumnFilters<String> get gender => $composableBuilder(
       column: $table.gender, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get weightInKg => $composableBuilder(
+  ColumnFilters<double> get weightInKg => $composableBuilder(
       column: $table.weightInKg, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get weightInLb => $composableBuilder(
+  ColumnFilters<double> get weightInLb => $composableBuilder(
       column: $table.weightInLb, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get heightInFt => $composableBuilder(
+  ColumnFilters<double> get heightInFt => $composableBuilder(
       column: $table.heightInFt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get heightInCm => $composableBuilder(
+  ColumnFilters<double> get heightInCm => $composableBuilder(
       column: $table.heightInCm, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get isTrainer => $composableBuilder(
@@ -4930,16 +4930,16 @@ class $$ClientsTableOrderingComposer
   ColumnOrderings<String> get gender => $composableBuilder(
       column: $table.gender, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get weightInKg => $composableBuilder(
+  ColumnOrderings<double> get weightInKg => $composableBuilder(
       column: $table.weightInKg, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get weightInLb => $composableBuilder(
+  ColumnOrderings<double> get weightInLb => $composableBuilder(
       column: $table.weightInLb, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get heightInFt => $composableBuilder(
+  ColumnOrderings<double> get heightInFt => $composableBuilder(
       column: $table.heightInFt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get heightInCm => $composableBuilder(
+  ColumnOrderings<double> get heightInCm => $composableBuilder(
       column: $table.heightInCm, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get isTrainer => $composableBuilder(
@@ -4991,16 +4991,16 @@ class $$ClientsTableAnnotationComposer
   GeneratedColumn<String> get gender =>
       $composableBuilder(column: $table.gender, builder: (column) => column);
 
-  GeneratedColumn<int> get weightInKg => $composableBuilder(
+  GeneratedColumn<double> get weightInKg => $composableBuilder(
       column: $table.weightInKg, builder: (column) => column);
 
-  GeneratedColumn<int> get weightInLb => $composableBuilder(
+  GeneratedColumn<double> get weightInLb => $composableBuilder(
       column: $table.weightInLb, builder: (column) => column);
 
-  GeneratedColumn<int> get heightInFt => $composableBuilder(
+  GeneratedColumn<double> get heightInFt => $composableBuilder(
       column: $table.heightInFt, builder: (column) => column);
 
-  GeneratedColumn<int> get heightInCm => $composableBuilder(
+  GeneratedColumn<double> get heightInCm => $composableBuilder(
       column: $table.heightInCm, builder: (column) => column);
 
   GeneratedColumn<bool> get isTrainer =>
@@ -5191,10 +5191,10 @@ class $$ClientsTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<int?> age = const Value.absent(),
             Value<String?> gender = const Value.absent(),
-            Value<int?> weightInKg = const Value.absent(),
-            Value<int?> weightInLb = const Value.absent(),
-            Value<int?> heightInFt = const Value.absent(),
-            Value<int?> heightInCm = const Value.absent(),
+            Value<double?> weightInKg = const Value.absent(),
+            Value<double?> weightInLb = const Value.absent(),
+            Value<double?> heightInFt = const Value.absent(),
+            Value<double?> heightInCm = const Value.absent(),
             Value<bool> isTrainer = const Value.absent(),
             Value<bool> isUserActive = const Value.absent(),
             Value<String> username = const Value.absent(),
@@ -5229,10 +5229,10 @@ class $$ClientsTableTableManager extends RootTableManager<
             required String id,
             Value<int?> age = const Value.absent(),
             Value<String?> gender = const Value.absent(),
-            Value<int?> weightInKg = const Value.absent(),
-            Value<int?> weightInLb = const Value.absent(),
-            Value<int?> heightInFt = const Value.absent(),
-            Value<int?> heightInCm = const Value.absent(),
+            Value<double?> weightInKg = const Value.absent(),
+            Value<double?> weightInLb = const Value.absent(),
+            Value<double?> heightInFt = const Value.absent(),
+            Value<double?> heightInCm = const Value.absent(),
             required bool isTrainer,
             required bool isUserActive,
             required String username,

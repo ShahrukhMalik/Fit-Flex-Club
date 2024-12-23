@@ -6,3 +6,8 @@ abstract class SyncmanagerEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class CheckConnectivityEvent extends SyncmanagerEvent {}
+
+class SyncDataEvent extends SyncmanagerEvent {}
+

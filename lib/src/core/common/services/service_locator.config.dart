@@ -71,6 +71,16 @@ import '../../../features/client_profile/presentation/clientweights/clientweight
     as _i677;
 import '../../../features/client_profile/presentation/getclientweights/getclientweights_cubit.dart'
     as _i596;
+import '../../../features/syncmanager/data/datasources/remote/sync_manager_remote_datasource.dart'
+    as _i843;
+import '../../../features/syncmanager/data/repositories/sync_manager_repository_impl.dart'
+    as _i128;
+import '../../../features/syncmanager/domain/repositories/sync_manager_repository.dart'
+    as _i273;
+import '../../../features/syncmanager/domain/usecases/check_connectivity_usecase.dart'
+    as _i798;
+import '../../../features/syncmanager/presentation/bloc/syncmanager_bloc.dart'
+    as _i219;
 import '../../../features/trainer_profile/domain/usecases/get_clients_usecase.dart'
     as _i781;
 import '../../../features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart'
@@ -205,6 +215,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i988.ForgotPasswordUsecase>(() =>
         _i988.ForgotPasswordUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i843.SyncManagerRemoteDatasource>(
+        () => _i843.SyncManagerRemoteDatasourceImpl(
+              gh<_i59.FirebaseAuth>(),
+              gh<_i974.FirebaseFirestore>(),
+              connectivity: gh<_i895.Connectivity>(),
+            ));
     gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
         _i617.IsClientProfileCreatedActiveUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
@@ -287,6 +303,9 @@ extension GetItInjectableX on _i174.GetIt {
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i273.SyncManagerRepository>(() =>
+        _i128.SyncManagerRepositoryImpl(
+            remoteDatasource: gh<_i843.SyncManagerRemoteDatasource>()));
     gh.singleton<_i430.UpdateWorkoutPlanUsecase>(() =>
         _i430.UpdateWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -316,6 +335,11 @@ extension GetItInjectableX on _i174.GetIt {
         _i120.GetWorkoutPlansUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i798.CheckConnectivityUsecase>(() =>
+        _i798.CheckConnectivityUsecaseImpl(
+            syncManagerRepository: gh<_i273.SyncManagerRepository>()));
+    gh.factory<_i219.SyncmanagerBloc>(
+        () => _i219.SyncmanagerBloc(gh<_i798.CheckConnectivityUsecase>()));
     gh.singleton<_i208.LogWorkoutHistoryUsecase>(() =>
         _i208.LogWorkoutHistoryUsecaseImpl(
             workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));

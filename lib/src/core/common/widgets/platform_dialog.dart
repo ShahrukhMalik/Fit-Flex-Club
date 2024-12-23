@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -50,7 +51,6 @@ class PlatformDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          
           title: Text(title),
           content: Text(message),
           actions: [
@@ -80,27 +80,62 @@ class PlatformDialog {
     required BuildContext context,
     required String title,
     required Widget content,
+    bool? onlyUseContent,
     List<Widget>? actions,
     bool barrierDismissible = true,
-
   }) async {
     if (Platform.isIOS) {
-      return showCupertinoDialog(
+      return showGeneralDialog(
         context: context,
         barrierDismissible: barrierDismissible,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text(title),
-            content: content,
-            actions: actions ??
-                [
-                  CupertinoDialogAction(
-                    isDefaultAction: true,
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('OK'),
+        pageBuilder: (BuildContext context, __, _) {
+          if (onlyUseContent ?? false) {
+            return Padding(
+              padding: const EdgeInsets.only(
+                bottom: 200,
+                top: 200,
+                left: 20,
+                right: 20,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: CupertinoPageScaffold(
+                  backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeBottom: true,
+                    child: Stack(
+                      children: [
+                        BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          child: Container(
+                            color: Colors.white, // Semi-transparent background
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: content,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-          );
+                ),
+              ),
+            );
+          } else {
+            return CupertinoAlertDialog(
+              title: Text(title),
+              content: content,
+              actions: actions ??
+                  [
+                    CupertinoDialogAction(
+                      isDefaultAction: true,
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+            );
+          }
         },
       );
     }
@@ -108,7 +143,6 @@ class PlatformDialog {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
-      
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),

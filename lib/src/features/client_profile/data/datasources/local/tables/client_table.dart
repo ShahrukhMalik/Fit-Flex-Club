@@ -4,10 +4,10 @@ class Clients extends Table {
   TextColumn get id => text()();
   IntColumn get age => integer().nullable()();
   TextColumn get gender => text().nullable()();
-  IntColumn get weightInKg => integer().nullable()(); // Default value for weight
-  IntColumn get weightInLb => integer().nullable()(); // Default weight unit
-  IntColumn get heightInFt => integer().nullable()(); // Default value for height
-  IntColumn get heightInCm => integer().nullable()(); // Default height unit
+  RealColumn get weightInKg => real().nullable()(); // Default value for weight
+  RealColumn get weightInLb => real().nullable()(); // Default weight unit
+  RealColumn get heightInFt => real().nullable()(); // Default value for height
+  RealColumn get heightInCm => real().nullable()(); // Default height unit
   BoolColumn get isTrainer => boolean()();
   BoolColumn get isUserActive => boolean()();
   TextColumn get username => text()();

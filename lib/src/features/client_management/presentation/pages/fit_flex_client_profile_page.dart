@@ -513,6 +513,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                         .read<GetclientweightsCubit>()
                                         .getClientWeights();
                                     context.pop();
+                                    weightController.clear();
                                   }
                                 },
                               ),
@@ -547,7 +548,8 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                     // ),
                                     keyboardType: TextInputType.number,
                                     style: TextStyle(
-                                      color: globalColorScheme.onPrimaryContainer,
+                                      color:
+                                          globalColorScheme.onPrimaryContainer,
                                     ),
                                   )
                                 ],
@@ -725,20 +727,43 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
     currentWeights.value = filteredWeights;
   }
 
+  ValueNotifier<bool> isLoading = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<GetclientweightsCubit, GetclientweightsState>(
       listener: (context, state) {
+        if (state is GetclientweightsLoading) {
+          isLoading.value = true;
+        }
         if (state is GetclientweightsComplete) {
           currentWeights.value = state.weights;
           _originalWeights = state.weights;
+          isLoading.value = false;
         }
       },
       child: ValueListenableBuilder(
         valueListenable: currentWeights,
         builder: (context, value, child) {
           if (value == null) {
-            return SizedBox();
+            return ValueListenableBuilder(
+              valueListenable: isLoading,
+              builder: (context, ifLoading, child) {
+                if (ifLoading) {
+                  return SizedBox(
+                    width: double.maxFinite,
+                    height: 200,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: globalColorScheme.tertiaryContainer,
+                      ),
+                    ),
+                  );
+                } else {
+                  return SizedBox();
+                }
+              },
+            );
           } else {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -762,7 +787,20 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
                 if (value.isEmpty)
                   const Padding(
                     padding: EdgeInsets.only(top: 20),
-                    child: Text('No weights for this month.'),
+                    child: Center(
+                      child: Text(
+                        'No weight tracking available for this month.',
+                      ),
+                    ),
+                  )
+                else if ((value.length == 1))
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Center(
+                      child: Text(
+                        'Update your weight weekly to track the progress.',
+                      ),
+                    ),
                   )
                 else
                   Padding(

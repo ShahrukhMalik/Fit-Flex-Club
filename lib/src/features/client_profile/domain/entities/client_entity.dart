@@ -7,13 +7,13 @@ class ClientEntity extends Equatable {
   final Map<String, dynamic>? phone;
   final int? age;
   final String? gender;
-  final int? heightInFt;
-  final int? heightInCm;
+  final double? heightInFt;
+  final double? heightInCm;
   final bool? isTrainer;
   final bool? isUserActive;
   final String? username;
-  final int? weightInKg;
-  final int? weightInLb;
+  final double? weightInKg;
+  final double? weightInLb;
   final String? currentWorkoutPlanName;
 
   const ClientEntity({

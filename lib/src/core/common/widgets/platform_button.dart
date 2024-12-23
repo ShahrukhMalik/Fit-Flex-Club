@@ -695,6 +695,7 @@ class PlatformButton {
       icon: Icon(
         icon,
         color: foregroundColor,
+            size: height ?? width,
       ),
     );
 

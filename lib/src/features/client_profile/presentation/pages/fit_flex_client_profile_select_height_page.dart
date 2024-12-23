@@ -51,17 +51,25 @@ class FitFlexClientProfileSelectHeightPage extends StatefulWidget {
 
 class _FitFlexClientProfileSelectHeightPageState
     extends State<FitFlexClientProfileSelectHeightPage> {
-  final ValueNotifier<String> heightSelected = ValueNotifier<String>("");
-  final ValueNotifier<String> metricSelected = ValueNotifier<String>("");
+  final ValueNotifier<String> heightSelected = ValueNotifier<String>("5");
+  final ValueNotifier<String> decimalheightSelected =
+      ValueNotifier<String>("6");
+  final ValueNotifier<String> metricSelected = ValueNotifier<String>("ft");
   final ValueNotifier<bool> isFirstMetricSelected = ValueNotifier<bool>(true);
-  final FixedExtentScrollController fixedExtentScrollController =
+  final FixedExtentScrollController heightController =
       FixedExtentScrollController(initialItem: 4);
-
+  final FixedExtentScrollController decimalHeightController =
+      FixedExtentScrollController(initialItem: 50);
   final List<String> metrics = ['ft', 'cm'];
 
-  void _scrollToIndex(int index) {
-    fixedExtentScrollController.animateToItem(
+  void _scrollToIndex(int index, int minorIndex) {
+    heightController.animateToItem(
       index,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+    decimalHeightController.animateToItem(
+      minorIndex,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -74,14 +82,26 @@ class _FitFlexClientProfileSelectHeightPageState
       () {
         if (isFirstMetricSelected.value) {
           metricSelected.value = metrics[0];
-          heightSelected.value =
-              convertCmToFt(int.tryParse(heightSelected.value)).toString();
-          _scrollToIndex(int.tryParse(heightSelected.value) ?? 1 - 1);
+          final currentValue = double.tryParse(
+              '${heightSelected.value}.${decimalheightSelected.value}');
+          final getWeightConverted =
+              convertCmToFtD(currentValue).toStringAsFixed(2);
+
+          heightSelected.value = getWeightConverted.split('.')[0];
+          decimalheightSelected.value = getWeightConverted.split('.')[1];
+          _scrollToIndex(int.tryParse(heightSelected.value) ?? 1 - 1,
+              int.tryParse(decimalheightSelected.value) ?? 1 - 1);
         } else {
           metricSelected.value = metrics[1];
-          heightSelected.value =
-              convertFtToCm(int.tryParse(heightSelected.value)).toString();
-          _scrollToIndex(int.tryParse(heightSelected.value) ?? 1 - 1);
+          final currentValue = double.tryParse(
+              '${heightSelected.value}.${decimalheightSelected.value}');
+          final getWeightConverted =
+              convertFtToCmD(currentValue).toStringAsFixed(2);
+
+          heightSelected.value = getWeightConverted.split('.')[0];
+          decimalheightSelected.value = getWeightConverted.split('.')[1];
+          _scrollToIndex(int.tryParse(heightSelected.value) ?? 1 - 1,
+              int.tryParse(decimalheightSelected.value) ?? 1 - 1);
         }
       },
     );
@@ -142,31 +162,47 @@ class _FitFlexClientProfileSelectHeightPageState
                               return Column(
                                 children: [
                                   ValueListenableBuilder(
-                                    valueListenable: heightSelected,
-                                    builder: (context, age, _) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 25),
-                                        child: Text(
-                                          "$age " "$metric",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 30,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                      valueListenable: decimalheightSelected,
+                                      builder: (context, decimalHeight, _) {
+                                        return ValueListenableBuilder(
+                                          valueListenable: heightSelected,
+                                          builder: (context, age, _) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 25),
+                                              child: Text(
+                                                "$age.$decimalHeight"
+                                                " $metric",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 30,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      }),
                                   SizedBox(
-                                    height: height * 0.4,
-                                    child: FitFlexScrollWheelWidget(
-                                      controller: fixedExtentScrollController,
-                                      selectedValue: heightSelected,
-                                      maxCount: metric == metric[0] ? 8 : 245,
-                                      metric: metric,
+                                    height: height * .4,
+                                    child: ValueListenableBuilder(
+                                      valueListenable: isFirstMetricSelected,
+                                      builder: (context, showkg, _) {
+                                        return FitFlexScrollWheelWidget(
+                                          selectedValueKgLb: heightSelected,
+                                          selectedValueGmsOz:
+                                              decimalheightSelected,
+                                          controllerKgLb: heightController,
+                                          controllerGmsOz:
+                                              decimalHeightController,
+                                          maxCountKgLb: 1499,
+                                          maxCountGmsOz: 99,
+                                          unitKgLb: showkg ? 'ft' : 'cm',
+                                          unitGmsOz: showkg ? 'in' : 'mm',
+                                        );
+                                      },
                                     ),
-                                  ),
+                                  )
                                 ],
                               );
                             },
@@ -208,27 +244,38 @@ class _FitFlexClientProfileSelectHeightPageState
                                       weightInKg:
                                           widget.weightUnit.toLowerCase() ==
                                                   'kg'
-                                              ? int.tryParse(widget.weight)
-                                              : convertLbToKg(
-                                                  int.tryParse(widget.weight)),
-                                      heightInCm: metricSelected.value
+                                              ? double.tryParse(widget.weight)
+                                              : convertLbToKgDouble(
+                                                  double.tryParse(
+                                                    widget.weight,
+                                                  ),
+                                                ),
+                                      heightInCm:
+                                          metricSelected.value.toLowerCase() ==
+                                                  'cm'
+                                              ? double.tryParse(
+                                                   '${heightSelected.value}.${decimalheightSelected.value}')
+                                              : convertFtToCmD(
+                                                  double.tryParse(
+                                                    '${heightSelected.value}.${decimalheightSelected.value}',
+                                                  ),
+                                                ),
+                                      weightInLb: widget.weightUnit
                                                   .toLowerCase() ==
-                                              'ft'
-                                          ? int.tryParse(heightSelected.value)
-                                          : convertCmToFt(int.tryParse(
-                                              heightSelected.value)),
-                                      weightInLb:
-                                          widget.weightUnit.toLowerCase() ==
-                                                  'lb'
-                                              ? int.tryParse(widget.weight)
-                                              : convertKgToLb(
-                                                  int.tryParse(widget.weight)),
-                                      heightInFt: metricSelected.value
-                                                  .toLowerCase() ==
-                                              'ft'
-                                          ? int.tryParse(heightSelected.value)
-                                          : convertCmToFt(int.tryParse(
-                                              heightSelected.value)),
+                                              'lb'
+                                          ? double.tryParse(widget.weight)
+                                          : convertKgToLbDouble(
+                                              double.tryParse(widget.weight)),
+                                      heightInFt:
+                                          metricSelected.value.toLowerCase() ==
+                                                  'ft'
+                                              ? double.tryParse(
+                                                   '${heightSelected.value}.${decimalheightSelected.value}')
+                                              : convertCmToFtD(
+                                                  double.tryParse(
+                                                     '${heightSelected.value}.${decimalheightSelected.value}',
+                                                  ),
+                                                ),
                                     ),
                                   ),
                                 );

@@ -20,5 +20,6 @@ enum ListenerEvents {
   updateAssignedWorkoutPlan,
   deleteAssignedWorkoutPlan,
   addAssignedWorkoutPlan,
+  addNewClient,
   deactivateUser,
 }
