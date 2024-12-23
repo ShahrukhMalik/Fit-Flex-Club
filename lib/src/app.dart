@@ -1,10 +1,11 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/clientweights/clientweights_cubit.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
@@ -51,20 +52,16 @@ class MyApp extends StatelessWidget {
               getIt<AuthenticationBloc>()..add(ListenToEvents()),
         ),
         BlocProvider(create: (context) => getIt<ClientProfileBloc>()),
-        // BlocProvider(
-        //     create: (context) => getIt<ListenBloc>()..add(ListenToEvent())),
+        BlocProvider(create: (context) => getIt<ClientweightsCubit>()),
+        BlocProvider(
+            create: (context) =>
+                getIt<GetclientweightsCubit>()),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
         BlocProvider(
-          create: (context) => getIt<WorkoutManagementBloc>()
-            ..add(
-              GetExercisesEvent(),
-            )
-            ..add(
-              GetWorkoutPlansForClientEvent(
-                clientId: getIt<FirebaseAuth>().currentUser!.uid,
-              ),
-            ),
-        ),
+            create: (context) => getIt<WorkoutManagementBloc>()
+              ..add(
+                GetExercisesEvent(),
+              )),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],
       child: localizations,

@@ -3394,9 +3394,23 @@ class $ClientWeightTable extends ClientWeight
   late final GeneratedColumn<double> weightInLb = GeneratedColumn<double>(
       'weight_in_lb', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.now().millisecondsSinceEpoch);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+      'updated_at', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [clientId, timeStamp, weightInKg, weightInLb];
+      [clientId, timeStamp, weightInKg, weightInLb, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3433,6 +3447,14 @@ class $ClientWeightTable extends ClientWeight
     } else if (isInserting) {
       context.missing(_weightInLbMeta);
     }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
     return context;
   }
 
@@ -3450,6 +3472,10 @@ class $ClientWeightTable extends ClientWeight
           .read(DriftSqlType.double, data['${effectivePrefix}weight_in_kg'])!,
       weightInLb: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}weight_in_lb'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}updated_at']),
     );
   }
 
@@ -3465,11 +3491,15 @@ class ClientWeightData extends DataClass
   final int timeStamp;
   final double weightInKg;
   final double weightInLb;
+  final int createdAt;
+  final int? updatedAt;
   const ClientWeightData(
       {this.clientId,
       required this.timeStamp,
       required this.weightInKg,
-      required this.weightInLb});
+      required this.weightInLb,
+      required this.createdAt,
+      this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3479,6 +3509,10 @@ class ClientWeightData extends DataClass
     map['time_stamp'] = Variable<int>(timeStamp);
     map['weight_in_kg'] = Variable<double>(weightInKg);
     map['weight_in_lb'] = Variable<double>(weightInLb);
+    map['created_at'] = Variable<int>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<int>(updatedAt);
+    }
     return map;
   }
 
@@ -3490,6 +3524,10 @@ class ClientWeightData extends DataClass
       timeStamp: Value(timeStamp),
       weightInKg: Value(weightInKg),
       weightInLb: Value(weightInLb),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
     );
   }
 
@@ -3501,6 +3539,8 @@ class ClientWeightData extends DataClass
       timeStamp: serializer.fromJson<int>(json['timeStamp']),
       weightInKg: serializer.fromJson<double>(json['weightInKg']),
       weightInLb: serializer.fromJson<double>(json['weightInLb']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int?>(json['updatedAt']),
     );
   }
   @override
@@ -3511,6 +3551,8 @@ class ClientWeightData extends DataClass
       'timeStamp': serializer.toJson<int>(timeStamp),
       'weightInKg': serializer.toJson<double>(weightInKg),
       'weightInLb': serializer.toJson<double>(weightInLb),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int?>(updatedAt),
     };
   }
 
@@ -3518,12 +3560,16 @@ class ClientWeightData extends DataClass
           {Value<String?> clientId = const Value.absent(),
           int? timeStamp,
           double? weightInKg,
-          double? weightInLb}) =>
+          double? weightInLb,
+          int? createdAt,
+          Value<int?> updatedAt = const Value.absent()}) =>
       ClientWeightData(
         clientId: clientId.present ? clientId.value : this.clientId,
         timeStamp: timeStamp ?? this.timeStamp,
         weightInKg: weightInKg ?? this.weightInKg,
         weightInLb: weightInLb ?? this.weightInLb,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
       );
   ClientWeightData copyWithCompanion(ClientWeightCompanion data) {
     return ClientWeightData(
@@ -3533,6 +3579,8 @@ class ClientWeightData extends DataClass
           data.weightInKg.present ? data.weightInKg.value : this.weightInKg,
       weightInLb:
           data.weightInLb.present ? data.weightInLb.value : this.weightInLb,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -3542,13 +3590,16 @@ class ClientWeightData extends DataClass
           ..write('clientId: $clientId, ')
           ..write('timeStamp: $timeStamp, ')
           ..write('weightInKg: $weightInKg, ')
-          ..write('weightInLb: $weightInLb')
+          ..write('weightInLb: $weightInLb, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(clientId, timeStamp, weightInKg, weightInLb);
+  int get hashCode => Object.hash(
+      clientId, timeStamp, weightInKg, weightInLb, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3556,7 +3607,9 @@ class ClientWeightData extends DataClass
           other.clientId == this.clientId &&
           other.timeStamp == this.timeStamp &&
           other.weightInKg == this.weightInKg &&
-          other.weightInLb == this.weightInLb);
+          other.weightInLb == this.weightInLb &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
@@ -3564,12 +3617,16 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
   final Value<int> timeStamp;
   final Value<double> weightInKg;
   final Value<double> weightInLb;
+  final Value<int> createdAt;
+  final Value<int?> updatedAt;
   final Value<int> rowid;
   const ClientWeightCompanion({
     this.clientId = const Value.absent(),
     this.timeStamp = const Value.absent(),
     this.weightInKg = const Value.absent(),
     this.weightInLb = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ClientWeightCompanion.insert({
@@ -3577,6 +3634,8 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
     required int timeStamp,
     required double weightInKg,
     required double weightInLb,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : timeStamp = Value(timeStamp),
         weightInKg = Value(weightInKg),
@@ -3586,6 +3645,8 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
     Expression<int>? timeStamp,
     Expression<double>? weightInKg,
     Expression<double>? weightInLb,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3593,6 +3654,8 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
       if (timeStamp != null) 'time_stamp': timeStamp,
       if (weightInKg != null) 'weight_in_kg': weightInKg,
       if (weightInLb != null) 'weight_in_lb': weightInLb,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3602,12 +3665,16 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
       Value<int>? timeStamp,
       Value<double>? weightInKg,
       Value<double>? weightInLb,
+      Value<int>? createdAt,
+      Value<int?>? updatedAt,
       Value<int>? rowid}) {
     return ClientWeightCompanion(
       clientId: clientId ?? this.clientId,
       timeStamp: timeStamp ?? this.timeStamp,
       weightInKg: weightInKg ?? this.weightInKg,
       weightInLb: weightInLb ?? this.weightInLb,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3627,6 +3694,12 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
     if (weightInLb.present) {
       map['weight_in_lb'] = Variable<double>(weightInLb.value);
     }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3640,6 +3713,8 @@ class ClientWeightCompanion extends UpdateCompanion<ClientWeightData> {
           ..write('timeStamp: $timeStamp, ')
           ..write('weightInKg: $weightInKg, ')
           ..write('weightInLb: $weightInLb, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -5679,8 +5754,9 @@ final class $$WeeksTableReferences
           $_aliasNameGenerator(db.weeks.workoutPlanId, db.workoutPlans.uid));
 
   $$WorkoutPlansTableProcessedTableManager? get workoutPlanId {
+    if ($_item.workoutPlanId == null) return null;
     final manager = $$WorkoutPlansTableTableManager($_db, $_db.workoutPlans)
-        .filter((f) => f.uid($_item.workoutPlanId));
+        .filter((f) => f.uid($_item.workoutPlanId!));
     final item = $_typedResult.readTableOrNull(_workoutPlanIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -6104,8 +6180,9 @@ final class $$DaysTableReferences
       db.weeks.createAlias($_aliasNameGenerator(db.days.weekId, db.weeks.id));
 
   $$WeeksTableProcessedTableManager? get weekId {
+    if ($_item.weekId == null) return null;
     final manager = $$WeeksTableTableManager($_db, $_db.weeks)
-        .filter((f) => f.id($_item.weekId));
+        .filter((f) => f.id($_item.weekId!));
     final item = $_typedResult.readTableOrNull(_weekIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -6559,8 +6636,9 @@ final class $$WorkoutPlanExerciseTableReferences extends BaseReferences<
       $_aliasNameGenerator(db.workoutPlanExercise.dayId, db.days.id));
 
   $$DaysTableProcessedTableManager? get dayId {
+    if ($_item.dayId == null) return null;
     final manager = $$DaysTableTableManager($_db, $_db.days)
-        .filter((f) => f.id($_item.dayId));
+        .filter((f) => f.id($_item.dayId!));
     final item = $_typedResult.readTableOrNull(_dayIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -7105,9 +7183,10 @@ final class $$ExerciseSetsTableReferences
           db.exerciseSets.exerciseId, db.workoutPlanExercise.id));
 
   $$WorkoutPlanExerciseTableProcessedTableManager? get exerciseId {
+    if ($_item.exerciseId == null) return null;
     final manager =
         $$WorkoutPlanExerciseTableTableManager($_db, $_db.workoutPlanExercise)
-            .filter((f) => f.id($_item.exerciseId));
+            .filter((f) => f.id($_item.exerciseId!));
     final item = $_typedResult.readTableOrNull(_exerciseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -7866,6 +7945,8 @@ typedef $$ClientWeightTableCreateCompanionBuilder = ClientWeightCompanion
   required int timeStamp,
   required double weightInKg,
   required double weightInLb,
+  Value<int> createdAt,
+  Value<int?> updatedAt,
   Value<int> rowid,
 });
 typedef $$ClientWeightTableUpdateCompanionBuilder = ClientWeightCompanion
@@ -7874,6 +7955,8 @@ typedef $$ClientWeightTableUpdateCompanionBuilder = ClientWeightCompanion
   Value<int> timeStamp,
   Value<double> weightInKg,
   Value<double> weightInLb,
+  Value<int> createdAt,
+  Value<int?> updatedAt,
   Value<int> rowid,
 });
 
@@ -7897,6 +7980,12 @@ class $$ClientWeightTableFilterComposer
 
   ColumnFilters<double> get weightInLb => $composableBuilder(
       column: $table.weightInLb, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$ClientWeightTableOrderingComposer
@@ -7919,6 +8008,12 @@ class $$ClientWeightTableOrderingComposer
 
   ColumnOrderings<double> get weightInLb => $composableBuilder(
       column: $table.weightInLb, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ClientWeightTableAnnotationComposer
@@ -7941,6 +8036,12 @@ class $$ClientWeightTableAnnotationComposer
 
   GeneratedColumn<double> get weightInLb => $composableBuilder(
       column: $table.weightInLb, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$ClientWeightTableTableManager extends RootTableManager<
@@ -7973,6 +8074,8 @@ class $$ClientWeightTableTableManager extends RootTableManager<
             Value<int> timeStamp = const Value.absent(),
             Value<double> weightInKg = const Value.absent(),
             Value<double> weightInLb = const Value.absent(),
+            Value<int> createdAt = const Value.absent(),
+            Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ClientWeightCompanion(
@@ -7980,6 +8083,8 @@ class $$ClientWeightTableTableManager extends RootTableManager<
             timeStamp: timeStamp,
             weightInKg: weightInKg,
             weightInLb: weightInLb,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -7987,6 +8092,8 @@ class $$ClientWeightTableTableManager extends RootTableManager<
             required int timeStamp,
             required double weightInKg,
             required double weightInLb,
+            Value<int> createdAt = const Value.absent(),
+            Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ClientWeightCompanion.insert(
@@ -7994,6 +8101,8 @@ class $$ClientWeightTableTableManager extends RootTableManager<
             timeStamp: timeStamp,
             weightInKg: weightInKg,
             weightInLb: weightInLb,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -8055,9 +8164,10 @@ final class $$WorkoutHistorySetTableReferences extends BaseReferences<
           db.workoutHistorySet.exerciseId, db.workoutPlanExercise.id));
 
   $$WorkoutPlanExerciseTableProcessedTableManager? get exerciseId {
+    if ($_item.exerciseId == null) return null;
     final manager =
         $$WorkoutPlanExerciseTableTableManager($_db, $_db.workoutPlanExercise)
-            .filter((f) => f.id($_item.exerciseId));
+            .filter((f) => f.id($_item.exerciseId!));
     final item = $_typedResult.readTableOrNull(_exerciseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(

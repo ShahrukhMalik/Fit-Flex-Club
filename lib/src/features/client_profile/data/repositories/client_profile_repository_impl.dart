@@ -2,6 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
+import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
+import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/client_profile_local_datasource.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/remote/client_profile_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
@@ -199,6 +201,97 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
     } on ServerException catch (error) {
       return Left(
         ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, List<ClientWeightEntity>?>>? getClientWeights([
+    String? clientId,
+  ]) async {
+    final isNetworkConnected = await networkInfo.isConnected;
+
+    try {
+      final cache = await clientProfileLocalDatasource.getClientWeights();
+
+      return cache.fold(
+        (l) async {
+          if (isNetworkConnected == null || !isNetworkConnected) {
+            return const Left(
+              NetworkFailure(message: 'No internet Connection'),
+            );
+          } else {
+            final remoteClientWeights =
+                await clientProfileRemoteDatasource.getClientWeights();
+            if (remoteClientWeights != null && remoteClientWeights.isNotEmpty) {
+              await clientProfileLocalDatasource
+                  .insertClientWeights(remoteClientWeights);
+            }
+            return Right(
+              remoteClientWeights,
+            );
+          }
+        },
+        (r) {
+          return Right(r);
+        },
+      );
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, void>>? addClientWeight(
+    ClientWeightEntity weight,
+  ) async {
+    try {
+      final isNetworkConnected = await networkInfo.isConnected;
+      final cache = await clientProfileLocalDatasource.insertClientWeight(
+        ClientWeightModel(
+          timeStamp: weight.timeStamp,
+          weightInKg: weight.weightInKg,
+          weightInLb: weight.weightInLb,
+          clientId: weight.clientId,
+        ),
+      );
+      if (isNetworkConnected == null || !isNetworkConnected) {
+        //TODO:OFFLINE SUPPORT
+        return const Left(
+          NetworkFailure(
+            message: 'Offline Support is coming soon!',
+          ),
+        );
+      } else {
+        return Right(
+          await clientProfileRemoteDatasource.addClientWeight(
+            ClientWeightModel(
+              timeStamp: weight.timeStamp,
+              weightInKg: weight.weightInKg,
+              weightInLb: weight.weightInLb,
+              clientId: weight.clientId,
+            ),
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
           message: error.errorMessage,
           code: error.errorCode,
         ),

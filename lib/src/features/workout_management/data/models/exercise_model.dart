@@ -23,8 +23,9 @@ class ExerciseModel extends Exercise {
     this.completed,
   });
 
+
   factory ExerciseModel.fromMap(Map<String, dynamic> data) {
-    print(data['completed']);
+    // print(data['completed']);
     return ExerciseModel(
       completed: data['completed'],
       createdAt: data['createdAt'],

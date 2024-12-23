@@ -99,7 +99,7 @@ class _WorkoutProgramsOverviewState extends State<WorkoutProgramsOverview> {
                           IconButton(
                             onPressed: () {
                               // Handle edit action
-                              context.go(
+                              context.push(
                                 FitFlexClubCreateWorkoutPlanPage.route,
                                 extra: {
                                   'updateData': true,
@@ -176,85 +176,113 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'createWorkout',
-        splashColor: globalColorScheme.tertiary,
-        backgroundColor: globalColorScheme.primaryContainer,
-        onPressed: () {
-          context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
-          context.go(FitFlexClubCreateWorkoutPlanPage.route);
-        },
-        child: Icon(
-          Icons.add,
-          color: globalColorScheme.surface,
-        ),
-      ),
-      backgroundColor: globalColorScheme.surface,
-      appBar: PlatformAppbar.basicAppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: globalColorScheme.onPrimaryContainer,
-        title: "Workout Programs",
-        context: context,
-        trailing: PlatformButton().buildButton(
-          foregroundColor: globalColorScheme.primary,
-          context: context,
-          type: ButtonType.icon,
-          icon: Icons.logout,
-          text: "",
-          onPressed: () => context
-              .read<AuthenticationBloc>()
-              .add(LogOutAuthenticationEvent()),
-        )!,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
-          listener: (context, state) {
-            if (state is WorkoutManagementError) {
-              PlatformDialog.showAlertDialog(
-                context: context,
-                title: "Workout Plans",
-                message: state.failures.message ?? "Something Went Wrong!",
-                onConfirm: () {
-                  context.go(FitFlexTrainerWorkoutPage.route);
-                },
-              );
-            }
-
-            if (state is DeleteWorkoutComplete) {
-              PlatformDialog.showAlertDialog(
-                context: context,
-                title: "Workout Plans",
-                message: "Workout Deleted Successfully!",
-                onConfirm: () {
-                  context
-                      .read<WorkoutManagementBloc>()
-                      .add(GetWorkoutPlansEvent());
-                  context.go(FitFlexTrainerWorkoutPage.route);
-                },
-              );
-            }
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        print('Trainer WK Page');
+      },
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatingActionButton(
+          heroTag: 'createWorkout',
+          splashColor: globalColorScheme.tertiary,
+          backgroundColor: globalColorScheme.primaryContainer,
+          onPressed: () {
+            context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+            context.go(FitFlexClubCreateWorkoutPlanPage.route);
           },
-          builder: (context, state) {
-            if (state is GetWorkoutPlansComplete) {
-              final workoutPlans = state.workoutPlans;
-              if (workoutPlans.isNotEmpty) {
-                return WorkoutProgramsOverview(
-                  programs: workoutPlans,
-                  colorScheme: colorScheme,
+          child: Icon(
+            Icons.add,
+            color: globalColorScheme.surface,
+          ),
+        ),
+        backgroundColor: globalColorScheme.surface,
+        appBar: PlatformAppbar.basicAppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: globalColorScheme.onPrimaryContainer,
+          title: "Workout Programs",
+          context: context,
+          trailing: PlatformButton().buildButton(
+            foregroundColor: globalColorScheme.primary,
+            context: context,
+            type: ButtonType.icon,
+            icon: Icons.logout,
+            text: "",
+            onPressed: () => context
+                .read<AuthenticationBloc>()
+                .add(LogOutAuthenticationEvent()),
+          )!,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
+            listener: (context, state) {
+              if (state is WorkoutManagementError) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Workout Plans",
+                  message: state.failures.message ?? "Something Went Wrong!",
+                  onConfirm: () {
+                    context.go(FitFlexTrainerWorkoutPage.route);
+                  },
                 );
-              } else {
-                return Center(
-                  child: Text(
-                    'No workout plans found.',
+              }
+      
+              if (state is DeleteWorkoutComplete) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Workout Plans",
+                  message: "Workout Deleted Successfully!",
+                  onConfirm: () {
+                    context
+                        .read<WorkoutManagementBloc>()
+                        .add(GetWorkoutPlansEvent());
+                    context.go(FitFlexTrainerWorkoutPage.route);
+                  },
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state is GetWorkoutPlansComplete) {
+                final workoutPlans = state.workoutPlans;
+                if (workoutPlans.isNotEmpty) {
+                  return WorkoutProgramsOverview(
+                    programs: workoutPlans,
+                    colorScheme: colorScheme,
+                  );
+                } else {
+                  return Center(
+                    child: Text(
+                      'No workout plans found.',
+                    ),
+                  );
+                }
+              }
+      
+              if (state is GetWorkoutPlansLoading) {
+                return SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(
+                      8,
+                      (index) => Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: PlatformLoader().buildLoader(
+                          type: LoaderType.shimmer,
+                        ),
+                      ),
+                    ),
                   ),
                 );
               }
-            }
-
-            if (state is GetWorkoutPlansLoading) {
+      
+              if (state is WorkoutManagementError) {
+                final error = state.failures;
+                return Center(
+                  child: Text(
+                    error.message ?? 'No workout plans found.',
+                  ),
+                );
+              }
               return SingleChildScrollView(
                 child: Column(
                   children: List.generate(
@@ -268,30 +296,8 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                   ),
                 ),
               );
-            }
-
-            if (state is WorkoutManagementError) {
-              final error = state.failures;
-              return Center(
-                child: Text(
-                  error.message ?? 'No workout plans found.',
-                ),
-              );
-            }
-            return SingleChildScrollView(
-              child: Column(
-                children: List.generate(
-                  8,
-                  (index) => Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: PlatformLoader().buildLoader(
-                      type: LoaderType.shimmer,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+            },
+          ),
         ),
       ),
     );

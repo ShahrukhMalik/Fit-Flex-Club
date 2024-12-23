@@ -1,13 +1,21 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dropdown.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/clientweights/clientweights_cubit.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
@@ -114,12 +122,12 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
                             fontWeight: FontWeight.bold,
                           ),
                           onPressed: () {
-                            if (widget.workoutPlan != null) {
-                              context.go(
-                                FitFlexClientAssignedWorkoutPlanPage.route,
-                                extra: {'workoutPlan': widget.workoutPlan},
-                              );
-                            } else {}
+                            // if (widget.workoutPlan != null) {
+                            context.go(
+                              FitFlexClientAssignedWorkoutPlanPage.route,
+                              extra: {'workoutPlan': widget.workoutPlan},
+                            );
+                            // } else {}
                           },
                         )!
                     ],
@@ -195,7 +203,7 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
 class WeightGraphPainter extends CustomPainter {
   final Color lineColor;
   final Color pointColor;
-  final List<Map<String, dynamic>> entries;
+  final List<ClientWeightEntity> entries;
 
   WeightGraphPainter({
     required this.lineColor,
@@ -208,7 +216,7 @@ class WeightGraphPainter extends CustomPainter {
     if (entries.isEmpty) return;
 
     final paint = Paint()
-      ..color = globalColorScheme.onPrimaryContainer
+      ..color = lineColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
@@ -225,26 +233,28 @@ class WeightGraphPainter extends CustomPainter {
     final path = Path();
 
     // Find min and max weights for scaling
-    double minWeight = entries
-        .map((e) => (e['weight'] as double))
-        .reduce((a, b) => math.min(a, b));
-    double maxWeight = entries
-        .map((e) => (e['weight'] as double))
-        .reduce((a, b) => math.max(a, b));
+    double minWeight =
+        entries.map((e) => e.weightInKg).reduce((a, b) => math.min(a, b));
+    double maxWeight =
+        entries.map((e) => e.weightInKg).reduce((a, b) => math.max(a, b));
 
-    // Add some padding to min/max for better visualization
+    // Ensure there's a valid range
+    if (maxWeight == minWeight) {
+      minWeight -= 1.0;
+      maxWeight += 1.0;
+    }
+
+    // Add padding for better visualization
     final padding = (maxWeight - minWeight) * 0.1;
     minWeight -= padding;
     maxWeight += padding;
 
-    // Store previous Y coordinate
-    double? previousY;
-
     void drawWeightLabel(double x, double y, double weight, bool isAbove) {
+      if (x.isNaN || y.isNaN) return; // Ensure valid coordinates
       textPainter.text = TextSpan(
         text: '${weight.toStringAsFixed(1)} Kg',
-        style:
-            textTheme.labelLarge?.copyWith(color: globalColorScheme.tertiary),
+        style: TextStyle(
+            color: globalColorScheme.secondaryContainer, fontSize: 12),
       );
       textPainter.layout();
 
@@ -259,17 +269,22 @@ class WeightGraphPainter extends CustomPainter {
     }
 
     void addPoint(double x, double y, Path path, int index) {
+      if (x.isNaN || y.isNaN) return; // Ensure valid coordinates
       if (index == 0) {
         path.moveTo(x, y);
-        previousY = y;
       } else {
         final double previousX =
             (index - 1) * size.width / (entries.length - 1);
+        final double previousY = size.height -
+            ((entries[index - 1].weightInKg - minWeight) /
+                    (maxWeight - minWeight)) *
+                size.height;
 
+        // Calculate control points for smooth curves
         final double controlX1 = previousX + (x - previousX) / 2;
         final double controlX2 = x - (x - previousX) / 2;
 
-        path.cubicTo(controlX1, previousY!, controlX2, y, x, y);
+        path.cubicTo(controlX1, previousY, controlX2, y, x, y);
       }
 
       // Draw the point
@@ -277,44 +292,19 @@ class WeightGraphPainter extends CustomPainter {
 
       // Draw weight label (alternating above/below)
       bool isAbove = index % 2 == 0;
-      drawWeightLabel(x, y, entries[index]['weight'], isAbove);
-
-      // Draw weight difference if not first point
-      // if (index > 0) {
-      //   double weightDiff = entries[index].weight - entries[index - 1].weight;
-      //   String diffText =
-      //       '${weightDiff >= 0 ? '+' : ''}${weightDiff.toStringAsFixed(1)}';
-
-      //   textPainter.text = TextSpan(
-      //     text: diffText,
-      //     style: TextStyle(
-      //       color: weightDiff >= 0 ? Colors.red[400] : Colors.green[400],
-      //       fontSize: 12,
-      //       fontWeight: FontWeight.w500,
-      //     ),
-      //   );
-      //   textPainter.layout();
-
-      //   // Position the difference text in the middle between points
-      //   double midX = (x + (index - 1) * size.width / (entries.length - 1)) / 2;
-      //   double midY = (y + previousY!) / 2;
-
-      //   textPainter.paint(
-      //     canvas,
-      //     Offset(midX - textPainter.width / 2, midY - textPainter.height / 2),
-      //   );
-      // }
-
-      previousY = y;
+      drawWeightLabel(x, y, entries[index].weightInKg, isAbove);
     }
 
     for (int i = 0; i < entries.length; i++) {
       final double x = i * size.width / (entries.length - 1);
-      final double y = size.height -
-          ((entries[i]['weight'] - minWeight) / (maxWeight - minWeight)) *
-              size.height;
+      final double scaleFactor = (maxWeight - minWeight) > 0
+          ? (entries[i].weightInKg - minWeight) / (maxWeight - minWeight)
+          : 0.0;
+      final double y = size.height - scaleFactor * size.height;
 
-      addPoint(x, y, path, i);
+      if (!x.isNaN && !y.isNaN) {
+        addPoint(x, y, path, i);
+      }
     }
 
     canvas.drawPath(path, paint);
@@ -328,8 +318,8 @@ class WeightGraphPainter extends CustomPainter {
       Offset(size.width / 2, 0),
       Offset(size.width / 2, size.height),
       [
-        globalColorScheme.onPrimaryContainer.withOpacity(0.2),
-        globalColorScheme.secondary.withOpacity(0.05),
+        lineColor.withOpacity(0.2),
+        lineColor.withOpacity(0.05),
       ],
     );
 
@@ -346,19 +336,24 @@ class WeightGraphPainter extends CustomPainter {
 
 // Don't forget to add the ClientWeightEntity class if you haven't already:
 
-class WeightTrackerScreen extends StatelessWidget {
-  const WeightTrackerScreen({super.key});
+class WeightTrackerScreen extends StatefulWidget {
+  final String initialClientWeight;
+  const WeightTrackerScreen({
+    super.key,
+    required this.initialClientWeight,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    // Sample weight data
-    final weightData = [
-      // ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
-      // ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
-      // ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
-      // ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
-    ];
+  State<WeightTrackerScreen> createState() => _WeightTrackerScreenState();
+}
 
+class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
+  final TextEditingController weightController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ValueNotifier<Map<String, dynamic>> weightDifferenceInfo =
+      ValueNotifier({});
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       margin: const EdgeInsets.only(left: 20, right: 20),
@@ -374,106 +369,202 @@ class WeightTrackerScreen extends StatelessWidget {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  'Current Weight',
-                  style: textTheme.titleMedium,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Weight',
+                      style: textTheme.titleMedium,
+                    ),
+                    ValueListenableBuilder(
+                        valueListenable: weightDifferenceInfo,
+                        builder: (context, weight, _) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(
+                                weight['currentWeight'] ??
+                                    widget.initialClientWeight,
+                                style: TextStyle(
+                                  color: globalColorScheme.tertiary,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'kg',
+                                style: TextStyle(
+                                  color: globalColorScheme.secondary,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Row(
+                                children: [
+                                  if (weight['icon'] != null)
+                                    Icon(
+                                      weight['icon'] ?? Icons.add,
+                                      color: globalColorScheme.onErrorContainer,
+                                      size: 16,
+                                    ),
+                                  Text(
+                                    weight['difference'] != null
+                                        ? '${weight['difference'] ?? ''} (${weight['percentage'] ?? ''} %)'
+                                        : '',
+                                    style: TextStyle(
+                                      color: globalColorScheme.onErrorContainer,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }),
+                  ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
+                  // const SizedBox(height: 4),
+                  // const SizedBox(height: 4),
+                  Column(
                     children: [
-                      Text(
-                        '90.22',
-                        style: TextStyle(
-                          color: globalColorScheme.tertiary,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
+                      PlatformButton().buildButton(
+                        context: context,
+                        type: ButtonType.icon,
+                        foregroundColor: globalColorScheme.onPrimaryContainer,
+                        icon: Icons.add_circle_rounded,
+                        height: 40,
+                        text: '',
+                        onPressed: () => PlatformDialog.showCustomDialog(
+                          context: context,
+                          title: "Add Weight",
+                          actions: [
+                            BlocProvider(
+                              create: (context) => getIt<ClientweightsCubit>(),
+                              child: BlocConsumer<ClientweightsCubit,
+                                  ClientweightsState>(
+                                builder: (context, state) {
+                                  if (state is ClientweightsLoading) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: PlatformLoader().buildLoader(
+                                            type: LoaderType.circular,
+                                            size: 30),
+                                      ),
+                                    );
+                                  }
+                                  return PlatformButton().buildButton(
+                                    context: context,
+                                    type: ButtonType.primary,
+                                    textStyle: TextStyle(
+                                      color:
+                                          globalColorScheme.onPrimaryContainer,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    text: 'Submit',
+                                    onPressed: () {
+                                      if (_formKey.currentState?.validate() ??
+                                          false) {
+                                        if (weightController.text.isNotEmpty) {
+                                          context
+                                              .read<ClientweightsCubit>()
+                                              .addClientWeight(
+                                                ClientWeightEntity(
+                                                  clientId:
+                                                      getIt<FirebaseAuth>()
+                                                          .currentUser!
+                                                          .uid,
+                                                  timeStamp: DateTime.now()
+                                                      .millisecondsSinceEpoch,
+                                                  weightInKg: double.tryParse(
+                                                          weightController
+                                                              .text) ??
+                                                      0,
+                                                  weightInLb:
+                                                      convertLbToKgDouble(
+                                                    double.tryParse(
+                                                          weightController.text,
+                                                        ) ??
+                                                        0,
+                                                  ),
+                                                ),
+                                              );
+                                        }
+                                      }
+                                    },
+                                  )!;
+                                },
+                                listener: (context, state) {
+                                  if (state is ClientweightsComplete) {
+                                    context
+                                        .read<GetclientweightsCubit>()
+                                        .getClientWeights();
+                                    context.pop();
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                          content: SizedBox(
+                            height: 75,
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  AppTextFields.prefixSuffixTextField(
+                                    controller: weightController,
+                                    labelText: 'Weight in (kgs)',
+                                    // suffix: Container(
+                                    //   decoration: BoxDecoration(
+                                    //     color: globalColorScheme.surface,
+                                    //     borderRadius: BorderRadius.circular(
+                                    //       15,
+                                    //     ),
+                                    //   ),
+                                    //   child: Padding(
+                                    //     padding: const EdgeInsets.symmetric(
+                                    //         horizontal: 25, vertical: 5),
+                                    //     child: Text(
+                                    //       'kg',
+                                    //       style: TextStyle(
+                                    //         fontSize: 17,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(
+                                      color: globalColorScheme.onPrimaryContainer,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'kg',
-                        style: TextStyle(
-                          color: globalColorScheme.secondary,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_upward,
-                        color: globalColorScheme.onErrorContainer,
-                        size: 16,
-                      ),
-                      Text(
-                        '4.2 (2.68%)',
-                        style: TextStyle(
-                          color: globalColorScheme.onErrorContainer,
-                          fontSize: 14,
-                        ),
-                      ),
+                      )!
                     ],
                   ),
                 ],
               ),
-              // Container(
-              //   width: 60,
-              //   height: 60,
-              //   decoration: BoxDecoration(
-              //     color: Colors.blue.withOpacity(0.2),
-              //     borderRadius: BorderRadius.circular(30),
-              //   ),
-              //   child: Center(
-              //     child: Text(
-              //       '60%',
-              //       style: TextStyle(
-              //         color: Colors.blue[300],
-              //         fontSize: 16,
-              //         fontWeight: FontWeight.bold,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
-
-          // Graph Section
-          // Container(
-          //   height: 250,
-          //   padding: const EdgeInsets.all(16),
-          //   child: WeightTrackerGraph(
-          //     entries: weightData,
-          //     minWeight: 80.0,
-          //     maxWeight: 95.0,
-          //   ),
-          // ),
-
-          // Additional Stats
-          // Container(
-          //   padding: const EdgeInsets.all(16),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       _buildStatItem('Calories Burned', '1280', 'kcal'),
-          //       _buildStatItem('Steps', '8,439', 'steps'),
-          //       _buildStatItem('Distance', '6.2', 'km'),
-          //     ],
-          //   ),
-          // ),
+          WeightTrackerGraph(
+            weightDifferenceInfo: weightDifferenceInfo,
+          )
         ],
       ),
     );
@@ -520,31 +611,179 @@ Widget _buildStatItem(String label, String value, String unit) {
 }
 
 // WeightTrackerGraph Widget
-class WeightTrackerGraph extends StatelessWidget {
-  final List<ClientWeightEntity> entries;
-  final double minWeight;
-  final double maxWeight;
+class WeightTrackerGraph extends StatefulWidget {
+  final ValueNotifier<Map<String, dynamic>> weightDifferenceInfo;
 
   const WeightTrackerGraph({
     super.key,
-    required this.entries,
-    required this.minWeight,
-    required this.maxWeight,
+    required this.weightDifferenceInfo,
   });
 
   @override
+  State<WeightTrackerGraph> createState() => _WeightTrackerGraphState();
+}
+
+class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
+  final ValueNotifier<List<ClientWeightEntity>?> currentWeights =
+      ValueNotifier(null);
+  List<ClientWeightEntity>? _originalWeights;
+  late final List<Map<String, String>> _lastFourMonths;
+  late Map<String, String> _selectedMonth;
+
+  // Map<String, dynamic> weightDifferenceInfo = {};
+
+  void calculateWeightDifference() {
+    if (currentWeights.value != null &&
+        ((currentWeights.value?.length ?? 0) >= 2)) {
+      // Get the last two weights
+      final lastWeight = currentWeights.value!.last.weightInKg;
+      final secondLastWeight =
+          currentWeights.value![currentWeights.value!.length - 2].weightInKg;
+
+      // Calculate the difference
+      final difference = lastWeight - secondLastWeight;
+
+      // Calculate percentage change
+      final percentageChange = (difference / secondLastWeight) * 100;
+
+      // Determine the icon
+      final icon = difference >= 0 ? Icons.arrow_upward : Icons.arrow_downward;
+
+      // Update the map
+      widget.weightDifferenceInfo.value = {
+        'currentWeight': lastWeight.toStringAsFixed(2),
+        'icon': icon,
+        'difference': difference
+            .abs()
+            .toStringAsFixed(2), // Show absolute value for difference
+        'percentage': percentageChange
+            .abs()
+            .toStringAsFixed(2), // Show absolute value for percentage
+      };
+    } else {
+      // If there are not enough weights, reset the map
+      widget.weightDifferenceInfo.value = {};
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+// Example: Adding a listener to recalculate when weights change
+    currentWeights.addListener(() {
+      calculateWeightDifference();
+    });
+
+    final now = DateTime.now();
+
+    final List<Map<String, String>> lastFourMonths = List.generate(
+      4,
+      (index) {
+        final date = DateTime(now.year, now.month - index, 1);
+        final key = "${date.month.toString().padLeft(2, '0')}-${date.year}";
+        final value =
+            "${_monthAbbreviation(date.month)}-${date.year.toString().substring(2)}";
+        return {key: value};
+      },
+    );
+
+    // Set default selection and filter weights
+    _lastFourMonths = lastFourMonths;
+    _selectedMonth = lastFourMonths.first;
+    _filterWeights(_selectedMonth);
+  }
+
+  String _monthAbbreviation(int month) {
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return monthNames[month - 1];
+  }
+
+  void _filterWeights(Map<String, String> monthYear) {
+    final monthYearParts = monthYear.keys.first.split('-');
+    final selectedMonth = int.parse(monthYearParts[0]);
+    final selectedYear = int.parse(monthYearParts[1]);
+
+    final filteredWeights = _originalWeights?.where((entry) {
+      final entryDate = DateTime.fromMillisecondsSinceEpoch(entry.timeStamp);
+      return entryDate.month == selectedMonth && entryDate.year == selectedYear;
+    }).toList();
+
+    currentWeights.value = filteredWeights;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: WeightGraphPainter(
-        entries: entries
-            .map(
-              (e) => e.toMapforGraph(),
-            )
-            .toList(),
-        lineColor: globalColorScheme.onPrimaryContainer,
-        pointColor: primaryColor,
+    return BlocListener<GetclientweightsCubit, GetclientweightsState>(
+      listener: (context, state) {
+        if (state is GetclientweightsComplete) {
+          currentWeights.value = state.weights;
+          _originalWeights = state.weights;
+        }
+      },
+      child: ValueListenableBuilder(
+        valueListenable: currentWeights,
+        builder: (context, value, child) {
+          if (value == null) {
+            return SizedBox();
+          } else {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                const Text('Your weight tracker for the last 4 months.'),
+                const SizedBox(height: 5),
+                PlatformSpecificDropdown(
+                  onTap: (value) {
+                    context.pop();
+                  },
+                  initialValue: _selectedMonth,
+                  options: _lastFourMonths,
+                  onChanged: (selected) {
+                    setState(() {
+                      _selectedMonth = selected;
+                      _filterWeights(_selectedMonth);
+                    });
+                  },
+                ),
+                if (value.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Text('No weights for this month.'),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: SizedBox(
+                      height: 200,
+                      child: CustomPaint(
+                        painter: WeightGraphPainter(
+                          entries: value,
+                          lineColor: globalColorScheme.onPrimaryContainer,
+                          pointColor: globalColorScheme.tertiaryContainer,
+                        ),
+                        size: Size.infinite,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }
+        },
       ),
-      size: Size.infinite,
     );
   }
 }
@@ -596,61 +835,30 @@ class _WorkoutActionButtonState extends State<WorkoutActionButton>
       child: AnimatedBuilder(
         animation: _glowAnimation,
         builder: (context, child) {
-          return Container(
-            // width: 50,
-            // height: 50,
-            // decoration: BoxDecoration(
-            //   borderRadius: BorderRadius.circular(12),
-            //   gradient: LinearGradient(
-            //     colors: [
-            //       Colors.red.withOpacity(0.8),
-            //       Colors.orange.withOpacity(0.8),
-            //     ],
-            //     begin: Alignment.topLeft,
-            //     end: Alignment.bottomRight,
-            //   ),
-            //   boxShadow: [
-            //     BoxShadow(
-            //       color: Colors.red.withOpacity(0.3 * _glowAnimation.value),
-            //       blurRadius: 8,
-            //       spreadRadius: 2,
-            //     ),
-            //   ],
-            // ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Animated background effect
-                Transform.scale(
-                    scale: _glowAnimation.value,
-                    child: Transform.rotate(
-                      angle: 35,
-                      child: Icon(
-                        Icons.bolt,
-                        color: globalColorScheme.secondary.withOpacity(0.3),
-                        size: 150,
-                      ),
-                    )
-                    // Container(
-                    //   width: 150,
-                    //   height: 150,
-                    //   decoration: BoxDecoration(
-                    //     shape: BoxShape.circle,
-                    //     color: globalColorScheme.secondary.withOpacity(0.3),
-                    //   ),
-                    // ),
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              // Animated background effect
+              Transform.scale(
+                  scale: _glowAnimation.value,
+                  child: Transform.rotate(
+                    angle: 35,
+                    child: Icon(
+                      Icons.bolt,
+                      color: globalColorScheme.secondary.withOpacity(0.3),
+                      size: 150,
                     ),
-                // Icon
-                Transform.rotate(
-                  angle: 60,
-                  child: Icon(
-                    Icons.bolt,
-                    color: globalColorScheme.primary,
-                    size: 100,
-                  ),
+                  )),
+              // Icon
+              Transform.rotate(
+                angle: 60,
+                child: Icon(
+                  Icons.bolt,
+                  color: globalColorScheme.primary,
+                  size: 100,
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -670,17 +878,14 @@ class FitFlexClientProfilePage extends StatefulWidget {
 
 class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
   ValueNotifier<WorkoutPlanModel?> workoutPlanModel = ValueNotifier(null);
+  ValueNotifier<ClientEntity?> clientValue = ValueNotifier(null);
   @override
   void initState() {
     super.initState();
 
     context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
-    context.read<WorkoutManagementBloc>().add(
-          GetWorkoutPlansForClientEvent(
-            clientId: getIt<FirebaseAuth>().currentUser!.uid,
-          ),
-        );
+    // context.read<GetclientweightsCubit>().getClientWeights();
   }
 
 // On Surface
@@ -705,14 +910,7 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    final weightData = [
-      // ClientWeightEntity(date: DateTime(2023, 1, 1), weight: 92.3),
-      // ClientWeightEntity(date: DateTime(2023, 2, 1), weight: 89.5),
-      // ClientWeightEntity(date: DateTime(2023, 3, 1), weight: 85.7),
-      // ClientWeightEntity(date: DateTime(2023, 4, 1), weight: 80.4),
-      // ClientWeightEntity(date: DateTime(2023, 5, 1), weight: 83.8),
-      // ClientWeightEntity(date: DateTime(2023, 6, 1), weight: 90.22),
-    ];
+
     return Scaffold(
       backgroundColor: globalColorScheme.surface,
       body: SingleChildScrollView(
@@ -791,7 +989,15 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                                 color: Colors.grey[400], fontSize: 14),
                           ),
                           const SizedBox(height: 8),
-                          BlocBuilder<ClientProfileBloc, ClientProfileState>(
+                          BlocConsumer<ClientProfileBloc, ClientProfileState>(
+                            listener: (context, state) {
+                              if (state is GetProfileComplete) {
+                                clientValue.value = state.entity;
+                                context
+                                    .read<GetclientweightsCubit>()
+                                    .getClientWeights();
+                              }
+                            },
                             builder: (context, state) {
                               if (state is GetProfileComplete) {
                                 final client = state.entity;
@@ -826,15 +1032,15 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
             BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
               listener: (context, state) {
                 if (state is GetWorkoutPlansForClientLoading) {
-                  PlatformDialog.showLoadingDialog(
-                    context: context,
-                    message: "Fetching workout plan details for you...",
-                  );
+                  // PlatformDialog.showLoadingDialog(
+                  //   context: context,
+                  //   message: "Fetching workout plan details for you...",
+                  // );
                 }
 
                 if (state is GetWorkoutPlansForClientComplete) {
-                  workoutPlanModel.value = state.workoutPlan;
-                  context.pop();
+                  // workoutPlanModel.value = state.workoutPlan;
+                  // context.pop();
                 }
               },
               child: ValueListenableBuilder(
@@ -845,146 +1051,26 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                   );
                 },
               ),
-            )
-            // Padding(
-            //   padding: const EdgeInsets.all(16.0),
-            //   child: Container(
-            //     padding: const EdgeInsets.all(16),
-            //     decoration: BoxDecoration(
-            //       color: primaryColor,
-            //       borderRadius: BorderRadius.circular(30),
-            //       boxShadow: [
-            //         BoxShadow(
-            //           color: Colors.grey.withOpacity(0.2),
-            //           blurRadius: 10,
-            //           offset: const Offset(0, 5),
-            //         ),
-            //       ],
-            //     ),
-            //     child: Column(
-            //       crossAxisAlignment: CrossAxisAlignment.start,
-            //       children: [
-            //         // Header Section
-            //         Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //           children: [
-            //             Column(
-            //               crossAxisAlignment: CrossAxisAlignment.start,
-            //               children: [
-            //                 const Text(
-            //                   "Workout Plan",
-            //                   style: TextStyle(
-            //                     fontSize: 20,
-            //                     fontWeight: FontWeight.bold,
-            //                     color: deepNavyBlue,
-            //                   ),
-            //                 ),
-            //                 const SizedBox(height: 8),
-            //                 Text(
-            //                   "Keep pushing towards your goal!",
-            //                   style: TextStyle(
-            //                     fontSize: 14,
-            //                     color: deepNavyBlue.withOpacity(0.8),
-            //                   ),
-            //                 ),
-            //               ],
-            //             ),
-            //             Container(
-            //               width: 60,
-            //               height: 60,
-            //               decoration: BoxDecoration(
-            //                 color: Colors.blue.withOpacity(0.2),
-            //                 borderRadius: BorderRadius.circular(30),
-            //               ),
-            //               child: Center(
-            //                 child: Text(
-            //                   '60%',
-            //                   style: TextStyle(
-            //                     color: Colors.blue[300],
-            //                     fontSize: 18,
-            //                     fontWeight: FontWeight.bold,
-            //                   ),
-            //                 ),
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //         const SizedBox(height: 20),
-
-            //         // Workout Details Section
-            //         Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //           children: [
-            //             _buildWorkoutDetail(
-            //               icon: Icons.timer,
-            //               title: "Duration",
-            //               value: "45 mins",
-            //               color: Colors.green,
-            //             ),
-            //             _buildWorkoutDetail(
-            //               icon: Icons.fireplace,
-            //               title: "Calories",
-            //               value: "350 kcal",
-            //               color: Colors.redAccent,
-            //             ),
-            //             _buildWorkoutDetail(
-            //               icon: Icons.fitness_center,
-            //               title: "Exercises",
-            //               value: "8",
-            //               color: Colors.orange,
-            //             ),
-            //           ],
-            //         ),
-            //         const SizedBox(height: 20),
-
-            //         // Progress Bar Section
-            //         const Text(
-            //           "Today's Progress",
-            //           style: TextStyle(
-            //             fontSize: 16,
-            //             fontWeight: FontWeight.bold,
-            //             color: deepNavyBlue,
-            //           ),
-            //         ),
-            //         const SizedBox(height: 10),
-            //         Stack(
-            //           children: [
-            //             Container(
-            //               height: 10,
-            //               width: double.infinity,
-            //               decoration: BoxDecoration(
-            //                 color: Colors.grey[300],
-            //                 borderRadius: BorderRadius.circular(5),
-            //               ),
-            //             ),
-            //             Container(
-            //               height: 10,
-            //               width: MediaQuery.of(context).size.width *
-            //                   0.6, // 60% progress
-            //               decoration: BoxDecoration(
-            //                 color: Colors.blue,
-            //                 borderRadius: BorderRadius.circular(5),
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // )
-            ,
-
-            Container(
-              height: 200,
-              width: double.maxFinite,
-              decoration: BoxDecoration(),
-              child: Center(
-                child: Text(
-                  'Weight Tracker Comming Soon..',
-                ),
-              ),
             ),
-            // const WeightTrackerScreen()
+            ValueListenableBuilder(
+              valueListenable: clientValue,
+              builder: (context, client, _) {
+                if (client != null) {
+                  return WeightTrackerScreen(
+                    initialClientWeight: client.weightInKg.toString(),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: PlatformLoader().buildLoader(
+                      type: LoaderType.shimmer,
+                      containerRadius: 30,
+                      height: 100,
+                    ),
+                  );
+                }
+              },
+            )
           ],
         ),
       ),
@@ -1033,4 +1119,3 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
 //   @override
 //   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 // }
-

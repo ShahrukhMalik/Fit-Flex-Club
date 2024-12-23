@@ -16,13 +16,5 @@ class ClientWeightEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [timeStamp, weightInKg, weightInLb];
-
-  Map<String, dynamic> toMapforGraph([bool showInKg = true]) {
-    return <String, dynamic>{
-      'timeStamp': timeStamp,
-      'weight': showInKg ? weightInKg : weightInLb,
-      'unit': showInKg ? 'kg' : 'lb',
-    };
-  }
+  List<Object?> get props => [timeStamp, weightInKg, weightInLb, clientId];
 }

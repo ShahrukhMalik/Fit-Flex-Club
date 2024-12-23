@@ -30,7 +30,6 @@ import 'package:go_router/go_router.dart';
 
 import 'package:uuid_v4/uuid_v4.dart';
 
-
 enum ConcludeEvent {
   submit,
   goback,
@@ -617,6 +616,11 @@ class _FitFlexClubCreateWorkoutPlanPageState
     final colorScheme = globalColorScheme;
 
     return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+        context.pop();
+      },
       child: SafeArea(
         bottom: true,
         top: false,

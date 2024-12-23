@@ -108,6 +108,7 @@ class PlatformDialog {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
+      
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),

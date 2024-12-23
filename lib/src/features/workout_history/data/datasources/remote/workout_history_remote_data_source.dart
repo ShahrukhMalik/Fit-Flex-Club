@@ -5,6 +5,7 @@ import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 
@@ -44,65 +45,30 @@ class WorkoutHistoryRemoteDataSourceImpl
       final CollectionReference ref = db.collection('Users');
 
       // Fetch workout plans for the user
-      final workoutPlanSnapshot =
-          await ref.doc(clientUid ?? clientId).collection('workoutPlans').get();
+      final workoutHistorySnapshot = await ref
+          .doc(clientUid ?? clientId)
+          .collection('workoutHistory')
+          .get();
       final Map<String, List<ExerciseModel>> groupedByDate = {};
 
-      // Fetch weeks, days, and exercises for each workout plan
       final List<WorkoutHistoryModel> allWorkoutHistories = [];
 
-      for (final workoutPlanDoc in workoutPlanSnapshot.docs) {
-        final weeksRef = workoutPlanDoc.reference.collection('weeks');
-        final weekSnapshot = await weeksRef.get();
+      final List<ExerciseModel> exercises = await Future.wait(
+        workoutHistorySnapshot.docs.map((exerciseDoc) async {
+          final exerciseData = exerciseDoc.data();
+          final exerciseModel = ExerciseModel.fromMap(exerciseData);
+          return exerciseModel;
+        }),
+      );
 
-        for (final weekDoc in weekSnapshot.docs) {
-          final daysRef = weekDoc.reference.collection('days');
-          final daySnapshot = await daysRef.get();
+      // Group exercises by `updatedAt` date
 
-          for (final dayDoc in daySnapshot.docs) {
-            final exerciseRef = dayDoc.reference.collection('exercises');
-            final exerciseSnapshot = await exerciseRef
-                .where('completed', isEqualTo: true)
-                .where(
-                  'updatedAt',
-                  isNotEqualTo: null,
-                )
-                .get();
-
-            // Fetch exercise details and group them by date
-            final List<ExerciseModel> exercises = await Future.wait(
-              exerciseSnapshot.docs.map((exerciseDoc) async {
-                final exerciseData = exerciseDoc.data();
-
-                final setRef = exerciseDoc.reference.collection('sets');
-                final setSnapshot = await setRef.get();
-
-                final sets = setSnapshot.docs.map((setDoc) {
-                  return SetModel.fromMap(setDoc.data());
-                }).toList();
-
-                // print(exerciseData);
-                final exerciseModel = ExerciseModel.fromMap(exerciseData);
-                print(exerciseModel.toMap());
-                return exerciseModel.copyWith(sets: sets);
-              }),
-            );
-
-            // Group exercises by `updatedAt` date
-
-            for (final exercise in exercises) {
-              if (exercise.updatedAt != null) {
-                final String formattedDate = DateFormat('yyyy-MM-dd').format(
-                  DateTime.fromMillisecondsSinceEpoch(exercise.updatedAt!),
-                );
-                groupedByDate
-                    .putIfAbsent(formattedDate, () => [])
-                    .add(exercise);
-              }
-            }
-
-            // Create WorkoutHistoryModels for each date group
-          }
+      for (final exercise in exercises) {
+        if (exercise.updatedAt != null) {
+          final String formattedDate = DateFormat('yyyy-MM-dd').format(
+            DateTime.fromMillisecondsSinceEpoch(exercise.updatedAt!),
+          );
+          groupedByDate.putIfAbsent(formattedDate, () => []).add(exercise);
         }
       }
 
@@ -144,35 +110,64 @@ class WorkoutHistoryRemoteDataSourceImpl
       WriteBatch batch = db.batch();
 
       ///
-      final exerciseDocRef = ref
-          .doc(clientId ?? clientUid)
-          .collection('workoutPlans')
-          .doc(workoutPlanId)
-          .collection('weeks')
-          .doc(weekId)
-          .collection('days')
-          .doc(dayId)
-          .collection('exercises')
-          .doc(exerciseId);
+      final historyCollection =
+          ref.doc(clientId ?? clientUid).collection('workoutHistory');
 
-      // final exerciseMap =
-      batch.set(
-          exerciseDocRef,
-          {
-            'completed': true,
-            'updatedAt': DateTime.now().millisecondsSinceEpoch
-          },
-          SetOptions(merge: true));
+      final documents =
+          await ref.doc(clientUid).collection('workoutPlans').get();
 
-      ///
-      for (final set in sets) {
-        final setMap = set.toMap();
-        setMap['setNumber'] = sets.indexOf(set) + 1;
-        DocumentReference setRef = exerciseDocRef.collection('sets').doc(
-              set.id.toString(),
+      // Using await in the map to ensure async calls complete
+      // if (documents.exists) {
+      final workoutPlanData = documents.docs.first.data();
+      //
+      final workoutPlanModel = WorkoutPlanModel.fromMap(
+        workoutPlanData,
+      );
+      // return workoutPlanModel;
+      final updatedWeeks = workoutPlanModel.weeks.map((week) {
+        return week.copyWith(
+          days: week.days.map((day) {
+            return day.copyWith(
+              exercises: day.exercises.map((exercise) {
+                if (exercise.id == exerciseId) {
+                  return exercise.copyWith(
+                    completed: true,
+                    updatedAt: DateTime.now().millisecondsSinceEpoch,
+                    sets: sets,
+                  );
+                }
+                return exercise;
+              }).toList(),
             );
-        batch.set(setRef, setMap, SetOptions(merge: true));
-      }
+          }).toList(),
+        );
+      }).toList();
+
+      final updatedWorkoutPlan = workoutPlanModel.copyWith(
+        weeks: updatedWeeks,
+      );
+
+      batch.set(
+        documents.docs.first.reference,
+        updatedWorkoutPlan.toMap(),
+        SetOptions(merge: true),
+      );
+      final completedExercise = updatedWorkoutPlan.weeks
+          .expand((week) => week.days.expand((day) => day.exercises.where(
+                (element) => element.completed ?? false,
+              )))
+          .firstWhere(
+            (element) => element.id == exerciseId,
+          );
+
+      batch.set(
+        historyCollection.doc(completedExercise.id),
+        completedExercise.toMap(),
+        SetOptions(
+          merge: true,
+        ),
+      );
+      // }
 
       ///
       await batch.commit();

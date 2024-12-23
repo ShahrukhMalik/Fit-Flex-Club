@@ -49,9 +49,3 @@ abstract class WorkoutManagementRepository {
 
 }
 
-enum ListenerEvents {
-  updateAssignedWorkoutPlan,
-  deleteAssignedWorkoutPlan,
-  addAssignedWorkoutPlan,
-  deactivateUser,
-}

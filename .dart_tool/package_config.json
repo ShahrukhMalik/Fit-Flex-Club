@@ -405,7 +405,7 @@
     },
     {
       "name": "go_router",
-      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/go_router-14.4.1",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/go_router-14.6.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -884,7 +884,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-12-17T10:13:10.722035Z",
+  "generated": "2024-12-23T04:24:28.806340Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///Users/apple/development/flutter",

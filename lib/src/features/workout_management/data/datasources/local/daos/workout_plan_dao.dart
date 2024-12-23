@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
@@ -14,6 +16,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid_v4/uuid_v4.dart';
 part 'workout_plan_dao.g.dart';
@@ -322,7 +325,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
               ..where((tbl) => tbl.id.equals(workoutPlan.clientId!)))
             .write(
           ClientsCompanion(
-            currentWorkoutPlanName: Value.absent(),
+            currentWorkoutPlanName: Value(null),
           ),
         );
         await (delete(workoutPlans)
@@ -496,7 +499,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         .write(updatedSet);
   }
 
-  Future<WorkoutPlanModel?> getWorkoutPlanForClient(String clientId) async {
+  Future<String?> getWorkoutPlanForClient(String clientId) async {
     try {
       // Fetch all workout plans
       final workoutPlansList = await (select(workoutPlans)
@@ -504,146 +507,69 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           .get();
 
       if (workoutPlansList.isNotEmpty) {
-        // Use Future.wait to fetch all related data concurrently
-        // return await Future.wait(workoutPlansObj.map((plan) async {
-        // Fetch weeks for the workout plan efficiently
         final weeksObj = await (select(weeks)
               ..where(
                   (week) => week.workoutPlanId.equals(workoutPlansList[0].uid))
               ..orderBy([(week) => OrderingTerm(expression: week.weekNumber)]))
             .get();
 
-        // Fetch all days for these weeks in a single query
         final daysObj = await (select(days)
               ..where((day) => day.weekId.isIn(weeksObj.map((week) => week.id)))
               ..orderBy([(day) => OrderingTerm(expression: day.dayNumber)]))
             .get();
 
-        final exercisesWithBaseAndSets =
-            await (select(workoutPlanExercise).join([
-          innerJoin(
-            baseExercise,
-            baseExercise.code.equalsExp(workoutPlanExercise.code),
-          ),
-          leftOuterJoin(
-            exerciseSets,
-            exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
-          ),
-          // leftOuterJoin(
-          //   workoutHistorySet,
-          //   exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
-          // ),
+        final exercisesWithBaseAndSets = await (select(workoutPlanExercise)
+                .join([
+          innerJoin(baseExercise,
+              baseExercise.code.equalsExp(workoutPlanExercise.code)),
+          leftOuterJoin(exerciseSets,
+              exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id)),
         ])
-                  ..where(
-                    workoutPlanExercise.dayId
-                        .isIn(daysObj.map((day) => day.id)),
-                  )
-                  ..orderBy(
-                    [
-                      OrderingTerm(
-                        expression: workoutPlanExercise.exerciseOrder,
-                        mode: OrderingMode
-                            .asc, // Ascending order (optional, default is ascending)
-                      ),
-                      OrderingTerm(
-                        expression: exerciseSets.setNumber,
-                        mode: OrderingMode.asc,
-                      ),
-                    ],
-                  ))
-                .get();
+              ..where(
+                  workoutPlanExercise.dayId.isIn(daysObj.map((day) => day.id)))
+              ..orderBy([
+                OrderingTerm(
+                  expression: workoutPlanExercise.exerciseOrder,
+                  mode: OrderingMode.asc,
+                ),
+                OrderingTerm(
+                  expression: exerciseSets.setNumber,
+                  mode: OrderingMode.asc,
+                ),
+              ]))
+            .get();
 
-        // Group exercises and sets by exercise ID
-        final exerciseGroups = <String, Map<String, dynamic>>{};
-        for (final row in exercisesWithBaseAndSets) {
-          final workoutExercise = row.readTable(workoutPlanExercise);
-          final base = row.readTable(baseExercise);
-          final exerciseSet = row.readTableOrNull(exerciseSets);
-
-          if (!exerciseGroups.containsKey(workoutExercise.id)) {
-            exerciseGroups[workoutExercise.id] = {
-              'exercise': ExerciseModel(
-                completed: workoutExercise.completed,
-                clientId: workoutExercise.clientId,
-                dayId: workoutExercise.dayId,
-                id: workoutExercise.id,
-                code: base.code,
-                name: base.name,
-                category: base.category,
-                muscleGroup: base.muscleGroup,
-                exerciseOrder: workoutExercise.exerciseOrder,
-                parameters: {
-                  'weight': base.weight,
-                  'reps': base.reps,
-                  'duration': base.duration,
-                },
-                [],
-              ),
-              'sets': <SetModel>[],
+        // Prepare input for compute
+        final computeInput = json.encode({
+          'exercisesWithBaseAndSets': exercisesWithBaseAndSets.map((row) {
+            return {
+              'workoutExercise': row.readTable(workoutPlanExercise).toJson(),
+              'base': row.readTable(baseExercise).toJson(),
+              'exerciseSet': row.readTableOrNull(exerciseSets)?.toJson(),
             };
-          }
+          }).toList(),
+          'daysObj': daysObj.map((day) => day.toJson()).toList(),
+          'weeksObj': weeksObj.map((week) => week.toJson()).toList(),
+          'workoutPlan': workoutPlansList[0].toJson(),
+        });
 
-          if (exerciseSet != null) {
-            (exerciseGroups[workoutExercise.id]!['sets'] as List<SetModel>).add(
-              SetModel.fromMap(exerciseSet.toJson()),
-            );
-          }
-        }
+        return computeInput;
 
-        // Group exercises by dayId
-        final exercisesGroupedByDay = <String, List<ExerciseModel>>{};
-        for (final group in exerciseGroups.values) {
-          final exercise = group['exercise'] as ExerciseModel;
-          final sets = group['sets'] as List<SetModel>;
-          final finalExercise = exercise.copyWith(sets: sets);
-          exercisesGroupedByDay
-              .putIfAbsent(exercise.dayId, () => [])
-              .add(finalExercise);
-        }
+        // // Perform processing in a separate isolate
+        // final workoutPlan =
+        //     await compute(_processWorkoutPlanModel, computeInput);
 
-        // Map days to models, attaching exercises
-        final dayModels = daysObj.map((day) {
-          return DayModel(
-            clientId: day.clientId,
-            weekId: day.weekId,
-            id: day.id,
-            dayNumber: day.dayNumber,
-            exercises: exercisesGroupedByDay[day.id] ?? [],
-          );
-        }).toList();
-
-        // Map weeks to models, attaching days
-        final weekModels = weeksObj.map((week) {
-          return WeekModel(
-            clientId: week.clientId,
-            workoutPlanId: week.workoutPlanId,
-            id: week.id,
-            weekNumber: week.weekNumber,
-            days: dayModels
-                .where((day) => day.weekId == week.id)
-                .toList(), // Filter days belonging to the week
-          );
-        }).toList();
-
-        // Create and return the final workout plan model
-        return WorkoutPlanModel(
-          clientId: workoutPlansList[0].clientId,
-          createdAt: workoutPlansList[0].createdAt,
-          updatedAt: workoutPlansList[0].updatedAt,
-          name: workoutPlansList[0].name,
-          weeks: weekModels,
-          uid: workoutPlansList[0].uid,
-        );
+        // return workoutPlan;
       } else {
         return null;
       }
-      // }).toList());
     } catch (e) {
-      // Add proper error handling
       print('Error fetching workout plans: $e');
       rethrow;
     }
   }
+
+
 
   Future<List<WorkoutPlanModel>> getWorkoutPlans() async {
     try {

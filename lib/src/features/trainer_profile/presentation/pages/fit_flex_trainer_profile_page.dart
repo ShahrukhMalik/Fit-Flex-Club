@@ -68,46 +68,253 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
   Widget build(BuildContext context) {
     // Sample data with gender added
 
-    return Scaffold(
-      backgroundColor: widget.colorScheme.surface,
-      appBar: PlatformAppbar.basicAppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: globalColorScheme.onPrimaryContainer,
-        title: "Client Profiles",
-        context: context,
-        trailing: PlatformButton().buildButton(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        print(didPop);
+      },
+      child: Scaffold(
+        backgroundColor: widget.colorScheme.surface,
+        appBar: PlatformAppbar.basicAppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: globalColorScheme.onPrimaryContainer,
+          title: "Client Profiles",
           context: context,
-          type: ButtonType.icon,
-          foregroundColor: globalColorScheme.primary,
-          icon: Icons.logout,
-          text: "",
-          onPressed: () => context
-              .read<AuthenticationBloc>()
-              .add(LogOutAuthenticationEvent()),
-        )!,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Search Bar
-              AppTextFields.searchTextField(
-                onChanged: (value) => _filterClients(value),
-                // decoration: InputDecoration(
-                //   labelText: 'Search by Name',
-                //   hintText: 'Search by Name',
-                // ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Clients List
-              BlocBuilder<TrainerProfileBloc, TrainerProfileState>(
-                builder: (context, state) {
-                  if (state is TrainerProfileLoading) {
+          trailing: PlatformButton().buildButton(
+            context: context,
+            type: ButtonType.icon,
+            foregroundColor: globalColorScheme.primary,
+            icon: Icons.logout,
+            text: "",
+            onPressed: () => context
+                .read<AuthenticationBloc>()
+                .add(LogOutAuthenticationEvent()),
+          )!,
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Search Bar
+                AppTextFields.searchTextField(
+                  onChanged: (value) => _filterClients(value),
+                  // decoration: InputDecoration(
+                  //   labelText: 'Search by Name',
+                  //   hintText: 'Search by Name',
+                  // ),
+                ),
+      
+                const SizedBox(height: 16),
+      
+                // Clients List
+                BlocBuilder<TrainerProfileBloc, TrainerProfileState>(
+                  builder: (context, state) {
+                    if (state is TrainerProfileLoading) {
+                      return Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(
+                              6,
+                              (index) => Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: PlatformLoader().buildLoader(
+                                  type: LoaderType.shimmer,
+                                  height: 100,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    if (state is TrainerProfileComplete) {
+                      clients.value = state.entities;
+                      _originalList = state.entities;
+                      return Expanded(
+                        child: ValueListenableBuilder(
+                            valueListenable: clients,
+                            builder: (context, clients, _) {
+                              return ListView.builder(
+                                itemCount: clients?.length,
+                                itemBuilder: (context, index) {
+                                  final client = clients?[index];
+                                  return InkWell(
+                                    onTap: () => context.go(
+                                        FitFlexTrainerClientDetailsPage.route,
+                                        extra: {'client': client}),
+                                    child: Card(
+                                      elevation: 2,
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      color: widget.colorScheme.inversePrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                        side: BorderSide(
+                                            color: widget.colorScheme.outline),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Client Name and Gender
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    client?.username ?? "",
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: widget
+                                                          .colorScheme.onSurface,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        client?.gender == 'Male'
+                                                            ? widget.colorScheme
+                                                                .tertiary
+                                                                .withOpacity(0.1)
+                                                            : widget.colorScheme
+                                                                .secondary
+                                                                .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(50),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        client?.gender == 'Male'
+                                                            ? Icons.male
+                                                            : Icons.female,
+                                                        size: 16,
+                                                        color: client?.gender ==
+                                                                'Male'
+                                                            ? widget.colorScheme
+                                                                .tertiary
+                                                            : widget.colorScheme
+                                                                .secondary,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        client?.gender ?? "",
+                                                        style: TextStyle(
+                                                          color: client?.gender ==
+                                                                  'Male'
+                                                              ? widget.colorScheme
+                                                                  .tertiary
+                                                              : widget.colorScheme
+                                                                  .secondary,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+      
+                                            // Client Details Row
+                                            Row(
+                                              children: [
+                                                _buildDetailItem(
+                                                  icon: Icons.calendar_today,
+                                                  label: 'Age',
+                                                  value: '${client?.age} years',
+                                                  colorScheme: widget.colorScheme,
+                                                ),
+                                                const SizedBox(width: 16),
+                                                _buildDetailItem(
+                                                  icon: Icons.monitor_weight,
+                                                  label: 'Weight',
+                                                  value:
+                                                      '${client?.weightInKg} kg',
+                                                  colorScheme: widget.colorScheme,
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+      
+                                            // Program Status
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.fitness_center,
+                                                  size: 20,
+                                                  color: widget.colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  'Program:',
+                                                  style: TextStyle(
+                                                    color: widget.colorScheme
+                                                        .onSurfaceVariant,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 6,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        client?.currentWorkoutPlanName !=
+                                                                null
+                                                            ? widget.colorScheme
+                                                                .primary
+                                                            : widget.colorScheme
+                                                                .secondary,
+                                                    borderRadius:
+                                                        BorderRadius.circular(20),
+                                                  ),
+                                                  child: Text(
+                                                    client?.currentWorkoutPlanName !=
+                                                            null
+                                                        ? client!
+                                                            .currentWorkoutPlanName!
+                                                        : 'Not Assigned',
+                                                    style: TextStyle(
+                                                      color:
+                                                          client?.currentWorkoutPlanName !=
+                                                                  null
+                                                              ? widget.colorScheme
+                                                                  .onPrimary
+                                                              : widget.colorScheme
+                                                                  .onSecondary,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }),
+                      );
+                    }
                     return Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -124,220 +331,19 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                         ),
                       ),
                     );
-                  }
-                  if (state is TrainerProfileComplete) {
-                    clients.value = state.entities;
-                    _originalList = state.entities;
-                    return Expanded(
-                      child: ValueListenableBuilder(
-                          valueListenable: clients,
-                          builder: (context, clients, _) {
-                            return ListView.builder(
-                              itemCount: clients?.length,
-                              itemBuilder: (context, index) {
-                                final client = clients?[index];
-                                return InkWell(
-                                  onTap: () => context.go(
-                                      FitFlexTrainerClientDetailsPage.route,
-                                      extra: {'client': client}),
-                                  child: Card(
-                                    elevation: 2,
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    color: widget.colorScheme.inversePrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      side: BorderSide(
-                                          color: widget.colorScheme.outline),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // Client Name and Gender
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  client?.username ?? "",
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: widget
-                                                        .colorScheme.onSurface,
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      client?.gender == 'Male'
-                                                          ? widget.colorScheme
-                                                              .tertiary
-                                                              .withOpacity(0.1)
-                                                          : widget.colorScheme
-                                                              .secondary
-                                                              .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      client?.gender == 'Male'
-                                                          ? Icons.male
-                                                          : Icons.female,
-                                                      size: 16,
-                                                      color: client?.gender ==
-                                                              'Male'
-                                                          ? widget.colorScheme
-                                                              .tertiary
-                                                          : widget.colorScheme
-                                                              .secondary,
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      client?.gender ?? "",
-                                                      style: TextStyle(
-                                                        color: client?.gender ==
-                                                                'Male'
-                                                            ? widget.colorScheme
-                                                                .tertiary
-                                                            : widget.colorScheme
-                                                                .secondary,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 12),
-
-                                          // Client Details Row
-                                          Row(
-                                            children: [
-                                              _buildDetailItem(
-                                                icon: Icons.calendar_today,
-                                                label: 'Age',
-                                                value: '${client?.age} years',
-                                                colorScheme: widget.colorScheme,
-                                              ),
-                                              const SizedBox(width: 16),
-                                              _buildDetailItem(
-                                                icon: Icons.monitor_weight,
-                                                label: 'Weight',
-                                                value:
-                                                    '${client?.weightInKg} kg',
-                                                colorScheme: widget.colorScheme,
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 12),
-
-                                          // Program Status
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.fitness_center,
-                                                size: 20,
-                                                color: widget.colorScheme
-                                                    .onSurfaceVariant,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                'Program:',
-                                                style: TextStyle(
-                                                  color: widget.colorScheme
-                                                      .onSurfaceVariant,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 6,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      client?.currentWorkoutPlanName !=
-                                                              null
-                                                          ? widget.colorScheme
-                                                              .primary
-                                                          : widget.colorScheme
-                                                              .secondary,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: Text(
-                                                  client?.currentWorkoutPlanName !=
-                                                          null
-                                                      ? client!
-                                                          .currentWorkoutPlanName!
-                                                      : 'Not Assigned',
-                                                  style: TextStyle(
-                                                    color:
-                                                        client?.currentWorkoutPlanName !=
-                                                                null
-                                                            ? widget.colorScheme
-                                                                .onPrimary
-                                                            : widget.colorScheme
-                                                                .onSecondary,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }),
-                    );
-                  }
-                  return Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(
-                          6,
-                          (index) => Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: PlatformLoader().buildLoader(
-                              type: LoaderType.shimmer,
-                              height: 100,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      // FAB for quick actions
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: widget.colorScheme.primaryContainer,
-        child: Icon(Icons.filter_list,
-            color: widget.colorScheme.onPrimaryContainer),
+        // FAB for quick actions
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: widget.colorScheme.primaryContainer,
+          child: Icon(Icons.filter_list,
+              color: widget.colorScheme.onPrimaryContainer),
+        ),
       ),
     );
   }

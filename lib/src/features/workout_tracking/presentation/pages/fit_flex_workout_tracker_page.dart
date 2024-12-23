@@ -32,135 +32,157 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PlatformAppbar.basicAppBar(
-        title: "Workout Plan",
-        context: context,
-        backgroundColor: globalColorScheme.onPrimaryContainer,
-        onLeadingPressed: () {
-          PlatformDialog.showAlertDialog(
-            context: context,
-            title: "Workout Tracker",
-            message:
-                "Progress is not saved, if you continue your progress will be lost.",
-            cancelText: 'Cancel',
-            confirmText: 'Continue',
-            // onCancel: () => context.pop(),
-            onConfirm: () => context.pop(),
-          );
-        },
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 200,
-            width: double.maxFinite,
-            child: Center(
-              child: Text(
-                'Video Assist Comming Soon..',
+    final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
+    bool isKeyboardOpen = bottomInsets != 0;
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        PlatformDialog.showAlertDialog(
+          context: context,
+          title: "Workout Tracker",
+          message:
+              "Progress is not saved, if you continue your progress will be lost.",
+          cancelText: 'Cancel',
+          confirmText: 'Continue',
+          // onCancel: () => context.pop(),
+          onConfirm: () => context.pop(),
+        );
+      },
+      child: Scaffold(
+        // resizeToAvoidBottomInset: true,
+        appBar: PlatformAppbar.basicAppBar(
+          title: "Workout Plan",
+          context: context,
+          backgroundColor: globalColorScheme.onPrimaryContainer,
+          onLeadingPressed: () {
+            PlatformDialog.showAlertDialog(
+              context: context,
+              title: "Workout Tracker",
+              message:
+                  "Progress is not saved, if you continue your progress will be lost.",
+              cancelText: 'Cancel',
+              confirmText: 'Continue',
+              // onCancel: () => context.pop(),
+              onConfirm: () => context.pop(),
+            );
+          },
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!isKeyboardOpen) ...[
+              SizedBox(
+                height: 200,
+                width: double.maxFinite,
+                child: Center(
+                  child: Text(
+                    'Video Assist Comming Soon..',
+                  ),
+                ),
               ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: SizedBox(
-              width: 40,
-              child: Divider(
-                // indent: 10,
-                thickness: 3,
+              Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 40,
+                  child: Divider(
+                    // indent: 10,
+                    thickness: 3,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              width: double.maxFinite,
-              height: double.maxFinite,
-              color: globalColorScheme.surface,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Day ${day.dayNumber}',
-                    style: TextStyle(
-                      color: globalColorScheme.primaryContainer,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    workoutPlan.name,
-                    style: TextStyle(
-                        color: globalColorScheme.onSurfaceVariant,
-                        // fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    '${exercise.name}',
-                    style: TextStyle(
-                      color: globalColorScheme.tertiaryContainer,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
-                    listener: (context, state) {
-                      if (state is GetWorkoutPlansForClientComplete) {
-                        context.pop();
-                        context.pop(exercise.copyWith(completed: true));
-                      }
-                    },
-                    child: SizedBox(height: 10),
-                  ),
-                  BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
-                    listener: (context, state) {
-                      if (state is LogWorkoutHistoryLoading) {
-                        PlatformDialog.showLoadingDialog(
-                          context: context,
-                          message: "Saving your progress..",
-                        );
-                      }
-                      if (state is LogWorkoutHistoryComplete) {
-                        context.read<WorkoutManagementBloc>().add(
-                              GetWorkoutPlansForClientEvent(
-                                clientId:
-                                    getIt<FirebaseAuth>().currentUser!.uid,
-                              ),
-                            );
-                      }
-                    },
-                    child: Expanded(
-                      child: SetTrakerWidget(
-                        onConfirmExit: () {
-                          context.pop(exercise.copyWith(completed: false));
-                        },
-                        onSubmit: (sets) {
-                          print(sets);
-                          context.read<WorkoutHistoryBloc>().add(
-                                LogWorkoutHistoryEvent(
-                                  sets: sets,
-                                  exerciseId: exercise.id!,
-                                  dayId: day.id,
-                                  weekId: week.id,
-                                  workoutPlanId: workoutPlan.uid,
-                                ),
-                              );
-                        },
-                        sets: exercise.sets,
-                        showReps: exercise.parameters?['reps'],
-                        showTime: exercise.parameters?['duration'],
-                        showWeight: exercise.parameters?['weight'],
+            ],
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                width: double.maxFinite,
+                height: double.maxFinite,
+                color: globalColorScheme.surface,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Day ${day.dayNumber}',
+                      style: TextStyle(
+                        color: globalColorScheme.primaryContainer,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 2),
+                    Text(
+                      workoutPlan.name,
+                      style: TextStyle(
+                          color: globalColorScheme.onSurfaceVariant,
+                          // fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      '${exercise.name}',
+                      style: TextStyle(
+                        color: globalColorScheme.tertiaryContainer,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
+                      listener: (context, state) {
+                        if (state is GetWorkoutPlansForClientComplete) {
+                          context.pop();
+                          context.pop(exercise.copyWith(completed: true));
+                        }
+                      },
+                      child: SizedBox(height: 10),
+                    ),
+                    BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
+                      listener: (context, state) {
+                        if (state is LogWorkoutHistoryLoading) {
+                          PlatformDialog.showLoadingDialog(
+                            context: context,
+                            message: "Saving your progress..",
+                          );
+                        }
+                        if (state is LogWorkoutHistoryComplete) {
+                          context.read<WorkoutManagementBloc>().add(
+                                GetWorkoutPlansForClientEvent(
+                                  clientId:
+                                      getIt<FirebaseAuth>().currentUser!.uid,
+                                ),
+                              );
+                        }
+                      },
+                      child: Expanded(
+                        child: SetTrakerWidget(
+                          showSubmit: !isKeyboardOpen,
+                          onConfirmExit: () {
+                            context.pop(exercise.copyWith(completed: false));
+                          },
+                          onSubmit: (sets) {
+                            print(sets);
+                            context.read<WorkoutHistoryBloc>().add(
+                                  LogWorkoutHistoryEvent(
+                                    sets: sets,
+                                    exerciseId: exercise.id!,
+                                    dayId: day.id,
+                                    weekId: week.id,
+                                    workoutPlanId: workoutPlan.uid,
+                                  ),
+                                );
+                          },
+                          sets: exercise.sets,
+                          showReps: exercise.parameters?['reps'],
+                          showTime: exercise.parameters?['duration'],
+                          showWeight: exercise.parameters?['weight'],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -169,6 +191,7 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
 // import 'package:flutter/material.dart';
 
 class SetTrakerWidget extends StatefulWidget {
+  final bool showSubmit;
   final List<SetModel> sets;
   final bool showWeight;
   final bool showReps;
@@ -179,6 +202,7 @@ class SetTrakerWidget extends StatefulWidget {
     super.key,
     required this.sets,
     required this.showWeight,
+    required this.showSubmit,
     required this.showReps,
     required this.showTime,
     required this.onSubmit,
@@ -240,7 +264,7 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: globalColorScheme.primary,
+                                color: globalColorScheme.tertiary,
                               ),
                             ),
                           ],
@@ -265,6 +289,9 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                           vertical: 10),
                                       child: Center(
                                         child: AppTextFields.basicTextField(
+                                          style: TextStyle(
+                                              color: globalColorScheme
+                                                  .onPrimaryContainer),
                                           keyboardType: TextInputType.number,
                                           onChanged: (p0) => _updateSets(
                                               sets![index].copyWith(
@@ -308,6 +335,9 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                           vertical: 10),
                                       child: Center(
                                         child: AppTextFields.basicTextField(
+                                          style: TextStyle(
+                                              color: globalColorScheme
+                                                  .onPrimaryContainer),
                                           onChanged: (p0) => _updateSets(
                                               sets![index].copyWith(
                                                   actualReps:
@@ -386,73 +416,75 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: PlatformButton().buildButton(
-            context: context,
-            type: ButtonType.primary,
-            backgroundColor: globalColorScheme.primary,
-            foregroundColor: globalColorScheme.surface,
-            text: 'Submit',
-            onPressed: () {
-              if (widget.showWeight && widget.showReps) {
-                final isNotReady = _sets.value?.any(
-                  (element) => ((element.actualWeight ?? 0) <= 0 ||
-                      (element.actualReps ?? 0) <= 0),
-                );
-                if (isNotReady ?? true) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Workout Tracker",
-                    message:
-                        "You haven't updated your progress, wish to cancel ?",
-                    onConfirm: () => widget.onConfirmExit(),
-                    cancelText: 'No',
-                    confirmText: 'Yes',
+        if (widget.showSubmit)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: PlatformButton().buildButton(
+              context: context,
+              type: ButtonType.primary,
+              backgroundColor: globalColorScheme.primary,
+              foregroundColor: globalColorScheme.surface,
+              text: 'Submit',
+              textStyle: TextStyle(color: globalColorScheme.surface),
+              onPressed: () {
+                if (widget.showWeight && widget.showReps) {
+                  final isNotReady = _sets.value?.any(
+                    (element) => ((element.actualWeight ?? 0) <= 0 ||
+                        (element.actualReps ?? 0) <= 0),
                   );
-                } else {
-                  widget.onSubmit(_sets.value!);
-                }
-              } else if (!widget.showWeight && widget.showReps) {
-                final isNotReady = _sets.value?.any(
-                  (element) => ((element.actualReps ?? 0) <= 0),
-                );
-                if (isNotReady ?? true) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Workout Tracker",
-                    message:
-                        "You haven't updated your progress, wish to cancel ?",
-                    onConfirm: () => widget.onConfirmExit(),
-                    cancelText: 'No',
-                    confirmText: 'Yes',
+                  if (isNotReady ?? true) {
+                    PlatformDialog.showAlertDialog(
+                      context: context,
+                      title: "Workout Tracker",
+                      message:
+                          "You haven't updated your progress, wish to cancel ?",
+                      onConfirm: () => widget.onConfirmExit(),
+                      cancelText: 'No',
+                      confirmText: 'Yes',
+                    );
+                  } else {
+                    widget.onSubmit(_sets.value!);
+                  }
+                } else if (!widget.showWeight && widget.showReps) {
+                  final isNotReady = _sets.value?.any(
+                    (element) => ((element.actualReps ?? 0) <= 0),
                   );
-                } else {
-                  widget.onSubmit(_sets.value!);
-                }
-              } else if (widget.showTime) {
-                final isNotReady = _sets.value?.any(
-                  (element) => ((element.actualTime?.inMinutes ??
-                          Duration(minutes: 0).inMinutes) <=
-                      Duration(minutes: 0).inMinutes),
-                );
-                if (isNotReady ?? true) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Workout Tracker",
-                    message:
-                        "You haven't updated your progress, wish to cancel ?",
-                    onConfirm: () => widget.onConfirmExit(),
-                    cancelText: 'No',
-                    confirmText: 'Yes',
+                  if (isNotReady ?? true) {
+                    PlatformDialog.showAlertDialog(
+                      context: context,
+                      title: "Workout Tracker",
+                      message:
+                          "You haven't updated your progress, wish to cancel ?",
+                      onConfirm: () => widget.onConfirmExit(),
+                      cancelText: 'No',
+                      confirmText: 'Yes',
+                    );
+                  } else {
+                    widget.onSubmit(_sets.value!);
+                  }
+                } else if (widget.showTime) {
+                  final isNotReady = _sets.value?.any(
+                    (element) => ((element.actualTime?.inMinutes ??
+                            Duration(minutes: 0).inMinutes) <=
+                        Duration(minutes: 0).inMinutes),
                   );
-                } else {
-                  widget.onSubmit(_sets.value!);
+                  if (isNotReady ?? true) {
+                    PlatformDialog.showAlertDialog(
+                      context: context,
+                      title: "Workout Tracker",
+                      message:
+                          "You haven't updated your progress, wish to cancel ?",
+                      onConfirm: () => widget.onConfirmExit(),
+                      cancelText: 'No',
+                      confirmText: 'Yes',
+                    );
+                  } else {
+                    widget.onSubmit(_sets.value!);
+                  }
                 }
-              }
-            },
-          )!,
-        ),
+              },
+            )!,
+          ),
       ],
     );
   }

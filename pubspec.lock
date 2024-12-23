@@ -239,7 +239,7 @@ packages:
     source: hosted
     version: "1.19.0"
   connectivity_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: connectivity_plus
       sha256: e0817759ec6d2d8e57eb234e6e57d2173931367a865850c7acea40d4b4f9c27d
@@ -526,10 +526,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: ce89c5a993ca5eea74535f798478502c30a625ecb10a1de4d7fef5cd1bcac2a4
+      sha256: "2fd11229f59e23e967b0775df8d5948a519cd7e1e8b6e849729e010587b46539"
       url: "https://pub.dev"
     source: hosted
-    version: "14.4.1"
+    version: "14.6.2"
   graphs:
     dependency: transitive
     description:

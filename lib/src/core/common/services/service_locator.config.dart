@@ -9,6 +9,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -50,10 +51,14 @@ import '../../../features/client_profile/data/repositories/client_profile_reposi
     as _i560;
 import '../../../features/client_profile/domain/repositories/client_profile_repository.dart'
     as _i627;
+import '../../../features/client_profile/domain/usecases/add_client_weight_usecase.dart'
+    as _i702;
 import '../../../features/client_profile/domain/usecases/add_user_usecase.dart'
     as _i541;
 import '../../../features/client_profile/domain/usecases/get_client_by_id_usecase.dart'
     as _i841;
+import '../../../features/client_profile/domain/usecases/get_client_weights_usecase.dart'
+    as _i535;
 import '../../../features/client_profile/domain/usecases/is_client_profile_created_usecase.dart'
     as _i617;
 import '../../../features/client_profile/domain/usecases/is_user_active_usecase.dart'
@@ -62,6 +67,10 @@ import '../../../features/client_profile/domain/usecases/update_user_usecase.dar
     as _i864;
 import '../../../features/client_profile/presentation/bloc/client_profile_bloc.dart'
     as _i268;
+import '../../../features/client_profile/presentation/clientweights/clientweights_cubit.dart'
+    as _i677;
+import '../../../features/client_profile/presentation/getclientweights/getclientweights_cubit.dart'
+    as _i596;
 import '../../../features/trainer_profile/domain/usecases/get_clients_usecase.dart'
     as _i781;
 import '../../../features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart'
@@ -132,6 +141,7 @@ extension GetItInjectableX on _i174.GetIt {
     final registerModule = _$RegisterModule();
     gh.factory<_i973.InternetConnectionChecker>(
         () => registerModule.internetConnectionChecker);
+    gh.factory<_i895.Connectivity>(() => registerModule.connectivity);
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => registerModule.prefs,
       preResolve: true,
@@ -189,6 +199,9 @@ extension GetItInjectableX on _i174.GetIt {
         clientProfileRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i831.LogInUsecase>(() =>
         _i831.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i535.GetClientWeightsUsecase>(() =>
+        _i535.GetClientWeightsUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i988.ForgotPasswordUsecase>(() =>
         _i988.ForgotPasswordUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
@@ -205,6 +218,11 @@ extension GetItInjectableX on _i174.GetIt {
             authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i702.AddClientWeightUsecase>(() =>
+        _i702.AddClientWeightUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.factory<_i677.ClientweightsCubit>(
+        () => _i677.ClientweightsCubit(gh<_i702.AddClientWeightUsecase>()));
     gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
@@ -220,6 +238,8 @@ extension GetItInjectableX on _i174.GetIt {
               dao: gh<_i939.WorkoutPlanDao>(),
               database: gh<_i987.AppDatabase>(),
             ));
+    gh.factory<_i596.GetclientweightsCubit>(
+        () => _i596.GetclientweightsCubit(gh<_i535.GetClientWeightsUsecase>()));
     gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i615.WorkoutHistoryLocalDataSource>(

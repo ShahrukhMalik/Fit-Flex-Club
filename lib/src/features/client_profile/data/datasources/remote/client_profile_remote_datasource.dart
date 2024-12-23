@@ -1,5 +1,7 @@
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
+import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
+import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:injectable/injectable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,6 +29,12 @@ abstract class ClientProfileRemoteDatasource {
 
   ///
   Future<ClientModel?> getClientById([String? id]);
+
+  ///Get clients weights
+  Future<List<ClientWeightEntity>?>? getClientWeights();
+
+  ///Get clients weights
+  Future<void>? addClientWeight(ClientWeightModel clientWeightModel);
 }
 
 @Singleton(as: ClientProfileRemoteDatasource)
@@ -43,8 +51,21 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
     required ClientModel clientModel,
   }) async {
     final CollectionReference ref = db.collection('Users');
+    final CollectionReference weightTrakerRef = db
+        .collection('Users')
+        .doc(auth.currentUser?.uid)
+        .collection('weightTracker');
+
     try {
       await ref.doc(auth.currentUser?.uid).set(clientModel.toFirestore());
+      await weightTrakerRef.add(
+        ClientWeightModel(
+          timeStamp: DateTime.now().millisecondsSinceEpoch,
+          weightInKg: clientModel.weightInKg?.toDouble() ?? 0,
+          weightInLb: clientModel.weightInLb?.toDouble() ?? 0,
+          clientId: auth.currentUser?.uid,
+        ),
+      );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -208,6 +229,53 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
       }
 
       return user;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<List<ClientWeightEntity>?>? getClientWeights() async {
+    try {
+      final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+      final CollectionReference clients = db.collection('Users');
+      final clientWeightsDocs = await clients
+          .doc(clientId)
+          .collection('weightTracker')
+          .orderBy('timeStamp', descending: false)
+          .get();
+
+      if (clientWeightsDocs.docs.isEmpty) {
+        return null;
+      }
+
+      final List<ClientWeightEntity> clientWeights =
+          (clientWeightsDocs.docs).map(
+        (e) {
+          return ClientWeightModel.fromMap(e.data());
+        },
+      ).toList();
+
+      return clientWeights;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<void>? addClientWeight(ClientWeightModel clientWeightModel) async {
+    try {
+      final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+      final CollectionReference weightTrakerRef =
+          db.collection('Users').doc(clientId).collection('weightTracker');
+
+      await weightTrakerRef.add(clientWeightModel.toMap());
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

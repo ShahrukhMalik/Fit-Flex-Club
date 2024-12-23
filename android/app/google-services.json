@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "608017073256",
+    "project_id": "fitflexclub-fa604",
+    "storage_bucket": "fitflexclub-fa604.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608017073256:android:9fa8d1e61a58cef67667dd",
+        "android_client_info": {
+          "package_name": "com.fitflexiclub.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDePQDVTVJI0rnKeqo4od-y7CH4UUc7iYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608017073256:android:f1bf49be9dd066797667dd",
+        "android_client_info": {
+          "package_name": "com.fitflexiclub.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDePQDVTVJI0rnKeqo4od-y7CH4UUc7iYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -11,6 +11,22 @@ class DayModel extends Day {
     this.clientId,
   });
 
+  factory DayModel.fromMap(Map<String, dynamic> map,
+      [bool isFromModel = false]) {
+    return DayModel(
+      dayNumber: map['dayNumber'] as int,
+      id: map['id'] as String,
+      weekId: map['weekId'] as String,
+      clientId: map['clientId'] as String?,
+      exercises: isFromModel
+          ? map['exercises']
+          : (map['exercises'])
+              .map((exerciseMap) => ExerciseModel.fromMap(exerciseMap))
+              .cast<ExerciseModel>()
+              .toList(),
+    );
+  }
+
   factory DayModel.forEachElement(
     int dayNumber,
     String id,
@@ -33,6 +49,11 @@ class DayModel extends Day {
       'id': id,
       'weekId': weekId,
       'clientId': clientId,
+      'exercises': exercises
+          .map(
+            (exercise) => exercise.toMap(),
+          )
+          .toList()
     };
   }
 
@@ -44,7 +65,6 @@ class DayModel extends Day {
     List<ExerciseModel>? exercises,
   }) {
     return DayModel(
-
       dayNumber: dayNumber ?? this.dayNumber,
       id: id ?? this.id,
       clientId: clientId ?? this.clientId,

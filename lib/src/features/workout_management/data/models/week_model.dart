@@ -1,7 +1,6 @@
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/week_entity.dart';
 
-
 class WeekModel extends Week {
   final String? clientId;
   const WeekModel({
@@ -12,6 +11,21 @@ class WeekModel extends Week {
     this.clientId,
   });
 
+  factory WeekModel.fromMap(Map<String, dynamic> map,
+      [bool isFromModel = false]) {
+    return WeekModel(
+      weekNumber: map['weekNumber'] as int,
+      id: map['id'] as String,
+      clientId: map['clientId'] as String?,
+      workoutPlanId: map['workoutPlanId'] as String,
+      days: isFromModel
+          ? map['days']
+          : (map['days'])
+              .map((dayMap) => DayModel.fromMap(dayMap, isFromModel))
+               .cast<DayModel>()
+              .toList(),
+    );
+  }
   factory WeekModel.forEachElement(
     int weekNumber,
     String id,
@@ -34,6 +48,11 @@ class WeekModel extends Week {
       'id': id,
       'clientId': clientId,
       'workoutPlanId': workoutPlanId,
+      'days': days
+          .map(
+            (e) => e.toMap(),
+          )
+          .toList()
     };
   }
 

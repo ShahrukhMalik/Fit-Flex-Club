@@ -373,10 +373,4 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       );
     }
   }
-
-  @override
-  Future<Either<Failures, Stream<ListenerEvents>>> listenToEvents() async {
-    // TODO: implement listenToEvents
-    throw UnimplementedError();
-  }
 }

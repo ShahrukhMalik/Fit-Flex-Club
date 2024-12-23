@@ -20,10 +20,20 @@ class WorkoutPlanModel extends WorkoutPlan {
     this.clientId,
   });
 
-  factory WorkoutPlanModel.fromMap(Map<String, dynamic> data) {
+  factory WorkoutPlanModel.fromMap(Map<String, dynamic> data,
+      [bool isFromModel = false]) {
     return WorkoutPlanModel(
       name: data['name'],
-      weeks: data['weeks'],
+      weeks: data['weeks'] != null
+          ? isFromModel
+              ? data['weeks']
+              : (data['weeks'])
+                  .map(
+                    (e) => WeekModel.fromMap(e, isFromModel),
+                  )
+                  .cast<WeekModel>()
+                  .toList()
+          : [],
       uid: data['uid'],
       clientId: data['clientId'],
       createdAt: data['createdAt'],
@@ -106,7 +116,7 @@ class WorkoutPlanModel extends WorkoutPlan {
       'clientId': data['clientId'],
       'createdAt': data['createdAt'],
       'updatedAt': data['updatedAt'],
-    });
+    }, true);
   }
 
   WorkoutPlanModel copyWith({
@@ -134,6 +144,11 @@ class WorkoutPlanModel extends WorkoutPlan {
       'clientId': clientId,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'weeks': weeks
+          .map(
+            (e) => e.toMap(),
+          )
+          .toList()
     };
   }
 }

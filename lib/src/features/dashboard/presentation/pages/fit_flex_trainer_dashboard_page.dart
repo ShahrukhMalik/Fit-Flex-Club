@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -157,14 +163,38 @@ class _FitFlexTrainerDashboardPageState
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Main content
-          widget.navigationShell,
-          // Bottom navigation overlay
-          _buildBottomNavOverlay(context, width),
-        ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (selectedIndex.value == 0) {
+          PlatformDialog.showAlertDialog(
+            context: context,
+            title: "Fit Flex Club",
+            message: 'Are you sure ,you want to exit ?',
+            cancelText: 'No',
+            confirmText: 'Yes',
+            onConfirm: () {
+              // SystemChannels;
+              SystemNavigator.pop();
+            },
+          );
+        } else {
+          selectedIndex.value = 0;
+          widget.navigationShell.goBranch(
+            0,
+            initialLocation: true,
+          );
+        }
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Main content
+            widget.navigationShell,
+            // Bottom navigation overlay
+            _buildBottomNavOverlay(context, width),
+          ],
+        ),
       ),
     );
   }

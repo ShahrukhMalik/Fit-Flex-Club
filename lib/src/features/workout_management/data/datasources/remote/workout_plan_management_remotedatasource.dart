@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
@@ -234,43 +235,50 @@ class WorkoutPlanManagementRemotedatasourceImpl
           .collection('workoutPlans')
           .doc(workoutPlanModel.uid);
 
+      // final allExercises = workoutPlanModel.weeks
+      //     .expand((week) => week.days)
+      //     .expand(
+      //       (day) => day.exercises,
+      //     )
+      //     .toList();
+
       batch.set(clientRef, workoutPlanModel.toMap(), SetOptions(merge: true));
 
       // Iterate through weeks
-      for (var week in workoutPlanModel.weeks) {
-        // Save week
-        DocumentReference weekRef =
-            clientRef.collection('weeks').doc(week.id.toString());
-        batch.set(weekRef, week.toMap(), SetOptions(merge: true));
+      // for (var week in workoutPlanModel.weeks) {
+      //   // Save week
+      //   DocumentReference weekRef =
+      //       clientRef.collection('weeks').doc(week.id.toString());
+      //   batch.set(weekRef, week.toMap(), SetOptions(merge: true));
 
-        // Iterate through days
-        for (var day in week.days) {
-          // Save day
-          DocumentReference dayRef =
-              weekRef.collection('days').doc(day.id.toString());
-          batch.set(dayRef, day.toMap(), SetOptions(merge: true));
+      //   // Iterate through days
+      //   for (var day in week.days) {
+      //     // Save day
+      //     DocumentReference dayRef =
+      //         weekRef.collection('days').doc(day.id.toString());
+      //     batch.set(dayRef, day.toMap(), SetOptions(merge: true));
 
-          // Iterate through exercises
-          for (var exercise in day.exercises) {
-            // Save exercise
-            final exerciseMap = exercise.toMap();
-            exerciseMap['exerciseOrder'] = day.exercises.indexOf(exercise) + 1;
-            DocumentReference exerciseRef =
-                dayRef.collection('exercises').doc(exercise.id.toString());
-            batch.set(exerciseRef, exerciseMap, SetOptions(merge: true));
+      //     // Iterate through exercises
+      //     for (var exercise in day.exercises) {
+      //       // Save exercise
+      //       final exerciseMap = exercise.toMap();
+      //       exerciseMap['exerciseOrder'] = day.exercises.indexOf(exercise) + 1;
+      //       DocumentReference exerciseRef =
+      //           dayRef.collection('exercises').doc(exercise.id.toString());
+      //       batch.set(exerciseRef, exerciseMap, SetOptions(merge: true));
 
-            // Iterate through sets
-            for (var set in exercise.sets) {
-              // Save set
-              final setMap = set.toMap();
-              setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
-              DocumentReference setRef =
-                  exerciseRef.collection('sets').doc(set.id.toString());
-              batch.set(setRef, setMap, SetOptions(merge: true));
-            }
-          }
-        }
-      }
+      //       // Iterate through sets
+      //       for (var set in exercise.sets) {
+      //         // Save set
+      //         final setMap = set.toMap();
+      //         setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
+      //         DocumentReference setRef =
+      //             exerciseRef.collection('sets').doc(set.id.toString());
+      //         batch.set(setRef, setMap, SetOptions(merge: true));
+      //       }
+      //     }
+      //   }
+      // }
 
       // Commit the batch to execute all operations at once
       batch.set(
@@ -301,8 +309,9 @@ class WorkoutPlanManagementRemotedatasourceImpl
       if (documents.docs.isNotEmpty) {
         final workoutPlanDoc = documents.docs.first;
         //
-        final workoutPlanModel = await WorkoutPlanModel.fromFirestore(
-          workoutPlanDoc,
+        final workoutPlanModel = WorkoutPlanModel.fromMap(
+          workoutPlanDoc.data(),
+          
         );
         return workoutPlanModel;
       } else {
@@ -331,51 +340,55 @@ class WorkoutPlanManagementRemotedatasourceImpl
       WriteBatch mainBatch = db.batch();
 
       // Update main workout plan document
-      mainBatch.update(workoutPlanRef, workoutPlanModel.toMap());
+      mainBatch.set(
+        workoutPlanRef,
+        workoutPlanModel.toMap(),
+        SetOptions(merge: true),
+      );
 
-      // Process updates for weeks, days, and exercises in a more efficient manner
-      for (var week in workoutPlanModel.weeks) {
-        DocumentReference weekRef =
-            workoutPlanRef.collection('weeks').doc(week.id.toString());
+      // // Process updates for weeks, days, and exercises in a more efficient manner
+      // for (var week in workoutPlanModel.weeks) {
+      //   DocumentReference weekRef =
+      //       workoutPlanRef.collection('weeks').doc(week.id.toString());
 
-        for (var day in week.days) {
-          DocumentReference dayRef =
-              weekRef.collection('days').doc(day.id.toString());
+      //   for (var day in week.days) {
+      //     DocumentReference dayRef =
+      //         weekRef.collection('days').doc(day.id.toString());
 
-          for (var exercise in day.exercises) {
-            DocumentReference exerciseRef =
-                dayRef.collection('exercises').doc(exercise.id.toString());
+      //     for (var exercise in day.exercises) {
+      //       DocumentReference exerciseRef =
+      //           dayRef.collection('exercises').doc(exercise.id.toString());
 
-            // Batch update exercise
-            mainBatch.set(
-                exerciseRef, exercise.toMap(), SetOptions(merge: true));
+      //       // Batch update exercise
+      //       mainBatch.set(
+      //           exerciseRef, exercise.toMap(), SetOptions(merge: true));
 
-            // Batch handle sets
-            CollectionReference setsRef = exerciseRef.collection('sets');
+      //       // Batch handle sets
+      //       CollectionReference setsRef = exerciseRef.collection('sets');
 
-            // Add or update sets
-            for (var set in exercise.sets) {
-              DocumentReference setRef = setsRef.doc(set.id.toString());
-              final setMap = set.toMap();
-              setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
-              mainBatch.set(setRef, setMap, SetOptions(merge: true));
-            }
+      //       // Add or update sets
+      //       for (var set in exercise.sets) {
+      //         DocumentReference setRef = setsRef.doc(set.id.toString());
+      //         final setMap = set.toMap();
+      //         setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
+      //         mainBatch.set(setRef, setMap, SetOptions(merge: true));
+      //       }
 
-            // Batch delete obsolete sets
-            final setsSnapshot = await setsRef.get();
-            final existingSetIds =
-                setsSnapshot.docs.map((doc) => doc.id).toList();
-            final currentSetIds =
-                exercise.sets.map((set) => set.id.toString()).toList();
+      //       // Batch delete obsolete sets
+      //       final setsSnapshot = await setsRef.get();
+      //       final existingSetIds =
+      //           setsSnapshot.docs.map((doc) => doc.id).toList();
+      //       final currentSetIds =
+      //           exercise.sets.map((set) => set.id.toString()).toList();
 
-            for (var setId in existingSetIds) {
-              if (!currentSetIds.contains(setId)) {
-                mainBatch.delete(setsRef.doc(setId));
-              }
-            }
-          }
-        }
-      }
+      //       for (var setId in existingSetIds) {
+      //         if (!currentSetIds.contains(setId)) {
+      //           mainBatch.delete(setsRef.doc(setId));
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
 
       // Commit all batched operations
       mainBatch.set(

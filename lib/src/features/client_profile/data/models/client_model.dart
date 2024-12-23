@@ -178,5 +178,7 @@ class ClientModel extends ClientEntity {
 // Helper conversion methods
 int convertKgToLb(int? kg) => kg != null ? (kg * 2.205).floor() : 0;
 int convertLbToKg(int? lb) => lb != null ? (lb / 2.205).floor() : 0;
+double convertLbToKgDouble(double? lb) =>
+    lb != null ? double.parse((lb / 2.205).toStringAsFixed(2)) : 0;
 int convertFtToCm(int? ft) => ft != null ? (ft * 30.48).floor() : 0;
 int convertCmToFt(int? cm) => cm != null ? (cm / 30.48).floor() : 0;

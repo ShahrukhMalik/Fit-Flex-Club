@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
+import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_weight.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
@@ -12,7 +13,7 @@ part 'client_dao.g.dart';
 class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
   ClientsDao(super.attachedDatabase);
 
-  Future<void> insertClientWeightsBatch(List<ClientWeightModel> models) async {
+  Future<void> insertClientWeightsBatch(List<ClientWeightEntity> models) async {
     await batch(
       (batch) {
         batch.insertAll(
@@ -48,14 +49,15 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
   }
 
 // Fetch method
-  Future<List<ClientWeightModel>> getClientWeights(String? clientId) async {
-    final query = select(clientWeight);
+  Future<List<ClientWeightData>> getClientWeights(String? clientId) async {
+    final query = select(clientWeight)
+      ..orderBy([(client) => OrderingTerm.asc(client.timeStamp)]);
     if (clientId != null) {
       query.where((tbl) => tbl.clientId.equals(clientId));
     }
     final rows = await query.get();
 
-    return rows.map((row) => ClientWeightModel.fromRow(row)).toList();
+    return rows;
   }
 
   Future<void> assignWorkoutPlan(
@@ -210,28 +212,6 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
     final clientRow = await (select(clients)..where((tbl) => tbl.id.equals(id)))
         .getSingleOrNull(); // Returns null if no client is found
     return clientRow;
-    // Directly map fields from the clientRow to ClientModel constructor
-    // if (clientRow != null) {
-    //   return ClientModel(
-    //     id: clientRow.id,
-    //     age: clientRow.age,
-    //     gender: clientRow.gender,
-    //     weight: clientRow.weight,
-    //     weightUnit: clientRow.weightUnit,
-    //     height: clientRow.height,
-    //     heightUnit: clientRow.heightUnit,
-    //     isTrainer: clientRow.isTrainer,
-    //     isUserActive: clientRow.isUserActive,
-    //     username: clientRow.username,
-    //     email: clientRow.email,
-    //     phone: {
-    //       "phoneNumber": clientRow.phone,
-    //       "countryCode": clientRow.phoneCountryCode
-    //     },
-    //     currentWorkoutPlanName: clientRow.currentWorkoutPlanName,
-    //   );
-    // }
-    // return null; // Return null if no client is found
   }
 
   // Fetch all clients

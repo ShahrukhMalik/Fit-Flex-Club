@@ -60,20 +60,20 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAY2Dg9lRCUnhzxjJeEQDzog-4_4vx3ZIc',
-    appId: '1:608017073256:ios:3e465ce7441a658c7667dd',
+    appId: '1:608017073256:ios:d373fe1c3e95ba4f7667dd',
     messagingSenderId: '608017073256',
     projectId: 'fitflexclub-fa604',
     storageBucket: 'fitflexclub-fa604.firebasestorage.app',
-    iosBundleId: 'com.example.fitFlexClub',
+    iosBundleId: 'com.fitflex.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAY2Dg9lRCUnhzxjJeEQDzog-4_4vx3ZIc',
-    appId: '1:608017073256:ios:3e465ce7441a658c7667dd',
+    appId: '1:608017073256:ios:d373fe1c3e95ba4f7667dd',
     messagingSenderId: '608017073256',
     projectId: 'fitflexclub-fa604',
     storageBucket: 'fitflexclub-fa604.firebasestorage.app',
-    iosBundleId: 'com.example.fitFlexClub',
+    iosBundleId: 'com.fitflex.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'fitflexclub-fa604.firebasestorage.app',
     measurementId: 'G-ZDF4HBW2R9',
   );
+
 }

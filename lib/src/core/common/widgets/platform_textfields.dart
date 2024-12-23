@@ -22,14 +22,15 @@ class AppTextFields {
     InputBorder? border,
     String? initialValue,
     UniqueKey? uniqueKey,
+    TextAlign? textAlign,
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
         key: uniqueKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         initialValue: initialValue,
         onChanged: onChanged,
-        textAlign: TextAlign.center,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
+        textAlign: textAlign ?? TextAlign.start,
         // key: formStateKey,
         inputFormatters: textInputFormatter,
         validator: (value) {
@@ -280,11 +281,25 @@ class AppTextFields {
     String? labelText,
     Widget? prefix,
     Widget? suffix,
+    TextInputType? keyboardType,
+    TextStyle? style,
     TextEditingController? controller,
     void Function(String)? onChanged,
   }) {
     if (Platform.isIOS) {
-      return CupertinoTextField(
+      return CupertinoTextFormFieldRow(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (value) {
+          if (value == null) {
+            return 'Please enter weight';
+          } else if (value.isEmpty) {
+            return 'Please enter weight';
+          }
+
+          return null;
+        },
+        style: style,
+        keyboardType: keyboardType,
         controller: controller,
         placeholder: labelText,
         onChanged: onChanged,
@@ -295,12 +310,12 @@ class AppTextFields {
                 child: prefix,
               )
             : null,
-        suffix: suffix != null
-            ? Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: suffix,
-              )
-            : null,
+        // suffix: suffix != null
+        //     ? Padding(
+        //         padding: const EdgeInsets.only(right: 8),
+        //         child: suffix,
+        //       )
+        //     : null,
         decoration: BoxDecoration(
           border: Border.all(color: CupertinoColors.systemGrey),
           borderRadius: BorderRadius.circular(8),
@@ -308,7 +323,18 @@ class AppTextFields {
       );
     }
 
-    return TextField(
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (value) {
+        if (value == null) {
+          return 'Please enter weight';
+        } else if (value.isEmpty) {
+          return 'Please enter weight';
+        }
+
+        return null;
+      },
+      style: style,
       controller: controller,
       onChanged: onChanged,
       decoration: InputDecoration(

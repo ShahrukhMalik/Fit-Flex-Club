@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:fit_flex_club/src/core/db/sync/sync_queue_dao.dart';
-import 'package:fit_flex_club/src/core/db/sync/sync_queue_table.dart';
+import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
+import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/tables/sync_queue_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/daos/client_dao.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_weight.dart';
@@ -42,6 +42,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deleteAllTables() async {
     Future.wait([
       clients.deleteAll(),
+      clientWeight.deleteAll(),
       workoutPlans.deleteAll(),
       weeks.deleteAll(),
       days.deleteAll(),
@@ -97,6 +98,9 @@ class AppDatabase extends _$AppDatabase {
   // Other database methods and queries
   Future<void> deleteClients() async {
     await clients.deleteAll();
+  }
+  Future<void> deleteClientWeights() async {
+    await clientWeight.deleteAll();
   }
 
   Future<void> deleteWorkoutPlans() async {

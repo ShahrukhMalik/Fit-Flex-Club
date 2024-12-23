@@ -176,7 +176,7 @@ class _AddExerciseBottomSheetWidgetState
                           child: Icon(Icons.fitness_center),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      // const SizedBox(width: 12),
                       // Content Column
                       Expanded(
                         child: Column(

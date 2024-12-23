@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
+import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 
 ///[Marker Interface] abstraction of client profile repository
@@ -19,6 +20,13 @@ abstract class ClientProfileRepository {
 
   ///Get clients list for trainer
   Future<Either<Failures, List<ClientEntity>?>>? getClients();
+
+  ///Get clients weights
+  Future<Either<Failures, List<ClientWeightEntity>?>>? getClientWeights(
+      [String? clientId]);
+
+  ///Add clients weights
+  Future<Either<Failures, void>>? addClientWeight(ClientWeightEntity weight);
 
   ///Get client details
   Future<Either<Failures, ClientEntity?>>? getClientById([String? id]);

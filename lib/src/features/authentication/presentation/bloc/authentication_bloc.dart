@@ -17,6 +17,7 @@ import 'package:fit_flex_club/src/features/authentication/domain/usecases/login_
     as login;
 import 'package:fit_flex_club/src/features/authentication/domain/usecases/logout_usecase.dart'
     as logout;
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
 

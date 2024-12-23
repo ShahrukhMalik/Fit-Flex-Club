@@ -1,10 +1,17 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/functions/is_data_stale.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/daos/workout_plan_dao.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class WorkoutPlanManagementLocaldatasource {
@@ -174,7 +181,8 @@ class WorkoutPlanManagementLocaldatasourceImpl
     String clientId,
   ) async {
     try {
-      final workoutPlanModel = await dao.getWorkoutPlanForClient(clientId);
+      final input = await dao.getWorkoutPlanForClient(clientId);
+      final workoutPlanModel = await compute(_processWorkoutPlanModel, input);
 
       if (workoutPlanModel != null) {
         if (isDataStale(
@@ -216,5 +224,104 @@ class WorkoutPlanManagementLocaldatasourceImpl
         errorMessage: err.toString(),
       );
     }
+  }
+}
+
+// Function to process workout plan in a separate isolate
+WorkoutPlanModel? _processWorkoutPlanModel(String? encodedInput) {
+  if (encodedInput != null) {
+    final input = json.decode(encodedInput);
+    final exercisesWithBaseAndSets = input['exercisesWithBaseAndSets'];
+    final daysObj = input['daysObj'];
+    final weeksObj = input['weeksObj'];
+    final workoutPlan = input['workoutPlan'] as Map<String, dynamic>;
+
+    // Group exercises and sets by exercise ID
+    final exerciseGroups = <String, Map<String, dynamic>>{};
+    for (final row in exercisesWithBaseAndSets) {
+      final workoutExercise = row['workoutExercise'] as Map<String, dynamic>;
+      final base = row['base'] as Map<String, dynamic>;
+      final exerciseSet = row['exerciseSet'] as Map<String, dynamic>?;
+
+      if (!exerciseGroups.containsKey(workoutExercise['id'])) {
+        exerciseGroups[workoutExercise['id']] = {
+          'exercise': ExerciseModel(
+            completed: workoutExercise['completed'],
+            clientId: workoutExercise['clientId'],
+            dayId: workoutExercise['dayId'],
+            id: workoutExercise['id'],
+            code: base['code'],
+            name: base['name'],
+            category: base['category'],
+            muscleGroup: base['muscleGroup'],
+            exerciseOrder: workoutExercise['exerciseOrder'],
+            parameters: {
+              'weight': base['weight'],
+              'reps': base['reps'],
+              'duration': base['duration'],
+            },
+            [],
+          ),
+          'sets': <SetModel>[],
+        };
+      }
+
+      if (exerciseSet != null) {
+        (exerciseGroups[workoutExercise['id']]!['sets'] as List<SetModel>).add(
+          SetModel.fromMap(exerciseSet),
+        );
+      }
+    }
+
+    // Group exercises by dayId
+    final exercisesGroupedByDay = <String, List<ExerciseModel>>{};
+    for (final group in exerciseGroups.values) {
+      final exercise = group['exercise'] as ExerciseModel;
+      final sets = group['sets'] as List<SetModel>;
+      final finalExercise = exercise.copyWith(sets: sets);
+      exercisesGroupedByDay
+          .putIfAbsent(exercise.dayId, () => [])
+          .add(finalExercise);
+    }
+
+    // Map days to models, attaching exercises
+    final dayModels = daysObj.map((day) {
+      return DayModel(
+        clientId: day['clientId'],
+        weekId: day['weekId'],
+        id: day['id'],
+        dayNumber: day['dayNumber'],
+        exercises: exercisesGroupedByDay[day['id']] ?? [],
+      );
+    }).toList();
+
+    // Map weeks to models, attaching days
+    final weekModels = weeksObj
+        .map((week) {
+          return WeekModel(
+            clientId: week['clientId'],
+            workoutPlanId: week['workoutPlanId'],
+            id: week['id'],
+            weekNumber: week['weekNumber'],
+            days: dayModels
+                .where((day) => day.weekId == week['id'])
+                .cast<DayModel>()
+                .toList(),
+          );
+        })
+        .cast<WeekModel>()
+        .toList();
+
+    // Create and return the final workout plan model
+    return WorkoutPlanModel(
+      clientId: workoutPlan['clientId'],
+      createdAt: workoutPlan['createdAt'],
+      updatedAt: workoutPlan['updatedAt'],
+      name: workoutPlan['name'],
+      weeks: weekModels,
+      uid: workoutPlan['uid'],
+    );
+  } else {
+    return null;
   }
 }

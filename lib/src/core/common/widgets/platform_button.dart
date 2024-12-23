@@ -682,7 +682,11 @@ class PlatformButton {
         onPressed: onPressed,
         child: isLoading
             ? const CupertinoActivityIndicator(color: Colors.white)
-            : Icon(icon, color: foregroundColor),
+            : Icon(
+                icon,
+                color: foregroundColor,
+                size: height ?? width,
+              ),
       );
     }
 
