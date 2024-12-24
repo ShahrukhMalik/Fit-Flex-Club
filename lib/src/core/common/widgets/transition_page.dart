@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// A page that slides in from the bottom.
+/// A page that slides in from the right (iOS-style transition).
 class TransitionPage extends CustomTransitionPage<void> {
-  /// Creates a [TransitionPage].
   TransitionPage({
     required LocalKey super.key,
     required super.child,
   }) : super(
-          transitionDuration: const Duration(milliseconds: 200),
+          transitionDuration: const Duration(milliseconds: 300),
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,
@@ -18,7 +17,7 @@ class TransitionPage extends CustomTransitionPage<void> {
               SlideTransition(
             position: animation.drive(
               Tween<Offset>(
-                begin: const Offset(0, 1), // Starts from bottom
+                begin: const Offset(1, 0), // Starts from the right
                 end: Offset.zero, // Ends at the center
               ).chain(_curveTween),
             ),
@@ -26,5 +25,5 @@ class TransitionPage extends CustomTransitionPage<void> {
           ),
         );
 
-  static final CurveTween _curveTween = CurveTween(curve: Curves.easeIn);
+  static final CurveTween _curveTween = CurveTween(curve: Curves.easeInOut);
 }

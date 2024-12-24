@@ -87,7 +87,9 @@ class PlatformDialog {
     if (Platform.isIOS) {
       return showGeneralDialog(
         context: context,
-        barrierDismissible: barrierDismissible,
+        // barrierDismissible: barrierDismissible,
+        // barrierLabel:
+        //     MaterialLocalizations.of(context).modalBarrierDismissLabel,
         pageBuilder: (BuildContext context, __, _) {
           if (onlyUseContent ?? false) {
             return Padding(
@@ -143,6 +145,7 @@ class PlatformDialog {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),

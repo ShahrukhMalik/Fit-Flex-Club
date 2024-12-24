@@ -1,3 +1,4 @@
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
@@ -128,26 +129,30 @@ class _FitFlexClientProfileSelectGenderPageState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     PlatformButton().buildButton(
-                      foregroundColor: Color(0xFFFFC26A),
+                      foregroundColor: globalColorScheme.tertiaryContainer,
                       backgroundColor: Colors.transparent,
                       textStyle: TextStyle(
-                        color: Color(0xFFFFC26A),
+                        color: globalColorScheme.tertiaryContainer,
+                        fontWeight: FontWeight.bold,
                       ),
                       context: context,
                       type: ButtonType.iconText,
                       icon: Icons.arrow_back_ios_new,
                       iconAlignment: IconAlignment.start,
                       text: "Previous",
-                      onPressed: () => context.go(FitFlexAuthLandingPage.route),
+                      onPressed: () => context.pop(),
                     )!,
                     PlatformButton().buildButton(
                       backgroundColor: Color(0xFFFFC26A),
-                      foregroundColor: Color(0xFFF2F2F7),
+                      foregroundColor: globalColorScheme.tertiaryContainer,
                       context: context,
                       type: ButtonType.iconText,
                       icon: Icons.arrow_forward_ios,
                       text: "Continue",
-                      textStyle: TextStyle(),
+                      textStyle: TextStyle(
+                        color: globalColorScheme.tertiaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                       onPressed: () {
                         if (selectedButton.value.isEmpty) {
                           PlatformDialog.showAlertDialog(
@@ -156,8 +161,8 @@ class _FitFlexClientProfileSelectGenderPageState
                             message: "Please select Gender before you proceed.",
                           );
                         } else {
-                          context.go(
-                            FitFlexClientProfileSelectAgePage.route,
+                          context.push(
+                            '${FitFlexClientProfileSelectGenderPage.route}/${FitFlexClientProfileSelectAgePage.route}',
                             extra: {
                               "gender": selectedButton.value,
                             },

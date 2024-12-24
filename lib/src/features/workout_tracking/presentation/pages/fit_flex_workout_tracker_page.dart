@@ -485,7 +485,22 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                 }
               },
             )!,
-          ),
+          )
+        else
+          SizedBox(
+            height: 50,
+            width: 100,
+            child: PlatformButton().buildButton(
+              context: context,
+              type: ButtonType.outlined,
+              backgroundColor: globalColorScheme.onPrimaryContainer,
+              textStyle: TextStyle(
+                  color: globalColorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.bold),
+              text: "Done",
+              onPressed: () => FocusScope.of(context).unfocus(),
+            )!,
+          )
       ],
     );
   }

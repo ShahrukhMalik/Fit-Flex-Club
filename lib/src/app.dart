@@ -75,14 +75,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
-    Fluttertoast.showToast(
-        msg: result[0] == ConnectivityResult.none
-            ? "You are offline"
-            : "You are back online",
-        gravity: ToastGravity.TOP,
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: globalColorScheme.inversePrimary,
-        textColor: globalColorScheme.onPrimaryContainer);
+    // Fluttertoast.showToast(
+    //     msg: result[0] == ConnectivityResult.none
+    //         ? "You are offline"
+    //         : "You are back online",
+    //     gravity: ToastGravity.TOP,
+    //     toastLength: Toast.LENGTH_LONG,
+    //     backgroundColor: globalColorScheme.inversePrimary,
+    //     textColor: globalColorScheme.onPrimaryContainer);
   }
 
   @override
@@ -110,9 +110,15 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              getIt<AuthenticationBloc>()..add(ListenToEvents()),
+          create: (context) => getIt<AuthenticationBloc>()
+            // ..add(AuthenticateUserEvent())
+            ..add(ListenToEvents()),
         ),
+        // BlocProvider(
+        //   create: (context) => getIt<AuthenticationBloc>()
+        //     ..add(AuthenticateUserEvent())
+        //     ..add(ListenToEvents()),
+        // ),
         // BlocProvider(
         //   create: (context) =>
         //       getIt<SyncmanagerBloc>()..add(CheckConnectivityEvent()),

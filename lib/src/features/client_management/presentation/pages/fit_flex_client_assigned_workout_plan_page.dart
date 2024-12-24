@@ -17,7 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid_v4/uuid_v4.dart';
 
 class FitFlexClientAssignedWorkoutPlanPage extends StatefulWidget {
-  static const String route = "/fit-flex-assigned-workout-plan";
+  static const String route = "assigned-workout-plan";
   final WorkoutPlanModel? workoutPlanModel;
   const FitFlexClientAssignedWorkoutPlanPage({
     super.key,
@@ -442,7 +442,7 @@ class _FitFlexClientAssignedWorkoutPlanPageState
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        context.go(FitFlexClientProfilePage.route);
+        if (context.canPop()) context.pop();
       },
       child: SafeArea(
         bottom: true,
@@ -450,30 +450,6 @@ class _FitFlexClientAssignedWorkoutPlanPageState
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          // floatingActionButton: FloatingActionButton(
-          //   heroTag: 'addWorkout',
-          //   splashColor: globalColorScheme.tertiary,
-          //   backgroundColor: globalColorScheme.primaryContainer,
-          //   onPressed: () async {
-          //     final result = await _showExerciseSheet(context);
-          //     if (result != null) {
-          //       // ignore: use_build_context_synchronously
-          //       if (result != null) {
-          //         _showExerciseSetSheet(context, result).then(
-          //           (value) async {
-          //             await _updateExercises(
-          //               value,
-          //             );
-          //           },
-          //         );
-          //       }
-          //     }
-          //   },
-          //   child: Icon(
-          //     Icons.add,
-          //     color: globalColorScheme.surface,
-          //   ),
-          // ),
           appBar: PlatformAppbar.basicAppBar(
             title: "Workout Plan",
             context: context,
@@ -618,6 +594,40 @@ class _FitFlexClientAssignedWorkoutPlanPageState
                         builder: (context, days, _) {
                           return AutoScrollTabsWidget(
                             onEditSets: (exercise) {
+                              final existingWeeks = _weeks.value;
+                              // _weeks.value = existingWeeks.map((w) {
+                              //   return w.days.map((d) {
+                              //     return d.exercises.map((e) {
+                              //       if (e.id == exercise.id) {
+                              //         return e.copyWith(
+                              //           completed: exercise.completed,
+                              //         );
+                              //       }
+                              //       return e;
+                              //     }).toList();
+                              //   }).toList();
+                              // }).toList();
+
+                              _weeks.value = existingWeeks.map(
+                                (w) {
+                                  return w.copyWith(
+                                    days: w.days
+                                        .map(
+                                          (d) => d.copyWith(
+                                            exercises: d.exercises.map((e) {
+                                              if (e.id == exercise.id) {
+                                                return e.copyWith(
+                                                  completed: exercise.completed,
+                                                );
+                                              }
+                                              return e;
+                                            }).toList(),
+                                          ),
+                                        )
+                                        .toList(),
+                                  );
+                                },
+                              ).toList();
                               final existingExercises = _exercises.value;
                               _exercises.value = existingExercises.map(
                                 (e) {

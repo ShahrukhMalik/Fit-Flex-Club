@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class FitFlexAuthForgotPasswordPage extends StatefulWidget {
-  static const String route = '/fit-forgot-password';
+  static const String route = 'forgot-password';
   const FitFlexAuthForgotPasswordPage({super.key});
 
   @override
@@ -35,84 +35,88 @@ class _FitFlexAuthForgotPasswordPageState
               alignment: Alignment.center,
             ),
           ),
-          Positioned(
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: PlatformAppbar.basicAppBar(
-                onLeadingPressed: () => context.go('/'),
-                title: "Forgot Password",
-                context: context,
+          PopScope(
+            canPop: true,
+            child: Positioned(
+              child: Scaffold(
                 backgroundColor: Colors.transparent,
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Form(
-                      key: formStateKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: AppTextFields.basicTextField(
-                        hintText: "Enter your email address",
-                        fieldType: TextFieldType.email,
-                        controller: _emailController,
-                        boxDecoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              width: 2,
-                              color: Color(0xFFFFCD7C),
+                appBar: PlatformAppbar.basicAppBar(
+                  onLeadingPressed: () => context.pop(),
+                  title: "Forgot Password",
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Form(
+                        key: formStateKey,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        child: AppTextFields.basicTextField(
+                          hintText: "Enter your email address",
+                          fieldType: TextFieldType.email,
+                          controller: _emailController,
+                          boxDecoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 2,
+                                color: Color(0xFFFFCD7C),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
-                      child:
-                          BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                        listener: (context, state) {
-                          if (state is AuthenticationComplete) {
-                            if (state.entity?.mailSent ?? false) {
-                              context.go(FitFlexAuthLogInPage.route);
-                            }
-                          }
-                          if (state is AuthenticationError) {
-                            PlatformDialog.showAlertDialog(
-                              context: context,
-                              title: "Forgot Password",
-                              message: state.failures.message ??
-                                  "Something went wrong!",
-                            );
-                          }
-                          if (state is AuthenticationLoading) {}
-                        },
-                        builder: (context, state) {
-                          return PlatformButton().buildButton(
-                            borderRadius: 100,
-                            context: context,
-                            isLoading: state is AuthenticationLoading,
-                            type: ButtonType.primary,
-                            backgroundColor: Color(0xFFFFCD7C),
-                            textStyle: TextStyle(
-                              color: Color.fromARGB(255, 94, 87, 86),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                            text: "Send Email",
-                            onPressed: () {
-                              if (formStateKey.currentState!.validate()) {
-                                context.read<AuthenticationBloc>().add(
-                                      ForgotPasswordAuthenticationEvent(
-                                        email: _emailController.text,
-                                      ),
-                                    );
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 20),
+                        child: BlocConsumer<AuthenticationBloc,
+                            AuthenticationState>(
+                          listener: (context, state) {
+                            if (state is AuthenticationComplete) {
+                              if (state.entity?.mailSent ?? false) {
+                                context.go(FitFlexAuthLogInPage.route);
                               }
-                            },
-                            width: double.maxFinite,
-                          )!;
-                        },
+                            }
+                            if (state is AuthenticationError) {
+                              PlatformDialog.showAlertDialog(
+                                context: context,
+                                title: "Forgot Password",
+                                message: state.failures.message ??
+                                    "Something went wrong!",
+                              );
+                            }
+                            if (state is AuthenticationLoading) {}
+                          },
+                          builder: (context, state) {
+                            return PlatformButton().buildButton(
+                              borderRadius: 100,
+                              context: context,
+                              isLoading: state is AuthenticationLoading,
+                              type: ButtonType.primary,
+                              backgroundColor: Color(0xFFFFCD7C),
+                              textStyle: TextStyle(
+                                color: Color.fromARGB(255, 94, 87, 86),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                              text: "Send Email",
+                              onPressed: () {
+                                if (formStateKey.currentState!.validate()) {
+                                  context.read<AuthenticationBloc>().add(
+                                        ForgotPasswordAuthenticationEvent(
+                                          email: _emailController.text,
+                                        ),
+                                      );
+                                }
+                              },
+                              width: double.maxFinite,
+                            )!;
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

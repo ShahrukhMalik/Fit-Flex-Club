@@ -1,3 +1,4 @@
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
@@ -35,7 +36,7 @@ class FitFlexClientProfileSelectHeightPage extends StatefulWidget {
   final String age;
   final String weight;
   final String weightUnit;
-  static const String route = "/select-height";
+  static const String route = "select-height";
   const FitFlexClientProfileSelectHeightPage({
     super.key,
     required this.gender,
@@ -57,9 +58,9 @@ class _FitFlexClientProfileSelectHeightPageState
   final ValueNotifier<String> metricSelected = ValueNotifier<String>("ft");
   final ValueNotifier<bool> isFirstMetricSelected = ValueNotifier<bool>(true);
   final FixedExtentScrollController heightController =
-      FixedExtentScrollController(initialItem: 4);
+      FixedExtentScrollController(initialItem: 5);
   final FixedExtentScrollController decimalHeightController =
-      FixedExtentScrollController(initialItem: 50);
+      FixedExtentScrollController(initialItem: 0);
   final List<String> metrics = ['ft', 'cm'];
 
   void _scrollToIndex(int index, int minorIndex) {
@@ -114,11 +115,6 @@ class _FitFlexClientProfileSelectHeightPageState
     final double height = MediaQuery.of(context).size.height;
     return PopScope(
       canPop: true,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          context.go(FitFlexClientProfileSelectWeightPage.route);
-        }
-      },
       child: Scaffold(
         body: Stack(
           children: [
@@ -196,7 +192,7 @@ class _FitFlexClientProfileSelectHeightPageState
                                           controllerGmsOz:
                                               decimalHeightController,
                                           maxCountKgLb: 1499,
-                                          maxCountGmsOz: 99,
+                                          maxCountGmsOz: 10,
                                           unitKgLb: showkg ? 'ft' : 'cm',
                                           unitGmsOz: showkg ? 'in' : 'mm',
                                         );
@@ -214,22 +210,26 @@ class _FitFlexClientProfileSelectHeightPageState
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         PlatformButton().buildButton(
-                          foregroundColor: Color(0xFFFFC26A),
+                          foregroundColor: globalColorScheme.tertiaryContainer,
                           backgroundColor: Colors.transparent,
                           textStyle: TextStyle(
-                            color: Color(0xFFFFC26A),
+                            color: globalColorScheme.tertiaryContainer,
+                            fontWeight: FontWeight.bold,
                           ),
                           context: context,
                           type: ButtonType.iconText,
                           icon: Icons.arrow_back_ios_new,
                           iconAlignment: IconAlignment.start,
                           text: "Previous",
-                          onPressed: () => context
-                              .go(FitFlexClientProfileSelectWeightPage.route),
+                          onPressed: () => context.pop(),
                         )!,
                         PlatformButton().buildButton(
                           backgroundColor: Color(0xFFFFC26A),
-                          foregroundColor: Color(0xFFF2F2F7),
+                          foregroundColor: globalColorScheme.tertiaryContainer,
+                          textStyle: TextStyle(
+                            color: globalColorScheme.tertiaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
                           context: context,
                           type: ButtonType.iconText,
                           icon: Icons.arrow_forward_ios,
@@ -250,32 +250,32 @@ class _FitFlexClientProfileSelectHeightPageState
                                                     widget.weight,
                                                   ),
                                                 ),
-                                      heightInCm:
-                                          metricSelected.value.toLowerCase() ==
-                                                  'cm'
-                                              ? double.tryParse(
-                                                   '${heightSelected.value}.${decimalheightSelected.value}')
-                                              : convertFtToCmD(
-                                                  double.tryParse(
-                                                    '${heightSelected.value}.${decimalheightSelected.value}',
-                                                  ),
-                                                ),
+                                      heightInCm: metricSelected.value
+                                                  .toLowerCase() ==
+                                              'cm'
+                                          ? double.tryParse(
+                                              '${heightSelected.value}.${decimalheightSelected.value}')
+                                          : convertFtToCmD(
+                                              double.tryParse(
+                                                '${heightSelected.value}.${decimalheightSelected.value}',
+                                              ),
+                                            ),
                                       weightInLb: widget.weightUnit
                                                   .toLowerCase() ==
                                               'lb'
                                           ? double.tryParse(widget.weight)
                                           : convertKgToLbDouble(
                                               double.tryParse(widget.weight)),
-                                      heightInFt:
-                                          metricSelected.value.toLowerCase() ==
-                                                  'ft'
-                                              ? double.tryParse(
-                                                   '${heightSelected.value}.${decimalheightSelected.value}')
-                                              : convertCmToFtD(
-                                                  double.tryParse(
-                                                     '${heightSelected.value}.${decimalheightSelected.value}',
-                                                  ),
-                                                ),
+                                      heightInFt: metricSelected.value
+                                                  .toLowerCase() ==
+                                              'ft'
+                                          ? double.tryParse(
+                                              '${heightSelected.value}.${decimalheightSelected.value}')
+                                          : convertCmToFtD(
+                                              double.tryParse(
+                                                '${heightSelected.value}.${decimalheightSelected.value}',
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 );

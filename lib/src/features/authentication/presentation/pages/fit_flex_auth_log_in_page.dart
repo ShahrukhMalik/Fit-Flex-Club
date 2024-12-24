@@ -4,12 +4,13 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_forgot_password_page.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class FitFlexAuthLogInPage extends StatefulWidget {
-  static const String route = '/log_in_page';
+  static const String route = 'log_in_page';
   const FitFlexAuthLogInPage({super.key});
 
   @override
@@ -180,7 +181,9 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                       ),
                       text: "Forgot Password ?",
                       onPressed: () {
-                        context.go(FitFlexAuthForgotPasswordPage.route);
+                        context.push(
+                          '${FitFlexAuthLandingPage.route}/${FitFlexAuthLogInPage.route}/${FitFlexAuthForgotPasswordPage.route}',
+                        );
                       },
                       width: double.maxFinite,
                     )!,

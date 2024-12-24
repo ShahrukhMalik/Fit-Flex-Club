@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fit_flex_club/src/core/common/widgets/fit_flex_loader_page.dart';
 import 'package:fit_flex_club/src/core/common/widgets/transition_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
@@ -23,6 +25,7 @@ import 'package:fit_flex_club/src/features/workout_management/presentation/pages
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_picker_widget.dart';
 import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 // ... other imports remain the same
 
@@ -50,10 +53,40 @@ GoRouter goRouter(appState) {
       ),
       GoRoute(
         path: FitFlexAuthLandingPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexAuthLandingPage(),
-        ),
+        pageBuilder: (context, state) {
+          final String flag = state.pathParameters['flag']!;
+          return TransitionPage(
+            key: state.pageKey,
+            child: FitFlexAuthLandingPage(
+              isUserActive: flag == '0' ? false : null,
+            ),
+          );
+        },
+        routes: [
+          GoRoute(
+            path: FitFlexAuthLogInPage.route,
+            pageBuilder: (context, state) => TransitionPage(
+              key: state.pageKey,
+              child: const FitFlexAuthLogInPage(),
+            ),
+            routes: [
+              GoRoute(
+                path: FitFlexAuthForgotPasswordPage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
+                  child: const FitFlexAuthForgotPasswordPage(),
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: FitFlexAuthSignUpPage.route,
+            pageBuilder: (context, state) => TransitionPage(
+              key: state.pageKey,
+              child: const FitFlexAuthSignUpPage(),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: FitFlexLoaderPage.route,
@@ -63,56 +96,56 @@ GoRouter goRouter(appState) {
         ),
       ),
 
-      GoRoute(
-        path: FitFlexClientAssignedWorkoutPlanPage.route,
-        routes: [
-          GoRoute(
-            path: FitFlexWorkoutTrackerPage.route,
-            pageBuilder: (context, state) {
-              final extraData = state.extra as Map<String, dynamic>?;
-              return TransitionPage(
-                key: state.pageKey,
-                child: FitFlexWorkoutTrackerPage(
-                  exercise: extraData?['exercise'],
-                  workoutPlan: extraData?['workoutPlan'],
-                  week: extraData?['week'],
-                  day: extraData?['day'],
-                ),
-              );
-            },
-          ),
-        ],
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexClientAssignedWorkoutPlanPage(
-              workoutPlanModel: extraData?['workoutPlan'],
-            ),
-          );
-        },
-      ),
-      GoRoute(
-        path: FitFlexAuthLogInPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexAuthLogInPage(),
-        ),
-      ),
-      GoRoute(
-        path: FitFlexAuthSignUpPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexAuthSignUpPage(),
-        ),
-      ),
-      GoRoute(
-        path: FitFlexAuthForgotPasswordPage.route,
-        pageBuilder: (context, state) => TransitionPage(
-          key: state.pageKey,
-          child: const FitFlexAuthForgotPasswordPage(),
-        ),
-      ),
+      // GoRoute(
+      //   path: FitFlexClientAssignedWorkoutPlanPage.route,
+      //   routes: [
+      //     GoRoute(
+      //       path: FitFlexWorkoutTrackerPage.route,
+      //       pageBuilder: (context, state) {
+      //         final extraData = state.extra as Map<String, dynamic>?;
+      //         return TransitionPage(
+      //           key: state.pageKey,
+      //           child: FitFlexWorkoutTrackerPage(
+      //             exercise: extraData?['exercise'],
+      //             workoutPlan: extraData?['workoutPlan'],
+      //             week: extraData?['week'],
+      //             day: extraData?['day'],
+      //           ),
+      //         );
+      //       },
+      //     ),
+      //   ],
+      //   pageBuilder: (context, state) {
+      //     final extraData = state.extra as Map<String, dynamic>?;
+      //     return TransitionPage(
+      //       key: state.pageKey,
+      //       child: FitFlexClientAssignedWorkoutPlanPage(
+      //         workoutPlanModel: extraData?['workoutPlan'],
+      //       ),
+      //     );
+      //   },
+      // ),
+      // GoRoute(
+      //   path: FitFlexAuthLogInPage.route,
+      //   pageBuilder: (context, state) => TransitionPage(
+      //     key: state.pageKey,
+      //     child: const FitFlexAuthLogInPage(),
+      //   ),
+      // ),
+      // GoRoute(
+      //   path: FitFlexAuthSignUpPage.route,
+      //   pageBuilder: (context, state) => TransitionPage(
+      //     key: state.pageKey,
+      //     child: const FitFlexAuthSignUpPage(),
+      //   ),
+      // ),
+      // GoRoute(
+      //   path: FitFlexAuthForgotPasswordPage.route,
+      //   pageBuilder: (context, state) => TransitionPage(
+      //     key: state.pageKey,
+      //     child: const FitFlexAuthForgotPasswordPage(),
+      //   ),
+      // ),
 
       // Profile creation flow
       GoRoute(
@@ -121,6 +154,52 @@ GoRouter goRouter(appState) {
           key: state.pageKey,
           child: const FitFlexClientProfileSelectGenderPage(),
         ),
+        routes: [
+          GoRoute(
+            path: FitFlexClientProfileSelectAgePage.route,
+            pageBuilder: (context, state) {
+              final extraData = state.extra as Map<String, dynamic>?;
+              return TransitionPage(
+                key: state.pageKey,
+                child: FitFlexClientProfileSelectAgePage(
+                  gender: extraData?['gender'] ?? "Unknown",
+                ),
+              );
+            },
+            routes: [
+              GoRoute(
+                path: FitFlexClientProfileSelectWeightPage.route,
+                pageBuilder: (context, state) {
+                  final extraData = state.extra as Map<String, dynamic>?;
+                  return TransitionPage(
+                    key: state.pageKey,
+                    child: FitFlexClientProfileSelectWeightPage(
+                      gender: extraData?['gender'] ?? "Unknown",
+                      age: extraData?['age'] ?? "Unknown",
+                    ),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: FitFlexClientProfileSelectHeightPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexClientProfileSelectHeightPage(
+                          gender: extraData?['gender'] ?? "Unknown",
+                          age: extraData?['age'] ?? "Unknown",
+                          weight: extraData?['weight'] ?? "Unknown",
+                          weightUnit: extraData?['weightUnit'] ?? "Unknown",
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: FitFlexClubCreateWorkoutPlanPage.route,
@@ -143,18 +222,18 @@ GoRouter goRouter(appState) {
           child: const FitFlexClubSelectExercisePage(),
         ),
       ),
-      GoRoute(
-        path: FitFlexClientProfileSelectAgePage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexClientProfileSelectAgePage(
-              gender: extraData?['gender'] ?? "Unknown",
-            ),
-          );
-        },
-      ),
+      // GoRoute(
+      //   path: FitFlexClientProfileSelectAgePage.route,
+      //   pageBuilder: (context, state) {
+      //     final extraData = state.extra as Map<String, dynamic>?;
+      //     return TransitionPage(
+      //       key: state.pageKey,
+      //       child: FitFlexClientProfileSelectAgePage(
+      //         gender: extraData?['gender'] ?? "Unknown",
+      //       ),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: FitFlexTrainerClientDetailsPage.route,
         pageBuilder: (context, state) {
@@ -167,19 +246,19 @@ GoRouter goRouter(appState) {
           );
         },
       ),
-      GoRoute(
-        path: FitFlexClientProfileSelectWeightPage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexClientProfileSelectWeightPage(
-              gender: extraData?['gender'] ?? "Unknown",
-              age: extraData?['age'] ?? "Unknown",
-            ),
-          );
-        },
-      ),
+      // GoRoute(
+      //   path: FitFlexClientProfileSelectWeightPage.route,
+      //   pageBuilder: (context, state) {
+      //     final extraData = state.extra as Map<String, dynamic>?;
+      //     return TransitionPage(
+      //       key: state.pageKey,
+      //       child: FitFlexClientProfileSelectWeightPage(
+      //         gender: extraData?['gender'] ?? "Unknown",
+      //         age: extraData?['age'] ?? "Unknown",
+      //       ),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: FitFlexTrainerHistoryPage.route,
         pageBuilder: (context, state) {
@@ -195,21 +274,21 @@ GoRouter goRouter(appState) {
           );
         },
       ),
-      GoRoute(
-        path: FitFlexClientProfileSelectHeightPage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexClientProfileSelectHeightPage(
-              gender: extraData?['gender'] ?? "Unknown",
-              age: extraData?['age'] ?? "Unknown",
-              weight: extraData?['weight'] ?? "Unknown",
-              weightUnit: extraData?['weightUnit'] ?? "Unknown",
-            ),
-          );
-        },
-      ),
+      // GoRoute(
+      //   path: FitFlexClientProfileSelectHeightPage.route,
+      //   pageBuilder: (context, state) {
+      //     final extraData = state.extra as Map<String, dynamic>?;
+      //     return TransitionPage(
+      //       key: state.pageKey,
+      //       child: FitFlexClientProfileSelectHeightPage(
+      //         gender: extraData?['gender'] ?? "Unknown",
+      //         age: extraData?['age'] ?? "Unknown",
+      //         weight: extraData?['weight'] ?? "Unknown",
+      //         weightUnit: extraData?['weightUnit'] ?? "Unknown",
+      //       ),
+      //     );
+      //   },
+      // ),
       // Trainer app shell route
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -264,6 +343,38 @@ GoRouter goRouter(appState) {
                   key: state.pageKey,
                   child: FitFlexClientProfilePage(),
                 ),
+                routes: [
+                  GoRoute(
+                    path: FitFlexClientAssignedWorkoutPlanPage.route,
+                    routes: [
+                      GoRoute(
+                        path: FitFlexWorkoutTrackerPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexWorkoutTrackerPage(
+                              exercise: extraData?['exercise'],
+                              workoutPlan: extraData?['workoutPlan'],
+                              week: extraData?['week'],
+                              day: extraData?['day'],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexClientAssignedWorkoutPlanPage(
+                          workoutPlanModel: extraData?['workoutPlan'],
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -299,7 +410,12 @@ GoRouter goRouter(appState) {
     redirect: (context, state) {
       // Handle loading state
       if (appState is AuthenticationLoading) {
-        return FitFlexLoaderPage.route;
+        if (Platform.isAndroid) return FitFlexLoaderPage.route;
+      }
+      if (appState is AuthenticationError) {
+        Fluttertoast.showToast(
+            msg: appState.failures.message ?? "Something went wrong");
+        return FitFlexAuthLandingPage.route;
       }
 
       // Handle authenticated state

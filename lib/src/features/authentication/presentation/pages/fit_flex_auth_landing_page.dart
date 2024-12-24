@@ -83,7 +83,8 @@ class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
                     fontSize: 20,
                   ),
                   text: "Log In",
-                  onPressed: () => context.go(FitFlexAuthLogInPage.route),
+                  onPressed: () => context.push(
+                      '${FitFlexAuthLandingPage.route}/${FitFlexAuthLogInPage.route}'),
                 )!,
                 const SizedBox(height: 16), // Space between buttons
                 PlatformButton().buildButton(
@@ -99,7 +100,8 @@ class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
                   type: ButtonType
                       .primary, // Assuming you have a secondary button type
                   text: "Sign Up",
-                  onPressed: () => context.go(FitFlexAuthSignUpPage.route),
+                  onPressed: () =>context.push(
+                      '${FitFlexAuthLandingPage.route}/${FitFlexAuthSignUpPage.route}'),
                 )!,
                 const SizedBox(height: 50),
               ],

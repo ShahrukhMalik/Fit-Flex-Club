@@ -170,7 +170,7 @@ class _FitFlexTrainerDashboardPageState
           PlatformDialog.showAlertDialog(
             context: context,
             title: "Fit Flex Club",
-            message: 'Are you sure ,you want to exit ?',
+            message: 'Want to exit ?',
             cancelText: 'No',
             confirmText: 'Yes',
             onConfirm: () {

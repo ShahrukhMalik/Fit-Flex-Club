@@ -26,6 +26,8 @@ class AppTextFields {
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
+        
+        textInputAction: TextInputAction.done,
         key: uniqueKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         initialValue: initialValue,
@@ -67,6 +69,7 @@ class AppTextFields {
     }
 
     return TextFormField(
+         textInputAction: TextInputAction.done,
       key: uniqueKey,
       initialValue: initialValue,
 

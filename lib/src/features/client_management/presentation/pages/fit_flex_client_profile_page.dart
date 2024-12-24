@@ -123,10 +123,13 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
                           ),
                           onPressed: () {
                             // if (widget.workoutPlan != null) {
-                            context.go(
-                              FitFlexClientAssignedWorkoutPlanPage.route,
+                            print(
+                                'Navigating to: ${FitFlexClientProfilePage.route}/${FitFlexClientAssignedWorkoutPlanPage.route}');
+                            context.push(
+                              '${FitFlexClientProfilePage.route}/${FitFlexClientAssignedWorkoutPlanPage.route}',
                               extra: {'workoutPlan': widget.workoutPlan},
                             );
+
                             // } else {}
                           },
                         )!

@@ -1,3 +1,4 @@
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_age_page.dart';
@@ -9,7 +10,7 @@ import 'package:go_router/go_router.dart';
 class FitFlexClientProfileSelectWeightPage extends StatefulWidget {
   final String gender;
   final String age;
-  static const String route = "/select-weight";
+  static const String route = "select-weight";
   const FitFlexClientProfileSelectWeightPage({
     super.key,
     required this.gender,
@@ -190,28 +191,32 @@ class _FitFlexClientProfileSelectWeightPageState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     PlatformButton().buildButton(
-                      foregroundColor: Color(0xFFFFC26A),
+                      foregroundColor: globalColorScheme.tertiaryContainer,
                       backgroundColor: Colors.transparent,
                       textStyle: TextStyle(
-                        color: Color(0xFFFFC26A),
+                        color: globalColorScheme.tertiaryContainer,
+                        fontWeight: FontWeight.bold,
                       ),
                       context: context,
                       type: ButtonType.iconText,
                       icon: Icons.arrow_back_ios_new,
                       iconAlignment: IconAlignment.start,
                       text: "Previous",
-                      onPressed: () =>
-                          context.go(FitFlexClientProfileSelectAgePage.route),
+                      onPressed: () => context.pop(),
                     )!,
                     PlatformButton().buildButton(
                       backgroundColor: Color(0xFFFFC26A),
-                      foregroundColor: Color(0xFFF2F2F7),
+                      foregroundColor: globalColorScheme.tertiaryContainer,
                       context: context,
                       type: ButtonType.iconText,
                       icon: Icons.arrow_forward_ios,
+                      textStyle: TextStyle(
+                        color: globalColorScheme.tertiaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                       text: "Continue",
-                      onPressed: () => context.go(
-                        FitFlexClientProfileSelectHeightPage.route,
+                      onPressed: () => context.push(
+                        '${FitFlexClientProfileSelectGenderPage.route}/${FitFlexClientProfileSelectAgePage.route}/${FitFlexClientProfileSelectWeightPage.route}/${FitFlexClientProfileSelectHeightPage.route}',
                         extra: {
                           "gender": widget.gender,
                           "age": widget.age,
@@ -385,7 +390,7 @@ class _FitFlexScrollWheelWidgetState extends State<FitFlexScrollWheelWidget> {
                     children: List<Widget>.generate(
                       widget.maxCountGmsOz,
                       (index) => _buildWheelItem(
-                        index: index + 1,
+                        index: index,
                         selectedValue: widget.selectedValueGmsOz,
                         unit: widget.unitGmsOz,
                       ),
