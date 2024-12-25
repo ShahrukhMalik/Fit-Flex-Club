@@ -39,6 +39,7 @@ class SharedPrefsUtil {
   AuthEntity? getAuthEntity() {
     final jsonString = _prefs.getString(_keyAuthEntity);
     if (jsonString == null) return null;
+    if(isDataStale()) return null;
     
     try {
       final jsonMap = json.decode(jsonString);

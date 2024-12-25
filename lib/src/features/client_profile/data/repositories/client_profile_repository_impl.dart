@@ -5,10 +5,13 @@ import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/client_profile_local_datasource.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/remote/client_profile_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/repositories/client_profile_repository.dart';
+import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:injectable/injectable.dart';
 
 @Singleton(as: ClientProfileRepository)
@@ -16,8 +19,10 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
   final NetworkInfo networkInfo;
   final ClientProfileRemoteDatasource clientProfileRemoteDatasource;
   final ClientLocalDatasource clientProfileLocalDatasource;
+  final SyncQueueDao syncQueueDao;
 
-  ClientProfileRepositoryImpl({
+  ClientProfileRepositoryImpl(
+    this.syncQueueDao, {
     required this.networkInfo,
     required this.clientProfileRemoteDatasource,
     required this.clientProfileLocalDatasource,
@@ -255,30 +260,27 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
   ) async {
     try {
       final isNetworkConnected = await networkInfo.isConnected;
+      final model = ClientWeightModel(
+        timeStamp: weight.timeStamp,
+        weightInKg: weight.weightInKg,
+        weightInLb: weight.weightInLb,
+        clientId: weight.clientId,
+      );
       final cache = await clientProfileLocalDatasource.insertClientWeight(
-        ClientWeightModel(
-          timeStamp: weight.timeStamp,
-          weightInKg: weight.weightInKg,
-          weightInLb: weight.weightInLb,
-          clientId: weight.clientId,
-        ),
+        model,
       );
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.addUser.name,
+            'Clients',
+            model.toMap(),
           ),
         );
       } else {
         return Right(
           await clientProfileRemoteDatasource.addClientWeight(
-            ClientWeightModel(
-              timeStamp: weight.timeStamp,
-              weightInKg: weight.weightInKg,
-              weightInLb: weight.weightInLb,
-              clientId: weight.clientId,
-            ),
+            model,
           ),
         );
       }

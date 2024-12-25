@@ -2,6 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
+import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/workout_plan_management_localdatabase.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/remote/workout_plan_management_remotedatasource.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
@@ -14,8 +16,9 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
   final NetworkInfo networkInfo;
   final WorkoutPlanManagementLocaldatasource local;
   final WorkoutPlanManagementRemotedatasource remote;
+    final SyncQueueDao syncQueueDao;
 
-  WorkoutManagementRepositoryImpl({
+  WorkoutManagementRepositoryImpl(this.syncQueueDao, {
     required this.networkInfo,
     required this.local,
     required this.remote,
@@ -69,10 +72,11 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.insertWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.createWorkoutPlan.name,
+            'WorkoutPlans',
+            workoutPlan.toMap(),
           ),
         );
       } else {
@@ -147,10 +151,11 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.updateWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.updateWorkoutPlan.name,
+            'WorkoutPlans',
+            workoutPlan.toMap(),
           ),
         );
       } else {
@@ -185,10 +190,11 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.assignWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.assignWorkoutPlan.name,
+            'WorkoutPlans',
+            workoutPlan.toMap(),
           ),
         );
       } else {
@@ -269,10 +275,11 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.updateWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.updateAssignedWorkoutPlan.name,
+            'WorkoutPlans',
+            workoutPlan.toMap(),
           ),
         );
       } else {
@@ -307,10 +314,11 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.deleteAssignedWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.deleteAssignedWorkoutPlan.name,
+            'WorkoutPlans',
+            workoutPlan.toMap(),
           ),
         );
       } else {
@@ -344,10 +352,11 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       final isNetworkConnected = await networkInfo.isConnected;
       final cache = await local.deleteWorkoutPlan(workoutPlan);
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.deleteWorkoutPlan.name,
+            'WorkoutPlans',
+            workoutPlan.toMap(),
           ),
         );
       } else {

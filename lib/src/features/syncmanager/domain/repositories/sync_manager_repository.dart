@@ -19,7 +19,12 @@ abstract class SyncManagerRepository {
 enum ListenerEvents {
   updateAssignedWorkoutPlan,
   deleteAssignedWorkoutPlan,
-  addAssignedWorkoutPlan,
-  addNewClient,
+  assignWorkoutPlan,
+  addUser,
+  addClientWeight,
   deactivateUser,
+  logWorkoutProgress,
+  createWorkoutPlan,
+  updateWorkoutPlan,
+  deleteWorkoutPlan,
 }

@@ -242,7 +242,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       bool? isTrainer;
 
       final AuthEntity? authEntity = prefs.getAuthEntity();
-      // if (authEntity == null) {
+      if (authEntity == null) {
       final CollectionReference ref = remoteDb.collection('Users');
       final DocumentSnapshot<Object?> snapshot =
           await ref.doc(auth.currentUser?.uid).get();
@@ -303,9 +303,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       return Future.value(
         toStoreEntity,
       );
-      // } else {
-      //   return Future.value(authEntity);
-      // }
+      } else {
+        return Future.value(authEntity);
+      }
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

@@ -15,17 +15,11 @@ class Params extends Equatable {
   final String? clientId;
   final List<SetModel> sets;
   final String exerciseId;
-  final String dayId;
-  final String weekId;
-  final String workoutPlanId;
 
   const Params({
     required this.sets,
     this.clientId,
     required this.exerciseId,
-    required this.dayId,
-    required this.weekId,
-    required this.workoutPlanId,
   });
 
   @override
@@ -44,11 +38,8 @@ class LogWorkoutHistoryUsecaseImpl extends LogWorkoutHistoryUsecase {
   Future<Either<Failures, void>?>? call(Params params) {
     return workoutHistoryRepository.logWorkoutProgress(
       clientId: params.clientId,
-      dayId: params.dayId,
       exerciseId: params.exerciseId,
       sets: params.sets,
-      weekId: params.weekId,
-      workoutPlanId: params.workoutPlanId,
     );
   }
 }

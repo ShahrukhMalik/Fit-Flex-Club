@@ -71,6 +71,8 @@ import '../../../features/client_profile/presentation/clientweights/clientweight
     as _i677;
 import '../../../features/client_profile/presentation/getclientweights/getclientweights_cubit.dart'
     as _i596;
+import '../../../features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart'
+    as _i663;
 import '../../../features/syncmanager/data/datasources/remote/sync_manager_remote_datasource.dart'
     as _i843;
 import '../../../features/syncmanager/data/repositories/sync_manager_repository_impl.dart'
@@ -171,6 +173,8 @@ extension GetItInjectableX on _i174.GetIt {
         connectionChecker: gh<_i973.InternetConnectionChecker>()));
     gh.factory<_i593.WorkoutHistoryDao>(
         () => _i593.WorkoutHistoryDao(gh<_i987.AppDatabase>()));
+    gh.factory<_i663.SyncQueueDao>(
+        () => _i663.SyncQueueDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
           gh<_i878.SharedPrefsUtil>(),
           gh<_i974.FirebaseFirestore>(),
@@ -195,13 +199,6 @@ extension GetItInjectableX on _i174.GetIt {
               dao: gh<_i899.ClientsDao>(),
               database: gh<_i987.AppDatabase>(),
             ));
-    gh.singleton<_i627.ClientProfileRepository>(
-        () => _i560.ClientProfileRepositoryImpl(
-              networkInfo: gh<_i228.NetworkInfo>(),
-              clientProfileRemoteDatasource:
-                  gh<_i588.ClientProfileRemoteDatasource>(),
-              clientProfileLocalDatasource: gh<_i648.ClientLocalDatasource>(),
-            ));
     gh.singleton<_i98.IsClientProfileCreatedActiveUsecase>(() =>
         _i98.IsClientProfileCreatedActiveUsecaseImpl(
             clientProfileRepository: gh<_i20.AuthRepository>()));
@@ -209,21 +206,9 @@ extension GetItInjectableX on _i174.GetIt {
         clientProfileRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i831.LogInUsecase>(() =>
         _i831.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i535.GetClientWeightsUsecase>(() =>
-        _i535.GetClientWeightsUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i988.ForgotPasswordUsecase>(() =>
         _i988.ForgotPasswordUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i843.SyncManagerRemoteDatasource>(
-        () => _i843.SyncManagerRemoteDatasourceImpl(
-              gh<_i59.FirebaseAuth>(),
-              gh<_i974.FirebaseFirestore>(),
-              connectivity: gh<_i895.Connectivity>(),
-            ));
-    gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
-        _i617.IsClientProfileCreatedActiveUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i645.ListenToEventsUsecase>(() =>
         _i645.LogInUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i949.AuthenticateUserUsecase>(() =>
@@ -232,18 +217,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i955.CreateAccountUsecase>(() =>
         _i955.CreateAccountUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
-    gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i702.AddClientWeightUsecase>(() =>
-        _i702.AddClientWeightUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.factory<_i677.ClientweightsCubit>(
-        () => _i677.ClientweightsCubit(gh<_i702.AddClientWeightUsecase>()));
-    gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
-        _i781.GetClientsUsecaseUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i352.WorkoutHistoryRemoteDataSource>(() =>
         _i352.WorkoutHistoryRemoteDataSourceImpl(
             db: gh<_i974.FirebaseFirestore>()));
@@ -254,24 +227,26 @@ extension GetItInjectableX on _i174.GetIt {
               dao: gh<_i939.WorkoutPlanDao>(),
               database: gh<_i987.AppDatabase>(),
             ));
-    gh.factory<_i596.GetclientweightsCubit>(
-        () => _i596.GetclientweightsCubit(gh<_i535.GetClientWeightsUsecase>()));
-    gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
-        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i615.WorkoutHistoryLocalDataSource>(
         () => _i615.WorkoutHistoryLocalDataSourceImpl(
               dao: gh<_i593.WorkoutHistoryDao>(),
               database: gh<_i987.AppDatabase>(),
             ));
-    gh.singleton<_i841.GetClientByIdUsecase>(() =>
-        _i841.GetClientByIdUsecaseImpl(
-            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.singleton<_i530.WorkoutManagementRepository>(
         () => _i1071.WorkoutManagementRepositoryImpl(
+              gh<_i663.SyncQueueDao>(),
               networkInfo: gh<_i228.NetworkInfo>(),
               local: gh<_i415.WorkoutPlanManagementLocaldatasource>(),
               remote: gh<_i826.WorkoutPlanManagementRemotedatasource>(),
             ));
+    gh.singleton<_i853.CreateWorkoutPlanUsecase>(() =>
+        _i853.CreateWorkoutPlanUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i120.GetWorkoutPlansUsecase>(() =>
+        _i120.GetWorkoutPlansUsecaseImpl(
+            workoutManagementRepository:
+                gh<_i530.WorkoutManagementRepository>()));
     gh.singleton<_i175.DeleteAssignedWorkoutPlanUsecase>(() =>
         _i175.DeleteAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -282,13 +257,14 @@ extension GetItInjectableX on _i174.GetIt {
                 gh<_i530.WorkoutManagementRepository>()));
     gh.singleton<_i139.GetExercisesUsecase>(() => _i139.GetExercisesUsecaseImpl(
         workoutManagementRepository: gh<_i530.WorkoutManagementRepository>()));
-    gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
-          gh<_i541.AddUserUsecase>(),
-          gh<_i864.UpdateUserUsecase>(),
-          gh<_i617.IsClientProfileCreatedActiveUsecase>(),
-          gh<_i899.IsUserActiveUsecase>(),
-          gh<_i841.GetClientByIdUsecase>(),
-        ));
+    gh.singleton<_i627.ClientProfileRepository>(
+        () => _i560.ClientProfileRepositoryImpl(
+              gh<_i663.SyncQueueDao>(),
+              networkInfo: gh<_i228.NetworkInfo>(),
+              clientProfileRemoteDatasource:
+                  gh<_i588.ClientProfileRemoteDatasource>(),
+              clientProfileLocalDatasource: gh<_i648.ClientLocalDatasource>(),
+            ));
     gh.singleton<_i282.AssignWorkoutPlanUsecase>(() =>
         _i282.AssignWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -297,15 +273,10 @@ extension GetItInjectableX on _i174.GetIt {
         _i91.GetWorkoutPlansForClientUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
-    gh.factory<_i812.TrainerProfileBloc>(
-        () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
     gh.singleton<_i661.UpdateAssignedWorkoutPlanUsecase>(() =>
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
-    gh.singleton<_i273.SyncManagerRepository>(() =>
-        _i128.SyncManagerRepositoryImpl(
-            remoteDatasource: gh<_i843.SyncManagerRemoteDatasource>()));
     gh.singleton<_i430.UpdateWorkoutPlanUsecase>(() =>
         _i430.UpdateWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -318,31 +289,9 @@ extension GetItInjectableX on _i174.GetIt {
           forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
           listenToEventsUsecase: gh<_i645.ListenToEventsUsecase>(),
         ));
-    gh.singleton<_i198.WorkoutHistoryRepository>(
-        () => _i473.WorkoutHistoryRepositoryImpl(
-              networkInfo: gh<_i228.NetworkInfo>(),
-              local: gh<_i615.WorkoutHistoryLocalDataSource>(),
-              remote: gh<_i352.WorkoutHistoryRemoteDataSource>(),
-            ));
-    gh.singleton<_i119.GetWorkoutHistoryUsecase>(() =>
-        _i119.GetWorkoutHistoryUsecaseImpl(
-            workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
-    gh.singleton<_i853.CreateWorkoutPlanUsecase>(() =>
-        _i853.CreateWorkoutPlanUsecaseImpl(
-            workoutManagementRepository:
-                gh<_i530.WorkoutManagementRepository>()));
-    gh.singleton<_i120.GetWorkoutPlansUsecase>(() =>
-        _i120.GetWorkoutPlansUsecaseImpl(
-            workoutManagementRepository:
-                gh<_i530.WorkoutManagementRepository>()));
-    gh.singleton<_i798.CheckConnectivityUsecase>(() =>
-        _i798.CheckConnectivityUsecaseImpl(
-            syncManagerRepository: gh<_i273.SyncManagerRepository>()));
-    gh.factory<_i219.SyncmanagerBloc>(
-        () => _i219.SyncmanagerBloc(gh<_i798.CheckConnectivityUsecase>()));
-    gh.singleton<_i208.LogWorkoutHistoryUsecase>(() =>
-        _i208.LogWorkoutHistoryUsecaseImpl(
-            workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
+    gh.singleton<_i535.GetClientWeightsUsecase>(() =>
+        _i535.GetClientWeightsUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.factory<_i41.WorkoutManagementBloc>(() => _i41.WorkoutManagementBloc(
           gh<_i139.GetExercisesUsecase>(),
           gh<_i853.CreateWorkoutPlanUsecase>(),
@@ -354,10 +303,77 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i711.DeleteWorkoutPlanUsecase>(),
           gh<_i661.UpdateAssignedWorkoutPlanUsecase>(),
         ));
+    gh.singleton<_i617.IsClientProfileCreatedActiveUsecase>(() =>
+        _i617.IsClientProfileCreatedActiveUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i541.AddUserUsecase>(() => _i541.AddUserUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i702.AddClientWeightUsecase>(() =>
+        _i702.AddClientWeightUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.factory<_i677.ClientweightsCubit>(
+        () => _i677.ClientweightsCubit(gh<_i702.AddClientWeightUsecase>()));
+    gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
+        _i781.GetClientsUsecaseUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.factory<_i596.GetclientweightsCubit>(
+        () => _i596.GetclientweightsCubit(gh<_i535.GetClientWeightsUsecase>()));
+    gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
+        clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i198.WorkoutHistoryRepository>(
+        () => _i473.WorkoutHistoryRepositoryImpl(
+              gh<_i663.SyncQueueDao>(),
+              networkInfo: gh<_i228.NetworkInfo>(),
+              local: gh<_i615.WorkoutHistoryLocalDataSource>(),
+              remote: gh<_i352.WorkoutHistoryRemoteDataSource>(),
+            ));
+    gh.singleton<_i841.GetClientByIdUsecase>(() =>
+        _i841.GetClientByIdUsecaseImpl(
+            clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i119.GetWorkoutHistoryUsecase>(() =>
+        _i119.GetWorkoutHistoryUsecaseImpl(
+            workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
+    gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
+          gh<_i541.AddUserUsecase>(),
+          gh<_i864.UpdateUserUsecase>(),
+          gh<_i617.IsClientProfileCreatedActiveUsecase>(),
+          gh<_i899.IsUserActiveUsecase>(),
+          gh<_i841.GetClientByIdUsecase>(),
+        ));
+    gh.factory<_i812.TrainerProfileBloc>(
+        () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
+    gh.singleton<_i208.LogWorkoutHistoryUsecase>(() =>
+        _i208.LogWorkoutHistoryUsecaseImpl(
+            workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
     gh.factory<_i942.WorkoutHistoryBloc>(() => _i942.WorkoutHistoryBloc(
           gh<_i208.LogWorkoutHistoryUsecase>(),
           gh<_i119.GetWorkoutHistoryUsecase>(),
         ));
+    gh.singleton<_i843.SyncManagerRemoteDatasource>(
+        () => _i843.SyncManagerRemoteDatasourceImpl(
+              gh<_i59.FirebaseAuth>(),
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i663.SyncQueueDao>(),
+              gh<_i702.AddClientWeightUsecase>(),
+              gh<_i853.CreateWorkoutPlanUsecase>(),
+              gh<_i711.DeleteWorkoutPlanUsecase>(),
+              gh<_i282.AssignWorkoutPlanUsecase>(),
+              gh<_i175.DeleteAssignedWorkoutPlanUsecase>(),
+              gh<_i661.UpdateAssignedWorkoutPlanUsecase>(),
+              gh<_i430.UpdateWorkoutPlanUsecase>(),
+              gh<_i208.LogWorkoutHistoryUsecase>(),
+              connectivity: gh<_i895.Connectivity>(),
+            ));
+    gh.singleton<_i273.SyncManagerRepository>(() =>
+        _i128.SyncManagerRepositoryImpl(
+            remoteDatasource: gh<_i843.SyncManagerRemoteDatasource>()));
+    gh.singleton<_i798.CheckConnectivityUsecase>(() =>
+        _i798.CheckConnectivityUsecaseImpl(
+            syncManagerRepository: gh<_i273.SyncManagerRepository>()));
+    gh.factory<_i219.SyncmanagerBloc>(
+        () => _i219.SyncmanagerBloc(gh<_i798.CheckConnectivityUsecase>()));
     return this;
   }
 }

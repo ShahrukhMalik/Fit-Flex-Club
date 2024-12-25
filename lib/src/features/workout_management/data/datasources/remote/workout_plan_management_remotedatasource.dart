@@ -286,7 +286,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
         listenerRef.doc(UUIDv4().toString()),
         {
           'clientId': workoutPlanModel.clientId,
-          'eventType': ListenerEvents.addAssignedWorkoutPlan.name,
+          'eventType': ListenerEvents.assignWorkoutPlan.name,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
         },
       );

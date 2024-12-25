@@ -4,9 +4,11 @@ import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/tables/sync_queue_table.dart';
 import 'package:flutter/foundation.dart';
+import 'package:injectable/injectable.dart';
 
 part 'sync_queue_dao.g.dart';
 
+@injectable
 @DriftAccessor(tables: [SyncQueue])
 class SyncQueueDao extends DatabaseAccessor<AppDatabase>
     with _$SyncQueueDaoMixin {
@@ -20,13 +22,13 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> logSyncAction(
-    String operation,
+    String event,
     String table,
     Map<String, dynamic> data,
   ) async {
     await into(syncQueue).insert(
       SyncQueueCompanion(
-        operation: Value(operation),
+        event: Value(event),
         table: Value(table),
         data: Value(jsonEncode(data)),
         timestamp: Value(DateTime.now().millisecondsSinceEpoch),
@@ -34,4 +36,11 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase>
       ),
     );
   }
+
+Future<void> markDataAsSynced(int id) async {
+  await (update(syncQueue)
+        ..where((tbl) => tbl.id.equals(id)))
+      .write(SyncQueueCompanion(synced: Value(true)));
+}
+
 }

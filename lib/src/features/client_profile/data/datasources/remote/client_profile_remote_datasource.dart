@@ -93,7 +93,7 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
         await listenerRef.add(
           {
             'clientId': trainer.id,
-            'eventType': ListenerEvents.addNewClient.name,
+            'eventType': ListenerEvents.addUser.name,
             'timestamp': DateTime.now().millisecondsSinceEpoch,
           },
         );

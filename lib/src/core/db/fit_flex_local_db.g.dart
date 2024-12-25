@@ -4232,11 +4232,10 @@ class $SyncQueueTable extends SyncQueue
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _operationMeta =
-      const VerificationMeta('operation');
+  static const VerificationMeta _eventMeta = const VerificationMeta('event');
   @override
-  late final GeneratedColumn<String> operation = GeneratedColumn<String>(
-      'operation', aliasedName, false,
+  late final GeneratedColumn<String> event = GeneratedColumn<String>(
+      'event', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _dataMeta = const VerificationMeta('data');
   @override
@@ -4265,7 +4264,7 @@ class $SyncQueueTable extends SyncQueue
       defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns =>
-      [id, operation, data, table, timestamp, synced];
+      [id, event, data, table, timestamp, synced];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4279,11 +4278,11 @@ class $SyncQueueTable extends SyncQueue
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('operation')) {
-      context.handle(_operationMeta,
-          operation.isAcceptableOrUnknown(data['operation']!, _operationMeta));
+    if (data.containsKey('event')) {
+      context.handle(
+          _eventMeta, event.isAcceptableOrUnknown(data['event']!, _eventMeta));
     } else if (isInserting) {
-      context.missing(_operationMeta);
+      context.missing(_eventMeta);
     }
     if (data.containsKey('data')) {
       context.handle(
@@ -4318,8 +4317,8 @@ class $SyncQueueTable extends SyncQueue
     return SyncQueueData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      operation: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}operation'])!,
+      event: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}event'])!,
       data: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}data'])!,
       table: attachedDatabase.typeMapping
@@ -4339,14 +4338,14 @@ class $SyncQueueTable extends SyncQueue
 
 class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
   final int id;
-  final String operation;
+  final String event;
   final String data;
   final String table;
   final int timestamp;
   final bool synced;
   const SyncQueueData(
       {required this.id,
-      required this.operation,
+      required this.event,
       required this.data,
       required this.table,
       required this.timestamp,
@@ -4355,7 +4354,7 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['operation'] = Variable<String>(operation);
+    map['event'] = Variable<String>(event);
     map['data'] = Variable<String>(data);
     map['table'] = Variable<String>(table);
     map['timestamp'] = Variable<int>(timestamp);
@@ -4366,7 +4365,7 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
   SyncQueueCompanion toCompanion(bool nullToAbsent) {
     return SyncQueueCompanion(
       id: Value(id),
-      operation: Value(operation),
+      event: Value(event),
       data: Value(data),
       table: Value(table),
       timestamp: Value(timestamp),
@@ -4379,7 +4378,7 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SyncQueueData(
       id: serializer.fromJson<int>(json['id']),
-      operation: serializer.fromJson<String>(json['operation']),
+      event: serializer.fromJson<String>(json['event']),
       data: serializer.fromJson<String>(json['data']),
       table: serializer.fromJson<String>(json['table']),
       timestamp: serializer.fromJson<int>(json['timestamp']),
@@ -4391,7 +4390,7 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'operation': serializer.toJson<String>(operation),
+      'event': serializer.toJson<String>(event),
       'data': serializer.toJson<String>(data),
       'table': serializer.toJson<String>(table),
       'timestamp': serializer.toJson<int>(timestamp),
@@ -4401,14 +4400,14 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
 
   SyncQueueData copyWith(
           {int? id,
-          String? operation,
+          String? event,
           String? data,
           String? table,
           int? timestamp,
           bool? synced}) =>
       SyncQueueData(
         id: id ?? this.id,
-        operation: operation ?? this.operation,
+        event: event ?? this.event,
         data: data ?? this.data,
         table: table ?? this.table,
         timestamp: timestamp ?? this.timestamp,
@@ -4417,7 +4416,7 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
   SyncQueueData copyWithCompanion(SyncQueueCompanion data) {
     return SyncQueueData(
       id: data.id.present ? data.id.value : this.id,
-      operation: data.operation.present ? data.operation.value : this.operation,
+      event: data.event.present ? data.event.value : this.event,
       data: data.data.present ? data.data.value : this.data,
       table: data.table.present ? data.table.value : this.table,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
@@ -4429,7 +4428,7 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
   String toString() {
     return (StringBuffer('SyncQueueData(')
           ..write('id: $id, ')
-          ..write('operation: $operation, ')
+          ..write('event: $event, ')
           ..write('data: $data, ')
           ..write('table: $table, ')
           ..write('timestamp: $timestamp, ')
@@ -4439,14 +4438,13 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, operation, data, table, timestamp, synced);
+  int get hashCode => Object.hash(id, event, data, table, timestamp, synced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SyncQueueData &&
           other.id == this.id &&
-          other.operation == this.operation &&
+          other.event == this.event &&
           other.data == this.data &&
           other.table == this.table &&
           other.timestamp == this.timestamp &&
@@ -4455,14 +4453,14 @@ class SyncQueueData extends DataClass implements Insertable<SyncQueueData> {
 
 class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
   final Value<int> id;
-  final Value<String> operation;
+  final Value<String> event;
   final Value<String> data;
   final Value<String> table;
   final Value<int> timestamp;
   final Value<bool> synced;
   const SyncQueueCompanion({
     this.id = const Value.absent(),
-    this.operation = const Value.absent(),
+    this.event = const Value.absent(),
     this.data = const Value.absent(),
     this.table = const Value.absent(),
     this.timestamp = const Value.absent(),
@@ -4470,18 +4468,18 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
   });
   SyncQueueCompanion.insert({
     this.id = const Value.absent(),
-    required String operation,
+    required String event,
     required String data,
     required String table,
     required int timestamp,
     this.synced = const Value.absent(),
-  })  : operation = Value(operation),
+  })  : event = Value(event),
         data = Value(data),
         table = Value(table),
         timestamp = Value(timestamp);
   static Insertable<SyncQueueData> custom({
     Expression<int>? id,
-    Expression<String>? operation,
+    Expression<String>? event,
     Expression<String>? data,
     Expression<String>? table,
     Expression<int>? timestamp,
@@ -4489,7 +4487,7 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (operation != null) 'operation': operation,
+      if (event != null) 'event': event,
       if (data != null) 'data': data,
       if (table != null) 'table': table,
       if (timestamp != null) 'timestamp': timestamp,
@@ -4499,14 +4497,14 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
 
   SyncQueueCompanion copyWith(
       {Value<int>? id,
-      Value<String>? operation,
+      Value<String>? event,
       Value<String>? data,
       Value<String>? table,
       Value<int>? timestamp,
       Value<bool>? synced}) {
     return SyncQueueCompanion(
       id: id ?? this.id,
-      operation: operation ?? this.operation,
+      event: event ?? this.event,
       data: data ?? this.data,
       table: table ?? this.table,
       timestamp: timestamp ?? this.timestamp,
@@ -4520,8 +4518,8 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (operation.present) {
-      map['operation'] = Variable<String>(operation.value);
+    if (event.present) {
+      map['event'] = Variable<String>(event.value);
     }
     if (data.present) {
       map['data'] = Variable<String>(data.value);
@@ -4542,7 +4540,7 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
   String toString() {
     return (StringBuffer('SyncQueueCompanion(')
           ..write('id: $id, ')
-          ..write('operation: $operation, ')
+          ..write('event: $event, ')
           ..write('data: $data, ')
           ..write('table: $table, ')
           ..write('timestamp: $timestamp, ')
@@ -8473,7 +8471,7 @@ typedef $$WorkoutHistorySetTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool exerciseId})>;
 typedef $$SyncQueueTableCreateCompanionBuilder = SyncQueueCompanion Function({
   Value<int> id,
-  required String operation,
+  required String event,
   required String data,
   required String table,
   required int timestamp,
@@ -8481,7 +8479,7 @@ typedef $$SyncQueueTableCreateCompanionBuilder = SyncQueueCompanion Function({
 });
 typedef $$SyncQueueTableUpdateCompanionBuilder = SyncQueueCompanion Function({
   Value<int> id,
-  Value<String> operation,
+  Value<String> event,
   Value<String> data,
   Value<String> table,
   Value<int> timestamp,
@@ -8500,8 +8498,8 @@ class $$SyncQueueTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get operation => $composableBuilder(
-      column: $table.operation, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get event => $composableBuilder(
+      column: $table.event, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get data => $composableBuilder(
       column: $table.data, builder: (column) => ColumnFilters(column));
@@ -8528,8 +8526,8 @@ class $$SyncQueueTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get operation => $composableBuilder(
-      column: $table.operation, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get event => $composableBuilder(
+      column: $table.event, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get data => $composableBuilder(
       column: $table.data, builder: (column) => ColumnOrderings(column));
@@ -8556,8 +8554,8 @@ class $$SyncQueueTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get operation =>
-      $composableBuilder(column: $table.operation, builder: (column) => column);
+  GeneratedColumn<String> get event =>
+      $composableBuilder(column: $table.event, builder: (column) => column);
 
   GeneratedColumn<String> get data =>
       $composableBuilder(column: $table.data, builder: (column) => column);
@@ -8599,7 +8597,7 @@ class $$SyncQueueTableTableManager extends RootTableManager<
               $$SyncQueueTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<String> operation = const Value.absent(),
+            Value<String> event = const Value.absent(),
             Value<String> data = const Value.absent(),
             Value<String> table = const Value.absent(),
             Value<int> timestamp = const Value.absent(),
@@ -8607,7 +8605,7 @@ class $$SyncQueueTableTableManager extends RootTableManager<
           }) =>
               SyncQueueCompanion(
             id: id,
-            operation: operation,
+            event: event,
             data: data,
             table: table,
             timestamp: timestamp,
@@ -8615,7 +8613,7 @@ class $$SyncQueueTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required String operation,
+            required String event,
             required String data,
             required String table,
             required int timestamp,
@@ -8623,7 +8621,7 @@ class $$SyncQueueTableTableManager extends RootTableManager<
           }) =>
               SyncQueueCompanion.insert(
             id: id,
-            operation: operation,
+            event: event,
             data: data,
             table: table,
             timestamp: timestamp,

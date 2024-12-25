@@ -96,57 +96,6 @@ GoRouter goRouter(appState) {
         ),
       ),
 
-      // GoRoute(
-      //   path: FitFlexClientAssignedWorkoutPlanPage.route,
-      //   routes: [
-      //     GoRoute(
-      //       path: FitFlexWorkoutTrackerPage.route,
-      //       pageBuilder: (context, state) {
-      //         final extraData = state.extra as Map<String, dynamic>?;
-      //         return TransitionPage(
-      //           key: state.pageKey,
-      //           child: FitFlexWorkoutTrackerPage(
-      //             exercise: extraData?['exercise'],
-      //             workoutPlan: extraData?['workoutPlan'],
-      //             week: extraData?['week'],
-      //             day: extraData?['day'],
-      //           ),
-      //         );
-      //       },
-      //     ),
-      //   ],
-      //   pageBuilder: (context, state) {
-      //     final extraData = state.extra as Map<String, dynamic>?;
-      //     return TransitionPage(
-      //       key: state.pageKey,
-      //       child: FitFlexClientAssignedWorkoutPlanPage(
-      //         workoutPlanModel: extraData?['workoutPlan'],
-      //       ),
-      //     );
-      //   },
-      // ),
-      // GoRoute(
-      //   path: FitFlexAuthLogInPage.route,
-      //   pageBuilder: (context, state) => TransitionPage(
-      //     key: state.pageKey,
-      //     child: const FitFlexAuthLogInPage(),
-      //   ),
-      // ),
-      // GoRoute(
-      //   path: FitFlexAuthSignUpPage.route,
-      //   pageBuilder: (context, state) => TransitionPage(
-      //     key: state.pageKey,
-      //     child: const FitFlexAuthSignUpPage(),
-      //   ),
-      // ),
-      // GoRoute(
-      //   path: FitFlexAuthForgotPasswordPage.route,
-      //   pageBuilder: (context, state) => TransitionPage(
-      //     key: state.pageKey,
-      //     child: const FitFlexAuthForgotPasswordPage(),
-      //   ),
-      // ),
-
       // Profile creation flow
       GoRoute(
         path: FitFlexClientProfileSelectGenderPage.route,
@@ -222,18 +171,7 @@ GoRouter goRouter(appState) {
           child: const FitFlexClubSelectExercisePage(),
         ),
       ),
-      // GoRoute(
-      //   path: FitFlexClientProfileSelectAgePage.route,
-      //   pageBuilder: (context, state) {
-      //     final extraData = state.extra as Map<String, dynamic>?;
-      //     return TransitionPage(
-      //       key: state.pageKey,
-      //       child: FitFlexClientProfileSelectAgePage(
-      //         gender: extraData?['gender'] ?? "Unknown",
-      //       ),
-      //     );
-      //   },
-      // ),
+
       GoRoute(
         path: FitFlexTrainerClientDetailsPage.route,
         pageBuilder: (context, state) {
@@ -246,19 +184,7 @@ GoRouter goRouter(appState) {
           );
         },
       ),
-      // GoRoute(
-      //   path: FitFlexClientProfileSelectWeightPage.route,
-      //   pageBuilder: (context, state) {
-      //     final extraData = state.extra as Map<String, dynamic>?;
-      //     return TransitionPage(
-      //       key: state.pageKey,
-      //       child: FitFlexClientProfileSelectWeightPage(
-      //         gender: extraData?['gender'] ?? "Unknown",
-      //         age: extraData?['age'] ?? "Unknown",
-      //       ),
-      //     );
-      //   },
-      // ),
+
       GoRoute(
         path: FitFlexTrainerHistoryPage.route,
         pageBuilder: (context, state) {
@@ -268,27 +194,11 @@ GoRouter goRouter(appState) {
             child: FitFlexTrainerHistoryPage(
               histories: extraData?['histories'] ?? [],
               client: extraData?['client'],
-              // gender: extraData?['gender'] ?? "Unknown",
-              // age: extraData?['age'] ?? "Unknown",
             ),
           );
         },
       ),
-      // GoRoute(
-      //   path: FitFlexClientProfileSelectHeightPage.route,
-      //   pageBuilder: (context, state) {
-      //     final extraData = state.extra as Map<String, dynamic>?;
-      //     return TransitionPage(
-      //       key: state.pageKey,
-      //       child: FitFlexClientProfileSelectHeightPage(
-      //         gender: extraData?['gender'] ?? "Unknown",
-      //         age: extraData?['age'] ?? "Unknown",
-      //         weight: extraData?['weight'] ?? "Unknown",
-      //         weightUnit: extraData?['weightUnit'] ?? "Unknown",
-      //       ),
-      //     );
-      //   },
-      // ),
+
       // Trainer app shell route
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

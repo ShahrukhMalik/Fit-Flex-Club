@@ -39,9 +39,7 @@ class WorkoutHistoryBloc
       log.Params(
         sets: event.sets,
         exerciseId: event.exerciseId,
-        dayId: event.dayId,
-        weekId: event.weekId,
-        workoutPlanId: event.workoutPlanId,
+
       ),
     );
 

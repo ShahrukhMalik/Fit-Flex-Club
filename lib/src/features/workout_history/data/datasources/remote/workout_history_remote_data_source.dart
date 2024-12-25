@@ -15,9 +15,7 @@ abstract class WorkoutHistoryRemoteDataSource {
     required List<SetModel> sets,
     String? clientId,
     required String exerciseId,
-    required String dayId,
-    required String weekId,
-    required String workoutPlanId,
+
   });
 
   ///
@@ -97,9 +95,7 @@ class WorkoutHistoryRemoteDataSourceImpl
     required List<SetModel> sets,
     String? clientId,
     required String exerciseId,
-    required String dayId,
-    required String weekId,
-    required String workoutPlanId,
+
   }) async {
     try {
       ///

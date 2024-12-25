@@ -4,6 +4,8 @@ import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
+import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/workout_history_local_data_source.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/remote/workout_history_remote_data_source.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
@@ -17,8 +19,10 @@ class WorkoutHistoryRepositoryImpl extends WorkoutHistoryRepository {
   final NetworkInfo networkInfo;
   final WorkoutHistoryRemoteDataSource remote;
   final WorkoutHistoryLocalDataSource local;
+  final SyncQueueDao syncQueueDao;
 
-  WorkoutHistoryRepositoryImpl({
+  WorkoutHistoryRepositoryImpl(
+    this.syncQueueDao, {
     required this.networkInfo,
     required this.local,
     required this.remote,
@@ -29,9 +33,6 @@ class WorkoutHistoryRepositoryImpl extends WorkoutHistoryRepository {
     required List<SetModel> sets,
     String? clientId,
     required String exerciseId,
-    required String dayId,
-    required String weekId,
-    required String workoutPlanId,
   }) async {
     try {
       final isNetworkConnected = await networkInfo.isConnected;
@@ -41,20 +42,26 @@ class WorkoutHistoryRepositoryImpl extends WorkoutHistoryRepository {
         clientUid: clientId,
       );
       if (isNetworkConnected == null || !isNetworkConnected) {
-        //TODO:OFFLINE SUPPORT
-        return const Left(
-          NetworkFailure(
-            message: 'Offline Support is coming soon!',
+        return Right(
+          await syncQueueDao.logSyncAction(
+            ListenerEvents.logWorkoutProgress.name,
+            'WorkoutHistorySet',
+            {
+              'exerciseId': exerciseId,
+              'clientId': clientId,
+              'sets': sets.map(
+                (e) => e.toMap(),
+              ),
+            },
           ),
         );
       } else {
         return Right(
           await remote.logWorkoutHistory(
-            dayId: dayId,
+
             exerciseId: exerciseId,
             sets: sets,
-            weekId: weekId,
-            workoutPlanId: workoutPlanId,
+
             clientId: clientId,
           ),
         );
