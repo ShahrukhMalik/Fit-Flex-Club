@@ -37,8 +37,45 @@ class SyncManagerRepositoryImpl extends SyncManagerRepository {
   }
 
   @override
-  Future<Either<Failures, void>> syncData() {
-    // TODO: implement syncData
-    throw UnimplementedError();
+  Future<Either<Failures, void>> syncData() async {
+    try {
+      return Right(await remoteDatasource.syncData());
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, Stream<Map<String, dynamic>?>?>>
+      eventListener() async {
+    try {
+      return Right(await remoteDatasource.eventListener());
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, void>> markEventListened(String docId) async {
+    try {
+      return Right(await remoteDatasource.markEventListened(docId));
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 }

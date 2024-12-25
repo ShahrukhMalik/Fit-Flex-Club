@@ -6,6 +6,7 @@ import 'package:fit_flex_club/src/features/client_profile/data/datasources/local
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_weight.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/daos/workout_history_dao.dart';
+import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_exercise_table.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_set_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/daos/workout_plan_dao.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/day_table.dart';
@@ -28,6 +29,7 @@ part 'fit_flex_local_db.g.dart';
     ClientWeight,
     WorkoutHistorySet,
     SyncQueue,
+    WorkoutHistoryExercise
   ],
   daos: [
     WorkoutPlanDao,
@@ -49,7 +51,8 @@ class AppDatabase extends _$AppDatabase {
       workoutPlanExercise.deleteAll(),
       exerciseSets.deleteAll(),
       baseExercise.deleteAll(),
-      workoutHistorySet.deleteAll()
+      workoutHistorySet.deleteAll(),
+      workoutHistoryExercise.deleteAll(),
     ]);
   }
 
@@ -68,12 +71,13 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(clientWeight);
           await m.createTable(workoutHistorySet);
           await m.createTable(syncQueue);
+          await m.createTable(workoutHistoryExercise);
         },
         onUpgrade: (Migrator m, int from, int to) async {
           // Handle schema version upgrades (when schemaVersion changes)
 
           // Example for migrating from version 1 to version 2:
-          if (from == 5 && to == 6) {
+          if (from == 6 && to == 7) {
             await m.createTable(workoutPlans);
             await m.createTable(weeks);
             await m.createTable(days);
@@ -84,6 +88,7 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(clientWeight);
             await m.createTable(workoutHistorySet);
             await m.createTable(syncQueue);
+            await m.createTable(workoutHistoryExercise);
             // Handle schema migration from version 1 to version 2
             // e.g., Add a new table, column, or index
             // Example: Adding a new column or table
@@ -99,6 +104,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deleteClients() async {
     await clients.deleteAll();
   }
+
   Future<void> deleteClientWeights() async {
     await clientWeight.deleteAll();
   }
@@ -120,10 +126,11 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteWorkoutHistorySets() async {
     await workoutHistorySet.deleteAll();
+    await workoutHistoryExercise.deleteAll();
   }
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

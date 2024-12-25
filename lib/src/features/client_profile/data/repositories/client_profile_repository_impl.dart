@@ -272,7 +272,7 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
       if (isNetworkConnected == null || !isNetworkConnected) {
         return Right(
           await syncQueueDao.logSyncAction(
-            ListenerEvents.addUser.name,
+            ListenerEvents.addClientWeight.name,
             'Clients',
             model.toMap(),
           ),

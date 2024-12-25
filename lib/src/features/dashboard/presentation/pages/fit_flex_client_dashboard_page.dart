@@ -10,11 +10,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FitFlexClientDashboardPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
+  final bool showBottomNavBar;
 
-  const FitFlexClientDashboardPage({
-    super.key,
-    required this.navigationShell,
-  });
+  const FitFlexClientDashboardPage(
+      {super.key,
+      required this.navigationShell,
+      this.showBottomNavBar = false});
 
   @override
   State<FitFlexClientDashboardPage> createState() =>
@@ -32,61 +33,61 @@ class _FitFlexClientDashboardPageState
   }
 
   Widget _buildBottomNavOverlay(BuildContext context, double width) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: width * 0.3, vertical: 30),
-        padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: globalColorScheme.onPrimaryContainer,
-          borderRadius: BorderRadius.circular(100),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 10,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            ValueListenableBuilder<int>(
-              valueListenable: selectedIndex,
-              builder: (context, currentIndex, _) {
-                return AnimatedPositioned(
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  left: currentIndex * (width * 0.24),
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color:
-                          globalColorScheme.surfaceContainer.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: width * 0.3, vertical: 10),
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: globalColorScheme.onPrimaryContainer,
+        borderRadius: BorderRadius.circular(100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ValueListenableBuilder<int>(
+            valueListenable: selectedIndex,
+            builder: (context, currentIndex, _) {
+              return AnimatedPositioned(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                left: currentIndex * (width * 0.24),
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: globalColorScheme.surfaceContainer.withOpacity(0.2),
+                    shape: BoxShape.circle,
                   ),
-                );
-              },
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                _buildIcon(
-                    0, Icons.person, selectedIndex, widget.navigationShell),
-                _buildIcon(1, Icons.history_rounded, selectedIndex,
-                    widget.navigationShell),
-                // _buildIcon(2, Icons.scale_outlined, selectedIndex,
-                //     widget.navigationShell),
-              ],
-            ),
-          ],
-        ),
+                ),
+              );
+            },
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _buildIcon(
+                0,
+                Icons.person,
+                selectedIndex,
+                widget.navigationShell,
+              ),
+              _buildIcon(
+                1,
+                Icons.history_rounded,
+                selectedIndex,
+                widget.navigationShell,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -162,12 +163,12 @@ class _FitFlexClientDashboardPageState
     final double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
           // Main content
-          widget.navigationShell,
+          Expanded(child: widget.navigationShell),
           // Bottom navigation overlay
-          _buildBottomNavOverlay(context, width),
+          if (widget.showBottomNavBar) _buildBottomNavOverlay(context, width),
         ],
       ),
     );

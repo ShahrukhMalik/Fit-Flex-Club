@@ -154,11 +154,24 @@ class ClientModel extends ClientEntity {
     }
     if (age != null) data['age'] = age;
     if (gender != null) data['gender'] = gender;
-    if (weightInKg != null) data['weightInKg'] = weightInKg;
-    if (weightInLb != null) data['weightInLb'] = weightInLb;
+    if (weightInKg != null) {
+      data['weightInKg'] =
+          double.tryParse(weightInKg?.toStringAsFixed(2) ?? "0");
+    }
+    if (weightInLb != null) {
+      data['weightInLb'] =
+          double.tryParse(weightInLb?.toStringAsFixed(2) ?? "0");
+    }
 
-    if (heightInCm != null) data['heightInCm'] = heightInCm;
-    if (heightInFt != null) data['heightInFt'] = heightInFt;
+    if (heightInCm != null) {
+      data['heightInCm'] =
+          double.tryParse(heightInCm?.toStringAsFixed(2) ?? "0");
+    }
+
+    if (heightInFt != null) {
+      data['heightInFt'] =
+          double.tryParse(heightInFt?.toStringAsFixed(2) ?? "0");
+    }
 
     if (isTrainer != null) data['isTrainer'] = isTrainer;
     if (isUserActive != null) data['isUserActive'] = isUserActive;

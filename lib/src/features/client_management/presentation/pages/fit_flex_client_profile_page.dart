@@ -411,24 +411,28 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              Row(
-                                children: [
-                                  if (weight['icon'] != null)
-                                    Icon(
-                                      weight['icon'] ?? Icons.add,
-                                      color: globalColorScheme.onErrorContainer,
-                                      size: 16,
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    if (weight['icon'] != null)
+                                      Icon(
+                                        weight['icon'] ?? Icons.add,
+                                        color: globalColorScheme.onErrorContainer,
+                                        size: 16,
+                                      ),
+                                    Expanded(
+                                      child: Text(
+                                        weight['difference'] != null
+                                            ? '${weight['difference'] ?? ''} (${weight['percentage'] ?? ''} %)'
+                                            : '',
+                                        style: TextStyle(
+                                          color: globalColorScheme.onErrorContainer,
+                                          fontSize: 14,
+                                        ),
+                                      ),
                                     ),
-                                  Text(
-                                    weight['difference'] != null
-                                        ? '${weight['difference'] ?? ''} (${weight['percentage'] ?? ''} %)'
-                                        : '',
-                                    style: TextStyle(
-                                      color: globalColorScheme.onErrorContainer,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           );
@@ -436,135 +440,109 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // const SizedBox(height: 4),
-                  // const SizedBox(height: 4),
-                  Column(
-                    children: [
-                      PlatformButton().buildButton(
-                        context: context,
-                        type: ButtonType.icon,
-                        foregroundColor: globalColorScheme.onPrimaryContainer,
-                        icon: Icons.add_circle_rounded,
-                        height: 40,
-                        text: '',
-                        onPressed: () => PlatformDialog.showCustomDialog(
-                          context: context,
-                          title: "Add Weight",
-                          actions: [
-                            BlocProvider(
-                              create: (context) => getIt<ClientweightsCubit>(),
-                              child: BlocConsumer<ClientweightsCubit,
-                                  ClientweightsState>(
-                                builder: (context, state) {
-                                  if (state is ClientweightsLoading) {
-                                    return Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: PlatformLoader().buildLoader(
-                                            type: LoaderType.circular,
-                                            size: 30),
-                                      ),
-                                    );
-                                  }
-                                  return PlatformButton().buildButton(
-                                    context: context,
-                                    type: ButtonType.primary,
-                                    textStyle: TextStyle(
-                                      color:
-                                          globalColorScheme.onPrimaryContainer,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    text: 'Submit',
-                                    onPressed: () {
-                                      if (_formKey.currentState?.validate() ??
-                                          false) {
-                                        if (weightController.text.isNotEmpty) {
-                                          context
-                                              .read<ClientweightsCubit>()
-                                              .addClientWeight(
-                                                ClientWeightEntity(
-                                                  clientId:
-                                                      getIt<FirebaseAuth>()
-                                                          .currentUser!
-                                                          .uid,
-                                                  timeStamp: DateTime.now()
-                                                      .millisecondsSinceEpoch,
-                                                  weightInKg: double.tryParse(
-                                                          weightController
-                                                              .text) ??
-                                                      0,
-                                                  weightInLb:
-                                                      convertLbToKgDouble(
-                                                    double.tryParse(
-                                                          weightController.text,
-                                                        ) ??
-                                                        0,
-                                                  ),
-                                                ),
-                                              );
-                                        }
-                                      }
-                                    },
-                                  )!;
-                                },
-                                listener: (context, state) {
-                                  if (state is ClientweightsComplete) {
-                                    context
-                                        .read<GetclientweightsCubit>()
-                                        .getClientWeights();
-                                    context.pop();
-                                    weightController.clear();
-                                  }
-                                },
+              PlatformButton().buildButton(
+                context: context,
+                type: ButtonType.icon,
+                foregroundColor: globalColorScheme.onPrimaryContainer,
+                icon: Icons.add_circle_rounded,
+                height: 35,
+                text: '',
+                onPressed: () => PlatformDialog.showCustomDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  title: "Add Weight",
+                  actions: [
+                    BlocProvider(
+                      create: (context) => getIt<ClientweightsCubit>(),
+                      child: BlocConsumer<ClientweightsCubit,
+                          ClientweightsState>(
+                        builder: (context, state) {
+                          if (state is ClientweightsLoading) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: PlatformLoader().buildLoader(
+                                  type: LoaderType.circular,
+                                  size: 20,
+                                ),
                               ),
+                            );
+                          }
+                          return PlatformButton().buildButton(
+                            context: context,
+                            type: ButtonType.primary,
+                            textStyle: TextStyle(
+                              color:
+                                  globalColorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                          content: SizedBox(
-                            height: 75,
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  AppTextFields.prefixSuffixTextField(
-                                    controller: weightController,
-                                    labelText: 'Weight in (kgs)',
-                                    // suffix: Container(
-                                    //   decoration: BoxDecoration(
-                                    //     color: globalColorScheme.surface,
-                                    //     borderRadius: BorderRadius.circular(
-                                    //       15,
-                                    //     ),
-                                    //   ),
-                                    //   child: Padding(
-                                    //     padding: const EdgeInsets.symmetric(
-                                    //         horizontal: 25, vertical: 5),
-                                    //     child: Text(
-                                    //       'kg',
-                                    //       style: TextStyle(
-                                    //         fontSize: 17,
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    keyboardType: TextInputType.number,
-                                    style: TextStyle(
-                                      color:
-                                          globalColorScheme.onPrimaryContainer,
-                                    ),
-                                  )
-                                ],
-                              ),
+                            text: 'Submit',
+                            onPressed: () {
+                              if (_formKey.currentState?.validate() ??
+                                  false) {
+                                if (weightController.text.isNotEmpty) {
+                                  context
+                                      .read<ClientweightsCubit>()
+                                      .addClientWeight(
+                                        ClientWeightEntity(
+                                          clientId:
+                                              getIt<FirebaseAuth>()
+                                                  .currentUser!
+                                                  .uid,
+                                          timeStamp: DateTime.now()
+                                              .millisecondsSinceEpoch,
+                                          weightInKg: double.tryParse(
+                                                  weightController
+                                                      .text) ??
+                                              0,
+                                          weightInLb:
+                                              convertLbToKgDouble(
+                                            double.tryParse(
+                                                  weightController.text,
+                                                ) ??
+                                                0,
+                                          ),
+                                        ),
+                                      );
+                                }
+                              }
+                            },
+                          )!;
+                        },
+                        listener: (context, state) {
+                          if (state is ClientweightsComplete) {
+                            context
+                                .read<GetclientweightsCubit>()
+                                .getClientWeights();
+                            context.pop();
+                            weightController.clear();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                  content: SizedBox(
+                    height: 75,
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          AppTextFields.prefixSuffixTextField(
+                            controller: weightController,
+                            labelText: 'Weight in (kgs)',
+                          
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(
+                              color:
+                                  globalColorScheme.onPrimaryContainer,
                             ),
-                          ),
-                        ),
-                      )!
-                    ],
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              )!,
             ],
           ),
           WeightTrackerGraph(

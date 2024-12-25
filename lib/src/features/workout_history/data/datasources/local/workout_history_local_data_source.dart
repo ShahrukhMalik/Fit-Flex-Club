@@ -6,15 +6,14 @@ import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/functions/is_data_stale.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/daos/workout_history_dao.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class WorkoutHistoryLocalDataSource {
   ///
   Future<void> insertWorkoutHistorySets({
-    required List<SetModel> setModel,
-    String? clientUid,
-    required String exerciseUid,
+    required ExerciseModel exerciseModel,
   });
 
   ///
@@ -41,17 +40,13 @@ class WorkoutHistoryLocalDataSourceImpl
   });
   @override
   Future<void> insertWorkoutHistorySets({
-    required List<SetModel> setModel,
-    String? clientUid,
-    required String exerciseUid,
+    required ExerciseModel exerciseModel,
   }) async {
     try {
       final clientId = getIt<FirebaseAuth>().currentUser?.uid;
       return Future(
         () async => await dao.insertWorkoutHistorySets(
-          clientUid: clientUid ?? clientId!,
-          exerciseUid: exerciseUid,
-          setModel: setModel,
+          exerciseModel: exerciseModel,
         ),
       );
     } catch (err) {
@@ -75,7 +70,7 @@ class WorkoutHistoryLocalDataSourceImpl
         if (isDataStale(
           Duration(minutes: 5).inSeconds,
           workoutHistorySets.first.exerciseModels.first.sets.first.createdAt!,
-          workoutHistorySets.first.exerciseModels.first.updatedAt!,
+          workoutHistorySets.first.exerciseModels.first.updatedAt,
         )) {
           await database.deleteWorkoutHistorySets();
           return Left(true);

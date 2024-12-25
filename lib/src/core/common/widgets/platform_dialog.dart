@@ -87,7 +87,7 @@ class PlatformDialog {
     if (Platform.isIOS) {
       return showGeneralDialog(
         context: context,
-        // barrierDismissible: barrierDismissible,
+        barrierDismissible: barrierDismissible,
         // barrierLabel:
         //     MaterialLocalizations.of(context).modalBarrierDismissLabel,
         pageBuilder: (BuildContext context, __, _) {

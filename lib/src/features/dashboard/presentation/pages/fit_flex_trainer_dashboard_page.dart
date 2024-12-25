@@ -12,11 +12,13 @@ import 'package:go_router/go_router.dart';
 
 class FitFlexTrainerDashboardPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
+  final bool showBottomNavBar;
 
   static const String route = "/fit-flex-trainer-dashboard";
   const FitFlexTrainerDashboardPage({
     super.key,
     required this.navigationShell,
+    this.showBottomNavBar = false,
   });
 
   @override
@@ -192,7 +194,7 @@ class _FitFlexTrainerDashboardPageState
             // Main content
             widget.navigationShell,
             // Bottom navigation overlay
-            _buildBottomNavOverlay(context, width),
+            if (widget.showBottomNavBar) _buildBottomNavOverlay(context, width),
           ],
         ),
       ),

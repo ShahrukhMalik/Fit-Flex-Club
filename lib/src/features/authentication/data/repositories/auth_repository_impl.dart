@@ -213,31 +213,32 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failures, AuthEntity?>>? authenticateUser() async {
-    final isNetworkConnected = await networkInfo.isConnected;
-    if (isNetworkConnected!) {
-      try {
-        return Right(
-          await remoteDatasource.authenticateUser(),
-        );
-      } on ServerException catch (error) {
-        return Left(
-          ServerFailure(
-            message: error.errorMessage,
-            code: error.errorCode,
-          ),
-        );
-      }
-    } else {
-      return const Left(
-        NetworkFailure(
-          message: 'No Internet Connection',
+    // final isNetworkConnected = await networkInfo.isConnected;
+    // if (isNetworkConnected!) {
+    try {
+      return Right(
+        await remoteDatasource.authenticateUser(),
+      );
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
         ),
       );
     }
+    // } else {
+    //   return const Left(
+    //     NetworkFailure(
+    //       message: 'No Internet Connection',
+    //     ),
+    //   );
+    // }
   }
 
   @override
-  Future<Either<Failures, Stream<Map<String,dynamic>?>?>> listenToEvents() async {
+  Future<Either<Failures, Stream<Map<String, dynamic>?>?>>
+      listenToEvents() async {
     final isNetworkConnected = await networkInfo.isConnected;
     if (isNetworkConnected!) {
       try {

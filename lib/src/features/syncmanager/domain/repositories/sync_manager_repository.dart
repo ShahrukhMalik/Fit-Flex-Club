@@ -14,6 +14,12 @@ abstract class SyncManagerRepository {
 
   ///
   Future<Either<Failures, Stream<bool>>> isOnline();
+
+  ///
+  Future<Either<Failures, Stream<Map<String,dynamic>?>?>> eventListener();
+
+  ///
+  Future<Either<Failures, void>> markEventListened(String docId);
 }
 
 enum ListenerEvents {

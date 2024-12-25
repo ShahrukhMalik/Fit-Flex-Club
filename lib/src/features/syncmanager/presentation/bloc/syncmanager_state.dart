@@ -24,13 +24,17 @@ class SyncmanagerLoading extends SyncmanagerState {
 class SyncmanagerComplete extends SyncmanagerState {
   final bool? isOnline;
   final bool? isDataSynced;
+  final ListenerEvents? listenerEvents;
+  final String? docId;
 
   const SyncmanagerComplete({
-    required this.isOnline,
-    required this.isDataSynced,
+     this.isOnline,
+     this.isDataSynced,
+     this.listenerEvents,
+     this.docId,
   });
   @override
-  List<Object?> get props => [isOnline,isDataSynced];
+  List<Object?> get props => [isOnline,isDataSynced,listenerEvents,docId];
 }
 
 class SyncmanagerError extends SyncmanagerState {

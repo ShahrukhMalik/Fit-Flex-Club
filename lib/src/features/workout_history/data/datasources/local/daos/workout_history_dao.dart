@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
+import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_exercise_table.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_set_table.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/exercise_bp_table.dart';
@@ -16,6 +17,7 @@ part 'workout_history_dao.g.dart';
   WorkoutHistorySet,
   ExerciseSets,
   WorkoutPlanExercise,
+  WorkoutHistoryExercise,
   BaseExercise
 ])
 class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
@@ -42,37 +44,58 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> insertWorkoutHistorySets({
-    required List<SetModel> setModel,
-    required String clientUid,
-    required String exerciseUid,
+    required ExerciseModel exerciseModel,
   }) async {
     return transaction(
       () async {
         await (update(workoutPlanExercise)
-              ..where((tbl) => tbl.id.equals(exerciseUid)))
+              ..where((tbl) => tbl.id.equals(exerciseModel.id!)))
             .write(
           WorkoutPlanExerciseCompanion(
-              completed: Value(true),
-              updatedAt: Value(DateTime.now().millisecondsSinceEpoch)),
+            completed: Value(true),
+            updatedAt: Value(
+              DateTime.now().millisecondsSinceEpoch,
+            ),
+          ),
         );
-        return batch(
+
+        await batch(
           (batch) {
             batch.insertAll(
               workoutHistorySet,
-              setModel.map(
+              exerciseModel.sets.map(
                 (setModel) => WorkoutHistorySetCompanion(
                   id: Value(setModel.id),
-                  clientId: Value(clientUid),
-                  exerciseId: Value(exerciseUid),
+                  clientId: Value(setModel.clientId ?? ''),
+                  exerciseId: Value(exerciseModel.id ?? ''),
                   actualReps: Value(setModel.actualReps),
                   actualWeight: Value(setModel.actualWeight),
                   actualDistance: Value(setModel.actualDistance),
-                  actualTime: Value(setModel.actualTime?.inMilliseconds),
-                  createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+                  actualTime: Value(setModel.actualTime?.inMinutes),
+                  targetDistance: Value(setModel.targetDistance),
+                  targetReps: Value(setModel.targetReps),
+                  targetTime: Value(setModel.targetTime?.inMinutes),
+                  targetWeight: Value(setModel.targetWeight),
                 ),
               ),
             );
           },
+        );
+
+        await into(workoutHistoryExercise).insert(
+          WorkoutHistoryExerciseCompanion(
+            reps: Value(exerciseModel.parameters?['reps']),
+            weight: Value(exerciseModel.parameters?['weight']),
+            duration: Value(exerciseModel.parameters?['duration']),
+            name: Value(exerciseModel.name ?? ""),
+            category: Value(exerciseModel.category ?? ""),
+            muscleGroup: Value(exerciseModel.muscleGroup ?? ""),
+            id: Value(exerciseModel.id ?? ""),
+            clientId: Value(exerciseModel.clientId),
+            code: Value(exerciseModel.code ?? ""),
+            completed: Value(exerciseModel.completed ?? false),
+            exerciseOrder: Value(exerciseModel.exerciseOrder ?? 0),
+          ),
         );
       },
     );
@@ -83,10 +106,6 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
   }) {
     return transaction(
       () async {
-        // for (f)
-        // await Future.wait(
-        //   historyList.map(
-        //     (history) async {
         for (final history in historyList) {
           for (final exercise in history.exerciseModels) {
             await batch(
@@ -96,12 +115,17 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
                   exercise.sets.map(
                     (setModel) => WorkoutHistorySetCompanion(
                       id: Value(setModel.id),
-                      clientId: Value(setModel.clientId ?? ""),
-                      exerciseId: Value(exercise.id!),
+                      createdAt: Value(setModel.createdAt ?? 0),
+                      clientId: Value(setModel.clientId ?? ''),
+                      exerciseId: Value(exercise.id ?? ''),
                       actualReps: Value(setModel.actualReps),
                       actualWeight: Value(setModel.actualWeight),
                       actualDistance: Value(setModel.actualDistance),
-                      actualTime: Value(setModel.actualTime?.inMilliseconds),
+                      actualTime: Value(setModel.actualTime?.inMinutes),
+                      targetDistance: Value(setModel.targetDistance),
+                      targetReps: Value(setModel.targetReps),
+                      targetTime: Value(setModel.targetTime?.inMinutes),
+                      targetWeight: Value(setModel.targetWeight),
                     ),
                   ),
                 );
@@ -117,146 +141,98 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
                 ),
               ),
             );
+            await into(workoutHistoryExercise).insert(
+              WorkoutHistoryExerciseCompanion(
+                createdAt: Value(exercise.createdAt ?? 0),
+                reps: Value(exercise.parameters?['reps']),
+                weight: Value(exercise.parameters?['weight']),
+                duration: Value(exercise.parameters?['duration']),
+                name: Value(exercise.name ?? ""),
+                category: Value(exercise.category ?? ""),
+                muscleGroup: Value(exercise.muscleGroup ?? ""),
+                id: Value(exercise.id ?? ""),
+                clientId: Value(exercise.clientId),
+                code: Value(exercise.code ?? ""),
+                completed: Value(exercise.completed ?? false),
+                exerciseOrder: Value(exercise.exerciseOrder ?? 0),
+              ),
+            );
           }
         }
-        // },
-        //   ),
-        // );
       },
     );
   }
 
   Future<List<WorkoutHistoryModel>> getWorkoutHistoryModels(
-    String clientUid,
-  ) async {
+      String clientUid) async {
     try {
-      final historySet = await (select(workoutHistorySet)
-            ..where(
-              (tbl) => tbl.clientId.equals(clientUid),
-            ))
+      // Fetch all exercises for the given client
+      final exercises = await (select(workoutHistoryExercise)
+            ..where((tbl) => tbl.clientId.equals(clientUid)))
           .get();
 
-      if (historySet.isEmpty) return [];
-
-      final exercisesWithBaseAndSets = await (select(workoutPlanExercise).join([
-        innerJoin(
-          baseExercise,
-          baseExercise.code.equalsExp(workoutPlanExercise.code),
-        ),
-        innerJoin(
-          exerciseSets,
-          exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
-        ),
-        // innerJoin(
-        //   workoutHistorySet,
-        //   exerciseSets.exerciseId.equalsExp(workoutPlanExercise.id),
-        // ),
-      ])
-            ..where(
-              workoutPlanExercise.clientId.equals(clientUid),
-            )
-            ..orderBy(
-              [
-                OrderingTerm(
-                  expression: workoutPlanExercise.createdAt,
-                  mode: OrderingMode.asc,
-                ),
-                OrderingTerm(
-                  expression: exerciseSets.setNumber,
-                  mode: OrderingMode.asc,
-                ),
-              ],
-            ))
+      // Fetch all sets for the given client
+      final sets = await (select(workoutHistorySet)
+            ..where((tbl) => tbl.clientId.equals(clientUid)))
           .get();
 
-      // Group exercises and sets by exercise ID
-      final exerciseGroups = <String, Map<String, dynamic>>{};
-      // Track unique sets per exercise
-      final setIds = <String>{};
-      for (final row in exercisesWithBaseAndSets) {
-        final workoutExercise = row.readTable(workoutPlanExercise);
-        final base = row.readTable(baseExercise);
-        final exerciseSet = row.readTableOrNull(exerciseSets);
-        final workoutHistoryList = historySet
-            .where(
-              (element) => element.id == exerciseSet?.id,
-              // orElse: () => [],
-            )
-            .toList();
+      if (exercises.isEmpty) return [];
 
-        // Initialize exercise group if not present
-        if (!exerciseGroups.containsKey(workoutExercise.id)) {
-          exerciseGroups[workoutExercise.id] = {
-            'exercise': ExerciseModel(
-              [],
-              dayId: workoutExercise.dayId,
-              completed: workoutExercise.completed,
-              clientId: workoutExercise.clientId,
-              id: workoutExercise.id,
-              code: base.code,
-              name: base.name,
-              category: base.category,
-              muscleGroup: base.muscleGroup,
-              exerciseOrder: workoutExercise.exerciseOrder,
-              createdAt: workoutExercise.createdAt,
-              updatedAt: workoutExercise.updatedAt,
-              parameters: {
-                'weight': base.weight,
-                'reps': base.reps,
-                'duration': base.duration,
-              },
-            ),
-            'sets': <SetModel>[],
-          };
-        }
-
-        // Add unique sets
-        if (exerciseSet != null && workoutHistoryList.isNotEmpty) {
-          final workoutHistory = workoutHistoryList[0];
-          // if (workoutExercise.id == workoutHistory.exerciseId &&
-          //     workoutExercise.id == exerciseSet.exerciseId) {
-          (exerciseGroups[workoutExercise.id]!['sets'] as List<SetModel>).add(
-            SetModel(
-              exerciseId: exerciseSet.exerciseId,
-              id: workoutHistory.id,
-              createdAt: workoutHistory.createdAt,
-              actualDistance: workoutHistory.actualDistance,
-              actualReps: workoutHistory.actualReps,
-              actualTime: Duration(minutes: workoutHistory.actualTime ?? 0),
-              actualWeight: workoutHistory.actualWeight,
-              clientId: exerciseSet.clientId,
-              targetDistance: exerciseSet.targetDistance,
-              targetReps: exerciseSet.targetReps,
-              targetWeight: exerciseSet.targetWeight,
-              targetTime: Duration(minutes: exerciseSet.targetTime ?? 0),
-            ),
-          );
-          // }
-          // }
-        }
+      // Group sets by exerciseId
+      final setsGroupedByExercise = <String, List<WorkoutHistorySetData>>{};
+      for (final set in sets) {
+        setsGroupedByExercise.putIfAbsent(set.exerciseId, () => []).add(set);
       }
 
-      // Combine exercises and their sets into a single ExerciseModel list
-      final List<ExerciseModel> exercises = exerciseGroups.values.map((group) {
-        final exercise = group['exercise'] as ExerciseModel;
-        final sets = group['sets'] as List<SetModel>;
-        // exercise.sets.addAll(sets);
-        return exercise.copyWith(sets: sets);
+      // Combine exercises and their sets
+      final List<ExerciseModel> exerciseModels = exercises.map((exercise) {
+        final exerciseSets = setsGroupedByExercise[exercise.id] ?? [];
 
-        // return exercise;
+        final List<SetModel> setModels = exerciseSets.map((set) {
+          return SetModel(
+            id: set.id,
+            exerciseId: set.exerciseId,
+            clientId: set.clientId,
+            actualReps: set.actualReps,
+            actualWeight: set.actualWeight,
+            actualDistance: set.actualDistance,
+            actualTime: Duration(seconds: set.actualTime ?? 0),
+            targetReps: set.targetReps,
+            targetWeight: set.targetWeight,
+            targetDistance: set.targetDistance,
+            targetTime: Duration(seconds: set.targetTime ?? 0),
+            createdAt: set.createdAt,
+          );
+        }).toList();
+
+        return ExerciseModel(
+          dayId: '',
+          parameters: {
+            'duration': exercise.duration,
+            'reps': exercise.reps,
+            'weight': exercise.weight,
+          },
+          name: exercise.name,
+          category: exercise.category,
+          muscleGroup: exercise.muscleGroup,
+          setModels,
+          clientId: exercise.clientId,
+          id: exercise.id,
+          code: exercise.code,
+          completed: exercise.completed,
+          exerciseOrder: exercise.exerciseOrder,
+          createdAt: exercise.createdAt,
+          updatedAt: exercise.updatedAt,
+        );
       }).toList();
 
       // Group exercises by `createdAt` date
       final Map<String, List<ExerciseModel>> groupedByDate = {};
-      for (final exercise in exercises) {
-        final isHistory =
-            exercise.updatedAt != null && (exercise.completed ?? false);
-        if (isHistory) {
-          final String formattedDate = DateFormat('yyyy-MM-dd').format(
-            DateTime.fromMillisecondsSinceEpoch(exercise.updatedAt!),
-          );
-          groupedByDate.putIfAbsent(formattedDate, () => []).add(exercise);
-        }
+      for (final exercise in exerciseModels) {
+        final String formattedDate = DateFormat('yyyy-MM-dd').format(
+          DateTime.fromMillisecondsSinceEpoch(exercise.createdAt!),
+        );
+        groupedByDate.putIfAbsent(formattedDate, () => []).add(exercise);
       }
 
       // Convert grouped data into WorkoutHistoryModel list

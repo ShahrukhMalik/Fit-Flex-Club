@@ -13,10 +13,11 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/week_m
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class FitFlexWorkoutTrackerPage extends StatelessWidget {
+class FitFlexWorkoutTrackerPage extends StatefulWidget {
   static const route = "workout-tracker";
   final ExerciseModel exercise;
   final WeekModel week;
@@ -31,9 +32,40 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
   });
 
   @override
+  State<FitFlexWorkoutTrackerPage> createState() =>
+      _FitFlexWorkoutTrackerPageState();
+}
+
+class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
+    with WidgetsBindingObserver {
+  bool isKeyboardVisible = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    // Ensure the widget is still active before updating state
+    if (!mounted) return;
+
+    // Use the updated way to access the render view
+    final bottomInset = RendererBinding
+        .instance.renderViews.first.flutterView.viewInsets.bottom;
+
+    // Update state based on the keyboard visibility
+    setState(() {
+      isKeyboardVisible = bottomInset > 0;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
-    bool isKeyboardOpen = bottomInsets != 0;
+    // final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
+    // bool isKeyboardOpen = bottomInsets != 0;
 
     return PopScope(
       canPop: false,
@@ -73,7 +105,7 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!isKeyboardOpen) ...[
+            if (!isKeyboardVisible) ...[
               SizedBox(
                 height: 200,
                 width: double.maxFinite,
@@ -104,7 +136,7 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Day ${day.dayNumber}',
+                      'Day ${widget.day.dayNumber}',
                       style: TextStyle(
                         color: globalColorScheme.primaryContainer,
                         fontWeight: FontWeight.bold,
@@ -112,7 +144,7 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      workoutPlan.name,
+                      widget.workoutPlan.name,
                       style: TextStyle(
                           color: globalColorScheme.onSurfaceVariant,
                           // fontWeight: FontWeight.bold,
@@ -120,7 +152,7 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      '${exercise.name}',
+                      '${widget.exercise.name}',
                       style: TextStyle(
                         color: globalColorScheme.tertiaryContainer,
                         fontWeight: FontWeight.bold,
@@ -129,10 +161,14 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                     ),
                     BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
                       listener: (context, state) {
-                        if (state is GetWorkoutPlansForClientComplete) {
-                          context.pop();
-                          context.pop(exercise.copyWith(completed: true));
-                        }
+                        // if (state is GetWorkoutPlansForClientComplete) {
+                        //   context.pop();
+                        //   context.pop(
+                        //     widget.exercise.copyWith(
+                        //       completed: true,
+                        //     ),
+                        //   );
+                        // }
                       },
                       child: SizedBox(height: 10),
                     ),
@@ -145,36 +181,38 @@ class FitFlexWorkoutTrackerPage extends StatelessWidget {
                           );
                         }
                         if (state is LogWorkoutHistoryComplete) {
-                          context.read<WorkoutManagementBloc>().add(
-                                GetWorkoutPlansForClientEvent(
-                                  clientId:
-                                      getIt<FirebaseAuth>().currentUser!.uid,
-                                ),
-                              );
+                          context.pop();
+                          context.pop(
+                            widget.exercise.copyWith(
+                              completed: true,
+                            ),
+                          );
+                          // context.read<WorkoutManagementBloc>().add(
+                          //       GetWorkoutPlansForClientEvent(
+                          //         clientId:
+                          //             getIt<FirebaseAuth>().currentUser!.uid,
+                          //       ),
+                          //     );
                         }
                       },
                       child: Expanded(
                         child: SetTrakerWidget(
-                          showSubmit: !isKeyboardOpen,
+                          showSubmit: !isKeyboardVisible,
                           onConfirmExit: () {
-                            context.pop(exercise.copyWith(completed: false));
+                            context.pop(
+                                widget.exercise.copyWith(completed: false));
                           },
                           onSubmit: (sets) {
-                            print(sets);
                             context.read<WorkoutHistoryBloc>().add(
                                   LogWorkoutHistoryEvent(
-                                    sets: sets,
-                                    exerciseId: exercise.id!,
-                                    dayId: day.id,
-                                    weekId: week.id,
-                                    workoutPlanId: workoutPlan.uid,
+                                    widget.exercise.copyWith(sets: sets),
                                   ),
                                 );
                           },
-                          sets: exercise.sets,
-                          showReps: exercise.parameters?['reps'],
-                          showTime: exercise.parameters?['duration'],
-                          showWeight: exercise.parameters?['weight'],
+                          sets: widget.exercise.sets,
+                          showReps: widget.exercise.parameters?['reps'],
+                          showTime: widget.exercise.parameters?['duration'],
+                          showWeight: widget.exercise.parameters?['weight'],
                         ),
                       ),
                     ),

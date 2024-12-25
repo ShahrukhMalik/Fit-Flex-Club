@@ -4,7 +4,6 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 
 class WorkoutPlanExercise extends Table {
   TextColumn get id => text()(); // Auto-increment primary key
-
   TextColumn get clientId => text().nullable().references(Clients, #id)();
   @override
   Set<Column> get primaryKey => {id}; // Auto-increment primary key

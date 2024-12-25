@@ -10,6 +10,7 @@ import 'package:fit_flex_club/src/features/workout_history/data/datasources/loca
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/remote/workout_history_remote_data_source.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_history/domain/repositories/workout_history_repository.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:injectable/injectable.dart';
 
@@ -30,39 +31,34 @@ class WorkoutHistoryRepositoryImpl extends WorkoutHistoryRepository {
 
   @override
   Future<Either<Failures, void>> logWorkoutProgress({
-    required List<SetModel> sets,
-    String? clientId,
-    required String exerciseId,
+    required ExerciseModel exerciseModel,
   }) async {
     try {
       final isNetworkConnected = await networkInfo.isConnected;
-      final cache = await local.insertWorkoutHistorySets(
-        exerciseUid: exerciseId,
-        setModel: sets,
-        clientUid: clientId,
-      );
+      final cache =
+          await local.insertWorkoutHistorySets(exerciseModel: exerciseModel);
       if (isNetworkConnected == null || !isNetworkConnected) {
         return Right(
           await syncQueueDao.logSyncAction(
             ListenerEvents.logWorkoutProgress.name,
             'WorkoutHistorySet',
             {
-              'exerciseId': exerciseId,
-              'clientId': clientId,
-              'sets': sets.map(
-                (e) => e.toMap(),
-              ),
+              'exerciseId': exerciseModel.id,
+              'clientId': exerciseModel.clientId,
+              'sets': exerciseModel.sets
+                  .map(
+                    (e) => e.toMap(),
+                  )
+                  .toList(),
             },
           ),
         );
       } else {
         return Right(
           await remote.logWorkoutHistory(
-
-            exerciseId: exerciseId,
-            sets: sets,
-
-            clientId: clientId,
+            exerciseId: exerciseModel.id!,
+            sets: exerciseModel.sets,
+            clientId: exerciseModel.clientId,
           ),
         );
       }

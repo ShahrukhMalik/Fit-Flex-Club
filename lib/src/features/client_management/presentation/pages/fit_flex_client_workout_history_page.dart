@@ -1,4 +1,3 @@
-
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
@@ -492,14 +491,14 @@ class _FitFlexClientWorkoutHistoryPageState
                                         ),
                                         Center(
                                           child: Text(
-                                            set.targetTime.toString(),
+                                            (set.targetTime?.inMinutes ?? 0)
+                                                .toString(),
                                           ),
                                         ),
                                         Center(
                                           child: Text(
-                                            set.actualTime != null
-                                                ? set.actualTime.toString()
-                                                : "0",
+                                            (set.actualTime?.inMinutes ?? 0)
+                                                .toString(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: globalColorScheme

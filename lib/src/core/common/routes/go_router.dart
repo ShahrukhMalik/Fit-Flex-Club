@@ -202,9 +202,12 @@ GoRouter goRouter(appState) {
       // Trainer app shell route
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
+          final route = state.fullPath;
+          final showBottomNavBar = (route == FitFlexTrainerProfilePage.route) ||
+              (route == FitFlexTrainerWorkoutPage.route);
           return FitFlexTrainerDashboardPage(
-            navigationShell: navigationShell,
-          );
+              navigationShell: navigationShell,
+              showBottomNavBar: showBottomNavBar);
         },
         branches: [
           StatefulShellBranch(
@@ -238,8 +241,12 @@ GoRouter goRouter(appState) {
       // Client app shell route
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
+          final route = state.fullPath;
+          final showBottomNavBar = (route == FitFlexClientProfilePage.route) ||
+              (route == FitFlexClientWorkoutHistoryPage.route);
           return FitFlexClientDashboardPage(
             navigationShell: navigationShell,
+            showBottomNavBar: showBottomNavBar,
           );
         },
         branches: [
@@ -319,8 +326,10 @@ GoRouter goRouter(appState) {
     ],
     redirect: (context, state) {
       // Handle loading state
-      if (appState is AuthenticationLoading) {
-        if (Platform.isAndroid) return FitFlexLoaderPage.route;
+      if (appState is AuthenticationLoading ||
+          appState is AuthenticationInitial) {
+        // if (Platform.isAndroid)
+        return FitFlexLoaderPage.route;
       }
       if (appState is AuthenticationError) {
         Fluttertoast.showToast(

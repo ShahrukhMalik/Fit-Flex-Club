@@ -7,6 +7,7 @@ import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_entity.dart';
+import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class AuthRemoteDatasource {
@@ -242,7 +243,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       bool? isTrainer;
 
       final AuthEntity? authEntity = prefs.getAuthEntity();
-      if (authEntity == null) {
+      final getUid = prefs.getAuthUid();
+      // if (authEntity == null || true) {
       final CollectionReference ref = remoteDb.collection('Users');
       final DocumentSnapshot<Object?> snapshot =
           await ref.doc(auth.currentUser?.uid).get();
@@ -303,9 +305,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       return Future.value(
         toStoreEntity,
       );
-      } else {
-        return Future.value(authEntity);
-      }
+      // } else {
+      //   return Future.value(authEntity);
+      // }
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -317,26 +319,65 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   @override
   Future<Stream<Map<String, dynamic>?>?> listenToEvents() async {
     try {
-      final CollectionReference listenerRef =
-          remoteDb.collection('ListenerEvents');
-      return listenerRef.snapshots().asBroadcastStream().map(
-        (snapshot) {
-          for (var doc in snapshot.docs) {
-            if (doc.exists && doc.data() is Map<String, dynamic>) {
-              final data = doc.data() as Map<String, dynamic>;
-              final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+      final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+      final listenerRef = remoteDb
+          .collection('ListenerEvents')
+          .where('clientId', isEqualTo: clientId)
+          .where('isListendAlready', isEqualTo: null)
+          .orderBy('timestamp', descending: true);
 
-              if (data['clientId'] == clientId) {
-                return data;
-              }
+      return listenerRef.snapshots().asBroadcastStream().map((snapshot) {
+        for (var doc in snapshot.docs) {
+          if (doc.exists) {
+            final data = doc.data();
+            String eventType = data['eventType'];
+
+            ListenerEvents? event;
+            switch (eventType) {
+              case 'updateAssignedWorkoutPlan':
+                event = ListenerEvents.updateAssignedWorkoutPlan;
+                break;
+              case 'deleteAssignedWorkoutPlan':
+                event = ListenerEvents.deleteAssignedWorkoutPlan;
+                break;
+              case 'assignWorkoutPlan':
+                event = ListenerEvents.assignWorkoutPlan;
+                break;
+              case 'addUser':
+                event = ListenerEvents.addUser;
+                break;
+              case 'addClientWeight':
+                event = ListenerEvents.addClientWeight;
+                break;
+              case 'deactivateUser':
+                event = ListenerEvents.deactivateUser;
+                break;
+              case 'logWorkoutProgress':
+                event = ListenerEvents.logWorkoutProgress;
+                break;
+              case 'createWorkoutPlan':
+                event = ListenerEvents.createWorkoutPlan;
+                break;
+              case 'updateWorkoutPlan':
+                event = ListenerEvents.updateWorkoutPlan;
+                break;
+              case 'deleteWorkoutPlan':
+                event = ListenerEvents.deleteWorkoutPlan;
+                break;
+              default:
+                break;
+            }
+
+            if (event != null) {
+              return {'eventType': event, 'docId': doc.id};
             }
           }
-          return null;
-        },
-      );
+        }
+        return null;
+      });
     } on FirebaseException catch (err) {
       throw ServerException(
-        errorMessage: err.message ?? "Failed to update workout plan",
+        errorMessage: err.message ?? "Something went wrong!",
         errorCode: err.code,
       );
     }

@@ -81,6 +81,10 @@ import '../../../features/syncmanager/domain/repositories/sync_manager_repositor
     as _i273;
 import '../../../features/syncmanager/domain/usecases/check_connectivity_usecase.dart'
     as _i798;
+import '../../../features/syncmanager/domain/usecases/event_listener_usecase.dart'
+    as _i85;
+import '../../../features/syncmanager/domain/usecases/mark_event_listened_usecase.dart'
+    as _i177;
 import '../../../features/syncmanager/presentation/bloc/syncmanager_bloc.dart'
     as _i219;
 import '../../../features/trainer_profile/domain/usecases/get_clients_usecase.dart'
@@ -222,6 +226,16 @@ extension GetItInjectableX on _i174.GetIt {
             db: gh<_i974.FirebaseFirestore>()));
     gh.singleton<_i447.LogOutUsecase>(() =>
         _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i843.SyncManagerRemoteDatasource>(
+        () => _i843.SyncManagerRemoteDatasourceImpl(
+              gh<_i59.FirebaseAuth>(),
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i663.SyncQueueDao>(),
+              gh<_i588.ClientProfileRemoteDatasource>(),
+              gh<_i826.WorkoutPlanManagementRemotedatasource>(),
+              gh<_i352.WorkoutHistoryRemoteDataSource>(),
+              connectivity: gh<_i895.Connectivity>(),
+            ));
     gh.singleton<_i415.WorkoutPlanManagementLocaldatasource>(
         () => _i415.WorkoutPlanManagementLocaldatasourceImpl(
               dao: gh<_i939.WorkoutPlanDao>(),
@@ -277,6 +291,9 @@ extension GetItInjectableX on _i174.GetIt {
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i273.SyncManagerRepository>(() =>
+        _i128.SyncManagerRepositoryImpl(
+            remoteDatasource: gh<_i843.SyncManagerRemoteDatasource>()));
     gh.singleton<_i430.UpdateWorkoutPlanUsecase>(() =>
         _i430.UpdateWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -342,6 +359,14 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i899.IsUserActiveUsecase>(),
           gh<_i841.GetClientByIdUsecase>(),
         ));
+    gh.singleton<_i177.MarkEventListenedUsecase>(() =>
+        _i177.MarkEventListenedUsecaseImpl(
+            syncManagerRepository: gh<_i273.SyncManagerRepository>()));
+    gh.singleton<_i85.EventListenerUsecase>(() => _i85.EventListenerUsecaseImpl(
+        syncManagerRepository: gh<_i273.SyncManagerRepository>()));
+    gh.singleton<_i798.CheckConnectivityUsecase>(() =>
+        _i798.CheckConnectivityUsecaseImpl(
+            syncManagerRepository: gh<_i273.SyncManagerRepository>()));
     gh.factory<_i812.TrainerProfileBloc>(
         () => _i812.TrainerProfileBloc(gh<_i781.GetClientsUsecaseUsecase>()));
     gh.singleton<_i208.LogWorkoutHistoryUsecase>(() =>
@@ -351,29 +376,11 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i208.LogWorkoutHistoryUsecase>(),
           gh<_i119.GetWorkoutHistoryUsecase>(),
         ));
-    gh.singleton<_i843.SyncManagerRemoteDatasource>(
-        () => _i843.SyncManagerRemoteDatasourceImpl(
-              gh<_i59.FirebaseAuth>(),
-              gh<_i974.FirebaseFirestore>(),
-              gh<_i663.SyncQueueDao>(),
-              gh<_i702.AddClientWeightUsecase>(),
-              gh<_i853.CreateWorkoutPlanUsecase>(),
-              gh<_i711.DeleteWorkoutPlanUsecase>(),
-              gh<_i282.AssignWorkoutPlanUsecase>(),
-              gh<_i175.DeleteAssignedWorkoutPlanUsecase>(),
-              gh<_i661.UpdateAssignedWorkoutPlanUsecase>(),
-              gh<_i430.UpdateWorkoutPlanUsecase>(),
-              gh<_i208.LogWorkoutHistoryUsecase>(),
-              connectivity: gh<_i895.Connectivity>(),
-            ));
-    gh.singleton<_i273.SyncManagerRepository>(() =>
-        _i128.SyncManagerRepositoryImpl(
-            remoteDatasource: gh<_i843.SyncManagerRemoteDatasource>()));
-    gh.singleton<_i798.CheckConnectivityUsecase>(() =>
-        _i798.CheckConnectivityUsecaseImpl(
-            syncManagerRepository: gh<_i273.SyncManagerRepository>()));
-    gh.factory<_i219.SyncmanagerBloc>(
-        () => _i219.SyncmanagerBloc(gh<_i798.CheckConnectivityUsecase>()));
+    gh.factory<_i219.SyncmanagerBloc>(() => _i219.SyncmanagerBloc(
+          gh<_i798.CheckConnectivityUsecase>(),
+          gh<_i85.EventListenerUsecase>(),
+          gh<_i177.MarkEventListenedUsecase>(),
+        ));
     return this;
   }
 }
