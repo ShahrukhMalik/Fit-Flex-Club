@@ -257,6 +257,19 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                 exercises.value = state.exercises;
                 if (context.canPop()) context.pop();
               }
+
+              if (state is GetexercisesError) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Get Exercises",
+                  message: state.failures.message ??
+                      "Something went wrong! Let's try again!",
+                  onConfirm: () {
+                    context.read<GetexercisesCubit>().getExercises();
+                  },
+                );
+              }
+
               // if (state is SubjectLoading) {
               //   showLoadingDialog(context);
               //   return;
@@ -280,7 +293,7 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                     title: "Workout Plans",
                     message: state.failures.message ?? "Something Went Wrong!",
                     onConfirm: () {
-                      context.go(FitFlexTrainerWorkoutPage.route);
+                      if (context.canPop()) context.pop();
                     },
                   );
                 }
@@ -304,9 +317,10 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                   final workoutPlans = state.workoutPlans;
                   if (workoutPlans.isNotEmpty) {
                     return WorkoutProgramsOverview(
-                        programs: workoutPlans,
-                        colorScheme: colorScheme,
-                        exercises: exercises);
+                      programs: workoutPlans,
+                      colorScheme: colorScheme,
+                      exercises: exercises,
+                    );
                   } else {
                     return Center(
                       child: Text(
