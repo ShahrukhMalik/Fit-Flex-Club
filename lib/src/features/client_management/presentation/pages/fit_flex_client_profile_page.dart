@@ -893,14 +893,10 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
   void initState() {
     super.initState();
 
-    context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+    // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
-    context.read<WorkoutManagementBloc>().add(
-          GetWorkoutPlansForClientEvent(
-            clientId: getIt<FirebaseAuth>().currentUser!.uid,
-          ),
-        );
-    // context.read<GetclientweightsCubit>().getClientWeights();
+
+    context.read<GetclientweightsCubit>().getClientWeights();
   }
 
   @override

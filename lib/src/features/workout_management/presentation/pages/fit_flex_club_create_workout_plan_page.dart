@@ -14,6 +14,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/week_m
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_add_exercise_bottom_sheet.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scroll_tabs_widget.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scrollweeks_widget.dart';
@@ -38,15 +39,17 @@ enum ConcludeEvent {
 }
 
 class FitFlexClubCreateWorkoutPlanPage extends StatefulWidget {
-  static const String route = "/fit-club-create-workout-plan";
+  static const String route = "create-workout-plan";
   final bool update;
   final WorkoutPlanModel? workoutPlanModel;
   final ClientEntity? clientEntity;
+  final List<ExerciseEntity>? exercises;
   const FitFlexClubCreateWorkoutPlanPage({
     super.key,
     required this.update,
     this.workoutPlanModel,
     this.clientEntity,
+    this.exercises,
   });
 
   @override
@@ -159,30 +162,17 @@ class _FitFlexClubCreateWorkoutPlanPageState
   final int _currentTabIndex = 0;
 
   Future _showExerciseSheet(
-      BuildContext context, List<ExerciseEntity> exercises) {
+    BuildContext context,
+    List<ExerciseEntity> exercises,
+  ) {
     if (Platform.isIOS) {
       return showCupertinoModalPopup(
         context: context,
         builder: (context) {
           return SafeArea(
-            child:
-                // BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
-                //   builder: (context, state) {
-                //     // if (state is SubjectFailed) {
-                //     //   return ErrorOutput(message: state.message);
-                //     // }
-                //     if (state is GetExercisesComplete) {
-                // return CupertinoScrollbar(
-                // child:
-                ExercisePickerBottomSheet(
+            child: ExercisePickerBottomSheet(
               exercises: exercises,
             ),
-            // )
-            // ;
-            //     }
-            //     return SizedBox();
-            //   },
-            // ),
           );
         },
       );
@@ -191,24 +181,9 @@ class _FitFlexClubCreateWorkoutPlanPageState
         context: context,
         builder: (context) {
           return SafeArea(
-            child:
-                // BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
-                //   builder: (context, state) {
-                //     // if (state is SubjectFailed) {
-                //     //   return ErrorOutput(message: state.message);
-                //     // }
-                //     if (state is GetExercisesComplete) {
-                // return CupertinoScrollbar(
-                // child:
-                ExercisePickerBottomSheet(
+            child: ExercisePickerBottomSheet(
               exercises: exercises,
             ),
-            // )
-            // ;
-            //     }
-            //     return SizedBox();
-            //   },
-            // ),
           );
         },
       );
@@ -316,6 +291,8 @@ class _FitFlexClubCreateWorkoutPlanPageState
   @override
   void initState() {
     super.initState();
+
+    exercises = widget.exercises;
 
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
@@ -503,17 +480,9 @@ class _FitFlexClubCreateWorkoutPlanPageState
               confirmText: 'Yes',
               onConfirm: () {
                 if (widget.clientEntity == null) {
-                  context.go(FitFlexTrainerWorkoutPage.route);
-                  context
-                      .read<WorkoutManagementBloc>()
-                      .add(GetWorkoutPlansEvent());
+                  context.pop();
                 } else {
-                  context.go(
-                    FitFlexTrainerClientDetailsPage.route,
-                    extra: {
-                      'client': widget.clientEntity,
-                    },
-                  );
+                  context.pop();
                 }
               },
             );
@@ -535,7 +504,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
               "You haven't added exercises for all the weeks, would you like to continue with 1st week program for all other weeks. If you cancel your progress will be lost",
           cancelText: 'Cancel',
           onCancel: () {
-            context.go(FitFlexTrainerWorkoutPage.route);
+            context.pop();
             context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
           },
           confirmText: 'Continue',
@@ -559,10 +528,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
                   cancelText: 'No',
                   confirmText: 'Yes',
                   onConfirm: () {
-                    context.go(FitFlexTrainerWorkoutPage.route);
-                    context
-                        .read<WorkoutManagementBloc>()
-                        .add(GetWorkoutPlansEvent());
+                    context.pop();
                   },
                 );
               }
@@ -583,43 +549,16 @@ class _FitFlexClubCreateWorkoutPlanPageState
         context: context,
         title: "Add Workout Plan",
         message: event == ConcludeEvent.submit
-            ? "You haven't completed setting up your workout program, if you cancel your progress will be lost."
+            ? "You haven't completed setting up your workout program, want to exit?"
             : "You haven't completed setting up your workout program, if you continue your progress will be lost.",
-        cancelText: 'Cancel',
+        cancelText: event == ConcludeEvent.submit ? 'No' : 'Cancel',
         onCancel: () {
-          if (event == ConcludeEvent.submit) {
-            if (widget.clientEntity == null) {
-              context.go(FitFlexTrainerWorkoutPage.route);
-              context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
-            } else {
-              context.go(
-                FitFlexTrainerClientDetailsPage.route,
-                extra: {
-                  'client': widget.clientEntity,
-                },
-              );
-            }
-          } else {
-            context.go(FitFlexClubCreateWorkoutPlanPage.route);
-          }
+          context.pop();
         },
-        confirmText: 'Continue',
+        confirmText: event == ConcludeEvent.submit ? 'Yes' : 'Continue',
         onConfirm: () {
-          if (event == ConcludeEvent.goback) {
-            if (widget.clientEntity == null) {
-              context.go(FitFlexTrainerWorkoutPage.route);
-              context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
-            } else {
-              context.go(
-                FitFlexTrainerClientDetailsPage.route,
-                extra: {
-                  'client': widget.clientEntity,
-                },
-              );
-            }
-          } else {
-            context.go(FitFlexClubCreateWorkoutPlanPage.route);
-          }
+          context.pop();
+          context.pop();
         },
       );
     }
@@ -630,176 +569,116 @@ class _FitFlexClubCreateWorkoutPlanPageState
     final colorScheme = globalColorScheme;
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        context.pop();
-        context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
-      },
+      // canPop: false,
+      // onPopInvokedWithResult: (didPop, result) {
+      //   context.pop();
+      // },
       child: SafeArea(
         bottom: true,
         top: false,
-        child: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
-          listener: (context, state) async {
-            if (state is GetExercisesLoading) {
-              PlatformDialog.showLoadingDialog(
-                context: context,
-                message: 'Fetching Exercises...',
-              );
-            }
-            if (state is GetExercisesComplete) {
-              context.pop();
-              exercises = state.exercises;
-              final result = await _showExerciseSheet(context, state.exercises);
-              if (result != null) {
-                // ignore: use_build_context_synchronously
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          floatingActionButton: FloatingActionButton(
+            heroTag: 'addWorkout',
+            splashColor: globalColorScheme.tertiary,
+            backgroundColor: globalColorScheme.primaryContainer,
+            onPressed: () async {
+              if (exercises == null || (exercises?.isEmpty ?? true)) {
+                context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+              } else {
+                final result = await _showExerciseSheet(context, exercises!);
                 if (result != null) {
-                  _showExerciseSetSheet(context, result).then(
-                    (value) async {
-                      await _updateExercises(
-                        value,
-                      );
-                    },
-                  );
-                }
-              }
-            }
-
-            // if (state is SubjectLoading) {
-            //   showLoadingDialog(context);
-            //   return;
-            // }
-            // Navigator.of(context, rootNavigator: true).pop();
-            // if (state is SubjectFailed) {
-            //   showErrorDialog(context);
-            // }
-            // if (state is SubjectSuccess) {
-            //   showSuccessDialog(context);
-            // }
-          },
-          child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            floatingActionButton: FloatingActionButton(
-              heroTag: 'addWorkout',
-              splashColor: globalColorScheme.tertiary,
-              backgroundColor: globalColorScheme.primaryContainer,
-              onPressed: () async {
-                if (exercises == null || (exercises?.isEmpty ?? true)) {
-                  context
-                      .read<WorkoutManagementBloc>()
-                      .add(GetExercisesEvent());
-                } else {
-                  final result = await _showExerciseSheet(context, exercises!);
+                  // ignore: use_build_context_synchronously
                   if (result != null) {
-                    // ignore: use_build_context_synchronously
-                    if (result != null) {
-                      _showExerciseSetSheet(context, result).then(
-                        (value) async {
-                          await _updateExercises(
-                            value,
-                          );
-                        },
-                      );
-                    }
+                    _showExerciseSetSheet(context, result).then(
+                      (value) async {
+                        await _updateExercises(
+                          value,
+                        );
+                      },
+                    );
                   }
                 }
-              },
-
-              //  {
-              //   // final result = await _showExerciseSheet(context);
-              //   // if (result != null) {
-              //   //   // ignore: use_build_context_synchronously
-              //   //   if (result != null) {
-              //   //     _showExerciseSetSheet(context, result).then(
-              //   //       (value) async {
-              //   //         await _updateExercises(
-              //   //           value,
-              //   //         );
-              //   //       },
-              //   //     );
-              //   //   }
-              //   // }
-              // },
-              child: Icon(
-                Icons.add,
-                color: globalColorScheme.surface,
-              ),
+              }
+            },
+            child: Icon(
+              Icons.add,
+              color: globalColorScheme.surface,
             ),
-            appBar: PlatformAppbar.basicAppBar(
-              title: "Workout Plan",
-              context: context,
-              backgroundColor: colorScheme.onPrimaryContainer,
-              onLeadingPressed: () => _onSubmit(ConcludeEvent.goback),
-            ),
-            body: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
-              listener: (context, state) {
-                if (state is UpdateWorkoutLoading) {
-                  PlatformDialog.showLoadingDialog(
-                    context: context,
-                    message: "Processing your request...",
-                  );
-                }
-                if (state is WorkoutManagementLoading) {
-                  PlatformDialog.showLoadingDialog(
-                    context: context,
-                    message: "Processing your request...",
-                  );
-                }
+          ),
+          appBar: PlatformAppbar.basicAppBar(
+            title: "Workout Plan",
+            context: context,
+            backgroundColor: colorScheme.onPrimaryContainer,
+            onLeadingPressed: () => _onSubmit(ConcludeEvent.goback),
+          ),
+          body: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
+            listener: (context, state) {
+              if (state is UpdateWorkoutLoading) {
+                PlatformDialog.showLoadingDialog(
+                  context: context,
+                  message: "Processing your request...",
+                );
+              }
+              if (state is WorkoutManagementLoading) {
+                PlatformDialog.showLoadingDialog(
+                  context: context,
+                  message: "Processing your request...",
+                );
+              }
 
-                if (state is WorkoutManagementError) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message: state.failures.message ?? "Something Went Wrong!",
-                    onConfirm: () => Navigator.pop(context),
-                  );
-                }
+              if (state is WorkoutManagementError) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: state.failures.message ?? "Something Went Wrong!",
+                  onConfirm: () => Navigator.pop(context),
+                );
+              }
 
-                if (state is CreateWorkoutComplete) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message: "Workout Plan Created Successfully!",
-                    onConfirm: () {
-                      context.go(FitFlexTrainerWorkoutPage.route);
-                      context
-                          .read<WorkoutManagementBloc>()
-                          .add(GetWorkoutPlansEvent());
-                    },
-                  );
-                }
-                if (state is UpdateWorkoutComplete) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message: "Workout Plan updated Successfully!",
-                    onConfirm: () {
-                      context.go(FitFlexTrainerWorkoutPage.route);
-                      context
-                          .read<WorkoutManagementBloc>()
-                          .add(GetWorkoutPlansEvent());
-                    },
-                  );
-                }
+              if (state is CreateWorkoutComplete) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "Workout Plan Created Successfully!",
+                  onConfirm: () {
+                    context.pop();
+                    context.pop();
+                    context
+                        .read<WorkoutManagementBloc>()
+                        .add(GetWorkoutPlansEvent());
+                  },
+                );
+              }
+              if (state is UpdateWorkoutComplete) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "Workout Plan updated Successfully!",
+                  onConfirm: () {
+                    context.pop();
+                    context.pop();
+                    context
+                        .read<WorkoutManagementBloc>()
+                        .add(GetWorkoutPlansEvent());
+                  },
+                );
+              }
 
-                if (state is UpdateAssignedWorkoutComplete) {
-                  PlatformDialog.showAlertDialog(
-                    context: context,
-                    title: "Add Workout Plan",
-                    message: "Workout Plan updated Successfully!",
-                    onConfirm: () {
-                      context.go(
-                        FitFlexTrainerClientDetailsPage.route,
-                        extra: {
-                          'client': widget.clientEntity,
-                        },
-                      );
-                    },
-                  );
-                }
-              },
-              child: _buildContent(context),
-            ),
+              if (state is UpdateAssignedWorkoutComplete) {
+                PlatformDialog.showAlertDialog(
+                  context: context,
+                  title: "Add Workout Plan",
+                  message: "Workout Plan updated Successfully!",
+                  onConfirm: () {
+                    context.pop();
+                    context.pop(true);
+                  },
+                );
+              }
+            },
+            child: _buildContent(context),
           ),
         ),
       ),

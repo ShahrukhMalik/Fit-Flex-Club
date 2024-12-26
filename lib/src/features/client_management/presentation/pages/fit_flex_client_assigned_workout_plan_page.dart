@@ -178,6 +178,11 @@ class _FitFlexClientAssignedWorkoutPlanPageState
   @override
   void initState() {
     super.initState();
+    context.read<WorkoutManagementBloc>().add(
+          GetWorkoutPlansForClientEvent(
+            clientId: getIt<FirebaseAuth>().currentUser!.uid,
+          ),
+        );
   }
 
   @override

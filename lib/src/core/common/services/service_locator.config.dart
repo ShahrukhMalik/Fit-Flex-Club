@@ -137,6 +137,8 @@ import '../../../features/workout_management/domain/usecases/update_workout_plan
     as _i430;
 import '../../../features/workout_management/presentation/bloc/workout_management_bloc.dart'
     as _i41;
+import '../../../features/workout_management/presentation/getexercises/getexercises_cubit.dart'
+    as _i29;
 import '../../db/fit_flex_local_db.dart' as _i987;
 import '../../util/module/register_module.dart' as _i19;
 import '../../util/network/network_info.dart' as _i228;
@@ -287,6 +289,8 @@ extension GetItInjectableX on _i174.GetIt {
         _i91.GetWorkoutPlansForClientUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
+    gh.factory<_i29.GetexercisesCubit>(
+        () => _i29.GetexercisesCubit(gh<_i139.GetExercisesUsecase>()));
     gh.singleton<_i661.UpdateAssignedWorkoutPlanUsecase>(() =>
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:

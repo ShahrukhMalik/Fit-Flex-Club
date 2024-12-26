@@ -150,53 +150,13 @@ GoRouter goRouter(appState) {
           ),
         ],
       ),
-      GoRoute(
-        path: FitFlexClubCreateWorkoutPlanPage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexClubCreateWorkoutPlanPage(
-              update: extraData?['updateData'] ?? false,
-              workoutPlanModel: extraData?['workoutPlan'],
-              clientEntity: extraData?['clientEntity'],
-            ),
-          );
-        },
-      ),
+
       GoRoute(
         path: FitFlexClubSelectExercisePage.route,
         pageBuilder: (context, state) => TransitionPage(
           key: state.pageKey,
           child: const FitFlexClubSelectExercisePage(),
         ),
-      ),
-
-      GoRoute(
-        path: FitFlexTrainerClientDetailsPage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexTrainerClientDetailsPage(
-              client: extraData?['client'] ?? "Unknown",
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: FitFlexTrainerHistoryPage.route,
-        pageBuilder: (context, state) {
-          final extraData = state.extra as Map<String, dynamic>?;
-          return TransitionPage(
-            key: state.pageKey,
-            child: FitFlexTrainerHistoryPage(
-              histories: extraData?['histories'] ?? [],
-              client: extraData?['client'],
-            ),
-          );
-        },
       ),
 
       // Trainer app shell route
@@ -220,6 +180,52 @@ GoRouter goRouter(appState) {
                   key: state.pageKey,
                   child: FitFlexTrainerProfilePage(),
                 ),
+                routes: [
+                  GoRoute(
+                    path: FitFlexTrainerClientDetailsPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexTrainerClientDetailsPage(
+                          client: extraData?['client'] ?? "Unknown",
+                        ),
+                      );
+                    },
+                    routes: [
+                      GoRoute(
+                        path: FitFlexClubCreateWorkoutPlanPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexClubCreateWorkoutPlanPage(
+                              update: extraData?['updateData'] ?? false,
+                              workoutPlanModel: extraData?['workoutPlan'],
+                              clientEntity: extraData?['clientEntity'],
+                              exercises: extraData?['exercises'],
+                            ),
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        path: FitFlexTrainerHistoryPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexTrainerHistoryPage(
+                              histories: extraData?['histories'] ?? [],
+                              client: extraData?['client'],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               )
             ],
           ),
@@ -233,6 +239,23 @@ GoRouter goRouter(appState) {
                   key: state.pageKey,
                   child: FitFlexTrainerWorkoutPage(),
                 ),
+                routes: [
+                  GoRoute(
+                    path: FitFlexClubCreateWorkoutPlanPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexClubCreateWorkoutPlanPage(
+                          update: extraData?['updateData'] ?? false,
+                          workoutPlanModel: extraData?['workoutPlan'],
+                          clientEntity: extraData?['clientEntity'],
+                          exercises: extraData?['exercises'],
+                        ),
+                      );
+                    },
+                  ),
+                ],
               )
             ],
           ),

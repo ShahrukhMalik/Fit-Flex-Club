@@ -11,7 +11,9 @@ import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fi
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -221,8 +223,11 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
 
 class FitFlexTrainerClientDetailsPage extends StatefulWidget {
   final ClientEntity client;
-  static const route = '/fit-flex-trainer-client-details';
-  const FitFlexTrainerClientDetailsPage({super.key, required this.client});
+  static const route = 'trainer-client-details';
+  const FitFlexTrainerClientDetailsPage({
+    super.key,
+    required this.client,
+  });
 
   @override
   State<FitFlexTrainerClientDetailsPage> createState() =>
@@ -233,13 +238,14 @@ class _FitFlexTrainerClientDetailsPageState
     extends State<FitFlexTrainerClientDetailsPage> {
   ClientModel client = ClientModel();
   final ValueNotifier<bool> isUserActive = ValueNotifier<bool>(false);
+  // List<ExerciseEntity>? exercises;
 
   @override
   void initState() {
     super.initState();
     isUserActive.value = widget.client.isUserActive ?? false;
     client = ClientModel.fromClientEntity(widget.client);
-    context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+    // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     context.read<WorkoutManagementBloc>().add(
           GetWorkoutPlansForClientEvent(
             clientId: widget.client.id!,
@@ -336,7 +342,7 @@ class _FitFlexTrainerClientDetailsPageState
         title: "Client Details Page",
         context: context,
         backgroundColor: globalColorScheme.onPrimaryContainer,
-        onLeadingPressed: () => context.go(FitFlexTrainerProfilePage.route),
+        onLeadingPressed: () => context.pop(),
       ),
       body: ClientEntityCompactWidget(
         isUserActive: isUserActive,
@@ -373,7 +379,7 @@ class _FitFlexTrainerClientDetailsPageState
   }
 }
 
-class ClientEntityCompactWidget extends StatelessWidget {
+class ClientEntityCompactWidget extends StatefulWidget {
   final ClientEntity client;
   final ColorScheme colorScheme;
   final ValueChanged<bool> onUserActiveToggle;
@@ -389,6 +395,13 @@ class ClientEntityCompactWidget extends StatelessWidget {
     required this.onAddWorkoutPlan,
   });
 
+  @override
+  State<ClientEntityCompactWidget> createState() =>
+      _ClientEntityCompactWidgetState();
+}
+
+class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
+  List<ExerciseEntity>? exercises;
   Widget _buildDetailItem(String title, String? value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,7 +411,7 @@ class ClientEntityCompactWidget extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: 12,
-            color: colorScheme.onSurfaceVariant,
+            color: widget.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -407,7 +420,7 @@ class ClientEntityCompactWidget extends StatelessWidget {
           value ?? 'N/A',
           style: TextStyle(
             fontSize: 14,
-            color: colorScheme.onSurface,
+            color: widget.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -417,494 +430,518 @@ class ClientEntityCompactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
+    return BlocListener<GetexercisesCubit, GetexercisesState>(
       listener: (context, state) {
-        if (state is AssigneWorkoutPlanLoading) {
+        if (state is GetexercisesLoading) {
           PlatformDialog.showLoadingDialog(
             context: context,
-            message: "Processing your request...",
+            message: "Fetching Exercises...",
           );
         }
 
-        if (state is GetWorkoutPlansForClientLoading) {
-          PlatformDialog.showLoadingDialog(
-            context: context,
-            message: "Fetching workout plan for client...",
-          );
-        }
-
-        if (state is WorkoutManagementError) {
-          PlatformDialog.showAlertDialog(
-            context: context,
-            title: "Client Details",
-            message: state.failures.message ?? "Something Went Wrong!",
-            onConfirm: () => Navigator.pop(context),
-          );
-        }
-
-        if (state is DeleteWorkoutLoading) {
-          PlatformDialog.showLoadingDialog(
-            context: context,
-            message: "Deleting the workout plan...",
-          );
-        }
-
-        if (state is DeleteWorkoutComplete) {
-          Navigator.pop(context);
-          context.read<WorkoutManagementBloc>().add(
-                GetWorkoutPlansForClientEvent(
-                  clientId: client.id!,
-                ),
-              );
-        }
-
-        if (state is AssignWorkoutComplete) {
-          PlatformDialog.showAlertDialog(
-            context: context,
-            title: "Assign Workout Plan",
-            message: "Workout Plan assigned Successfully!",
-            onConfirm: () {
-              Navigator.pop(context);
-              context.go(
-                FitFlexTrainerClientDetailsPage.route,
-                extra: {
-                  'client': client,
-                },
-              );
-              context.read<WorkoutManagementBloc>().add(
-                    GetWorkoutPlansForClientEvent(
-                      clientId: client.id!,
-                    ),
-                  );
-              // Navigator.pop(context);
-            },
-          );
+        if (state is GetExercisesComplete) {
+          exercises = state.exercises;
         }
       },
-      child: Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.35,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(16), // Slightly rounded corners
-                side: BorderSide(
-                  color: globalColorScheme.outline,
-                ), // Soft border
-              ),
-              color: colorScheme.inversePrimary,
-              margin: EdgeInsets.all(10),
-              elevation: 4,
-              shadowColor: colorScheme.shadow,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header Section with Name and Active Status
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: colorScheme.primaryContainer,
-                              child: Icon(
-                                Icons.person,
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  client.username ?? 'Unknown User',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                ValueListenableBuilder(
-                                  valueListenable: isUserActive,
-                                  builder: (context, isUserActive, _) {
-                                    return Text(
-                                      isUserActive ? 'Active' : 'Inactive',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isUserActive
-                                            ? colorScheme.secondary
-                                            : colorScheme.error,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        // Switch Button
-                        // ValueListenableBuilder(
-                        //   valueListenable: isUserActive,
-                        //   builder: (context, isUserActive, _) {
-                        //     return Switch(
-                        //       value: isUserActive,
-                        //       onChanged: (value) {
-                        //         print(value);
-                        //         onUserActiveToggle(value);
-                        //       },
-                        //       activeColor: colorScheme.primaryContainer,
-                        //       activeTrackColor: colorScheme.secondary,
-                        //       inactiveThumbColor:
-                        //           colorScheme.onPrimaryContainer,
-                        //       inactiveTrackColor: colorScheme.errorContainer,
-                        //     );
-                        //   },
-                        // ),
-                      ],
-                    ),
-                    const Divider(height: 20, color: Colors.grey),
-                    // Details Grid Section
+      child: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
+        listener: (context, state) {
+          if (state is AssigneWorkoutPlanLoading) {
+            PlatformDialog.showLoadingDialog(
+              context: context,
+              message: "Processing your request...",
+            );
+          }
 
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDetailItem(
-                                    'Email',
-                                    client.email,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: _buildDetailItem(
-                                    'Phone',
-                                    '${client.phone?['countryCode']}'
-                                        '-'
-                                        '${client.phone?['phone']}',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDetailItem(
-                                      'Age', client.age?.toString()),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child:
-                                      _buildDetailItem('Gender', client.gender),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDetailItem('Height',
-                                      '${client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: _buildDetailItem('Weight',
-                                      '${client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                    // GridView(
-                    //   shrinkWrap: true,
+          if (state is GetWorkoutPlansForClientLoading) {
+            PlatformDialog.showLoadingDialog(
+              context: context,
+              message: "Fetching workout plan for client...",
+            );
+          }
 
-                    //   physics: const NeverScrollableScrollPhysics(),
-                    //   gridDelegate:
-                    //       const SliverGridDelegateWithFixedCrossAxisCount(
-                    //     crossAxisCount: 2,
-                    //     mainAxisSpacing: 12,
-                    //     crossAxisSpacing: 16,
-                    //     childAspectRatio: 3.5,
-                    //   ),
-                    //   children: [
-                    //     _buildDetailItem('Email', client.email),
-                    //     _buildDetailItem(
-                    //         'Phone',
-                    //         '${client.phone?['countryCode']}'
-                    //             '-'
-                    //             '${client.phone?['phoneNumber']}'),
-                    //     _buildDetailItem('Age', client.age?.toString()),
-                    //     _buildDetailItem('Gender', client.gender),
-                    //     _buildDetailItem('Height',
-                    //         '${client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
-                    //     _buildDetailItem('Weight',
-                    //         '${client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
-                    //   ],
-                    // ),
+          if (state is WorkoutManagementError) {
+            PlatformDialog.showAlertDialog(
+              context: context,
+              title: "Client Details",
+              message: state.failures.message ?? "Something Went Wrong!",
+              onConfirm: () => Navigator.pop(context),
+            );
+          }
 
-                    //
-                  ],
-                ),
-              ),
-            ),
-          ),
-          BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
-            listener: (context, state) {
-              if (state is GetWorkoutPlansForClientComplete) {
-                Navigator.pop(context);
-              }
+          if (state is DeleteWorkoutLoading) {
+            PlatformDialog.showLoadingDialog(
+              context: context,
+              message: "Deleting the workout plan...",
+            );
+          }
 
-              if (state is WorkoutManagementError) {
-                PlatformDialog.showAlertDialog(
-                  context: context,
-                  title: "Client Details",
-                  message: state.failures.message ?? "Something Went Wrong",
-                );
-              }
-            },
-            builder: (context, state) {
-              if (state is WorkoutManagementError) {
-                return Text(
-                  state.failures.message ?? "Something went wrong!",
-                );
-              }
-              if (state is GetWorkoutPlansForClientComplete) {
-                final workoutPlan = state.workoutPlan;
-                return Card(
-                  elevation: 4, // Subtle shadow for a cleaner look
-                  margin: const EdgeInsets.all(10),
-                  color: globalColorScheme
-                      .inversePrimary, // Surface color for a professional look
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(16), // Slightly rounded corners
-                    side: BorderSide(
-                      color: globalColorScheme.outline,
-                    ), // Soft border
+          if (state is DeleteWorkoutComplete) {
+            Navigator.pop(context);
+            context.read<WorkoutManagementBloc>().add(
+                  GetWorkoutPlansForClientEvent(
+                    clientId: widget.client.id!,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Current Assigned Program',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment
-                              .center, // Center align elements
-                          children: [
-                            // Leading Icon
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundColor: globalColorScheme
-                                  .primaryContainer, // Subtle background
-                              child: Icon(
-                                Icons.fitness_center,
-                                color: globalColorScheme
-                                    .onPrimaryContainer, // Contrasting icon color
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
+                );
+          }
 
-                            // Program name and actions
-                            Expanded(
-                              child: Column(
+          if (state is AssignWorkoutComplete) {
+            PlatformDialog.showAlertDialog(
+              context: context,
+              title: "Assign Workout Plan",
+              message: "Workout Plan assigned Successfully!",
+              onConfirm: () {
+                context.pop();
+                context.read<WorkoutManagementBloc>().add(
+                      GetWorkoutPlansForClientEvent(
+                        clientId: widget.client.id!,
+                      ),
+                    );
+              },
+            );
+          }
+        },
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.35,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(16), // Slightly rounded corners
+                  side: BorderSide(
+                    color: globalColorScheme.outline,
+                  ), // Soft border
+                ),
+                color: widget.colorScheme.inversePrimary,
+                margin: EdgeInsets.all(10),
+                elevation: 4,
+                shadowColor: widget.colorScheme.shadow,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Section with Name and Active Status
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 24,
+                                backgroundColor:
+                                    widget.colorScheme.primaryContainer,
+                                child: Icon(
+                                  Icons.person,
+                                  color: widget.colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: globalColorScheme.primary,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Text(
-                                            workoutPlan?.name ?? "Not Assigned",
-                                            style: TextStyle(
-                                              color: workoutPlan == null
-                                                  ? globalColorScheme.secondary
-                                                  : globalColorScheme.onPrimary,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
+                                  Text(
+                                    widget.client.username ?? 'Unknown User',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: widget.colorScheme.onSurface,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  ValueListenableBuilder(
+                                    valueListenable: widget.isUserActive,
+                                    builder: (context, isUserActive, _) {
+                                      return Text(
+                                        isUserActive ? 'Active' : 'Inactive',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: isUserActive
+                                              ? widget.colorScheme.secondary
+                                              : widget.colorScheme.error,
                                         ),
-                                      ),
-                                      // Edit Button
-                                      if (workoutPlan == null)
-                                        IconButton(
-                                          onPressed: () {
-                                            onAddWorkoutPlan(client.id!);
-                                          },
-                                          icon: Icon(
-                                            Icons.add,
-                                          ),
-                                        )
-                                    ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          // Switch Button
+                          // ValueListenableBuilder(
+                          //   valueListenable: isUserActive,
+                          //   builder: (context, isUserActive, _) {
+                          //     return Switch(
+                          //       value: isUserActive,
+                          //       onChanged: (value) {
+                          //         print(value);
+                          //         onUserActiveToggle(value);
+                          //       },
+                          //       activeColor: colorScheme.primaryContainer,
+                          //       activeTrackColor: colorScheme.secondary,
+                          //       inactiveThumbColor:
+                          //           colorScheme.onPrimaryContainer,
+                          //       inactiveTrackColor: colorScheme.errorContainer,
+                          //     );
+                          //   },
+                          // ),
+                        ],
+                      ),
+                      const Divider(height: 20, color: Colors.grey),
+                      // Details Grid Section
+
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildDetailItem(
+                                      'Email',
+                                      widget.client.email,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: _buildDetailItem(
+                                      'Phone',
+                                      '${widget.client.phone?['countryCode']}'
+                                          '-'
+                                          '${widget.client.phone?['phone']}',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildDetailItem(
+                                        'Age', widget.client.age?.toString()),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: _buildDetailItem(
+                                        'Gender', widget.client.gender),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildDetailItem('Height',
+                                        '${widget.client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: _buildDetailItem('Weight',
+                                        '${widget.client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        if (workoutPlan != null)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    PlatformButton().buildButton(
-                                      context: context,
-                                      type: ButtonType.icon,
-                                      icon: Icons.edit_document,
-                                      foregroundColor:
-                                          globalColorScheme.onPrimaryContainer,
-                                      text: '',
-                                      onPressed: () {
-                                        context.go(
-                                          FitFlexClubCreateWorkoutPlanPage
-                                              .route,
-                                          extra: {
-                                            'updateData': true,
-                                            "workoutPlan": workoutPlan,
-                                            "clientEntity": client
-                                          },
-                                        );
-                                      },
-                                    )!,
-                                    Text('Edit'),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    PlatformButton().buildButton(
-                                      context: context,
-                                      type: ButtonType.icon,
-                                      icon: Icons.delete,
-                                      foregroundColor:
-                                          globalColorScheme.tertiaryContainer,
-                                      text: '',
-                                      onPressed: () {
-                                        context
-                                            .read<WorkoutManagementBloc>()
-                                            .add(
-                                              DeleteAssignedWorkoutPlanEvent(
-                                                workoutPlan: workoutPlan,
-                                              ),
-                                            );
-                                      },
-                                    )!,
-                                    Text('Delete'),
-                                  ],
-                                ),
-                              ),
-                              BlocListener<WorkoutHistoryBloc,
-                                  WorkoutHistoryState>(
-                                listener: (context, state) {
-                                  if (state is GetWorkoutHistoryLoading) {
-                                    PlatformDialog.showLoadingDialog(
-                                      context: context,
-                                      message: "Fetching Workout History!....",
-                                    );
-                                  }
+                      )
+                      // GridView(
+                      //   shrinkWrap: true,
 
-                                  if (state is GetWorkoutHistoryComplete) {
-                                    context.go(
-                                      FitFlexTrainerHistoryPage.route,
-                                      extra: {
-                                        'histories': state.workoutHistory,
-                                        'client': client,
-                                      },
-                                    );
-                                  }
-                                },
-                                child: Expanded(
+                      //   physics: const NeverScrollableScrollPhysics(),
+                      //   gridDelegate:
+                      //       const SliverGridDelegateWithFixedCrossAxisCount(
+                      //     crossAxisCount: 2,
+                      //     mainAxisSpacing: 12,
+                      //     crossAxisSpacing: 16,
+                      //     childAspectRatio: 3.5,
+                      //   ),
+                      //   children: [
+                      //     _buildDetailItem('Email', client.email),
+                      //     _buildDetailItem(
+                      //         'Phone',
+                      //         '${client.phone?['countryCode']}'
+                      //             '-'
+                      //             '${client.phone?['phoneNumber']}'),
+                      //     _buildDetailItem('Age', client.age?.toString()),
+                      //     _buildDetailItem('Gender', client.gender),
+                      //     _buildDetailItem('Height',
+                      //         '${client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
+                      //     _buildDetailItem('Weight',
+                      //         '${client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
+                      //   ],
+                      // ),
+
+                      //
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
+              listener: (context, state) {
+                if (state is GetWorkoutPlansForClientComplete) {
+                  context.pop();
+                  // Navigator.pop(context);
+                }
+
+                if (state is WorkoutManagementError) {
+                  PlatformDialog.showAlertDialog(
+                    context: context,
+                    title: "Client Details",
+                    message: state.failures.message ?? "Something Went Wrong",
+                  );
+                }
+              },
+              builder: (context, state) {
+                if (state is WorkoutManagementError) {
+                  return Text(
+                    state.failures.message ?? "Something went wrong!",
+                  );
+                }
+                if (state is GetWorkoutPlansForClientComplete) {
+                  final workoutPlan = state.workoutPlan;
+                  return Card(
+                    elevation: 4, // Subtle shadow for a cleaner look
+                    margin: const EdgeInsets.all(10),
+                    color: globalColorScheme
+                        .inversePrimary, // Surface color for a professional look
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(16), // Slightly rounded corners
+                      side: BorderSide(
+                        color: globalColorScheme.outline,
+                      ), // Soft border
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Current Assigned Program',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .center, // Center align elements
+                            children: [
+                              // Leading Icon
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: globalColorScheme
+                                    .primaryContainer, // Subtle background
+                                child: Icon(
+                                  Icons.fitness_center,
+                                  color: globalColorScheme
+                                      .onPrimaryContainer, // Contrasting icon color
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+
+                              // Program name and actions
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: globalColorScheme.primary,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              workoutPlan?.name ??
+                                                  "Not Assigned",
+                                              style: TextStyle(
+                                                color: workoutPlan == null
+                                                    ? globalColorScheme
+                                                        .secondary
+                                                    : globalColorScheme
+                                                        .onPrimary,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        // Edit Button
+                                        if (workoutPlan == null)
+                                          IconButton(
+                                            onPressed: () {
+                                              widget.onAddWorkoutPlan(
+                                                  widget.client.id!);
+                                            },
+                                            icon: Icon(
+                                              Icons.add,
+                                            ),
+                                          )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (workoutPlan != null)
+                            Row(
+                              children: [
+                                Expanded(
                                   child: Column(
                                     children: [
                                       PlatformButton().buildButton(
                                         context: context,
                                         type: ButtonType.icon,
-                                        icon: Icons.history_toggle_off,
+                                        icon: Icons.edit_document,
+                                        foregroundColor: globalColorScheme
+                                            .onPrimaryContainer,
+                                        text: '',
+                                        onPressed: () async {
+                                          final result = await context.push(
+                                            '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
+                                            extra: {
+                                              'updateData': true,
+                                              "workoutPlan": workoutPlan,
+                                              "clientEntity": widget.client,
+                                              "exercises": exercises
+                                            },
+                                          );
+                                          if (result == true) {
+                                            context
+                                                .read<WorkoutManagementBloc>()
+                                                .add(
+                                                  GetWorkoutPlansForClientEvent(
+                                                    clientId: widget.client.id!,
+                                                  ),
+                                                );
+                                          }
+                                        },
+                                      )!,
+                                      Text('Edit'),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      PlatformButton().buildButton(
+                                        context: context,
+                                        type: ButtonType.icon,
+                                        icon: Icons.delete,
                                         foregroundColor:
-                                            globalColorScheme.secondary,
+                                            globalColorScheme.tertiaryContainer,
                                         text: '',
                                         onPressed: () {
                                           context
-                                              .read<WorkoutHistoryBloc>()
+                                              .read<WorkoutManagementBloc>()
                                               .add(
-                                                GetWorkoutHistoryEvent(
-                                                  cliendId: client.id,
+                                                DeleteAssignedWorkoutPlanEvent(
+                                                  workoutPlan: workoutPlan,
                                                 ),
                                               );
                                         },
                                       )!,
-                                      Text('View History'),
+                                      Text('Delete'),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                      ],
+                                BlocListener<WorkoutHistoryBloc,
+                                    WorkoutHistoryState>(
+                                  listener: (context, state) {
+                                    if (state is GetWorkoutHistoryLoading) {
+                                      PlatformDialog.showLoadingDialog(
+                                        context: context,
+                                        message:
+                                            "Fetching Workout History!....",
+                                      );
+                                    }
+
+                                    if (state is GetWorkoutHistoryComplete) {
+                                      context.pop();
+                                      context.push(
+                                        '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexTrainerHistoryPage.route}',
+                                        extra: {
+                                          'histories': state.workoutHistory,
+                                          'client': widget.client,
+                                        },
+                                      );
+                                    }
+                                  },
+                                  child: Expanded(
+                                    child: Column(
+                                      children: [
+                                        PlatformButton().buildButton(
+                                          context: context,
+                                          type: ButtonType.icon,
+                                          icon: Icons.history_toggle_off,
+                                          foregroundColor:
+                                              globalColorScheme.secondary,
+                                          text: '',
+                                          onPressed: () {
+                                            context
+                                                .read<WorkoutHistoryBloc>()
+                                                .add(
+                                                  GetWorkoutHistoryEvent(
+                                                    cliendId: widget.client.id,
+                                                  ),
+                                                );
+                                          },
+                                        )!,
+                                        Text('View History'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                        ],
+                      ),
                     ),
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: PlatformLoader().buildLoader(
+                    type: LoaderType.shimmer,
+                    height: 200,
                   ),
                 );
-              }
-              return Padding(
-                padding: const EdgeInsets.all(10),
-                child: PlatformLoader().buildLoader(
-                  type: LoaderType.shimmer,
-                  height: 200,
-                ),
-              );
-            },
-          ),
-          // Container(
-          //   height: 200,
-          //   width: double.maxFinite,
-          //   decoration: BoxDecoration(),
-          //   child: Center(
-          //     child: Text(
-          //       'Workout History Comming Soon..',
-          //     ),
-          //   ),
-          // ),
-        ],
+              },
+            ),
+            // Container(
+            //   height: 200,
+            //   width: double.maxFinite,
+            //   decoration: BoxDecoration(),
+            //   child: Center(
+            //     child: Text(
+            //       'Workout History Comming Soon..',
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
       ),
     );
   }

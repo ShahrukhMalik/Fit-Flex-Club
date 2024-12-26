@@ -90,37 +90,37 @@ class WorkoutManagementBloc
     GetExercisesEvent event,
     Emitter<WorkoutManagementState> emit,
   ) async {
-    emit(GetExercisesLoading());
-    final result = await getExercisesUsecase(NoParams());
+    // emit(GetExercisesLoading());
+    // final result = await getExercisesUsecase(NoParams());
 
-    if (result == null) {
-      emit(
-        WorkoutManagementError(
-          failures: ServerFailure(
-            message: "Something went wrong",
-          ),
-        ),
-      );
-    } else {
-      result.fold(
-        (l) {
-          emit(WorkoutManagementError(failures: l));
-        },
-        (r) {
-          if (r == null) {
-            emit(
-              WorkoutManagementError(
-                failures: ServerFailure(
-                  message: "Something went wrong",
-                ),
-              ),
-            );
-          } else {
-            emit(GetExercisesComplete(exercises: r));
-          }
-        },
-      );
-    }
+    // if (result == null) {
+    //   emit(
+    //     WorkoutManagementError(
+    //       failures: ServerFailure(
+    //         message: "Something went wrong",
+    //       ),
+    //     ),
+    //   );
+    // } else {
+    //   result.fold(
+    //     (l) {
+    //       emit(WorkoutManagementError(failures: l));
+    //     },
+    //     (r) {
+    //       if (r == null) {
+    //         emit(
+    //           WorkoutManagementError(
+    //             failures: ServerFailure(
+    //               message: "Something went wrong",
+    //             ),
+    //           ),
+    //         );
+    //       } else {
+    //         emit(GetExercisesComplete(exercises: r));
+    //       }
+    //     },
+    //   );
+    // }
   }
 
   Future<void> _createWorkoutPlan(

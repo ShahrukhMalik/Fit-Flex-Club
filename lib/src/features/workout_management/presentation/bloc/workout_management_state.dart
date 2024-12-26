@@ -33,11 +33,11 @@ class GetWorkoutPlansComplete extends WorkoutManagementState {
   List<Object> get props => [workoutPlans];
 }
 
-class GetExercisesComplete extends WorkoutManagementState {
-  final List<ExerciseEntity> exercises;
+// class GetExercisesComplete extends WorkoutManagementState {
+//   final List<ExerciseEntity> exercises;
 
-  const GetExercisesComplete({required this.exercises});
-}
+//   const GetExercisesComplete({required this.exercises});
+// }
 
 class CreateWorkoutComplete extends WorkoutManagementState {}
 

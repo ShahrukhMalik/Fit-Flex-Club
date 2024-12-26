@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -530,7 +531,7 @@ class _FitFlexClubSelectExercisePageState
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
+      child: BlocBuilder<GetexercisesCubit, GetexercisesState>(
         builder: (context, state) {
           // if (state is SubjectFailed) {
           //   return ErrorOutput(message: state.message);

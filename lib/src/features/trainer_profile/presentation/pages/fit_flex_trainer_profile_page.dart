@@ -149,9 +149,12 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                 itemBuilder: (context, index) {
                                   final client = clients?[index];
                                   return InkWell(
-                                    onTap: () => context.go(
-                                        FitFlexTrainerClientDetailsPage.route,
-                                        extra: {'client': client}),
+                                    onTap: () => context.push(
+                                      '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}',
+                                      extra: {
+                                        'client': client,
+                                      },
+                                    ),
                                     child: Card(
                                       elevation: 2,
                                       margin: const EdgeInsets.only(bottom: 12),

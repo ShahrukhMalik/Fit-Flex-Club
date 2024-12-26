@@ -1,4 +1,3 @@
-
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
@@ -13,7 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class FitFlexTrainerHistoryPage extends StatefulWidget {
-  static const String route = '/fit-flex-trainer-history';
+  static const String route = 'trainer-history';
 
   final List<WorkoutHistoryModel> histories;
   final ClientEntity client;
@@ -94,12 +93,7 @@ class _FitFlexClientWorkoutHistoryPageState
       appBar: PlatformAppbar.basicAppBar(
           title: 'Workout History',
           context: context,
-          onLeadingPressed: () => context.go(
-                FitFlexTrainerClientDetailsPage.route,
-                extra: {
-                  'client': widget.client,
-                },
-              ),
+          onLeadingPressed: () => context.pop(),
           backgroundColor: globalColorScheme.onPrimaryContainer),
       body: Column(
         children: [

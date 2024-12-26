@@ -18,6 +18,7 @@ import 'package:fit_flex_club/src/features/syncmanager/presentation/bloc/syncman
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
@@ -149,10 +150,12 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<GetclientweightsCubit>()),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
         BlocProvider(
-            create: (context) => getIt<WorkoutManagementBloc>()
-              ..add(
-                GetExercisesEvent(),
-              )),
+            create: (context) => getIt<GetexercisesCubit>()..getExercises()),
+        BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()
+            // ..add(
+            //   GetExercisesEvent(),
+            // ),
+            ),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],
       child: localizations,
