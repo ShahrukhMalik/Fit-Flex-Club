@@ -192,7 +192,7 @@ class _FitFlexClientProfileSelectHeightPageState
                                           controllerGmsOz:
                                               decimalHeightController,
                                           maxCountKgLb: 1499,
-                                          maxCountGmsOz: 10,
+                                          maxCountGmsOz: 12,
                                           unitKgLb: showkg ? 'ft' : 'cm',
                                           unitGmsOz: showkg ? 'in' : 'mm',
                                         );
