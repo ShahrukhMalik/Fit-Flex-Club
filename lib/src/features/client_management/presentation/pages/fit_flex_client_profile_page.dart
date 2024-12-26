@@ -18,6 +18,7 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/clientwei
 import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -892,10 +893,8 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
   @override
   void initState() {
     super.initState();
-
-    // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+    context.read<GetexercisesCubit>().getExercises();
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
-
     context.read<GetclientweightsCubit>().getClientWeights();
   }
 
