@@ -409,7 +409,6 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
   Widget _buildDetailItem(String title, String? value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           title,
@@ -456,13 +455,6 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
             );
           }
 
-          // if (state is GetWorkoutPlansForClientLoading) {
-          //   PlatformDialog.showLoadingDialog(
-          //     context: context,
-          //     message: "Fetching workout plan for client...",
-          //   );
-          // }
-
           if (state is WorkoutManagementError) {
             PlatformDialog.showAlertDialog(
               context: context,
@@ -480,12 +472,19 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
           }
 
           if (state is DeleteWorkoutComplete) {
-            Navigator.pop(context);
-            context.read<WorkoutManagementBloc>().add(
-                  GetWorkoutPlansForClientEvent(
-                    clientId: widget.client.id!,
-                  ),
-                );
+
+            PlatformDialog.showAlertDialog(
+              context: context,
+              title: "Delete Workout Plan",
+              message: "Plan Deleted Successfully!",
+              onConfirm: () {
+                context.pop();
+                //TODO
+                context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
+                      widget.client.id!,
+                    );
+              },
+            );
           }
 
           if (state is AssignWorkoutComplete) {
@@ -495,10 +494,9 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
               message: "Workout Plan assigned Successfully!",
               onConfirm: () {
                 context.pop();
-                context.read<WorkoutManagementBloc>().add(
-                      GetWorkoutPlansForClientEvent(
-                        clientId: widget.client.id!,
-                      ),
+                //TODO
+                context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
+                      widget.client.id!,
                     );
               },
             );
@@ -573,24 +571,6 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                               ),
                             ],
                           ),
-                          // Switch Button
-                          // ValueListenableBuilder(
-                          //   valueListenable: isUserActive,
-                          //   builder: (context, isUserActive, _) {
-                          //     return Switch(
-                          //       value: isUserActive,
-                          //       onChanged: (value) {
-                          //         print(value);
-                          //         onUserActiveToggle(value);
-                          //       },
-                          //       activeColor: colorScheme.primaryContainer,
-                          //       activeTrackColor: colorScheme.secondary,
-                          //       inactiveThumbColor:
-                          //           colorScheme.onPrimaryContainer,
-                          //       inactiveTrackColor: colorScheme.errorContainer,
-                          //     );
-                          //   },
-                          // ),
                         ],
                       ),
                       const Divider(height: 20, color: Colors.grey),
@@ -658,35 +638,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                             ),
                           ],
                         ),
-                      )
-                      // GridView(
-                      //   shrinkWrap: true,
-
-                      //   physics: const NeverScrollableScrollPhysics(),
-                      //   gridDelegate:
-                      //       const SliverGridDelegateWithFixedCrossAxisCount(
-                      //     crossAxisCount: 2,
-                      //     mainAxisSpacing: 12,
-                      //     crossAxisSpacing: 16,
-                      //     childAspectRatio: 3.5,
-                      //   ),
-                      //   children: [
-                      //     _buildDetailItem('Email', client.email),
-                      //     _buildDetailItem(
-                      //         'Phone',
-                      //         '${client.phone?['countryCode']}'
-                      //             '-'
-                      //             '${client.phone?['phoneNumber']}'),
-                      //     _buildDetailItem('Age', client.age?.toString()),
-                      //     _buildDetailItem('Gender', client.gender),
-                      //     _buildDetailItem('Height',
-                      //         '${client.heightInFt ?? 'N/A'} ${'ft' ?? ''}'),
-                      //     _buildDetailItem('Weight',
-                      //         '${client.weightInKg ?? 'N/A'} ${'kg' ?? ''}'),
-                      //   ],
-                      // ),
-
-                      //
+                      ),
                     ],
                   ),
                 ),
@@ -839,12 +791,11 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                             },
                                           );
                                           if (result == true) {
+                                            //TODO
                                             context
-                                                .read<WorkoutManagementBloc>()
-                                                .add(
-                                                  GetWorkoutPlansForClientEvent(
-                                                    clientId: widget.client.id!,
-                                                  ),
+                                                .read<GetworkoutplanCubit>()
+                                                .getWorkoutPlanForClient(
+                                                  widget.client.id!,
                                                 );
                                           }
                                         },
@@ -940,16 +891,6 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                 );
               },
             ),
-            // Container(
-            //   height: 200,
-            //   width: double.maxFinite,
-            //   decoration: BoxDecoration(),
-            //   child: Center(
-            //     child: Text(
-            //       'Workout History Comming Soon..',
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
