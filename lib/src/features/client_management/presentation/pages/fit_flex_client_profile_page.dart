@@ -417,7 +417,8 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                     if (weight['icon'] != null)
                                       Icon(
                                         weight['icon'] ?? Icons.add,
-                                        color: globalColorScheme.onErrorContainer,
+                                        color:
+                                            globalColorScheme.onErrorContainer,
                                         size: 16,
                                       ),
                                     Expanded(
@@ -426,7 +427,8 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                             ? '${weight['difference'] ?? ''} (${weight['percentage'] ?? ''} %)'
                                             : '',
                                         style: TextStyle(
-                                          color: globalColorScheme.onErrorContainer,
+                                          color: globalColorScheme
+                                              .onErrorContainer,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -454,8 +456,8 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                   actions: [
                     BlocProvider(
                       create: (context) => getIt<ClientweightsCubit>(),
-                      child: BlocConsumer<ClientweightsCubit,
-                          ClientweightsState>(
+                      child:
+                          BlocConsumer<ClientweightsCubit, ClientweightsState>(
                         builder: (context, state) {
                           if (state is ClientweightsLoading) {
                             return Center(
@@ -472,31 +474,26 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                             context: context,
                             type: ButtonType.primary,
                             textStyle: TextStyle(
-                              color:
-                                  globalColorScheme.onPrimaryContainer,
+                              color: globalColorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.bold,
                             ),
                             text: 'Submit',
                             onPressed: () {
-                              if (_formKey.currentState?.validate() ??
-                                  false) {
+                              if (_formKey.currentState?.validate() ?? false) {
                                 if (weightController.text.isNotEmpty) {
                                   context
                                       .read<ClientweightsCubit>()
                                       .addClientWeight(
                                         ClientWeightEntity(
-                                          clientId:
-                                              getIt<FirebaseAuth>()
-                                                  .currentUser!
-                                                  .uid,
+                                          clientId: getIt<FirebaseAuth>()
+                                              .currentUser!
+                                              .uid,
                                           timeStamp: DateTime.now()
                                               .millisecondsSinceEpoch,
                                           weightInKg: double.tryParse(
-                                                  weightController
-                                                      .text) ??
+                                                  weightController.text) ??
                                               0,
-                                          weightInLb:
-                                              convertLbToKgDouble(
+                                          weightInLb: convertLbToKgDouble(
                                             double.tryParse(
                                                   weightController.text,
                                                 ) ??
@@ -525,19 +522,13 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                     height: 75,
                     child: Form(
                       key: _formKey,
-                      child: Column(
-                        children: [
-                          AppTextFields.prefixSuffixTextField(
-                            controller: weightController,
-                            labelText: 'Weight in (kgs)',
-                          
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(
-                              color:
-                                  globalColorScheme.onPrimaryContainer,
-                            ),
-                          )
-                        ],
+                      child: AppTextFields.prefixSuffixTextField(
+                        controller: weightController,
+                        labelText: 'Weight in (kgs)',
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          color: globalColorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
                   ),
@@ -904,27 +895,13 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
 
     context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
+    context.read<WorkoutManagementBloc>().add(
+          GetWorkoutPlansForClientEvent(
+            clientId: getIt<FirebaseAuth>().currentUser!.uid,
+          ),
+        );
     // context.read<GetclientweightsCubit>().getClientWeights();
   }
-
-// On Surface
-  final Color darkerTeal = const Color(0xFF006F6F);
-  // Darker Secondary (For contrast)
-  final ColorScheme customColorScheme = const ColorScheme(
-    brightness: Brightness.light,
-    primary: Color(0xFFFFCD7C),
-    onPrimary: Colors.white,
-    secondary: Color(0xFF00B3B8),
-    onSecondary: Colors.white,
-    surface: Color(0xFFF4F4F4),
-    onSurface: Color(0xFF1A2A3D),
-    error: Color(0xFFFF6F61),
-    onError: Colors.white,
-    outline: Color(0xFFFFBC00),
-    shadow: Colors.black54,
-    tertiary: Color(0xFF8BB7D9),
-    onTertiary: Color(0xFF1A2A3D),
-  );
 
   @override
   Widget build(BuildContext context) {

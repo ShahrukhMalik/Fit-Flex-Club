@@ -384,7 +384,7 @@ class _FitFlexScrollWheelWidgetState extends State<FitFlexScrollWheelWidget> {
                   diameterRatio: 1.2,
                   perspective: 0.002,
                   onSelectedItemChanged: (index) {
-                    widget.selectedValueGmsOz.value = (index + 1).toString();
+                    widget.selectedValueGmsOz.value = (index).toString();
                   },
                   childDelegate: ListWheelChildListDelegate(
                     children: List<Widget>.generate(
