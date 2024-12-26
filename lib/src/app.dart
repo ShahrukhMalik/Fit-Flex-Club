@@ -17,6 +17,7 @@ import 'package:fit_flex_club/src/features/syncmanager/domain/usecases/mark_even
 import 'package:fit_flex_club/src/features/syncmanager/presentation/bloc/syncmanager_bloc.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/getworkoutplan/getworkoutplan_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:flutter/services.dart';
@@ -148,13 +149,14 @@ class _MyAppState extends State<MyApp> {
                 getIt<SyncmanagerBloc>()..add(SyncOnlineDataEvent())),
         BlocProvider(create: (context) => getIt<ClientweightsCubit>()),
         BlocProvider(create: (context) => getIt<GetclientweightsCubit>()),
+        BlocProvider(create: (context) => getIt<GetworkoutplanCubit>()),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
         BlocProvider(
             create: (context) => getIt<GetexercisesCubit>()..getExercises()),
         BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()
-            // ..add(
-            //   GetExercisesEvent(),
-            // ),
+            ..add(
+              GetWorkoutPlansEvent(),
+            ),
             ),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],

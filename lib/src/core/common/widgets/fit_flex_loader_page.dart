@@ -1,4 +1,5 @@
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:flutter/material.dart';
 
 class FitFlexLoaderPage extends StatelessWidget {
@@ -22,7 +23,9 @@ class FitFlexLoaderPage extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
-            child: PlatformLoader().buildLoader(type: LoaderType.circular),
+            child: WorkoutActionButton(
+              onTap: () {},
+            ),
           )
         ],
       ),

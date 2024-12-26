@@ -294,7 +294,7 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
                       context
                           .read<WorkoutManagementBloc>()
                           .add(GetWorkoutPlansEvent());
-                      context.pop();
+                      if (context.canPop()) context.pop();
                     },
                   );
                 }

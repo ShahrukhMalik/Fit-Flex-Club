@@ -12,6 +12,7 @@ import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fi
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/getworkoutplan/getworkoutplan_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
@@ -246,10 +247,13 @@ class _FitFlexTrainerClientDetailsPageState
     isUserActive.value = widget.client.isUserActive ?? false;
     client = ClientModel.fromClientEntity(widget.client);
     // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
-    context.read<WorkoutManagementBloc>().add(
-          GetWorkoutPlansForClientEvent(
-            clientId: widget.client.id!,
-          ),
+    // context.read<WorkoutManagementBloc>().add(
+    //       GetWorkoutPlansForClientEvent(
+    //         clientId: widget.client.id!,
+    //       ),
+    //     );
+    context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
+          widget.client.id!,
         );
   }
 
@@ -350,7 +354,7 @@ class _FitFlexTrainerClientDetailsPageState
         colorScheme: globalColorScheme,
         onUserActiveToggle: _toggleUserActiveStatus,
         onAddWorkoutPlan: (clientId) {
-          context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+          // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
           _showExistingWorkoutPlans().then(
             (value) {
               if (value != null) {
@@ -452,12 +456,12 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
             );
           }
 
-          if (state is GetWorkoutPlansForClientLoading) {
-            PlatformDialog.showLoadingDialog(
-              context: context,
-              message: "Fetching workout plan for client...",
-            );
-          }
+          // if (state is GetWorkoutPlansForClientLoading) {
+          //   PlatformDialog.showLoadingDialog(
+          //     context: context,
+          //     message: "Fetching workout plan for client...",
+          //   );
+          // }
 
           if (state is WorkoutManagementError) {
             PlatformDialog.showAlertDialog(
@@ -688,28 +692,34 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                 ),
               ),
             ),
-            BlocConsumer<WorkoutManagementBloc, WorkoutManagementState>(
+            BlocConsumer<GetworkoutplanCubit, GetworkoutplanState>(
               listener: (context, state) {
-                if (state is GetWorkoutPlansForClientComplete) {
-                  context.pop();
+                if (state is GetworkoutplanComplete) {
+                  // context.pop();
                   // Navigator.pop(context);
                 }
 
-                if (state is WorkoutManagementError) {
+                if (state is GetworkoutplanError) {
                   PlatformDialog.showAlertDialog(
                     context: context,
                     title: "Client Details",
                     message: state.failures.message ?? "Something Went Wrong",
                   );
                 }
+                if (state is GetworkoutplanLoading) {
+                  PlatformDialog.showLoadingDialog(
+                    context: context,
+                    message: "Fetching workout plan for client...",
+                  );
+                }
               },
               builder: (context, state) {
-                if (state is WorkoutManagementError) {
+                if (state is GetworkoutplanError) {
                   return Text(
                     state.failures.message ?? "Something went wrong!",
                   );
                 }
-                if (state is GetWorkoutPlansForClientComplete) {
+                if (state is GetworkoutplanComplete) {
                   final workoutPlan = state.workoutPlan;
                   return Card(
                     elevation: 4, // Subtle shadow for a cleaner look

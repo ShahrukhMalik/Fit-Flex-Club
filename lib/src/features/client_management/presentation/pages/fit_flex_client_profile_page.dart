@@ -733,7 +733,11 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
                     ),
                   );
                 } else {
-                  return SizedBox();
+                  return SizedBox(
+                    width: double.maxFinite,
+                    height: 200,
+                    child: WeightLoaderAnimation(),
+                  );
                 }
               },
             );
@@ -1110,3 +1114,80 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
 //   @override
 //   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 // }
+
+class WeightLoaderAnimation extends StatefulWidget {
+  const WeightLoaderAnimation({super.key});
+
+  @override
+  _WeightLoaderAnimationState createState() => _WeightLoaderAnimationState();
+}
+
+class _WeightLoaderAnimationState extends State<WeightLoaderAnimation>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: LoaderPainter(
+        animation: _controller,
+        colorScheme: globalColorScheme,
+      ),
+      child: const SizedBox.expand(),
+    );
+  }
+}
+
+class LoaderPainter extends CustomPainter {
+  final Animation<double> animation;
+  final ColorScheme colorScheme;
+
+  LoaderPainter({required this.animation, required this.colorScheme})
+      : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          colorScheme.primary,
+          colorScheme.secondary,
+          colorScheme.tertiary,
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    final double radius = size.shortestSide * 0.15;
+    final double progress = animation.value * 2 * 3.14159;
+    final Offset center = Offset(size.width / 2, size.height / 2);
+
+    // Draw spinning circle
+    final Offset circleOffset = Offset(
+      center.dx + radius * 2 * animation.value * math.cos(progress),
+      center.dy + radius * 2 * animation.value * math.sin(progress),
+    );
+
+    canvas.drawCircle(center, radius, paint);
+    canvas.drawCircle(circleOffset, radius * 0.3, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+// void main() => runApp(const MaterialApp(home: Scaffold(body: WeightLoaderAnimation())));

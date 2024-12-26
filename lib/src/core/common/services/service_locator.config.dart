@@ -135,6 +135,8 @@ import '../../../features/workout_management/domain/usecases/update_assigned_wor
     as _i661;
 import '../../../features/workout_management/domain/usecases/update_workout_plan_usecase.dart'
     as _i430;
+import '../../../features/workout_management/presentation/bloc/getworkoutplan/getworkoutplan_cubit.dart'
+    as _i441;
 import '../../../features/workout_management/presentation/bloc/workout_management_bloc.dart'
     as _i41;
 import '../../../features/workout_management/presentation/getexercises/getexercises_cubit.dart'
@@ -353,6 +355,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i841.GetClientByIdUsecase>(() =>
         _i841.GetClientByIdUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.factory<_i441.GetworkoutplanCubit>(() =>
+        _i441.GetworkoutplanCubit(gh<_i91.GetWorkoutPlansForClientUsecase>()));
     gh.singleton<_i119.GetWorkoutHistoryUsecase>(() =>
         _i119.GetWorkoutHistoryUsecaseImpl(
             workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));

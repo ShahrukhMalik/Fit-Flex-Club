@@ -558,7 +558,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
         confirmText: event == ConcludeEvent.submit ? 'Yes' : 'Continue',
         onConfirm: () {
           context.pop();
-          context.pop();
+          if (context.canPop()) context.pop();
         },
       );
     }

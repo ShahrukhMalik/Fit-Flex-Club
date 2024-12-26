@@ -33,46 +33,106 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
   }
 
   void _showIosPicker(BuildContext context) {
-    showCupertinoDialog(
+    // Find the initial index of the selected value
+    final initialIndex = widget.options.indexOf(selectedValue);
+
+    showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
-        height: 300,
-        color: Colors.white,
-        child: CupertinoPicker(
-          itemExtent: 40,
-          onSelectedItemChanged: (index) {
-            if (widget.options[index] != selectedValue) {
-              setState(() {
-                selectedValue = widget.options[index];
-                widget.onChanged(widget.options[index]);
-              });
-              if (Platform.isIOS && context.canPop()) context.pop();
-            } else {
-              // Pop the dialog manually if the same item is tapped
-              if (Platform.isIOS && context.canPop()) context.pop();
-            }
-          },
-          children: widget.options
-              .map(
-                (option) => GestureDetector(
-                  onTap: () {
-                    if (option == selectedValue) {
-                      context.pop();
-                    } else {
-                      selectedValue = option;
-                      widget.onChanged(option);
-                      setState(() {});
-                      context.pop();
-                    }
-                  },
-                  child: Center(
+        height: 250, // Total height for dialog
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade300),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
                     child: Text(
-                      option.values.first,
+                      "Cancel",
+                      style: TextStyle(
+                        color: globalColorScheme.error,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
+                  Text(
+                    "Select Month",
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Text(
+                      "Done",
+                      style: TextStyle(
+                        color: globalColorScheme.onPrimaryContainer,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Picker
+            Expanded(
+              child: CupertinoPicker(
+                scrollController: FixedExtentScrollController(
+                  initialItem: initialIndex >= 0 ? initialIndex : 0,
                 ),
-              )
-              .toList(),
+                backgroundColor: Colors.white,
+                useMagnifier: true,
+                magnification: 1.15,
+                itemExtent: 40,
+                onSelectedItemChanged: (index) {
+                  setState(() {
+                    selectedValue = widget.options[index];
+                    widget.onChanged(widget.options[index]);
+                  });
+                },
+                children: widget.options
+                    .map(
+                      (option) => Center(
+                        child: Text(
+                          option.values.first,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: option == selectedValue
+                                ? globalColorScheme.tertiaryContainer
+                                : globalColorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );

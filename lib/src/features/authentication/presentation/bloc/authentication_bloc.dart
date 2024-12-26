@@ -70,9 +70,6 @@ class AuthenticationBloc
       if (event is ListenToEvents) {
         await _listenToEvents(event: event, emit: emit);
       }
-      // if (event is UpdateUserEvent) {
-      //   await _updateUser(event: event, emit: emit);
-      // }
     });
   }
 
@@ -286,6 +283,7 @@ class AuthenticationBloc
         (l) => emit(AuthenticationError(true, l)),
         (r) async {
           if (r == null) {
+            add(AuthenticateUserEvent());
           } else {
             await for (final syncResult in r) {
               if (syncResult != null) {

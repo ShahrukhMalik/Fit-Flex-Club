@@ -183,6 +183,8 @@ class _FitFlexClientAssignedWorkoutPlanPageState
             clientId: getIt<FirebaseAuth>().currentUser!.uid,
           ),
         );
+
+    // context.read()
   }
 
   @override
