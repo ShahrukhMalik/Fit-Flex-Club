@@ -63,6 +63,11 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
+  _isLoggedIn() {
+    final uid = getIt<FirebaseAuth>().currentUser?.uid;
+    return uid != null;
+  }
+
   _showToast(String message) {
     Fluttertoast.showToast(
       msg: message,
@@ -109,6 +114,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
+    if (!_isLoggedIn()) return;
     isOnline = result[0] != ConnectivityResult.none;
     if (!isOnline) {
       _showToast(isOnline ? "You are online!" : "You are now offline!");
@@ -153,11 +159,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
         BlocProvider(
             create: (context) => getIt<GetexercisesCubit>()..getExercises()),
-        BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()
-            ..add(
-              GetWorkoutPlansEvent(),
-            ),
-            ),
+        BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],
       child: localizations,
