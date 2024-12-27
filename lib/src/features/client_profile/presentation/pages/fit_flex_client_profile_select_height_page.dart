@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
@@ -296,7 +297,7 @@ class _FitFlexClientProfileSelectHeightPageState
               },
               listener: (context, state) {
                 if (state is ClientProfileComplete) {
-                  context.go(FitFlexClientProfilePage.route);
+                  context.read<AuthenticationBloc>().add(ListenToEvents());
                 }
                 if (state is ClientProfileError) {
                   PlatformDialog.showAlertDialog(

@@ -103,6 +103,23 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         );
 
         final uid = auth.currentUser?.uid;
+
+        final userDoc = await remoteDb.collection('Users').doc(uid).get();
+
+        if (!userDoc.exists) {
+          throw ServerException(
+            errorMessage: "User not found!",
+          );
+        } else {
+          final isUserActive = userDoc.data()?['isUserActive'];
+
+          if (isUserActive != true) {
+            throw ServerException(
+              errorMessage: "User is not active, kindly contact trainer!.",
+            );
+          }
+        }
+
         if (uid != null) {
           prefs.setAuthUid(uid);
         }
@@ -323,7 +340,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final listenerRef = remoteDb
           .collection('ListenerEvents')
           .where('clientId', isEqualTo: clientId)
-          .where('isListendAlready', isEqualTo: null)
+          .where('isListendAlready', isEqualTo: false)
           .orderBy('timestamp', descending: true);
 
       return listenerRef.snapshots().asBroadcastStream().map((snapshot) {

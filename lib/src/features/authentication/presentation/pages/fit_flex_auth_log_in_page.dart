@@ -125,7 +125,7 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                             if (!state.rebuild!) {
                               context
                                   .read<AuthenticationBloc>()
-                                  .add(AuthenticateUserEvent());
+                                  .add(ListenToEvents());
                             }
                           }
                         }

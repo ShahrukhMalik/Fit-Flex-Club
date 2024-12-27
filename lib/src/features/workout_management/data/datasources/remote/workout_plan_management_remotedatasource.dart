@@ -60,7 +60,8 @@ class WorkoutPlanManagementRemotedatasourceImpl
       WriteBatch mainBatch = db.batch();
 
       // Update main workout plan document
-      mainBatch.set(workoutPlanRef, workoutPlanModel.toMap(),SetOptions(merge: true));
+      mainBatch.set(
+          workoutPlanRef, workoutPlanModel.toMap(), SetOptions(merge: true));
 
       // Process updates for weeks, days, and exercises in a more efficient manner
       // for (var week in workoutPlanModel.weeks) {
@@ -147,48 +148,12 @@ class WorkoutPlanManagementRemotedatasourceImpl
       // Save the workout plan model
       DocumentReference workoutPlanRef = ref.doc(workoutPlanModel.uid);
       batch.set(
-          workoutPlanRef, workoutPlanModel.toMap(), SetOptions(merge: true));
-
-      // Iterate through weeks
-      // for (var week in workoutPlanModel.weeks) {
-      //   print('In Weeks Loop');
-      //   print(week);
-
-      //   // Save week
-      //   DocumentReference weekRef =
-      //       workoutPlanRef.collection('weeks').doc(week.id.toString());
-      //   batch.set(weekRef, week.toMap());
-
-      //   // Iterate through days
-      //   for (var day in week.days) {
-      //     // Save day
-      //     DocumentReference dayRef =
-      //         weekRef.collection('days').doc(day.id.toString());
-      //     batch.set(dayRef, day.toMap());
-
-      //     // Iterate through exercises
-      //     for (var exercise in day.exercises) {
-      //       // Save exercise
-      //       final exerciseMap = exercise.toMap();
-      //       exerciseMap['exerciseOrder'] = day.exercises.indexOf(exercise) + 1;
-      //       DocumentReference exerciseRef =
-      //           dayRef.collection('exercises').doc(exercise.id.toString());
-      //       batch.set(exerciseRef, exerciseMap);
-
-      //       // Iterate through sets
-      //       for (var set in exercise.sets) {
-      //         // Save set
-      //         final setMap = set.toMap();
-      //         setMap['setNumber'] = exercise.sets.indexOf(set) + 1;
-      //         DocumentReference setRef =
-      //             exerciseRef.collection('sets').doc(set.id.toString());
-      //         batch.set(setRef, setMap);
-      //       }
-      //     }
-      //   }
-      // }
-
-      // Commit the batch to execute all operations at once
+        workoutPlanRef,
+        workoutPlanModel.toMap(),
+        SetOptions(
+          merge: true,
+        ),
+      );
       await batch.commit();
     } on FirebaseException catch (err) {
       throw ServerException(
@@ -281,13 +246,13 @@ class WorkoutPlanManagementRemotedatasourceImpl
       //   }
       // }
 
-      // Commit the batch to execute all operations at once
       batch.set(
         listenerRef.doc(UUIDv4().toString()),
         {
           'clientId': workoutPlanModel.clientId,
           'eventType': ListenerEvents.assignWorkoutPlan.name,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'isListendAlready': false,
         },
       );
       await batch.commit();
@@ -397,6 +362,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
           'clientId': workoutPlanModel.clientId,
           'eventType': ListenerEvents.updateAssignedWorkoutPlan.name,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
+               'isListendAlready': false,
         },
       );
       await mainBatch.commit();
@@ -421,6 +387,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
         'clientId': workoutPlan.clientId,
         'eventType': ListenerEvents.deleteAssignedWorkoutPlan.name,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
+             'isListendAlready': false,
       });
     } on FirebaseException catch (err) {
       throw ServerException(

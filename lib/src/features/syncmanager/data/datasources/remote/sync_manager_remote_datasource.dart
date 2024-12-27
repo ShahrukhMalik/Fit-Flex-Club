@@ -160,7 +160,7 @@ class SyncManagerRemoteDatasourceImpl extends SyncManagerRemoteDatasource {
   Future<void> markEventListened(docId) async {
     try {
       final listenRefCollection = remoteDb.collection('ListenerEvents');
-      await listenRefCollection.doc(docId).set({'isListendAlready': true});
+      await listenRefCollection.doc(docId).update({'isListendAlready': true});
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

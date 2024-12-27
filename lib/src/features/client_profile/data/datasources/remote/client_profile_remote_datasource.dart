@@ -95,6 +95,7 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
             'clientId': trainer.id,
             'eventType': ListenerEvents.addUser.name,
             'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'isListendAlready': false,
           },
         );
       }

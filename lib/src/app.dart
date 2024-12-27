@@ -158,7 +158,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<GetworkoutplanCubit>()),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
         BlocProvider(
-            create: (context) => getIt<GetexercisesCubit>()..getExercises()),
+            create: (context) => getIt<GetexercisesCubit>()),
         BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],

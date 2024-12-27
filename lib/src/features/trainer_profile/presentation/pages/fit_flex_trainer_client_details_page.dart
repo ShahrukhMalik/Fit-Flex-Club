@@ -139,7 +139,7 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
       child: SizedBox(
         height: 500,
         child: Container(
-          color: globalColorScheme.shadow,
+          color: globalColorScheme.surface,
           child: Column(
             children: [
               Container(
@@ -375,7 +375,7 @@ class _FitFlexTrainerClientDetailsPageState
           colorScheme: globalColorScheme,
           onUserActiveToggle: _toggleUserActiveStatus,
           onAddWorkoutPlan: (clientId) {
-            // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+            context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
             _showExistingWorkoutPlans().then(
               (value) {
                 if (value != null) {

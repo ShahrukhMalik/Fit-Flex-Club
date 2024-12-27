@@ -356,6 +356,24 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ValueNotifier<Map<String, dynamic>> weightDifferenceInfo =
       ValueNotifier({});
+  ValueNotifier<List<ClientWeightEntity>?> weights = ValueNotifier(null);
+
+  bool _allowToAddWeight() {
+    if ((weights.value?.isEmpty ?? true)) return true;
+
+    final weightWithTodaysDate = weights.value?.any(
+      (element) {
+        final todaysDate = DateTime.now();
+        final weightDate =
+            DateTime.fromMillisecondsSinceEpoch(element.timeStamp);
+        return (weightDate.year == todaysDate.year &&
+            weightDate.month == todaysDate.month &&
+            weightDate.day == todaysDate.day);
+      },
+    );
+    return !(weightWithTodaysDate ?? false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -450,95 +468,106 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                 icon: Icons.add_circle_rounded,
                 height: 35,
                 text: '',
-                onPressed: () => PlatformDialog.showCustomDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  title: "Add Weight",
-                  actions: [
-                    BlocProvider(
-                      create: (context) => getIt<ClientweightsCubit>(),
-                      child:
-                          BlocConsumer<ClientweightsCubit, ClientweightsState>(
-                        builder: (context, state) {
-                          if (state is ClientweightsLoading) {
-                            return Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: PlatformLoader().buildLoader(
-                                  type: LoaderType.circular,
-                                  size: 20,
+                onPressed: () => _allowToAddWeight()
+                    ? PlatformDialog.showCustomDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        title: "Add Weight",
+                        actions: [
+                          BlocProvider(
+                            create: (context) => getIt<ClientweightsCubit>(),
+                            child: BlocConsumer<ClientweightsCubit,
+                                ClientweightsState>(
+                              builder: (context, state) {
+                                if (state is ClientweightsLoading) {
+                                  return Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: PlatformLoader().buildLoader(
+                                        type: LoaderType.circular,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return PlatformButton().buildButton(
+                                  context: context,
+                                  type: ButtonType.primary,
+                                  textStyle: TextStyle(
+                                    color: globalColorScheme.onPrimaryContainer,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  text: 'Submit',
+                                  onPressed: () {
+                                    if (_formKey.currentState?.validate() ??
+                                        false) {
+                                      if (weightController.text.isNotEmpty) {
+                                        context
+                                            .read<ClientweightsCubit>()
+                                            .addClientWeight(
+                                              ClientWeightEntity(
+                                                clientId: getIt<FirebaseAuth>()
+                                                    .currentUser!
+                                                    .uid,
+                                                timeStamp: DateTime.now()
+                                                    .millisecondsSinceEpoch,
+                                                weightInKg: double.tryParse(
+                                                        weightController
+                                                            .text) ??
+                                                    0,
+                                                weightInLb: convertLbToKgDouble(
+                                                  double.tryParse(
+                                                        weightController.text,
+                                                      ) ??
+                                                      0,
+                                                ),
+                                              ),
+                                            );
+                                      }
+                                    }
+                                  },
+                                )!;
+                              },
+                              listener: (context, state) {
+                                if (state is ClientweightsComplete) {
+                                  context
+                                      .read<GetclientweightsCubit>()
+                                      .getClientWeights();
+                                  context.pop();
+                                  weightController.clear();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                        content: SingleChildScrollView(
+                          child: SizedBox(
+                            height: 85,
+                            child: Form(
+                              key: _formKey,
+                              child: AppTextFields.prefixSuffixTextField(
+                                controller: weightController,
+                                labelText: 'Weight in (kgs)',
+                                keyboardType: TextInputType.number,
+                                style: TextStyle(
+                                  color: globalColorScheme.onPrimaryContainer,
                                 ),
                               ),
-                            );
-                          }
-                          return PlatformButton().buildButton(
-                            context: context,
-                            type: ButtonType.primary,
-                            textStyle: TextStyle(
-                              color: globalColorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
                             ),
-                            text: 'Submit',
-                            onPressed: () {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                if (weightController.text.isNotEmpty) {
-                                  context
-                                      .read<ClientweightsCubit>()
-                                      .addClientWeight(
-                                        ClientWeightEntity(
-                                          clientId: getIt<FirebaseAuth>()
-                                              .currentUser!
-                                              .uid,
-                                          timeStamp: DateTime.now()
-                                              .millisecondsSinceEpoch,
-                                          weightInKg: double.tryParse(
-                                                  weightController.text) ??
-                                              0,
-                                          weightInLb: convertLbToKgDouble(
-                                            double.tryParse(
-                                                  weightController.text,
-                                                ) ??
-                                                0,
-                                          ),
-                                        ),
-                                      );
-                                }
-                              }
-                            },
-                          )!;
-                        },
-                        listener: (context, state) {
-                          if (state is ClientweightsComplete) {
-                            context
-                                .read<GetclientweightsCubit>()
-                                .getClientWeights();
-                            context.pop();
-                            weightController.clear();
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                  content: SizedBox(
-                    height: 75,
-                    child: Form(
-                      key: _formKey,
-                      child: AppTextFields.prefixSuffixTextField(
-                        controller: weightController,
-                        labelText: 'Weight in (kgs)',
-                        keyboardType: TextInputType.number,
-                        style: TextStyle(
-                          color: globalColorScheme.onPrimaryContainer,
+                          ),
                         ),
+                      )
+                    : PlatformDialog.showAlertDialog(
+                        context: context,
+                        title: "Weight Tracker",
+                        message: "You've already added for today.",
                       ),
-                    ),
-                  ),
-                ),
               )!,
             ],
           ),
           WeightTrackerGraph(
             weightDifferenceInfo: weightDifferenceInfo,
+            weights: weights,
           )
         ],
       ),
@@ -588,10 +617,12 @@ Widget _buildStatItem(String label, String value, String unit) {
 // WeightTrackerGraph Widget
 class WeightTrackerGraph extends StatefulWidget {
   final ValueNotifier<Map<String, dynamic>> weightDifferenceInfo;
+  final ValueNotifier<List<ClientWeightEntity>?> weights;
 
   const WeightTrackerGraph({
     super.key,
     required this.weightDifferenceInfo,
+    required this.weights,
   });
 
   @override
@@ -716,6 +747,7 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
               "${DateTime.now().millisecondsSinceEpoch}");
           currentWeights.value = state.weights;
           _originalWeights = state.weights;
+          widget.weights.value = state.weights;
           isLoading.value = false;
         }
       },
