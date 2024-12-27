@@ -708,8 +708,12 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
       listener: (context, state) {
         if (state is GetclientweightsLoading) {
           isLoading.value = true;
+          currentWeights.value = null;
+          _originalWeights = null;
         }
         if (state is GetclientweightsComplete) {
+          print('State emitted at UI : '
+              "${DateTime.now().millisecondsSinceEpoch}");
           currentWeights.value = state.weights;
           _originalWeights = state.weights;
           isLoading.value = false;
@@ -723,6 +727,8 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
               valueListenable: isLoading,
               builder: (context, ifLoading, child) {
                 if (ifLoading) {
+                  print('UI Loading: '
+                      "${DateTime.now().millisecondsSinceEpoch}");
                   return SizedBox(
                     width: double.maxFinite,
                     height: 200,
@@ -733,6 +739,8 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
                     ),
                   );
                 } else {
+                  print('UI Loading stopped: '
+                      "${DateTime.now().millisecondsSinceEpoch}");
                   return SizedBox(
                     width: double.maxFinite,
                     height: 200,
@@ -899,7 +907,7 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
     super.initState();
     context.read<GetexercisesCubit>().getExercises();
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
-    context.read<GetclientweightsCubit>().getClientWeights();
+    // context.read<GetclientweightsCubit>().getClientWeights();
   }
 
   @override
@@ -981,7 +989,9 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                           Text(
                             intl.DateFormat.MMMEd().format(DateTime.now()),
                             style: TextStyle(
-                                color: Colors.grey[400], fontSize: 14),
+                              color: Colors.grey[400],
+                              fontSize: 14,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           BlocConsumer<ClientProfileBloc, ClientProfileState>(

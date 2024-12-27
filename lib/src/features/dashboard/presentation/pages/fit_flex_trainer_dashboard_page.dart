@@ -114,10 +114,10 @@ class _FitFlexTrainerDashboardPageState
     return GestureDetector(
       onTap: () {
         valueNotifier.value = index;
-        // if (index == 1) {
-        //   // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
-        //   // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
-        // }
+        if (index == 1) {
+          // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
+          // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+        }
         navigationShell.goBranch(
           index,
           initialLocation: index == navigationShell.currentIndex,

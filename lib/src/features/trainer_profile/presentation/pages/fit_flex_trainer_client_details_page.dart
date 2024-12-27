@@ -7,6 +7,7 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_history_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
@@ -239,6 +240,7 @@ class _FitFlexTrainerClientDetailsPageState
     extends State<FitFlexTrainerClientDetailsPage> {
   ClientModel client = ClientModel();
   final ValueNotifier<bool> isUserActive = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> fetchClients = ValueNotifier<bool>(false);
   // List<ExerciseEntity>? exercises;
 
   @override
@@ -341,43 +343,63 @@ class _FitFlexTrainerClientDetailsPageState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PlatformAppbar.basicAppBar(
-        title: "Client Details Page",
-        context: context,
-        backgroundColor: globalColorScheme.onPrimaryContainer,
-        onLeadingPressed: () => context.pop(),
-      ),
-      body: ClientEntityCompactWidget(
-        isUserActive: isUserActive,
-        client: widget.client,
-        colorScheme: globalColorScheme,
-        onUserActiveToggle: _toggleUserActiveStatus,
-        onAddWorkoutPlan: (clientId) {
-          // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
-          _showExistingWorkoutPlans().then(
-            (value) {
-              if (value != null) {
-                final workoutToAssign = _getWorkoutPlanToAssign(
-                  workoutPlan: value,
-                  clientId: clientId,
-                );
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop && fetchClients.value) {
+          context.read<TrainerProfileBloc>().add(
+                TrainerProfileGetClientsEvent(),
+              );
+          print("Button Pressed: " '${DateTime.now().millisecondsSinceEpoch}');
+        }
+        if (context.canPop() && !didPop) context.pop();
+      },
+      child: Scaffold(
+        appBar: PlatformAppbar.basicAppBar(
+          title: "Client Details Page",
+          context: context,
+          backgroundColor: globalColorScheme.onPrimaryContainer,
+          onLeadingPressed: () {
+            if (context.canPop()) context.pop();
+            if (fetchClients.value) {
+              context.read<TrainerProfileBloc>().add(
+                    TrainerProfileGetClientsEvent(),
+                  );
+            }
+          },
+        ),
+        body: ClientEntityCompactWidget(
+          fetchClients: fetchClients,
+          isUserActive: isUserActive,
+          client: widget.client,
+          colorScheme: globalColorScheme,
+          onUserActiveToggle: _toggleUserActiveStatus,
+          onAddWorkoutPlan: (clientId) {
+            // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+            _showExistingWorkoutPlans().then(
+              (value) {
+                if (value != null) {
+                  final workoutToAssign = _getWorkoutPlanToAssign(
+                    workoutPlan: value,
+                    clientId: clientId,
+                  );
 
-                if (workoutToAssign != null) {
-                  context.read<WorkoutManagementBloc>().add(
-                        AssignWorkoutPlanEvent(
-                          workoutPlan: workoutToAssign,
-                        ),
-                      );
+                  if (workoutToAssign != null) {
+                    context.read<WorkoutManagementBloc>().add(
+                          AssignWorkoutPlanEvent(
+                            workoutPlan: workoutToAssign,
+                          ),
+                        );
+                  } else {
+                    // Handle null case if needed.
+                  }
                 } else {
                   // Handle null case if needed.
                 }
-              } else {
-                // Handle null case if needed.
-              }
-            },
-          );
-        },
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -386,6 +408,7 @@ class _FitFlexTrainerClientDetailsPageState
 class ClientEntityCompactWidget extends StatefulWidget {
   final ClientEntity client;
   final ColorScheme colorScheme;
+  final ValueNotifier<bool> fetchClients;
   final ValueChanged<bool> onUserActiveToggle;
   final ValueNotifier<bool> isUserActive;
   final Function(String) onAddWorkoutPlan;
@@ -397,6 +420,7 @@ class ClientEntityCompactWidget extends StatefulWidget {
     required this.onUserActiveToggle,
     required this.isUserActive,
     required this.onAddWorkoutPlan,
+    required this.fetchClients,
   });
 
   @override
@@ -472,7 +496,6 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
           }
 
           if (state is DeleteWorkoutComplete) {
-
             PlatformDialog.showAlertDialog(
               context: context,
               title: "Delete Workout Plan",
@@ -646,10 +669,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
             ),
             BlocConsumer<GetworkoutplanCubit, GetworkoutplanState>(
               listener: (context, state) {
-                if (state is GetworkoutplanComplete) {
-                  // context.pop();
-                  // Navigator.pop(context);
-                }
+                if (state is GetworkoutplanComplete) {}
 
                 if (state is GetworkoutplanError) {
                   PlatformDialog.showAlertDialog(
@@ -658,12 +678,12 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                     message: state.failures.message ?? "Something Went Wrong",
                   );
                 }
-                if (state is GetworkoutplanLoading) {
-                  PlatformDialog.showLoadingDialog(
-                    context: context,
-                    message: "Fetching workout plan for client...",
-                  );
-                }
+                // if (state is GetworkoutplanLoading) {
+                //   PlatformDialog.showLoadingDialog(
+                //     context: context,
+                //     message: "Fetching workout plan for client...",
+                //   );
+                // }
               },
               builder: (context, state) {
                 if (state is GetworkoutplanError) {
@@ -753,6 +773,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                         if (workoutPlan == null)
                                           IconButton(
                                             onPressed: () {
+                                              widget.fetchClients.value = true;
                                               widget.onAddWorkoutPlan(
                                                   widget.client.id!);
                                             },
@@ -781,6 +802,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                             .onPrimaryContainer,
                                         text: '',
                                         onPressed: () async {
+                                          widget.fetchClients.value = true;
                                           final result = await context.push(
                                             '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
                                             extra: {
@@ -815,6 +837,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                             globalColorScheme.tertiaryContainer,
                                         text: '',
                                         onPressed: () {
+                                          widget.fetchClients.value = true;
                                           context
                                               .read<WorkoutManagementBloc>()
                                               .add(

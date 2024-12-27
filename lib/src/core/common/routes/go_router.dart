@@ -356,7 +356,8 @@ GoRouter goRouter(appState) {
       }
       if (appState is AuthenticationError) {
         Fluttertoast.showToast(
-            msg: appState.failures.message ?? "Something went wrong");
+          msg: appState.failures.message ?? "Something went wrong",
+        );
         return FitFlexAuthLandingPage.route;
       }
 

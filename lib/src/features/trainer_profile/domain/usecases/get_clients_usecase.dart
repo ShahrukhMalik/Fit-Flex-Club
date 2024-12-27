@@ -18,6 +18,7 @@ class GetClientsUsecaseUsecaseImpl extends GetClientsUsecaseUsecase {
 
   @override
   Future<Either<Failures, List<ClientEntity>?>>? call(NoParams noParams) {
+    print("Request reached usecase: " '${DateTime.now().millisecondsSinceEpoch}');
     return clientProfileRepository.getClients();
   }
 }

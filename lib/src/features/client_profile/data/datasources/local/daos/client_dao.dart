@@ -50,6 +50,8 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
 
 // Fetch method
   Future<List<ClientWeightData>> getClientWeights(String? clientId) async {
+    print('Request reached a local dao mehod : '
+        "${DateTime.now().millisecondsSinceEpoch}");
     final query = select(clientWeight)
       ..orderBy([(client) => OrderingTerm.asc(client.timeStamp)]);
     if (clientId != null) {
@@ -216,6 +218,8 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
 
   // Fetch all clients
   Future<List<Client>> getAllClients() async {
+    print("Request reached local dao method: "
+        '${DateTime.now().millisecondsSinceEpoch}');
     final insertedClients = await select(clients).get();
     print(insertedClients);
     return insertedClients;

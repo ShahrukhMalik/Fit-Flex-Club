@@ -133,10 +133,18 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                     if (state is TrainerProfileComplete) {
                       clients.value = state.entities;
                       _originalList = state.entities;
+                      print(
+                        "Complete state received at UI: "
+                        '${DateTime.now().millisecondsSinceEpoch}',
+                      );
                       return Expanded(
                         child: ValueListenableBuilder(
                             valueListenable: clients,
                             builder: (context, clients, _) {
+                              print(
+                                "UI being rebuilt: "
+                                '${DateTime.now().millisecondsSinceEpoch}',
+                              );
                               if (clients?.isEmpty ?? false) {
                                 return Center(
                                   child: Text(

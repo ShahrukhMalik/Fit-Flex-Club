@@ -17,6 +17,7 @@ class TrainerProfileBloc
       : super(TrainerProfileInitial()) {
     on<TrainerProfileEvent>((event, emit) async {
       if (event is TrainerProfileGetClientsEvent) {
+        print("Event Detected: " '${DateTime.now().millisecondsSinceEpoch}');
         await _getClients(event, emit);
       }
     });
@@ -27,7 +28,12 @@ class TrainerProfileBloc
     Emitter<TrainerProfileState> emit,
   ) async {
     emit(TrainerProfileLoading());
+    print("Loading state emitted: " '${DateTime.now().millisecondsSinceEpoch}');
     final result = await getClientsUsecaseUsecase(NoParams());
+    print(
+      "Response from repo and usecase: "
+      '${DateTime.now().millisecondsSinceEpoch}',
+    );
 
     if (result == null) {
       emit(
@@ -55,6 +61,10 @@ class TrainerProfileBloc
             );
           } else {
             emit(TrainerProfileComplete(entities: r));
+            print(
+              "Complete state emitted: "
+              '${DateTime.now().millisecondsSinceEpoch}',
+            );
           }
         },
       );

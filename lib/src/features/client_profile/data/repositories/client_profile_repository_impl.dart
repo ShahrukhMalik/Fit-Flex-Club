@@ -139,10 +139,18 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
 
   @override
   Future<Either<Failures, List<ClientEntity>?>>? getClients() async {
+    print("Request reached repo: " '${DateTime.now().millisecondsSinceEpoch}');
+    print('Before checking internet connection: '
+        '${DateTime.now().millisecondsSinceEpoch}');
     final isNetworkConnected = await networkInfo.isConnected;
-
+    print('Before checking internet connection: '
+        '${DateTime.now().millisecondsSinceEpoch}');
     try {
       final cache = await clientProfileLocalDatasource.getClients();
+      print(
+        "Response from local db: "
+        '${DateTime.now().millisecondsSinceEpoch}',
+      );
 
       return cache.fold(
         (l) async {
@@ -217,6 +225,8 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
   Future<Either<Failures, List<ClientWeightEntity>?>>? getClientWeights([
     String? clientId,
   ]) async {
+    print('Request reached a repo : '
+        "${DateTime.now().millisecondsSinceEpoch}");
     final isNetworkConnected = await networkInfo.isConnected;
 
     try {

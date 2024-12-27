@@ -45,8 +45,12 @@ class ClientLocalDatasourceImpl extends ClientLocalDatasource {
   });
   @override
   Future<Either<bool, List<ClientModel>?>> getClients() async {
+    print("Request reached local db: "
+        '${DateTime.now().millisecondsSinceEpoch}');
     try {
       final clients = await dao.getAllClients();
+      print("Response from local dao method: "
+          '${DateTime.now().millisecondsSinceEpoch}');
 
       if (clients.isEmpty) {
         return Left(false);
@@ -153,10 +157,13 @@ class ClientLocalDatasourceImpl extends ClientLocalDatasource {
   Future<Either<bool, List<ClientWeightEntity>?>> getClientWeights(
       [String? id]) async {
     try {
+      print('Request reached a local db : '
+          "${DateTime.now().millisecondsSinceEpoch}");
       final clientId = getIt<FirebaseAuth>().currentUser?.uid;
       if (clientId != null) {
         final clientWeights = await dao.getClientWeights(clientId);
-
+        print('Response from a dao method : '
+            "${DateTime.now().millisecondsSinceEpoch}");
         if (clientWeights.isEmpty) {
           return Left(false);
         }

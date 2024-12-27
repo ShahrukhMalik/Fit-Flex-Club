@@ -28,6 +28,8 @@ class GetClientWeightsUsecaseImpl extends GetClientWeightsUsecase {
 
   @override
   Future<Either<Failures, List<ClientWeightEntity>?>>? call([Params? params]) {
+    print('Request reached a usecase : '
+        "${DateTime.now().millisecondsSinceEpoch}");
     return clientProfileRepository.getClientWeights(params?.clientId);
   }
 }
