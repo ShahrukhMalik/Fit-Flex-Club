@@ -76,16 +76,17 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
   late final GeneratedColumn<String> email = GeneratedColumn<String>(
       'email', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  static const VerificationMeta _phoneNumberMeta =
+      const VerificationMeta('phoneNumber');
   @override
-  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
-      'phone', aliasedName, true,
+  late final GeneratedColumn<String> phoneNumber = GeneratedColumn<String>(
+      'phone_number', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _phoneCountryCodeMeta =
-      const VerificationMeta('phoneCountryCode');
+  static const VerificationMeta _countryCodeMeta =
+      const VerificationMeta('countryCode');
   @override
-  late final GeneratedColumn<String> phoneCountryCode = GeneratedColumn<String>(
-      'phone_country_code', aliasedName, true,
+  late final GeneratedColumn<String> countryCode = GeneratedColumn<String>(
+      'country_code', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _currentWorkoutPlanNameMeta =
       const VerificationMeta('currentWorkoutPlanName');
@@ -120,8 +121,8 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
         isUserActive,
         username,
         email,
-        phone,
-        phoneCountryCode,
+        phoneNumber,
+        countryCode,
         currentWorkoutPlanName,
         createdAt,
         updatedAt
@@ -197,15 +198,17 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
       context.handle(
           _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
     }
-    if (data.containsKey('phone')) {
+    if (data.containsKey('phone_number')) {
       context.handle(
-          _phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
+          _phoneNumberMeta,
+          phoneNumber.isAcceptableOrUnknown(
+              data['phone_number']!, _phoneNumberMeta));
     }
-    if (data.containsKey('phone_country_code')) {
+    if (data.containsKey('country_code')) {
       context.handle(
-          _phoneCountryCodeMeta,
-          phoneCountryCode.isAcceptableOrUnknown(
-              data['phone_country_code']!, _phoneCountryCodeMeta));
+          _countryCodeMeta,
+          countryCode.isAcceptableOrUnknown(
+              data['country_code']!, _countryCodeMeta));
     }
     if (data.containsKey('current_workout_plan_name')) {
       context.handle(
@@ -252,10 +255,10 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
           .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
       email: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}email']),
-      phone: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}phone']),
-      phoneCountryCode: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}phone_country_code']),
+      phoneNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}phone_number']),
+      countryCode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}country_code']),
       currentWorkoutPlanName: attachedDatabase.typeMapping.read(
           DriftSqlType.string,
           data['${effectivePrefix}current_workout_plan_name']),
@@ -284,8 +287,8 @@ class Client extends DataClass implements Insertable<Client> {
   final bool isUserActive;
   final String username;
   final String? email;
-  final String? phone;
-  final String? phoneCountryCode;
+  final String? phoneNumber;
+  final String? countryCode;
   final String? currentWorkoutPlanName;
   final int createdAt;
   final int? updatedAt;
@@ -301,8 +304,8 @@ class Client extends DataClass implements Insertable<Client> {
       required this.isUserActive,
       required this.username,
       this.email,
-      this.phone,
-      this.phoneCountryCode,
+      this.phoneNumber,
+      this.countryCode,
       this.currentWorkoutPlanName,
       required this.createdAt,
       this.updatedAt});
@@ -334,11 +337,11 @@ class Client extends DataClass implements Insertable<Client> {
     if (!nullToAbsent || email != null) {
       map['email'] = Variable<String>(email);
     }
-    if (!nullToAbsent || phone != null) {
-      map['phone'] = Variable<String>(phone);
+    if (!nullToAbsent || phoneNumber != null) {
+      map['phone_number'] = Variable<String>(phoneNumber);
     }
-    if (!nullToAbsent || phoneCountryCode != null) {
-      map['phone_country_code'] = Variable<String>(phoneCountryCode);
+    if (!nullToAbsent || countryCode != null) {
+      map['country_code'] = Variable<String>(countryCode);
     }
     if (!nullToAbsent || currentWorkoutPlanName != null) {
       map['current_workout_plan_name'] =
@@ -374,11 +377,12 @@ class Client extends DataClass implements Insertable<Client> {
       username: Value(username),
       email:
           email == null && nullToAbsent ? const Value.absent() : Value(email),
-      phone:
-          phone == null && nullToAbsent ? const Value.absent() : Value(phone),
-      phoneCountryCode: phoneCountryCode == null && nullToAbsent
+      phoneNumber: phoneNumber == null && nullToAbsent
           ? const Value.absent()
-          : Value(phoneCountryCode),
+          : Value(phoneNumber),
+      countryCode: countryCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(countryCode),
       currentWorkoutPlanName: currentWorkoutPlanName == null && nullToAbsent
           ? const Value.absent()
           : Value(currentWorkoutPlanName),
@@ -404,8 +408,8 @@ class Client extends DataClass implements Insertable<Client> {
       isUserActive: serializer.fromJson<bool>(json['isUserActive']),
       username: serializer.fromJson<String>(json['username']),
       email: serializer.fromJson<String?>(json['email']),
-      phone: serializer.fromJson<String?>(json['phone']),
-      phoneCountryCode: serializer.fromJson<String?>(json['phoneCountryCode']),
+      phoneNumber: serializer.fromJson<String?>(json['phoneNumber']),
+      countryCode: serializer.fromJson<String?>(json['countryCode']),
       currentWorkoutPlanName:
           serializer.fromJson<String?>(json['currentWorkoutPlanName']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
@@ -427,8 +431,8 @@ class Client extends DataClass implements Insertable<Client> {
       'isUserActive': serializer.toJson<bool>(isUserActive),
       'username': serializer.toJson<String>(username),
       'email': serializer.toJson<String?>(email),
-      'phone': serializer.toJson<String?>(phone),
-      'phoneCountryCode': serializer.toJson<String?>(phoneCountryCode),
+      'phoneNumber': serializer.toJson<String?>(phoneNumber),
+      'countryCode': serializer.toJson<String?>(countryCode),
       'currentWorkoutPlanName':
           serializer.toJson<String?>(currentWorkoutPlanName),
       'createdAt': serializer.toJson<int>(createdAt),
@@ -448,8 +452,8 @@ class Client extends DataClass implements Insertable<Client> {
           bool? isUserActive,
           String? username,
           Value<String?> email = const Value.absent(),
-          Value<String?> phone = const Value.absent(),
-          Value<String?> phoneCountryCode = const Value.absent(),
+          Value<String?> phoneNumber = const Value.absent(),
+          Value<String?> countryCode = const Value.absent(),
           Value<String?> currentWorkoutPlanName = const Value.absent(),
           int? createdAt,
           Value<int?> updatedAt = const Value.absent()}) =>
@@ -465,10 +469,8 @@ class Client extends DataClass implements Insertable<Client> {
         isUserActive: isUserActive ?? this.isUserActive,
         username: username ?? this.username,
         email: email.present ? email.value : this.email,
-        phone: phone.present ? phone.value : this.phone,
-        phoneCountryCode: phoneCountryCode.present
-            ? phoneCountryCode.value
-            : this.phoneCountryCode,
+        phoneNumber: phoneNumber.present ? phoneNumber.value : this.phoneNumber,
+        countryCode: countryCode.present ? countryCode.value : this.countryCode,
         currentWorkoutPlanName: currentWorkoutPlanName.present
             ? currentWorkoutPlanName.value
             : this.currentWorkoutPlanName,
@@ -494,10 +496,10 @@ class Client extends DataClass implements Insertable<Client> {
           : this.isUserActive,
       username: data.username.present ? data.username.value : this.username,
       email: data.email.present ? data.email.value : this.email,
-      phone: data.phone.present ? data.phone.value : this.phone,
-      phoneCountryCode: data.phoneCountryCode.present
-          ? data.phoneCountryCode.value
-          : this.phoneCountryCode,
+      phoneNumber:
+          data.phoneNumber.present ? data.phoneNumber.value : this.phoneNumber,
+      countryCode:
+          data.countryCode.present ? data.countryCode.value : this.countryCode,
       currentWorkoutPlanName: data.currentWorkoutPlanName.present
           ? data.currentWorkoutPlanName.value
           : this.currentWorkoutPlanName,
@@ -520,8 +522,8 @@ class Client extends DataClass implements Insertable<Client> {
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
           ..write('email: $email, ')
-          ..write('phone: $phone, ')
-          ..write('phoneCountryCode: $phoneCountryCode, ')
+          ..write('phoneNumber: $phoneNumber, ')
+          ..write('countryCode: $countryCode, ')
           ..write('currentWorkoutPlanName: $currentWorkoutPlanName, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -542,8 +544,8 @@ class Client extends DataClass implements Insertable<Client> {
       isUserActive,
       username,
       email,
-      phone,
-      phoneCountryCode,
+      phoneNumber,
+      countryCode,
       currentWorkoutPlanName,
       createdAt,
       updatedAt);
@@ -562,8 +564,8 @@ class Client extends DataClass implements Insertable<Client> {
           other.isUserActive == this.isUserActive &&
           other.username == this.username &&
           other.email == this.email &&
-          other.phone == this.phone &&
-          other.phoneCountryCode == this.phoneCountryCode &&
+          other.phoneNumber == this.phoneNumber &&
+          other.countryCode == this.countryCode &&
           other.currentWorkoutPlanName == this.currentWorkoutPlanName &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -581,8 +583,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
   final Value<bool> isUserActive;
   final Value<String> username;
   final Value<String?> email;
-  final Value<String?> phone;
-  final Value<String?> phoneCountryCode;
+  final Value<String?> phoneNumber;
+  final Value<String?> countryCode;
   final Value<String?> currentWorkoutPlanName;
   final Value<int> createdAt;
   final Value<int?> updatedAt;
@@ -599,8 +601,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     this.isUserActive = const Value.absent(),
     this.username = const Value.absent(),
     this.email = const Value.absent(),
-    this.phone = const Value.absent(),
-    this.phoneCountryCode = const Value.absent(),
+    this.phoneNumber = const Value.absent(),
+    this.countryCode = const Value.absent(),
     this.currentWorkoutPlanName = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -618,8 +620,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     required bool isUserActive,
     required String username,
     this.email = const Value.absent(),
-    this.phone = const Value.absent(),
-    this.phoneCountryCode = const Value.absent(),
+    this.phoneNumber = const Value.absent(),
+    this.countryCode = const Value.absent(),
     this.currentWorkoutPlanName = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -640,8 +642,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     Expression<bool>? isUserActive,
     Expression<String>? username,
     Expression<String>? email,
-    Expression<String>? phone,
-    Expression<String>? phoneCountryCode,
+    Expression<String>? phoneNumber,
+    Expression<String>? countryCode,
     Expression<String>? currentWorkoutPlanName,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -659,8 +661,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       if (isUserActive != null) 'is_user_active': isUserActive,
       if (username != null) 'username': username,
       if (email != null) 'email': email,
-      if (phone != null) 'phone': phone,
-      if (phoneCountryCode != null) 'phone_country_code': phoneCountryCode,
+      if (phoneNumber != null) 'phone_number': phoneNumber,
+      if (countryCode != null) 'country_code': countryCode,
       if (currentWorkoutPlanName != null)
         'current_workout_plan_name': currentWorkoutPlanName,
       if (createdAt != null) 'created_at': createdAt,
@@ -681,8 +683,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       Value<bool>? isUserActive,
       Value<String>? username,
       Value<String?>? email,
-      Value<String?>? phone,
-      Value<String?>? phoneCountryCode,
+      Value<String?>? phoneNumber,
+      Value<String?>? countryCode,
       Value<String?>? currentWorkoutPlanName,
       Value<int>? createdAt,
       Value<int?>? updatedAt,
@@ -699,8 +701,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
       email: email ?? this.email,
-      phone: phone ?? this.phone,
-      phoneCountryCode: phoneCountryCode ?? this.phoneCountryCode,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      countryCode: countryCode ?? this.countryCode,
       currentWorkoutPlanName:
           currentWorkoutPlanName ?? this.currentWorkoutPlanName,
       createdAt: createdAt ?? this.createdAt,
@@ -745,11 +747,11 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     if (email.present) {
       map['email'] = Variable<String>(email.value);
     }
-    if (phone.present) {
-      map['phone'] = Variable<String>(phone.value);
+    if (phoneNumber.present) {
+      map['phone_number'] = Variable<String>(phoneNumber.value);
     }
-    if (phoneCountryCode.present) {
-      map['phone_country_code'] = Variable<String>(phoneCountryCode.value);
+    if (countryCode.present) {
+      map['country_code'] = Variable<String>(countryCode.value);
     }
     if (currentWorkoutPlanName.present) {
       map['current_workout_plan_name'] =
@@ -781,8 +783,8 @@ class ClientsCompanion extends UpdateCompanion<Client> {
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
           ..write('email: $email, ')
-          ..write('phone: $phone, ')
-          ..write('phoneCountryCode: $phoneCountryCode, ')
+          ..write('phoneNumber: $phoneNumber, ')
+          ..write('countryCode: $countryCode, ')
           ..write('currentWorkoutPlanName: $currentWorkoutPlanName, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -5442,8 +5444,8 @@ typedef $$ClientsTableCreateCompanionBuilder = ClientsCompanion Function({
   required bool isUserActive,
   required String username,
   Value<String?> email,
-  Value<String?> phone,
-  Value<String?> phoneCountryCode,
+  Value<String?> phoneNumber,
+  Value<String?> countryCode,
   Value<String?> currentWorkoutPlanName,
   Value<int> createdAt,
   Value<int?> updatedAt,
@@ -5461,8 +5463,8 @@ typedef $$ClientsTableUpdateCompanionBuilder = ClientsCompanion Function({
   Value<bool> isUserActive,
   Value<String> username,
   Value<String?> email,
-  Value<String?> phone,
-  Value<String?> phoneCountryCode,
+  Value<String?> phoneNumber,
+  Value<String?> countryCode,
   Value<String?> currentWorkoutPlanName,
   Value<int> createdAt,
   Value<int?> updatedAt,
@@ -5626,12 +5628,11 @@ class $$ClientsTableFilterComposer
   ColumnFilters<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get phone => $composableBuilder(
-      column: $table.phone, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get phoneNumber => $composableBuilder(
+      column: $table.phoneNumber, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get phoneCountryCode => $composableBuilder(
-      column: $table.phoneCountryCode,
-      builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get countryCode => $composableBuilder(
+      column: $table.countryCode, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get currentWorkoutPlanName => $composableBuilder(
       column: $table.currentWorkoutPlanName,
@@ -5836,12 +5837,11 @@ class $$ClientsTableOrderingComposer
   ColumnOrderings<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get phone => $composableBuilder(
-      column: $table.phone, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get phoneNumber => $composableBuilder(
+      column: $table.phoneNumber, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get phoneCountryCode => $composableBuilder(
-      column: $table.phoneCountryCode,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get countryCode => $composableBuilder(
+      column: $table.countryCode, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get currentWorkoutPlanName => $composableBuilder(
       column: $table.currentWorkoutPlanName,
@@ -5896,11 +5896,11 @@ class $$ClientsTableAnnotationComposer
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
 
-  GeneratedColumn<String> get phone =>
-      $composableBuilder(column: $table.phone, builder: (column) => column);
+  GeneratedColumn<String> get phoneNumber => $composableBuilder(
+      column: $table.phoneNumber, builder: (column) => column);
 
-  GeneratedColumn<String> get phoneCountryCode => $composableBuilder(
-      column: $table.phoneCountryCode, builder: (column) => column);
+  GeneratedColumn<String> get countryCode => $composableBuilder(
+      column: $table.countryCode, builder: (column) => column);
 
   GeneratedColumn<String> get currentWorkoutPlanName => $composableBuilder(
       column: $table.currentWorkoutPlanName, builder: (column) => column);
@@ -6104,8 +6104,8 @@ class $$ClientsTableTableManager extends RootTableManager<
             Value<bool> isUserActive = const Value.absent(),
             Value<String> username = const Value.absent(),
             Value<String?> email = const Value.absent(),
-            Value<String?> phone = const Value.absent(),
-            Value<String?> phoneCountryCode = const Value.absent(),
+            Value<String?> phoneNumber = const Value.absent(),
+            Value<String?> countryCode = const Value.absent(),
             Value<String?> currentWorkoutPlanName = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
@@ -6123,8 +6123,8 @@ class $$ClientsTableTableManager extends RootTableManager<
             isUserActive: isUserActive,
             username: username,
             email: email,
-            phone: phone,
-            phoneCountryCode: phoneCountryCode,
+            phoneNumber: phoneNumber,
+            countryCode: countryCode,
             currentWorkoutPlanName: currentWorkoutPlanName,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -6142,8 +6142,8 @@ class $$ClientsTableTableManager extends RootTableManager<
             required bool isUserActive,
             required String username,
             Value<String?> email = const Value.absent(),
-            Value<String?> phone = const Value.absent(),
-            Value<String?> phoneCountryCode = const Value.absent(),
+            Value<String?> phoneNumber = const Value.absent(),
+            Value<String?> countryCode = const Value.absent(),
             Value<String?> currentWorkoutPlanName = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
@@ -6161,8 +6161,8 @@ class $$ClientsTableTableManager extends RootTableManager<
             isUserActive: isUserActive,
             username: username,
             email: email,
-            phone: phone,
-            phoneCountryCode: phoneCountryCode,
+            phoneNumber: phoneNumber,
+            countryCode: countryCode,
             currentWorkoutPlanName: currentWorkoutPlanName,
             createdAt: createdAt,
             updatedAt: updatedAt,

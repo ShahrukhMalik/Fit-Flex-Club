@@ -128,10 +128,10 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
       email: clientModel.email != null
           ? Value(clientModel.email!)
           : Value.absent(),
-      phone: clientModel.phone?['phoneNumber'] != null
+      phoneNumber: clientModel.phone?['phoneNumber'] != null
           ? Value(clientModel.phone!['phoneNumber']!)
           : Value.absent(),
-      phoneCountryCode: clientModel.phone?['countryCode'] != null
+      countryCode: clientModel.phone?['countryCode'] != null
           ? Value(clientModel.phone!['countryCode']!)
           : Value.absent(),
       currentWorkoutPlanName: clientModel.currentWorkoutPlanName != null
@@ -182,10 +182,10 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
                   email: clientModel.email != null
                       ? Value(clientModel.email!)
                       : Value.absent(),
-                  phone: clientModel.phone?['phoneNumber'] != null
+                  phoneNumber: clientModel.phone?['phoneNumber'] != null
                       ? Value(clientModel.phone?['phoneNumber']!)
                       : Value.absent(),
-                  phoneCountryCode: clientModel.phone?['countryCode'] != null
+                  countryCode: clientModel.phone?['countryCode'] != null
                       ? Value(clientModel.phone?['countryCode']!)
                       : Value.absent(),
                   currentWorkoutPlanName:

@@ -496,16 +496,25 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
           }
 
           if (state is DeleteWorkoutComplete) {
+            // context.pop();
+            // if (context.canPop()) context.pop();
             PlatformDialog.showAlertDialog(
               context: context,
               title: "Delete Workout Plan",
               message: "Plan Deleted Successfully!",
               onConfirm: () {
-                context.pop();
+                final isDismissable = Navigator.of(context).canPop() &&
+                    ModalRoute.of(context)?.popDisposition !=
+                        RoutePopDisposition.doNotPop;
+                if (context.canPop()) context.pop();
+                if (isDismissable) context.pop();
                 //TODO
                 context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
                       widget.client.id!,
                     );
+                context
+                    .read<WorkoutManagementBloc>()
+                    .add(GetWorkoutPlansEvent());
               },
             );
           }
@@ -516,11 +525,18 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
               title: "Assign Workout Plan",
               message: "Workout Plan assigned Successfully!",
               onConfirm: () {
-                context.pop();
+                final isDismissable = Navigator.of(context).canPop() &&
+                    ModalRoute.of(context)?.popDisposition !=
+                        RoutePopDisposition.doNotPop;
+                if (context.canPop()) context.pop();
+                if (isDismissable) context.pop();
                 //TODO
                 context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
                       widget.client.id!,
                     );
+                context
+                    .read<WorkoutManagementBloc>()
+                    .add(GetWorkoutPlansEvent());
               },
             );
           }
@@ -619,7 +635,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                       'Phone',
                                       '${widget.client.phone?['countryCode']}'
                                           '-'
-                                          '${widget.client.phone?['phone']}',
+                                          '${widget.client.phone?['phoneNumber']}',
                                     ),
                                   ),
                                 ],

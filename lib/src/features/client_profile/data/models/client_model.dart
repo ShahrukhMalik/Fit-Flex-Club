@@ -88,8 +88,8 @@ class ClientModel extends ClientEntity {
     return ClientModel(
       currentWorkoutPlanName: map['currentWorkoutPlanName'],
       phone: {
-        'countryCode': map['phoneCountryCode'],
-        'phone': map['phone'],
+        'countryCode': map['countryCode'],
+        'phoneNumber': map['phoneNumber'],
       },
       email: map['email'],
       id: map['id'],
