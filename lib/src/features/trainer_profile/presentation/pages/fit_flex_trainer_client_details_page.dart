@@ -104,7 +104,7 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
                               onPressed: () {
                                 // Handle edit action
                                 context.go(
-                                  FitFlexClubCreateWorkoutPlanPage.route,
+                                  '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
                                   extra: {
                                     'updateData': true,
                                     "workoutPlan": program,

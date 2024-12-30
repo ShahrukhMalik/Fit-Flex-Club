@@ -546,6 +546,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                             child: Form(
                               key: _formKey,
                               child: AppTextFields.prefixSuffixTextField(
+                                
                                 controller: weightController,
                                 labelText: 'Weight in (kgs)',
                                 keyboardType: TextInputType.number,
