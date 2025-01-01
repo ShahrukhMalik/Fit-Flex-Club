@@ -276,6 +276,7 @@ class _AddExerciseBottomSheetWidgetState
                           ),
                           Expanded(
                             child: AppTextFields.basicTextField(
+                              textAlign: TextAlign.center,
                               controller: durationController,
                               onChanged: (p0) {
                                 durationController.text = p0;
@@ -406,6 +407,7 @@ class _AddExerciseBottomSheetWidgetState
                                           // Reps
                                           if (widget.reps)
                                             DebouncedTextField(
+                                              
                                               controller: repsController,
                                               onChanged: (value) {
                                                 _editSet(

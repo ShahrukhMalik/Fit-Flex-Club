@@ -47,6 +47,7 @@ class _DebouncedTextFieldState extends State<DebouncedTextField> {
   Widget build(BuildContext context) {
     return AppTextFields.basicTextField(
       controller: widget.controller,
+      textAlign: TextAlign.center,
       onChanged: _onTextChanged,
       uniqueKey: UniqueKey(),
       keyboardType: TextInputType.phone,

@@ -117,10 +117,10 @@ class ClientModel extends ClientEntity {
       id: snapshot.id,
       age: data?['age'],
       gender: data?['gender'],
-      weightInKg: (data?['weightInKg']).toDouble(),
-      weightInLb: (data?['weightInLb']).toDouble(),
-      heightInCm: data?['heightInCm'].toDouble(),
-      heightInFt: data?['heightInFt'].toDouble(),
+      weightInKg: (data?['weightInKg'] ?? 0).toDouble(),
+      weightInLb: (data?['weightInLb'] ?? 0).toDouble(),
+      heightInCm:( data?['heightInCm'] ?? 0).toDouble(),
+      heightInFt: (data?['heightInFt'] ?? 0).toDouble(),
       isTrainer: data?['isTrainer'],
       isUserActive: data?['isUserActive'],
       username: data?['username'],
@@ -173,7 +173,7 @@ class ClientModel extends ClientEntity {
           double.tryParse(heightInFt?.toStringAsFixed(2) ?? "0");
     }
 
-    if (isTrainer != null) data['isTrainer'] = isTrainer;
+    data['isTrainer'] = false;
     if (isUserActive != null) data['isUserActive'] = isUserActive;
     if (username != null) data['username'] = username;
     if (email != null) data['email'] = email;

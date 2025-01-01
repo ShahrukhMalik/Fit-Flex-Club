@@ -173,9 +173,9 @@ class _FitFlexClientProfileSelectWeightPageState
                                       controllerKgLb: majorWeightController,
                                       controllerGmsOz: decimalWeightController,
                                       maxCountKgLb: 1499,
-                                      maxCountGmsOz: 11,
+                                      maxCountGmsOz: 100,
                                       unitKgLb: showkg ? 'kg' : 'lb',
-                                      unitGmsOz: showkg ? 'gm' : 'oz',
+                                      unitGmsOz: showkg ? '' : '',
                                     );
                                   },
                                 ),

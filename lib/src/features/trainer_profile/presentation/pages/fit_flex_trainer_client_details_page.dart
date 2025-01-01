@@ -24,7 +24,10 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid_v4/uuid_v4.dart';
 
 class WorkoutPlanPickerWidget extends StatefulWidget {
-  const WorkoutPlanPickerWidget({super.key});
+  final ClientEntity entity;
+  final List<ExerciseEntity> exercises;
+  const WorkoutPlanPickerWidget(
+      {super.key, required this.entity, required this.exercises});
 
   @override
   State<WorkoutPlanPickerWidget> createState() =>
@@ -103,11 +106,14 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
                             IconButton(
                               onPressed: () {
                                 // Handle edit action
-                                context.go(
+                                context.pop();
+                                context.push(
                                   '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
                                   extra: {
                                     'updateData': true,
                                     "workoutPlan": program,
+                                    "clientEntity": widget.entity,
+                                    "exercises": widget.exercises
                                   },
                                 );
                               },
@@ -224,7 +230,7 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
 }
 
 class FitFlexTrainerClientDetailsPage extends StatefulWidget {
-  final ClientEntity client;
+  final ClientEntity? client;
   static const route = 'trainer-client-details';
   const FitFlexTrainerClientDetailsPage({
     super.key,
@@ -241,13 +247,14 @@ class _FitFlexTrainerClientDetailsPageState
   ClientModel client = ClientModel();
   final ValueNotifier<bool> isUserActive = ValueNotifier<bool>(false);
   final ValueNotifier<bool> fetchClients = ValueNotifier<bool>(false);
+  final ValueNotifier<List<ExerciseEntity>> exercises = ValueNotifier([]);
   // List<ExerciseEntity>? exercises;
 
   @override
   void initState() {
     super.initState();
-    isUserActive.value = widget.client.isUserActive ?? false;
-    client = ClientModel.fromClientEntity(widget.client);
+    isUserActive.value = widget.client?.isUserActive ?? false;
+    client = ClientModel.fromClientEntity(widget.client!);
     // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
     // context.read<WorkoutManagementBloc>().add(
     //       GetWorkoutPlansForClientEvent(
@@ -255,7 +262,7 @@ class _FitFlexTrainerClientDetailsPageState
     //       ),
     //     );
     context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
-          widget.client.id!,
+          widget.client!.id!,
         );
   }
 
@@ -268,14 +275,20 @@ class _FitFlexTrainerClientDetailsPageState
       return showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return WorkoutPlanPickerWidget();
+          return WorkoutPlanPickerWidget(
+            entity: client,
+            exercises: exercises.value,
+          );
         },
       );
     } else {
       return showModalBottomSheet(
         context: context,
         builder: (context) {
-          return WorkoutPlanPickerWidget();
+          return WorkoutPlanPickerWidget(
+            entity: client,
+            exercises: exercises.value,
+          );
         },
       );
     }
@@ -369,9 +382,10 @@ class _FitFlexTrainerClientDetailsPageState
           },
         ),
         body: ClientEntityCompactWidget(
+          exercises: exercises,
           fetchClients: fetchClients,
           isUserActive: isUserActive,
-          client: widget.client,
+          client: widget.client!,
           colorScheme: globalColorScheme,
           onUserActiveToggle: _toggleUserActiveStatus,
           onAddWorkoutPlan: (clientId) {
@@ -411,6 +425,7 @@ class ClientEntityCompactWidget extends StatefulWidget {
   final ValueNotifier<bool> fetchClients;
   final ValueChanged<bool> onUserActiveToggle;
   final ValueNotifier<bool> isUserActive;
+  final ValueNotifier<List<ExerciseEntity>> exercises;
   final Function(String) onAddWorkoutPlan;
 
   const ClientEntityCompactWidget({
@@ -421,6 +436,7 @@ class ClientEntityCompactWidget extends StatefulWidget {
     required this.isUserActive,
     required this.onAddWorkoutPlan,
     required this.fetchClients,
+    required this.exercises,
   });
 
   @override
@@ -468,6 +484,7 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
 
         if (state is GetExercisesComplete) {
           exercises = state.exercises;
+          widget.exercises.value = state.exercises;
         }
       },
       child: BlocListener<WorkoutManagementBloc, WorkoutManagementState>(

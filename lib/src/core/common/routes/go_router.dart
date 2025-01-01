@@ -188,7 +188,7 @@ GoRouter goRouter(appState) {
                       return TransitionPage(
                         key: state.pageKey,
                         child: FitFlexTrainerClientDetailsPage(
-                          client: extraData?['client'] ?? "Unknown",
+                          client: extraData?['client'],
                         ),
                       );
                     },
