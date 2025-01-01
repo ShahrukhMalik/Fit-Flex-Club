@@ -256,7 +256,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     try {
       bool isUserLoggedIn = auth.currentUser != null;
       bool isUserActive = true;
-      bool isProfileCreated = true;
+      bool? isProfileCreated = false;
       bool? isTrainer;
 
       final AuthEntity? authEntity = prefs.getAuthEntity();
@@ -305,11 +305,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         ]) {
           if (data[field] == null) {
             isProfileCreated = false;
+          } else {
+            isProfileCreated = true;
           }
+          print(isProfileCreated);
         }
       } else {
         isProfileCreated = false;
       }
+      print(isProfileCreated);
       final AuthEntity toStoreEntity = AuthEntity(
         uid: auth.currentUser?.uid,
         isLoggedIn: isUserLoggedIn,
