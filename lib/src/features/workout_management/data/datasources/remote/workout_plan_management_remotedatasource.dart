@@ -6,7 +6,6 @@ import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid_v4/uuid_v4.dart';
 

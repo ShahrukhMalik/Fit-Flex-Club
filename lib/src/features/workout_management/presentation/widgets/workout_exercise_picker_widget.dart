@@ -1,6 +1,5 @@
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
-import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

@@ -1,7 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
@@ -20,7 +18,6 @@ import 'package:fit_flex_club/src/features/authentication/domain/usecases/logout
     as logout;
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/usecases/mark_event_listened_usecase.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/repositories/workout_management_repository.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:injectable/injectable.dart';
 

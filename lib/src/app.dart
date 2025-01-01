@@ -5,15 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
-import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
-import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/clientweights/clientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
-import 'package:fit_flex_club/src/features/syncmanager/domain/usecases/event_listener_usecase.dart';
-import 'package:fit_flex_club/src/features/syncmanager/domain/usecases/mark_event_listened_usecase.dart';
 import 'package:fit_flex_club/src/features/syncmanager/presentation/bloc/syncmanager_bloc.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
@@ -26,7 +22,6 @@ import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
 
 ///Widget that configures the application
 class MyApp extends StatefulWidget {
@@ -42,7 +37,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
+  final List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
 
@@ -97,7 +92,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       result = await _connectivity.checkConnectivity();
-    } on PlatformException catch (e) {
+    } on PlatformException {
       // developer.log('Couldn\'t check connectivity status', error: e);
       return;
     }

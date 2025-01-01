@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/tables/sync_queue_table.dart';
-import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 part 'sync_queue_dao.g.dart';

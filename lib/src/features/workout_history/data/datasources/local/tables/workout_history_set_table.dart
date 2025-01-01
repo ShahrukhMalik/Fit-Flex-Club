@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_exercise_table.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/exercise_table.dart';
 
 class WorkoutHistorySet extends Table {
   TextColumn get id => text()(); // Auto-increment primary key

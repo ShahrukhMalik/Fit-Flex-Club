@@ -5,7 +5,6 @@ import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/client_profile_local_datasource.dart';
-import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/tables/client_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/remote/client_profile_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';

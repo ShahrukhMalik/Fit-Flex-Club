@@ -1,8 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
-import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
-import 'package:fit_flex_club/src/features/syncmanager/data/repositories/sync_manager_repository_impl.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/usecases/sync_manager_usecase.dart';
 import 'package:injectable/injectable.dart';

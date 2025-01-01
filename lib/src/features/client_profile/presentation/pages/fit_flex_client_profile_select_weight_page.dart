@@ -290,7 +290,6 @@ class _FitFlexScrollWheelWidgetState extends State<FitFlexScrollWheelWidget> {
     required int index,
     required ValueNotifier<String> selectedValue,
     required String unit,
-    bool isBold = false,
   }) {
     return ValueListenableBuilder(
       valueListenable: selectedValue,

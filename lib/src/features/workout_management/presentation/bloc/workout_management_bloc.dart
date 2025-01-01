@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/usecases/create_workout_plan_usecase.dart'
     as create;
 import 'package:fit_flex_club/src/features/workout_management/domain/usecases/delete_assigned_workout_plan_usecase.dart'

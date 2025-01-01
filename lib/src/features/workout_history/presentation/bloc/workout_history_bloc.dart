@@ -6,7 +6,6 @@ import 'package:fit_flex_club/src/features/workout_history/domain/usecases/get_w
 import 'package:fit_flex_club/src/features/workout_history/domain/usecases/log_workout_history_usecase.dart'
     as log;
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:injectable/injectable.dart';
 
 part 'workout_history_event.dart';

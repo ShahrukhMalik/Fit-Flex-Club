@@ -1,11 +1,8 @@
 import 'dart:async';
 
-import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
-import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
-import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
@@ -14,7 +11,6 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/week_m
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
-import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_add_exercise_bottom_sheet.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scroll_tabs_widget.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scrollweeks_widget.dart';
@@ -419,7 +415,9 @@ class _FitFlexClubCreateWorkoutPlanPageState
     _workoutPlanBp.value = _workoutPlanBp.value.copyWith(weeks: _weeks.value);
     if (widget.update ||
         widget.clientEntity != null ||
-        widget.workoutPlanModel != null) isProgramEdited = true;
+        widget.workoutPlanModel != null) {
+      isProgramEdited = true;
+    }
   }
 
   bool _isFirstWeekValid(List<WeekModel> weeks) {

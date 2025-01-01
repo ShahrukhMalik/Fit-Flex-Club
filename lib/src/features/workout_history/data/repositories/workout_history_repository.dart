@@ -11,7 +11,6 @@ import 'package:fit_flex_club/src/features/workout_history/data/datasources/remo
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
 import 'package:fit_flex_club/src/features/workout_history/domain/repositories/workout_history_repository.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:injectable/injectable.dart';
 
 ///[Marker Interface] abstraction of WorkoutHistory repository

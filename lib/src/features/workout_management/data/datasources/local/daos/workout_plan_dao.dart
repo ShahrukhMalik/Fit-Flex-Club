@@ -6,7 +6,6 @@ import 'package:fit_flex_club/src/features/client_profile/data/datasources/local
 import 'package:fit_flex_club/src/features/workout_history/data/datasources/local/tables/workout_history_set_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/exercise_bp_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/workout_plan_management_localdatabase.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/day_table.dart';
@@ -15,7 +14,6 @@ import 'package:fit_flex_club/src/features/workout_management/data/datasources/l
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/week_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/datasources/local/tables/workout_plan_table.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
