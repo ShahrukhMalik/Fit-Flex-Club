@@ -97,12 +97,12 @@ class _AddExerciseBottomSheetWidgetState
     sets.value = updatedSets;
   }
 
-  _addSet(SetModel newSet) {
+  _addSet(SetModel newSet, [bool addNew = true]) {
     // Get the current list or initialize a new one
     final currentSets = sets.value ?? [];
 
     // Update the list: replace the matching set or add it
-    final updatedSets = currentSets.map((set) {
+    var updatedSets = currentSets.map((set) {
       if (set.id == newSet.id) {
         return set.copyWith(
           targetReps: newSet.targetReps,
@@ -114,10 +114,23 @@ class _AddExerciseBottomSheetWidgetState
 
     // Add the new set if it doesn't exist
     if (!currentSets.any((set) => set.id == newSet.id)) {
-      updatedSets.add(newSet);
+      if (addNew) {
+        updatedSets.add(newSet);
+      } else {
+        updatedSets = updatedSets.map(
+          (e) {
+            if (e.id == updatedSets.last.id) {
+              return e.copyWith(
+                targetReps: newSet.targetReps,
+                targetWeight: newSet.targetWeight,
+              );
+            }
+            return e;
+          },
+        ).toList();
+      }
     }
 
-    // Add an empty set at the end
     updatedSets.add(
       SetModel(
         clientId: newSet.clientId,
@@ -407,7 +420,6 @@ class _AddExerciseBottomSheetWidgetState
                                           // Reps
                                           if (widget.reps)
                                             DebouncedTextField(
-                                              
                                               controller: repsController,
                                               onChanged: (value) {
                                                 _editSet(
@@ -589,69 +601,146 @@ class _AddExerciseBottomSheetWidgetState
                 ],
               ),
             ),
-            PlatformButton().buildButton(
-              context: context,
-              type: ButtonType.primary,
-              // foregroundColor: ,
-              backgroundColor: globalColorScheme.primary,
-              textStyle: TextStyle(
-                color: globalColorScheme.onPrimaryContainer
-              ),
-              text: 'Submit',
-              onPressed: () {
-                if (widget.duration) {
-                  if (durationController.text.isEmpty) {
-                    Fluttertoast.showToast(
-                      msg: "Duration is not entered",
-                      backgroundColor: globalColorScheme.onErrorContainer,
-                      textColor: globalColorScheme.primary,
-                    );
-                  } else {
-                    Navigator.pop(
-                      context,
-                      exerciseModel.value?.copyWith(
-                        sets: sets.value,
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  // Row(
+                  //   children: [
+                  //     ValueListenableBuilder(
+                  //       valueListenable: sets,
+                  //       builder: (context, sets, value) {
+                  //         if ((sets?.length ?? 0) > 1) {
+                  //           return Expanded(
+                  //             child: PlatformButton().buildButton(
+                  //               context: context,
+                  //               type: ButtonType.outlined,
+                  //               borderRadius: 20,
+                  //               height: 45,
+                  //               // foregroundColor: ,
+                  //               backgroundColor: globalColorScheme.primary,
+                  //               textStyle: TextStyle(
+                  //                 color: globalColorScheme.onPrimaryContainer,
+                  //               ),
+                  //               text: 'Repeat Set',
+                  //               onPressed: () {
+                  //                 _addSet(sets!.last);
+                  //               },
+                  //             )!,
+                  //           );
+                  //         } else {
+                  //           return SizedBox.shrink();
+                  //         }
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+                  Row(
+                    spacing: 10,
+                    children: [
+                      ValueListenableBuilder(
+                        valueListenable: sets,
+                        builder: (context, sets, value) {
+                          if ((sets?.length ?? 0) > 1) {
+                            return Expanded(
+                              child: PlatformButton().buildButton(
+                                context: context,
+                                type: ButtonType.outlined,
+                                borderRadius: 20,
+                                height: 45,
+                                // foregroundColor: ,
+                                backgroundColor: globalColorScheme.primary,
+                                textStyle: TextStyle(
+                                  color: globalColorScheme.onPrimaryContainer,
+                                ),
+                                text: 'Repeat Set',
+                                onPressed: () {
+                                  _addSet(
+                                    sets![sets.length - 2]
+                                        .copyWith(id: UUIDv4().toString()),
+                                    false,
+                                  );
+                                },
+                              )!,
+                            );
+                          } else {
+                            return SizedBox.shrink();
+                          }
+                        },
                       ),
-                    );
-                  }
-                } else {
-                  if (widget.reps && !widget.weight) {
-                    if (sets.value?.first.targetReps == null) {
-                      Fluttertoast.showToast(
-                        msg: "Please input reps for the first set",
-                        backgroundColor: globalColorScheme.onErrorContainer,
-                        textColor: globalColorScheme.primary,
-                      );
-                    } else {
-                      Navigator.pop(
-                        context,
-                        exerciseModel.value?.copyWith(
-                          sets: sets.value,
-                        ),
-                      );
-                    }
-                  }
+                      Expanded(
+                        child: PlatformButton().buildButton(
+                          context: context,
+                          type: ButtonType.primary,
+                          // foregroundColor: ,
+                          backgroundColor: globalColorScheme.primary,
+                          textStyle: TextStyle(
+                              color: globalColorScheme.onPrimaryContainer),
+                          text: 'Submit',
+                          onPressed: () {
+                            if (widget.duration) {
+                              if (durationController.text.isEmpty) {
+                                Fluttertoast.showToast(
+                                  msg: "Duration is not entered",
+                                  backgroundColor:
+                                      globalColorScheme.onErrorContainer,
+                                  textColor: globalColorScheme.primary,
+                                );
+                              } else {
+                                Navigator.pop(
+                                  context,
+                                  exerciseModel.value?.copyWith(
+                                    sets: sets.value,
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (widget.reps && !widget.weight) {
+                                if (sets.value?.first.targetReps == null) {
+                                  Fluttertoast.showToast(
+                                    msg: "Please input reps for the first set",
+                                    backgroundColor:
+                                        globalColorScheme.onErrorContainer,
+                                    textColor: globalColorScheme.primary,
+                                  );
+                                } else {
+                                  Navigator.pop(
+                                    context,
+                                    exerciseModel.value?.copyWith(
+                                      sets: sets.value,
+                                    ),
+                                  );
+                                }
+                              }
 
-                  if (widget.reps && widget.weight) {
-                    if (sets.value?.first.targetReps == null ||
-                        sets.value?.first.targetWeight == null) {
-                      Fluttertoast.showToast(
-                        msg: "Please input reps and sets for the first set",
-                        backgroundColor: globalColorScheme.onErrorContainer,
-                        textColor: globalColorScheme.primary,
-                      );
-                    } else {
-                      Navigator.pop(
-                        context,
-                        exerciseModel.value?.copyWith(
-                          sets: sets.value,
-                        ),
-                      );
-                    }
-                  }
-                }
-              },
-            )!
+                              if (widget.reps && widget.weight) {
+                                if (sets.value?.first.targetReps == null ||
+                                    sets.value?.first.targetWeight == null) {
+                                  Fluttertoast.showToast(
+                                    msg:
+                                        "Please input reps and sets for the first set",
+                                    backgroundColor:
+                                        globalColorScheme.onErrorContainer,
+                                    textColor: globalColorScheme.primary,
+                                  );
+                                } else {
+                                  Navigator.pop(
+                                    context,
+                                    exerciseModel.value?.copyWith(
+                                      sets: sets.value,
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          },
+                        )!,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
