@@ -167,8 +167,7 @@ class _FitFlexClientProfileSelectHeightPageState
                                               padding: const EdgeInsets.only(
                                                   bottom: 25),
                                               child: Text(
-                                                "$age.$decimalHeight"
-                                                " $metric",
+                                                "$age ft ${(int.tryParse(decimalHeight) ?? 0) > 0 ? '$decimalHeight in' : ""}",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                   fontSize: 30,

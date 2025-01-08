@@ -179,7 +179,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                                 : _codeController.text,
                                         "phoneNumber": _phoneController.text,
                                       },
-                                      username: _nameController.text,
+                                      username: _nameController.text.trim(),
                                       email: _emailController.text,
                                       isUserActive: true,
                                     ),
