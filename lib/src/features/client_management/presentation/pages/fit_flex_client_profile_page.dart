@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
@@ -355,9 +354,11 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ValueNotifier<Map<String, dynamic>> weightDifferenceInfo =
       ValueNotifier({});
+  final ValueNotifier<bool> isWeightConfirmed = ValueNotifier(false);
   ValueNotifier<List<ClientWeightEntity>?> weights = ValueNotifier(null);
 
   bool _allowToAddWeight() {
+    return true;
     if ((weights.value?.isEmpty ?? true)) return true;
 
     final weightWithTodaysDate = weights.value?.any(
@@ -473,86 +474,151 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                         context: context,
                         title: "Add Weight",
                         actions: [
-                          BlocProvider(
-                            create: (context) => getIt<ClientweightsCubit>(),
-                            child: BlocConsumer<ClientweightsCubit,
-                                ClientweightsState>(
-                              builder: (context, state) {
-                                if (state is ClientweightsLoading) {
-                                  return Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: PlatformLoader().buildLoader(
-                                        type: LoaderType.circular,
-                                        size: 20,
+                          ValueListenableBuilder(
+                            valueListenable: isWeightConfirmed,
+                            builder: (context, weightConfirmed, _) {
+                              return BlocProvider(
+                                create: (context) =>
+                                    getIt<ClientweightsCubit>(),
+                                child: BlocConsumer<ClientweightsCubit,
+                                    ClientweightsState>(
+                                  builder: (context, state) {
+                                    if (state is ClientweightsLoading) {
+                                      return Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: PlatformLoader().buildLoader(
+                                            type: LoaderType.circular,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return PlatformButton().buildButton(
+                                      context: context,
+                                      type: ButtonType.primary,
+                                      backgroundColor:
+                                          globalColorScheme.primary,
+                                      textStyle: TextStyle(
+                                        color: globalColorScheme
+                                            .onPrimaryContainer,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                    ),
-                                  );
-                                }
-                                return PlatformButton().buildButton(
-                                  context: context,
-                                  type: ButtonType.primary,
-                                  textStyle: TextStyle(
-                                    color: globalColorScheme.onPrimaryContainer,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  text: 'Submit',
-                                  onPressed: () {
-                                    if (_formKey.currentState?.validate() ??
-                                        false) {
-                                      if (weightController.text.isNotEmpty) {
-                                        context
-                                            .read<ClientweightsCubit>()
-                                            .addClientWeight(
-                                              ClientWeightEntity(
-                                                clientId: getIt<FirebaseAuth>()
-                                                    .currentUser!
-                                                    .uid,
-                                                timeStamp: DateTime.now()
-                                                    .millisecondsSinceEpoch,
-                                                weightInKg: double.tryParse(
-                                                        weightController
-                                                            .text) ??
-                                                    0,
-                                                weightInLb: convertLbToKgDouble(
-                                                  double.tryParse(
-                                                        weightController.text,
-                                                      ) ??
-                                                      0,
-                                                ),
-                                              ),
-                                            );
-                                      }
+                                      text: 'Submit',
+                                      onPressed: !weightConfirmed
+                                          ? null
+                                          : () {
+                                              if (_formKey.currentState
+                                                      ?.validate() ??
+                                                  false) {
+                                                if (weightController
+                                                    .text.isNotEmpty) {
+                                                  context
+                                                      .read<
+                                                          ClientweightsCubit>()
+                                                      .addClientWeight(
+                                                        ClientWeightEntity(
+                                                          clientId: getIt<
+                                                                  FirebaseAuth>()
+                                                              .currentUser!
+                                                              .uid,
+                                                          timeStamp: DateTime
+                                                                  .now()
+                                                              .millisecondsSinceEpoch,
+                                                          weightInKg: double.tryParse(
+                                                                  weightController
+                                                                      .text) ??
+                                                              0,
+                                                          weightInLb:
+                                                              convertLbToKgDouble(
+                                                            double.tryParse(
+                                                                  weightController
+                                                                      .text,
+                                                                ) ??
+                                                                0,
+                                                          ),
+                                                        ),
+                                                      );
+                                                }
+                                              }
+                                            },
+                                    )!;
+                                  },
+                                  listener: (context, state) {
+                                    if (state is ClientweightsComplete) {
+                                      context
+                                          .read<GetclientweightsCubit>()
+                                          .getClientWeights();
+                                      context.pop();
+                                      weightController.clear();
                                     }
                                   },
-                                )!;
-                              },
-                              listener: (context, state) {
-                                if (state is ClientweightsComplete) {
-                                  context
-                                      .read<GetclientweightsCubit>()
-                                      .getClientWeights();
-                                  context.pop();
-                                  weightController.clear();
-                                }
-                              },
-                            ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                         content: SingleChildScrollView(
                           child: SizedBox(
-                            height: 85,
-                            child: Form(
-                              key: _formKey,
-                              child: AppTextFields.prefixSuffixTextField(
-                                
-                                controller: weightController,
-                                labelText: 'Weight in (kgs)',
-                                keyboardType: TextInputType.number,
-                                style: TextStyle(
-                                  color: globalColorScheme.onPrimaryContainer,
+                            height: 120,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Form(
+                                    key: _formKey,
+                                    child: AppTextFields.prefixSuffixTextField(
+                                      controller: weightController,
+                                      labelText: 'Weight in (kgs)',
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(
+                                        color: globalColorScheme
+                                            .onPrimaryContainer,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                ValueListenableBuilder(
+                                  valueListenable: isWeightConfirmed,
+                                  builder: (context, weightConfirmed, _) {
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () => isWeightConfirmed.value =
+                                              !isWeightConfirmed.value,
+                                          child: Container(
+                                            height: 20,
+                                            width: 20,
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              color: weightConfirmed
+                                                  ? globalColorScheme
+                                                      .primaryContainer
+                                                  : globalColorScheme.surface,
+                                              border: Border.all(
+                                                color: globalColorScheme
+                                                    .primaryContainer,
+                                                width: 1,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            'Confirm the weight added to submit.',
+                                            textAlign: TextAlign.start,
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -937,7 +1003,7 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
   @override
   void initState() {
     super.initState();
-    context.read<GetexercisesCubit>().getExercises();
+    // context.read<GetexercisesCubit>().getExercises();
     context.read<ClientProfileBloc>().add(GetClientByIdEvent(clientId: null));
     // context.read<GetclientweightsCubit>().getClientWeights();
   }
