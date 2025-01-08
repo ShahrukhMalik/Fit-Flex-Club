@@ -333,6 +333,7 @@ class _FitFlexTrainerClientDetailsPageState
             id: newDayId,
             exercises: newExercises,
             clientId: clientId,
+            weekId: newWeekId,
           );
         }).toList();
 
@@ -825,38 +826,86 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Column(
-                                    children: [
-                                      PlatformButton().buildButton(
-                                        context: context,
-                                        type: ButtonType.icon,
-                                        icon: Icons.edit_document,
-                                        foregroundColor: globalColorScheme
-                                            .onPrimaryContainer,
-                                        text: '',
-                                        onPressed: () async {
-                                          widget.fetchClients.value = true;
-                                          final result = await context.push(
-                                            '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
-                                            extra: {
-                                              'updateData': true,
-                                              "workoutPlan": workoutPlan,
-                                              "clientEntity": widget.client,
-                                              "exercises": exercises
-                                            },
-                                          );
-                                          if (result == true) {
-                                            //TODO
+                                  child: BlocListener<GetexercisesCubit,
+                                      GetexercisesState>(
+                                    listener: (context, state) {
+                                      if (state is GetexercisesLoading) {
+                                        // showLoadingDialog(context);
+                                        // PlatformDialog.showLoadingDialog(
+                                        //   context: context,
+                                        //   message: "Fetching exercises...",
+                                        // );
+                                      }
+
+                                      if (state is GetexercisesError) {
+                                        // showErrorDialog(context);
+                                      }
+                                      if (state is GetExercisesComplete) {
+                                        if (context.canPop()) context.pop();
+                                        final result = context.push(
+                                          '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
+                                          extra: {
+                                            'updateData': true,
+                                            "workoutPlan": workoutPlan,
+                                            "clientEntity": widget.client,
+                                            "exercises": exercises
+                                          },
+                                        );
+                                        result.then(
+                                          (value) {
                                             context
                                                 .read<GetworkoutplanCubit>()
                                                 .getWorkoutPlanForClient(
                                                   widget.client.id!,
                                                 );
-                                          }
-                                        },
-                                      )!,
-                                      Text('Edit'),
-                                    ],
+                                          },
+                                        );
+                                        // if (result == true) {
+                                        //   //TODO
+                                        //   context
+                                        //       .read<GetworkoutplanCubit>()
+                                        //       .getWorkoutPlanForClient(
+                                        //         widget.client.id!,
+                                        //       );
+                                        // }
+                                      }
+                                    },
+                                    child: Column(
+                                      children: [
+                                        PlatformButton().buildButton(
+                                          context: context,
+                                          type: ButtonType.icon,
+                                          icon: Icons.edit_document,
+                                          foregroundColor: globalColorScheme
+                                              .onPrimaryContainer,
+                                          text: '',
+                                          onPressed: () async {
+                                            widget.fetchClients.value = true;
+                                            context
+                                                .read<GetexercisesCubit>()
+                                                .getExercises();
+                                            // final result = await context.push(
+                                            //   '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
+                                            //   extra: {
+                                            //     'updateData': true,
+                                            //     "workoutPlan": workoutPlan,
+                                            //     "clientEntity": widget.client,
+                                            //     "exercises": exercises
+                                            //   },
+                                            // );
+                                            // if (result == true) {
+                                            //   //TODO
+                                            //   context
+                                            //       .read<GetworkoutplanCubit>()
+                                            //       .getWorkoutPlanForClient(
+                                            //         widget.client.id!,
+                                            //       );
+                                            // }
+                                          },
+                                        )!,
+                                        Text('Edit'),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Expanded(
