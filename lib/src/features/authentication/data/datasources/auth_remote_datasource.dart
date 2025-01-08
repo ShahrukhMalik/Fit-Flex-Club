@@ -273,7 +273,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final data = snapshot.data() as Map<String, dynamic>?;
 
       isUserActive = data == null ? false : (data)['isUserActive'];
-      isTrainer = data == null ? false : (data)['isTrainer'];
+      isTrainer = data == null || (data)['isTrainer'] == null ? false : (data)['isTrainer'];
 
       if (isTrainer == null) {
         throw ServerException(
