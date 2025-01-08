@@ -4,7 +4,8 @@ String? nameValidator(String? value) {
   }
 
   // Allows only alphabets and spaces
-  final nameRegExp = RegExp(r"^[a-zA-Z]+(\s[a-zA-Z]+)*$");
+  final nameRegExp = RegExp(r"^\s*[a-zA-Z]+( [a-zA-Z]+)*\s*$");
+  // final nameRegExp = RegExp(r"^[a-zA-Z]+(\s[a-zA-Z]+)*$");
   if (!nameRegExp.hasMatch(value)) {
     return 'Please enter a valid name';
   }
