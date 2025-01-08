@@ -466,15 +466,38 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
               onPressed: () {
                 if (widget.showWeight && widget.showReps) {
                   final isNotReady = _sets.value?.any(
-                    (element) => ((element.actualWeight ?? 0) <= 0 ||
-                        (element.actualReps ?? 0) <= 0),
+                    (element) => ((element.actualReps ?? 0) <= 0),
                   );
-                  if (isNotReady ?? true) {
+                  final isNotComplete = _sets.value?.any(
+                    (element) => ((element.actualReps ?? 0) > 0),
+                  );
+                  final isWeightNotReady = _sets.value?.any(
+                    (element) => ((element.actualWeight ?? 0) <= 0),
+                  );
+                  final isWeightNotComplete = _sets.value?.any(
+                    (element) => ((element.actualWeight ?? 0) > 0),
+                  );
+                  if (((isNotReady ?? true) && (isWeightNotReady ?? true)) &&
+                      ((isNotComplete ?? false) &&
+                          (isWeightNotComplete ?? true))) {
                     PlatformDialog.showAlertDialog(
                       context: context,
                       title: "Workout Tracker",
                       message:
-                          "You haven't updated your progress, wish to cancel ?",
+                          "You haven't updated all your sets, continue to submit ?",
+                      onConfirm: () => widget.onSubmit(_sets.value!),
+                      cancelText: 'No',
+                      confirmText: 'Yes',
+                    );
+                  } else if (((isNotReady ?? true) &&
+                          (isWeightNotReady ?? true)) &&
+                      !((isNotComplete ?? false) &&
+                          (isWeightNotComplete ?? true))) {
+                    PlatformDialog.showAlertDialog(
+                      context: context,
+                      title: "Workout Tracker",
+                      message:
+                          "You haven't updated your progress. please update atleast one set. wish to go back ?",
                       onConfirm: () => widget.onConfirmExit(),
                       cancelText: 'No',
                       confirmText: 'Yes',
@@ -486,12 +509,26 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                   final isNotReady = _sets.value?.any(
                     (element) => ((element.actualReps ?? 0) <= 0),
                   );
-                  if (isNotReady ?? true) {
+                  final isNotComplete = _sets.value?.any(
+                    (element) => ((element.actualReps ?? 0) > 0),
+                  );
+                  if ((isNotReady ?? true) && (isNotComplete ?? false)) {
                     PlatformDialog.showAlertDialog(
                       context: context,
                       title: "Workout Tracker",
                       message:
-                          "You haven't updated your progress, wish to cancel ?",
+                          "You haven't updated all your sets, continue to submit ?",
+                      onConfirm: () => widget.onSubmit(_sets.value!),
+                      cancelText: 'No',
+                      confirmText: 'Yes',
+                    );
+                  } else if ((isNotReady ?? true) &&
+                      !(isNotComplete ?? false)) {
+                    PlatformDialog.showAlertDialog(
+                      context: context,
+                      title: "Workout Tracker",
+                      message:
+                          "You haven't updated your progress. please update atleast one set. wish to go back ?",
                       onConfirm: () => widget.onConfirmExit(),
                       cancelText: 'No',
                       confirmText: 'Yes',
