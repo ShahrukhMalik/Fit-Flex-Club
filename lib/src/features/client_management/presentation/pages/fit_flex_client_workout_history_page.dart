@@ -24,7 +24,7 @@ class _FitFlexClientWorkoutHistoryPageState
   List<WorkoutHistoryModel?>? originalWorkoutHistoryModels;
 
   final ValueNotifier<List<ExerciseModel?>?> _workoutHistoryModelsDateWise =
-      ValueNotifier(null);
+      ValueNotifier([]);
 
   final List<DateTime> _dates = List.generate(
     30,

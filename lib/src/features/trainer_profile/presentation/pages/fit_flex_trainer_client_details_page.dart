@@ -261,9 +261,14 @@ class _FitFlexTrainerClientDetailsPageState
     //         clientId: widget.client.id!,
     //       ),
     //     );
+
+    // context.read<GetexercisesCubit>().getExercises().then(
+    //   (value) {
     context.read<GetworkoutplanCubit>().getWorkoutPlanForClient(
           widget.client!.id!,
         );
+    //   },
+    // );
   }
 
   void _toggleUserActiveStatus(bool isActive) {

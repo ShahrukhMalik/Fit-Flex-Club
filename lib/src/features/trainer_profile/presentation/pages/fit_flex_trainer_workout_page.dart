@@ -181,7 +181,11 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
   @override
   void initState() {
     super.initState();
-    context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+    context.read<GetexercisesCubit>().getExercises().then(
+      (value) {
+        context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
+      },
+    );
   }
 
   @override

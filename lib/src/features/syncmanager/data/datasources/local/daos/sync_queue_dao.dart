@@ -36,10 +36,8 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-Future<void> markDataAsSynced(int id) async {
-  await (update(syncQueue)
-        ..where((tbl) => tbl.id.equals(id)))
-      .write(SyncQueueCompanion(synced: Value(true)));
-}
-
+  Future<void> markDataAsSynced(int id) async {
+    await (update(syncQueue)..where((tbl) => tbl.id.equals(id)))
+        .write(SyncQueueCompanion(synced: Value(true)));
+  }
 }

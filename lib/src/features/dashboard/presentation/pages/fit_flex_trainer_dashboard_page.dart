@@ -115,7 +115,7 @@ class _FitFlexTrainerDashboardPageState
           // context.read<WorkoutManagementBloc>().add(GetExercisesEvent());
           // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
           // context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
-          context.read<GetexercisesCubit>().getExercises();
+          // context.read<GetexercisesCubit>().getExercises();
         }
         navigationShell.goBranch(
           index,
