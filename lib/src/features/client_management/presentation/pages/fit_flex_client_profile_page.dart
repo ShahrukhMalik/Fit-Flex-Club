@@ -358,9 +358,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   ValueNotifier<List<ClientWeightEntity>?> weights = ValueNotifier(null);
 
   bool _allowToAddWeight() {
-    return true;
     if ((weights.value?.isEmpty ?? true)) return true;
-
     final weightWithTodaysDate = weights.value?.any(
       (element) {
         final todaysDate = DateTime.now();
