@@ -889,23 +889,6 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                             context
                                                 .read<GetexercisesCubit>()
                                                 .getExercises();
-                                            // final result = await context.push(
-                                            //   '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}',
-                                            //   extra: {
-                                            //     'updateData': true,
-                                            //     "workoutPlan": workoutPlan,
-                                            //     "clientEntity": widget.client,
-                                            //     "exercises": exercises
-                                            //   },
-                                            // );
-                                            // if (result == true) {
-                                            //   //TODO
-                                            //   context
-                                            //       .read<GetworkoutplanCubit>()
-                                            //       .getWorkoutPlanForClient(
-                                            //         widget.client.id!,
-                                            //       );
-                                            // }
                                           },
                                         )!,
                                         Text('Edit'),

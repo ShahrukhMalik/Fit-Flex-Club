@@ -97,12 +97,20 @@ class _AddExerciseBottomSheetWidgetState
     sets.value = updatedSets;
   }
 
-  _addSet(SetModel newSet, [bool addNew = true]) {
+  _addSet(SetModel newSet, [bool addNew = true, bool repeat = false]) {
     // Get the current list or initialize a new one
     final currentSets = sets.value ?? [];
+    List<SetModel> updatedSets;
+    if (repeat) {
+      updatedSets = currentSets;
+      updatedSets.removeLast();
+      updatedSets.add(updatedSets.last.copyWith(id: UUIDv4().toString()));
+      sets.value = updatedSets;
+      return;
+    }
 
     // Update the list: replace the matching set or add it
-    var updatedSets = currentSets.map((set) {
+    updatedSets = currentSets.map((set) {
       if (set.id == newSet.id) {
         return set.copyWith(
           targetReps: newSet.targetReps,
@@ -659,6 +667,7 @@ class _AddExerciseBottomSheetWidgetState
                                     sets![sets.length - 2]
                                         .copyWith(id: UUIDv4().toString()),
                                     false,
+                                    true
                                   );
                                 },
                               )!,
