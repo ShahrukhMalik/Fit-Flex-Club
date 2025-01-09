@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/features/workout_history/data/models/workout_history_model.dart';
@@ -24,7 +26,7 @@ class _FitFlexClientWorkoutHistoryPageState
   List<WorkoutHistoryModel?>? originalWorkoutHistoryModels;
 
   final ValueNotifier<List<ExerciseModel?>?> _workoutHistoryModelsDateWise =
-      ValueNotifier([]);
+      ValueNotifier(null);
 
   final List<DateTime> _dates = List.generate(
     30,
@@ -65,6 +67,11 @@ class _FitFlexClientWorkoutHistoryPageState
   void initState() {
     super.initState();
     _selectedDate.value = DateTime.now();
+    context.read<WorkoutHistoryBloc>().add(
+          GetWorkoutHistoryEvent(
+            cliendId: getIt<FirebaseAuth>().currentUser?.uid,
+          ),
+        );
     _dateController = PageController(
       initialPage: 0,
       viewportFraction: 0.2,
@@ -88,7 +95,379 @@ class _FitFlexClientWorkoutHistoryPageState
         children: [
           // ,
           Expanded(
-            child: _buildWorkoutList(),
+            child: BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
+              listener: (context, state) {
+                if (state is GetWorkoutHistoryLoading) {}
+                if (state is GetWorkoutHistoryComplete) {
+                  originalWorkoutHistoryModels = state.workoutHistory;
+                  _updateWorkoutHistory(_selectedDate.value);
+                }
+              },
+              child: ValueListenableBuilder(
+                valueListenable: _workoutHistoryModelsDateWise,
+                builder: (context, histories, child) {
+                  if (histories == null) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: List.generate(
+                          6,
+                          (index) => Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: PlatformLoader().buildLoader(
+                              type: LoaderType.shimmer,
+                              height: 100,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  } else if (histories.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No workouts found for this date.',
+                        style: TextStyle(color: Colors.black87),
+                      ),
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: ListView.builder(
+                        itemCount: histories.length,
+                        itemBuilder: (context, index) {
+                          final exercise = histories[index];
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 10.0),
+                            margin: EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: globalColorScheme.primary,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                  10,
+                                ),
+                              ),
+                              border: Border.all(
+                                color: globalColorScheme.primary,
+                                width: 2,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Column(
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Index Circle
+                                        CircleAvatar(
+                                          radius: 16,
+                                          backgroundColor: globalColorScheme
+                                              .onPrimaryContainer,
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: TextStyle(
+                                              color: globalColorScheme
+                                                  .primaryContainer,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // Content Column
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Title and Subtitle
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          exercise?.name ?? "",
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: globalColorScheme
+                                                                .tertiaryContainer,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          exercise?.muscleGroup ??
+                                                              "",
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                globalColorScheme
+                                                                    .tertiary,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // Tag (e.g., Hypertrophy)
+                                                  if (exercise?.category !=
+                                                      null)
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 8.0,
+                                                        vertical: 4.0,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: globalColorScheme
+                                                            .onPrimaryContainer,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16),
+                                                      ),
+                                                      child: Text(
+                                                        exercise?.category ??
+                                                            "",
+                                                        style: TextStyle(
+                                                          color:
+                                                              globalColorScheme
+                                                                  .primary,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Divider(),
+                                ...exercise!.sets.asMap().entries.map(
+                                  (entry) {
+                                    final index = entry.key;
+                                    final set = entry.value;
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      child: Table(
+                                        border: TableBorder.all(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            width: 1,
+                                            color: globalColorScheme.surface),
+                                        defaultVerticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        // border: TableBorder.all(color: Colors.grey),
+                                        columnWidths: exercise
+                                                    .parameters?['weight'] ||
+                                                exercise.parameters?['duration']
+                                            ? {
+                                                0: FlexColumnWidth(2), // Set #
+                                                1: FlexColumnWidth(1), // Reps
+                                                2: FlexColumnWidth(1), // Weight
+                                                3: FlexColumnWidth(
+                                                    2), // Actions
+                                              }
+                                            : {
+                                                0: FlexColumnWidth(1), // Set #
+                                                1: FlexColumnWidth(2), // Reps
+                                                2: FlexColumnWidth(2), // Weight
+                                                3: FlexColumnWidth(2),
+                                              },
+                                        children: [
+                                          // Table Header
+                                          TableRow(
+                                            // decoration: BoxDecoration(color: globalColorScheme.secondary),
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  'Set ${index + 1}',
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  'Target',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  'Actual',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  'Completion',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          if (exercise.parameters?['reps'] ??
+                                              false)
+                                            TableRow(
+                                              // decoration: BoxDecoration(color: globalColorScheme.secondary),
+                                              children: [
+                                                Center(
+                                                  child: Text(
+                                                    'Reps',
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    set.targetReps.toString(),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    set.actualReps != null
+                                                        ? set.actualReps
+                                                            .toString()
+                                                        : "0",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: globalColorScheme
+                                                            .secondaryContainer),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    '${(((set.actualReps ?? 0) / (set.targetReps ?? 0)) * 100).toStringAsFixed(2)} %',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: globalColorScheme
+                                                            .tertiary),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          if (exercise.parameters?['weight'] ??
+                                              false)
+                                            TableRow(
+                                              // decoration: BoxDecoration(color: globalColorScheme.secondary),
+                                              children: [
+                                                Center(
+                                                  child: Text(
+                                                    'Weights(in kgs)',
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    set.targetWeight.toString(),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    set.actualWeight != null
+                                                        ? set.actualWeight
+                                                            .toString()
+                                                        : "0",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: globalColorScheme
+                                                          .secondaryContainer,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    '${(((set.actualWeight ?? 0) / (set.targetWeight ?? 0)) * 100).toStringAsFixed(2)} %',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: globalColorScheme
+                                                            .tertiary),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          if (exercise
+                                                  .parameters?['duration'] ??
+                                              false)
+                                            TableRow(
+                                              // decoration: BoxDecoration(color: globalColorScheme.secondary),
+                                              children: [
+                                                Center(
+                                                  child: Text(
+                                                    'Duration(in mins)',
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    (set.targetTime
+                                                                ?.inMinutes ??
+                                                            0)
+                                                        .toString(),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    (set.actualTime
+                                                                ?.inMinutes ??
+                                                            0)
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: globalColorScheme
+                                                          .secondaryContainer,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    '${(((set.actualTime!.inMinutes) / set.targetTime!.inMinutes) * 100).toStringAsFixed(2)} %',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: globalColorScheme
+                                                            .tertiary),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -176,394 +555,6 @@ class _FitFlexClientWorkoutHistoryPageState
               focusedDay: DateTime.now(),
             );
           }),
-    );
-  }
-
-  Widget _buildWorkoutList() {
-    return BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
-      listener: (context, state) {
-        if (state is GetWorkoutHistoryLoading) {
-          // return SingleChildScrollView(
-          //   child: Column(
-          //     children: List.generate(
-          //       6,
-          //       (index) => Padding(
-          //         padding: const EdgeInsets.all(10),
-          //         child: PlatformLoader().buildLoader(
-          //           type: LoaderType.shimmer,
-          //           height: 100,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // );
-        }
-        if (state is GetWorkoutHistoryComplete) {
-          originalWorkoutHistoryModels = state.workoutHistory;
-          _updateWorkoutHistory(_selectedDate.value);
-          // _workoutHistoryModelsDateWise.value = originalWorkoutHistoryModels;
-        }
-      },
-      child: ValueListenableBuilder(
-        valueListenable: _workoutHistoryModelsDateWise,
-        builder: (context, histories, child) {
-          if (histories == null) {
-            return SingleChildScrollView(
-              child: Column(
-                children: List.generate(
-                  6,
-                  (index) => Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: PlatformLoader().buildLoader(
-                      type: LoaderType.shimmer,
-                      height: 100,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          } else if (histories.isEmpty) {
-            return Center(
-              child: Text(
-                'No workouts found for this date.',
-                style: TextStyle(color: Colors.black87),
-              ),
-            );
-          } else {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: ListView.builder(
-                itemCount: histories.length,
-                itemBuilder: (context, index) {
-                  final exercise = histories[index];
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 10.0),
-                    margin: EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(
-                      color: globalColorScheme.primary,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(
-                          10,
-                        ),
-                      ),
-                      border: Border.all(
-                        color: globalColorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Column(
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Index Circle
-                                CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor:
-                                      globalColorScheme.onPrimaryContainer,
-                                  child: Text(
-                                    '${index + 1}',
-                                    style: TextStyle(
-                                      color: globalColorScheme.primaryContainer,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Content Column
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Title and Subtitle
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  exercise?.name ?? "",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: globalColorScheme
-                                                        .tertiaryContainer,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  exercise?.muscleGroup ?? "",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: globalColorScheme
-                                                        .tertiary,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Tag (e.g., Hypertrophy)
-                                          if (exercise?.category != null)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8.0,
-                                                vertical: 4.0,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: globalColorScheme
-                                                    .onPrimaryContainer,
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: Text(
-                                                exercise?.category ?? "",
-                                                style: TextStyle(
-                                                  color:
-                                                      globalColorScheme.primary,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Divider(),
-                        ...exercise!.sets.asMap().entries.map(
-                          (entry) {
-                            final index = entry.key;
-                            final set = entry.value;
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Table(
-                                border: TableBorder.all(
-                                    borderRadius: BorderRadius.circular(10),
-                                    width: 1,
-                                    color: globalColorScheme.surface),
-                                defaultVerticalAlignment:
-                                    TableCellVerticalAlignment.middle,
-                                // border: TableBorder.all(color: Colors.grey),
-                                columnWidths: exercise.parameters?['weight'] ||
-                                        exercise.parameters?['duration']
-                                    ? {
-                                        0: FlexColumnWidth(2), // Set #
-                                        1: FlexColumnWidth(1), // Reps
-                                        2: FlexColumnWidth(1), // Weight
-                                        3: FlexColumnWidth(2), // Actions
-                                      }
-                                    : {
-                                        0: FlexColumnWidth(1), // Set #
-                                        1: FlexColumnWidth(2), // Reps
-                                        2: FlexColumnWidth(2), // Weight
-                                        3: FlexColumnWidth(2),
-                                      },
-                                children: [
-                                  // Table Header
-                                  TableRow(
-                                    // decoration: BoxDecoration(color: globalColorScheme.secondary),
-                                    children: [
-                                      Center(
-                                        child: Text(
-                                          'Set ${index + 1}',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ),
-                                      Center(
-                                        child: Text(
-                                          'Target',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Center(
-                                        child: Text(
-                                          'Actual',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Center(
-                                        child: Text(
-                                          'Completion',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (exercise.parameters?['reps'] ?? false)
-                                    TableRow(
-                                      // decoration: BoxDecoration(color: globalColorScheme.secondary),
-                                      children: [
-                                        Center(
-                                          child: Text(
-                                            'Reps',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            set.targetReps.toString(),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            set.actualReps != null
-                                                ? set.actualReps.toString()
-                                                : "0",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: globalColorScheme
-                                                    .secondaryContainer),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            '${(((set.actualReps ?? 0) / (set.targetReps ?? 0)) * 100).toStringAsFixed(2)} %',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    globalColorScheme.tertiary),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  if (exercise.parameters?['weight'] ?? false)
-                                    TableRow(
-                                      // decoration: BoxDecoration(color: globalColorScheme.secondary),
-                                      children: [
-                                        Center(
-                                          child: Text(
-                                            'Weights(in kgs)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            set.targetWeight.toString(),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            set.actualWeight != null
-                                                ? set.actualWeight.toString()
-                                                : "0",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: globalColorScheme
-                                                  .secondaryContainer,
-                                            ),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            '${(((set.actualWeight ?? 0) / (set.targetWeight ?? 0)) * 100).toStringAsFixed(2)} %',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    globalColorScheme.tertiary),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  if (exercise.parameters?['duration'] ?? false)
-                                    TableRow(
-                                      // decoration: BoxDecoration(color: globalColorScheme.secondary),
-                                      children: [
-                                        Center(
-                                          child: Text(
-                                            'Duration(in mins)',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            (set.targetTime?.inMinutes ?? 0)
-                                                .toString(),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            (set.actualTime?.inMinutes ?? 0)
-                                                .toString(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: globalColorScheme
-                                                  .secondaryContainer,
-                                            ),
-                                          ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            '${(((set.actualTime!.inMinutes) / set.targetTime!.inMinutes) * 100).toStringAsFixed(2)} %',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    globalColorScheme.tertiary),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        // Column(
-                        //   children: List<Widget>.from(
-                        //     exercise!.sets.map(
-                        //       (e) => Column(
-                        //         crossAxisAlignment: CrossAxisAlignment.start,
-                        //         children: [
-                        //           Text('Set ${exercise.sets.indexOf(e)}'),
-                        //           if (exercise.parameters?['weight'] ?? false)
-                        //             _buildProgressRow(
-                        //               'Weight',
-                        //               e.targetWeight,
-                        //               e.actualWeight,
-                        //               e.weightProgress,
-                        //             ),
-                        //           if (exercise.parameters?['reps'] ?? false)
-                        //             _buildProgressRow(
-                        //               'Reps',
-                        //               e.targetReps,
-                        //               e.actualReps,
-                        //               e.weightProgress,
-                        //             ),
-                        //           if (exercise.parameters?['duration'] ?? false)
-                        //             _buildProgressRow(
-                        //               'Duration',
-                        //               e.targetTime?.inMinutes,
-                        //               e.actualTime?.inMinutes,
-                        //               e.weightProgress,
-                        //             ),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-        },
-      ),
     );
   }
 
