@@ -103,9 +103,19 @@ class _AddExerciseBottomSheetWidgetState
     List<SetModel> updatedSets;
     if (repeat) {
       updatedSets = currentSets;
-      updatedSets.removeLast();
+      final lastSet = updatedSets.last;
+      if (lastSet.targetDistance == null &&
+          lastSet.targetReps == null &&
+          lastSet.targetTime == null &&
+          lastSet.targetWeight == null) {
+        updatedSets.removeLast();
+      }
       updatedSets.add(updatedSets.last.copyWith(id: UUIDv4().toString()));
-      sets.value = updatedSets;
+      sets.value = updatedSets
+          .map(
+            (e) => e,
+          )
+          .toList();
       return;
     }
 
@@ -664,11 +674,10 @@ class _AddExerciseBottomSheetWidgetState
                                 text: 'Repeat Set',
                                 onPressed: () {
                                   _addSet(
-                                    sets![sets.length - 2]
-                                        .copyWith(id: UUIDv4().toString()),
-                                    false,
-                                    true
-                                  );
+                                      sets![sets.length - 2]
+                                          .copyWith(id: UUIDv4().toString()),
+                                      false,
+                                      true);
                                 },
                               )!,
                             );
