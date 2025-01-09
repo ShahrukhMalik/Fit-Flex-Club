@@ -59,7 +59,6 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: BlocBuilder<ClientProfileBloc, ClientProfileState>(
-        // bloc: context.read<ClientProfileBloc>().add(event),
         builder: (context, state) {
           if (state is ClientProfileLoading) {
             return PlatformLoader().buildLoader(
@@ -121,15 +120,12 @@ class _WorkoutPlanWidgetState extends State<WorkoutPlanWidget> {
                             fontWeight: FontWeight.bold,
                           ),
                           onPressed: () {
-                            // if (widget.workoutPlan != null) {
                             print(
                                 'Navigating to: ${FitFlexClientProfilePage.route}/${FitFlexClientAssignedWorkoutPlanPage.route}');
                             context.push(
                               '${FitFlexClientProfilePage.route}/${FitFlexClientAssignedWorkoutPlanPage.route}',
                               extra: {'workoutPlan': widget.workoutPlan},
                             );
-
-                            // } else {}
                           },
                         )!
                     ],

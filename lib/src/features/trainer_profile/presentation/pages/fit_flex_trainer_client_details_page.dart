@@ -938,53 +938,53 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                                     ],
                                   ),
                                 ),
-                                BlocListener<WorkoutHistoryBloc,
-                                    WorkoutHistoryState>(
-                                  listener: (context, state) {
-                                    if (state is GetWorkoutHistoryLoading) {
-                                      PlatformDialog.showLoadingDialog(
-                                        context: context,
-                                        message:
-                                            "Fetching Workout History!....",
-                                      );
-                                    }
+                                // BlocListener<WorkoutHistoryBloc,
+                                //     WorkoutHistoryState>(
+                                //   listener: (context, state) {
+                                //     if (state is GetWorkoutHistoryLoading) {
+                                //       PlatformDialog.showLoadingDialog(
+                                //         context: context,
+                                //         message:
+                                //             "Fetching Workout History!....",
+                                //       );
+                                //     }
 
-                                    if (state is GetWorkoutHistoryComplete) {
-                                      context.pop();
-                                      context.push(
-                                        '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexTrainerHistoryPage.route}',
-                                        extra: {
-                                          'histories': state.workoutHistory,
-                                          'client': widget.client,
-                                        },
-                                      );
-                                    }
-                                  },
-                                  child: Expanded(
-                                    child: Column(
-                                      children: [
-                                        PlatformButton().buildButton(
-                                          context: context,
-                                          type: ButtonType.icon,
-                                          icon: Icons.history_toggle_off,
-                                          foregroundColor:
-                                              globalColorScheme.secondary,
-                                          text: '',
-                                          onPressed: () {
-                                            context
-                                                .read<WorkoutHistoryBloc>()
-                                                .add(
-                                                  GetWorkoutHistoryEvent(
-                                                    cliendId: widget.client.id,
-                                                  ),
-                                                );
-                                          },
-                                        )!,
-                                        Text('View History'),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                //     if (state is GetWorkoutHistoryComplete) {
+                                //       context.pop();
+                                //       context.push(
+                                //         '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexTrainerHistoryPage.route}',
+                                //         extra: {
+                                //           'histories': state.workoutHistory,
+                                //           'client': widget.client,
+                                //         },
+                                //       );
+                                //     }
+                                //   },
+                                //   child: Expanded(
+                                //     child: Column(
+                                //       children: [
+                                //         PlatformButton().buildButton(
+                                //           context: context,
+                                //           type: ButtonType.icon,
+                                //           icon: Icons.history_toggle_off,
+                                //           foregroundColor:
+                                //               globalColorScheme.secondary,
+                                //           text: '',
+                                //           onPressed: () {
+                                //             context
+                                //                 .read<WorkoutHistoryBloc>()
+                                //                 .add(
+                                //                   GetWorkoutHistoryEvent(
+                                //                     cliendId: widget.client.id,
+                                //                   ),
+                                //                 );
+                                //           },
+                                //         )!,
+                                //         Text('View History'),
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             )
                         ],
@@ -1001,6 +1001,54 @@ class _ClientEntityCompactWidgetState extends State<ClientEntityCompactWidget> {
                 );
               },
             ),
+            BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
+              listener: (context, state) {
+                if (state is GetWorkoutHistoryLoading) {
+                  PlatformDialog.showLoadingDialog(
+                    context: context,
+                    message: "Fetching Workout History!....",
+                  );
+                }
+
+                if (state is GetWorkoutHistoryComplete) {
+                  context.pop();
+                  context.push(
+                    '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexTrainerHistoryPage.route}',
+                    extra: {
+                      'histories': state.workoutHistory,
+                      'client': widget.client,
+                    },
+                  );
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Card(
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    tileColor: globalColorScheme.inversePrimary,
+                    leading: Icon(Icons.history_outlined),
+                    title: Text('View workout history'),
+                    trailing: PlatformButton().buildButton(
+                      context: context,
+                      type: ButtonType.icon,
+                      icon: Icons.arrow_forward_ios,
+                      foregroundColor: globalColorScheme.secondary,
+                      text: '',
+                      onPressed: () {
+                        context.read<WorkoutHistoryBloc>().add(
+                              GetWorkoutHistoryEvent(
+                                cliendId: widget.client.id,
+                              ),
+                            );
+                      },
+                    )!,
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
