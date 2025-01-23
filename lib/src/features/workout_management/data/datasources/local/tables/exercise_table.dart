@@ -11,8 +11,10 @@ class WorkoutPlanExercise extends Table {
       text().references(Days, #id)(); // Foreign key to Days/ Exercise name
   TextColumn get code => text()(); // Exercise code
   IntColumn get exerciseOrder => integer()();
+  TextColumn get gifUrl => text().nullable().withLength(min: 1, max: 100)(); // GIF
   BoolColumn get completed => boolean().withDefault(Constant(false))();
-  IntColumn get createdAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
+  IntColumn get createdAt => integer().clientDefault(
+      () => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
   IntColumn get updatedAt =>
       integer().nullable()(); // Nullable updated timestamp
 }

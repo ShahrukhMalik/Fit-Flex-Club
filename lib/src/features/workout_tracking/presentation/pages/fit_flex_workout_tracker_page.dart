@@ -13,6 +13,7 @@ import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gif/gif.dart';
 import 'package:go_router/go_router.dart';
 
 class FitFlexWorkoutTrackerPage extends StatefulWidget {
@@ -104,15 +105,29 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!isKeyboardVisible) ...[
-              SizedBox(
-                height: 200,
-                width: double.maxFinite,
-                child: Center(
-                  child: Text(
-                    'Video Assist Comming Soon..',
+              Container(
+                  color: Colors.white,
+                  width: double.maxFinite,
+                  height: 250,
+                  // width: double.maxFinite,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Gif(
+                      alignment: Alignment.center,
+                      // fit: BoxFit.fitWidth,
+                      fps: 15,
+                      autostart: Autostart.loop,
+                      image: NetworkImage(
+                        widget.exercise.gifUrl ?? '',
+                      ),
+                    ),
+                  )
+
+                  // Image.network(
+                  //   widget.exercise.gifUrl ?? '',
+                  //   fit: BoxFit.cover,
+                  // ),
                   ),
-                ),
-              ),
               Align(
                 alignment: Alignment.center,
                 child: SizedBox(

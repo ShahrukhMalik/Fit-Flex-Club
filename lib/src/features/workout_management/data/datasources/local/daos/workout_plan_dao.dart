@@ -79,6 +79,9 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
                   // Insert new exercise
                   await into(workoutPlanExercise).insert(
                     WorkoutPlanExerciseCompanion(
+                      gifUrl: exercise.gifUrl != null
+                          ? Value(exercise.gifUrl!)
+                          : Value.absent(),
                       dayId: Value(day.id),
                       code: Value(exercise.code!),
                       id: Value(exercise.id!),
@@ -181,6 +184,9 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         // Insert the exercise
         final id = await into(baseExercise).insert(
           BaseExerciseCompanion(
+                        gifUrl: exercise.gifUrl != null
+                  ? Value(exercise.gifUrl!)
+                  : Value.absent(),
             id: Value(exercise.id ?? UUIDv4().toString()),
             code:
                 exercise.code == null ? Value.absent() : Value(exercise.code!),
@@ -228,92 +234,99 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
 
     for (final workoutPlan in workoutPlans) {
       final workoutPlanId = await insertWorkoutPlan(workoutPlan);
-      insertedIds.add(workoutPlanId);
+      // insertedIds.add(workoutPlanId);
     }
 
     return insertedIds;
   }
 
   //
-  Future<int> insertWorkoutPlan(WorkoutPlanModel workoutPlan) async {
+  Future<int?> insertWorkoutPlan(WorkoutPlanModel workoutPlan) async {
     // Insert the WorkoutPlan into the workoutPlans table
 
-    final workoutPlanId = await into(workoutPlans).insert(
-      WorkoutPlansCompanion(
-        uid: Value(workoutPlan.uid),
-        name: Value(workoutPlan.name),
-        createdAt: Value(
-          DateTime.now().millisecondsSinceEpoch,
-        ),
-      ),
-    );
-
-    if (workoutPlan.clientId != null) return Future.value(0);
-    // Insert Weeks for the WorkoutPlan
-    for (final week in workoutPlan.weeks) {
-      await into(weeks).insert(
-        WeeksCompanion(
-          clientId:
-              week.clientId != null ? Value(week.clientId) : Value.absent(),
-          workoutPlanId: Value(workoutPlan.uid),
-          weekNumber: Value(week.weekNumber),
-          id: Value(week.id),
+    try {
+      final workoutPlanId = await into(workoutPlans).insert(
+        WorkoutPlansCompanion(
+          uid: Value(workoutPlan.uid),
+          name: Value(workoutPlan.name),
+          createdAt: Value(
+            DateTime.now().millisecondsSinceEpoch,
+          ),
         ),
       );
-
-      // Insert Days for each Week
-      for (final day in week.days) {
-        await into(days).insert(
-          DaysCompanion(
+  
+      if (workoutPlan.clientId != null) return Future.value(0);
+      // Insert Weeks for the WorkoutPlan
+      for (final week in workoutPlan.weeks) {
+        await into(weeks).insert(
+          WeeksCompanion(
             clientId:
-                day.clientId != null ? Value(day.clientId) : Value.absent(),
-            weekId: Value(week.id),
-            dayNumber: Value(day.dayNumber),
-            id: Value(day.id),
+                week.clientId != null ? Value(week.clientId) : Value.absent(),
+            workoutPlanId: Value(workoutPlan.uid),
+            weekNumber: Value(week.weekNumber),
+            id: Value(week.id),
           ),
         );
-
-        // Insert Exercises for each Day
-        for (final exercise in day.exercises) {
-          final exerciseId = await into(workoutPlanExercise).insert(
-            WorkoutPlanExerciseCompanion(
-              clientId: exercise.clientId != null
-                  ? Value(exercise.clientId)
-                  : Value.absent(),
-              completed: Value(exercise.completed ?? false),
-              updatedAt: Value(exercise.updatedAt),
-              exerciseOrder: Value(day.exercises.indexOf(exercise) + 1),
-              dayId: Value(day.id),
-              code: Value(exercise.code!),
-              id: Value(
-                exercise.id!,
-              ),
+  
+        // Insert Days for each Week
+        for (final day in week.days) {
+          await into(days).insert(
+            DaysCompanion(
+              clientId:
+                  day.clientId != null ? Value(day.clientId) : Value.absent(),
+              weekId: Value(week.id),
+              dayNumber: Value(day.dayNumber),
+              id: Value(day.id),
             ),
           );
-
-          // Insert Sets for each Exercise
-          for (final set in exercise.sets) {
-            await into(exerciseSets).insert(
-              ExerciseSetsCompanion(
-                clientId:
-                    set.clientId != null ? Value(set.clientId) : Value.absent(),
-                exerciseId: Value(exercise.id!),
-                targetReps: Value(set.targetReps),
-                targetWeight: Value(set.targetWeight),
-                targetDistance: Value(set.targetDistance),
-                targetTime: Value(set.targetTime?.inMinutes),
-                id: Value(set.id),
-                setNumber: Value(
-                  exercise.sets.indexOf(set) + 1,
+  
+          // Insert Exercises for each Day
+          for (final exercise in day.exercises) {
+            final exerciseId = await into(workoutPlanExercise).insert(
+              WorkoutPlanExerciseCompanion(
+                gifUrl: exercise.gifUrl != null
+                    ? Value(exercise.gifUrl!)
+                    : Value.absent(),
+                clientId: exercise.clientId != null
+                    ? Value(exercise.clientId)
+                    : Value.absent(),
+                completed: Value(exercise.completed ?? false),
+                updatedAt: Value(exercise.updatedAt),
+                exerciseOrder: Value(day.exercises.indexOf(exercise) + 1),
+                dayId: Value(day.id),
+                code: Value(exercise.code!),
+                id: Value(
+                  exercise.id!,
                 ),
               ),
             );
+  
+            // Insert Sets for each Exercise
+            for (final set in exercise.sets) {
+              await into(exerciseSets).insert(
+                ExerciseSetsCompanion(
+                  clientId:
+                      set.clientId != null ? Value(set.clientId) : Value.absent(),
+                  exerciseId: Value(exercise.id!),
+                  targetReps: Value(set.targetReps),
+                  targetWeight: Value(set.targetWeight),
+                  targetDistance: Value(set.targetDistance),
+                  targetTime: Value(set.targetTime?.inMinutes),
+                  id: Value(set.id),
+                  setNumber: Value(
+                    exercise.sets.indexOf(set) + 1,
+                  ),
+                ),
+              );
+            }
           }
         }
       }
+  
+      return workoutPlanId;
+    } catch (err) {
+      print(err);
     }
-
-    return workoutPlanId;
   }
 
   Future<void> deleteWorkoutPlan(WorkoutPlanModel workoutPlan) async {
@@ -422,6 +435,9 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         for (final exercise in day.exercises) {
           final exerciseId = await into(workoutPlanExercise).insert(
             WorkoutPlanExerciseCompanion(
+              gifUrl: exercise.gifUrl != null
+                  ? Value(exercise.gifUrl!)
+                  : Value.absent(),
               clientId: exercise.clientId != null
                   ? Value(exercise.clientId)
                   : Value.absent(),

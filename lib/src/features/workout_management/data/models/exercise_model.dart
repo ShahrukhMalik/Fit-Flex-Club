@@ -8,6 +8,7 @@ class ExerciseModel extends Exercise {
   final int? createdAt;
   final int? updatedAt;
   const ExerciseModel(
+
     super.sets, {
     required super.code,
     required super.id,
@@ -15,6 +16,7 @@ class ExerciseModel extends Exercise {
     required super.name,
     super.category,
     required this.dayId,
+    required super.gifUrl,
     this.clientId,
     this.createdAt,
     this.updatedAt,
@@ -27,6 +29,7 @@ class ExerciseModel extends Exercise {
   factory ExerciseModel.fromMap(Map<String, dynamic> data) {
     // print(data['completed']);
     return ExerciseModel(
+      gifUrl: data['gifUrl'],
       completed: data['completed'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
@@ -62,6 +65,7 @@ class ExerciseModel extends Exercise {
       'exerciseOrder': exerciseOrder,
       'dayId': dayId,
       'sets': sets.map((e) => e.toMap()).toList(),
+      'gifUrl': gifUrl,
     };
   }
 
@@ -78,8 +82,10 @@ class ExerciseModel extends Exercise {
     dynamic parameters,
     int? createdAt,
     int? updatedAt,
+    String? gifUrl,
   }) {
     return ExerciseModel(
+      gifUrl: gifUrl ?? this.gifUrl,
       createdAt: createdAt ??
           this.createdAt, // Keep the same createdAt timestamp as before.
       updatedAt: updatedAt ?? this.updatedAt,

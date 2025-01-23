@@ -19,6 +19,7 @@ class WorkoutHistoryExercise extends Table {
   TextColumn get muscleGroup =>
       text().withLength(min: 1, max: 100)(); // Muscle group
   TextColumn get name => text().withLength(min: 1, max: 255)(); //
+  TextColumn get gifUrl => text().nullable().withLength(min: 1, max: 100)(); // GIF
   IntColumn get createdAt => integer().clientDefault(
       () => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
   IntColumn get updatedAt =>

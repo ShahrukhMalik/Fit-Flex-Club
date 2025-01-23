@@ -10,6 +10,7 @@ class BaseExercise extends Table {
   TextColumn get category => text().nullable()(); // Category (e.g., equipment)
   TextColumn get muscleGroup =>
       text().withLength(min: 1, max: 100)(); // Muscle group
+  TextColumn get gifUrl => text().nullable().withLength(min: 1, max: 100)(); // GIF
   TextColumn get name => text().withLength(min: 1, max: 255)(); // Exercise name
   // Additional Boolean fields
   BoolColumn get reps =>
@@ -19,7 +20,8 @@ class BaseExercise extends Table {
   BoolColumn get weight =>
       boolean().withDefault(Constant(false))(); // Defaults to true
 
-  IntColumn get createdAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
+  IntColumn get createdAt => integer().clientDefault(
+      () => DateTime.now().millisecondsSinceEpoch)(); // Creation timestamp
   IntColumn get updatedAt =>
       integer().nullable()(); // Nullable updated timestamp
 }

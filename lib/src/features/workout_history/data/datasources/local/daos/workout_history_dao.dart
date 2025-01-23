@@ -206,6 +206,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
         }).toList();
 
         return ExerciseModel(
+
           dayId: '',
           parameters: {
             'duration': exercise.duration,
@@ -218,6 +219,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
           setModels,
           clientId: exercise.clientId,
           id: exercise.id,
+          gifUrl: exercise.gifUrl,
           code: exercise.code,
           completed: exercise.completed,
           exerciseOrder: exercise.exerciseOrder,

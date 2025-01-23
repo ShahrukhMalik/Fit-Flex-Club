@@ -9,6 +9,10 @@ class Exercise extends ExerciseEntity {
     super.id,
     super.exerciseOrder,
     required super.code,
+    required super.gifUrl,
+    super.instructions,
+    super.secondaryMuscles,
+    super.targetMuscle,
     super.category,
     super.muscleGroup,
     required super.name,
@@ -24,5 +28,5 @@ class Exercise extends ExerciseEntity {
         code,
         category,
         id,
-    ];
+      ];
 }

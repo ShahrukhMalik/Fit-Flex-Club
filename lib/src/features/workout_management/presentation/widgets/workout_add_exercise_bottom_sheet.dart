@@ -47,6 +47,7 @@ class _AddExerciseBottomSheetWidgetState
     super.initState();
     exerciseModel.value = widget.editExercise ??
         ExerciseModel(
+          gifUrl: widget.exercise?.gifUrl ?? '',
           dayId: widget.dayId,
           // [
           //   SetModel(

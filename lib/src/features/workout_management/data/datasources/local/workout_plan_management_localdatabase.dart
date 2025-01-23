@@ -65,7 +65,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
         return Left(false);
       }
       if (isDataStale(
-        Duration(days: 1).inSeconds,
+        Duration(seconds: 1).inSeconds,
         workoutPlans.first.createdAt!,
         workoutPlans.first.updatedAt,
       )) {
@@ -123,6 +123,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
       return Right(
         exercises
             .map((e) => ExerciseBpModel(
+              gifUrl: e.gifUrl,
                   code: e.code,
                   category: e.category,
                   muscleGroup: e.muscleGroup,
@@ -242,6 +243,7 @@ WorkoutPlanModel processWorkoutPlanModel(String encodedInput) {
     if (!exerciseGroups.containsKey(workoutExercise['id'])) {
       exerciseGroups[workoutExercise['id']] = {
         'exercise': ExerciseModel(
+          gifUrl: workoutExercise['gifUrl'],
           completed: workoutExercise['completed'],
           clientId: workoutExercise['clientId'],
           dayId: workoutExercise['dayId'],

@@ -1861,6 +1861,14 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
   late final GeneratedColumn<int> exerciseOrder = GeneratedColumn<int>(
       'exercise_order', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _gifUrlMeta = const VerificationMeta('gifUrl');
+  @override
+  late final GeneratedColumn<String> gifUrl = GeneratedColumn<String>(
+      'gif_url', aliasedName, true,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
   static const VerificationMeta _completedMeta =
       const VerificationMeta('completed');
   @override
@@ -1892,6 +1900,7 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
         dayId,
         code,
         exerciseOrder,
+        gifUrl,
         completed,
         createdAt,
         updatedAt
@@ -1936,6 +1945,10 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
     } else if (isInserting) {
       context.missing(_exerciseOrderMeta);
     }
+    if (data.containsKey('gif_url')) {
+      context.handle(_gifUrlMeta,
+          gifUrl.isAcceptableOrUnknown(data['gif_url']!, _gifUrlMeta));
+    }
     if (data.containsKey('completed')) {
       context.handle(_completedMeta,
           completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
@@ -1968,6 +1981,8 @@ class $WorkoutPlanExerciseTable extends WorkoutPlanExercise
           .read(DriftSqlType.string, data['${effectivePrefix}code'])!,
       exerciseOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}exercise_order'])!,
+      gifUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gif_url']),
       completed: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
       createdAt: attachedDatabase.typeMapping
@@ -1990,6 +2005,7 @@ class WorkoutPlanExerciseData extends DataClass
   final String dayId;
   final String code;
   final int exerciseOrder;
+  final String? gifUrl;
   final bool completed;
   final int createdAt;
   final int? updatedAt;
@@ -1999,6 +2015,7 @@ class WorkoutPlanExerciseData extends DataClass
       required this.dayId,
       required this.code,
       required this.exerciseOrder,
+      this.gifUrl,
       required this.completed,
       required this.createdAt,
       this.updatedAt});
@@ -2012,6 +2029,9 @@ class WorkoutPlanExerciseData extends DataClass
     map['day_id'] = Variable<String>(dayId);
     map['code'] = Variable<String>(code);
     map['exercise_order'] = Variable<int>(exerciseOrder);
+    if (!nullToAbsent || gifUrl != null) {
+      map['gif_url'] = Variable<String>(gifUrl);
+    }
     map['completed'] = Variable<bool>(completed);
     map['created_at'] = Variable<int>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
@@ -2029,6 +2049,8 @@ class WorkoutPlanExerciseData extends DataClass
       dayId: Value(dayId),
       code: Value(code),
       exerciseOrder: Value(exerciseOrder),
+      gifUrl:
+          gifUrl == null && nullToAbsent ? const Value.absent() : Value(gifUrl),
       completed: Value(completed),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
@@ -2046,6 +2068,7 @@ class WorkoutPlanExerciseData extends DataClass
       dayId: serializer.fromJson<String>(json['dayId']),
       code: serializer.fromJson<String>(json['code']),
       exerciseOrder: serializer.fromJson<int>(json['exerciseOrder']),
+      gifUrl: serializer.fromJson<String?>(json['gifUrl']),
       completed: serializer.fromJson<bool>(json['completed']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int?>(json['updatedAt']),
@@ -2060,6 +2083,7 @@ class WorkoutPlanExerciseData extends DataClass
       'dayId': serializer.toJson<String>(dayId),
       'code': serializer.toJson<String>(code),
       'exerciseOrder': serializer.toJson<int>(exerciseOrder),
+      'gifUrl': serializer.toJson<String?>(gifUrl),
       'completed': serializer.toJson<bool>(completed),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int?>(updatedAt),
@@ -2072,6 +2096,7 @@ class WorkoutPlanExerciseData extends DataClass
           String? dayId,
           String? code,
           int? exerciseOrder,
+          Value<String?> gifUrl = const Value.absent(),
           bool? completed,
           int? createdAt,
           Value<int?> updatedAt = const Value.absent()}) =>
@@ -2081,6 +2106,7 @@ class WorkoutPlanExerciseData extends DataClass
         dayId: dayId ?? this.dayId,
         code: code ?? this.code,
         exerciseOrder: exerciseOrder ?? this.exerciseOrder,
+        gifUrl: gifUrl.present ? gifUrl.value : this.gifUrl,
         completed: completed ?? this.completed,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
@@ -2094,6 +2120,7 @@ class WorkoutPlanExerciseData extends DataClass
       exerciseOrder: data.exerciseOrder.present
           ? data.exerciseOrder.value
           : this.exerciseOrder,
+      gifUrl: data.gifUrl.present ? data.gifUrl.value : this.gifUrl,
       completed: data.completed.present ? data.completed.value : this.completed,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -2108,6 +2135,7 @@ class WorkoutPlanExerciseData extends DataClass
           ..write('dayId: $dayId, ')
           ..write('code: $code, ')
           ..write('exerciseOrder: $exerciseOrder, ')
+          ..write('gifUrl: $gifUrl, ')
           ..write('completed: $completed, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -2117,7 +2145,7 @@ class WorkoutPlanExerciseData extends DataClass
 
   @override
   int get hashCode => Object.hash(id, clientId, dayId, code, exerciseOrder,
-      completed, createdAt, updatedAt);
+      gifUrl, completed, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2127,6 +2155,7 @@ class WorkoutPlanExerciseData extends DataClass
           other.dayId == this.dayId &&
           other.code == this.code &&
           other.exerciseOrder == this.exerciseOrder &&
+          other.gifUrl == this.gifUrl &&
           other.completed == this.completed &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -2139,6 +2168,7 @@ class WorkoutPlanExerciseCompanion
   final Value<String> dayId;
   final Value<String> code;
   final Value<int> exerciseOrder;
+  final Value<String?> gifUrl;
   final Value<bool> completed;
   final Value<int> createdAt;
   final Value<int?> updatedAt;
@@ -2149,6 +2179,7 @@ class WorkoutPlanExerciseCompanion
     this.dayId = const Value.absent(),
     this.code = const Value.absent(),
     this.exerciseOrder = const Value.absent(),
+    this.gifUrl = const Value.absent(),
     this.completed = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2160,6 +2191,7 @@ class WorkoutPlanExerciseCompanion
     required String dayId,
     required String code,
     required int exerciseOrder,
+    this.gifUrl = const Value.absent(),
     this.completed = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2174,6 +2206,7 @@ class WorkoutPlanExerciseCompanion
     Expression<String>? dayId,
     Expression<String>? code,
     Expression<int>? exerciseOrder,
+    Expression<String>? gifUrl,
     Expression<bool>? completed,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -2185,6 +2218,7 @@ class WorkoutPlanExerciseCompanion
       if (dayId != null) 'day_id': dayId,
       if (code != null) 'code': code,
       if (exerciseOrder != null) 'exercise_order': exerciseOrder,
+      if (gifUrl != null) 'gif_url': gifUrl,
       if (completed != null) 'completed': completed,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -2198,6 +2232,7 @@ class WorkoutPlanExerciseCompanion
       Value<String>? dayId,
       Value<String>? code,
       Value<int>? exerciseOrder,
+      Value<String?>? gifUrl,
       Value<bool>? completed,
       Value<int>? createdAt,
       Value<int?>? updatedAt,
@@ -2208,6 +2243,7 @@ class WorkoutPlanExerciseCompanion
       dayId: dayId ?? this.dayId,
       code: code ?? this.code,
       exerciseOrder: exerciseOrder ?? this.exerciseOrder,
+      gifUrl: gifUrl ?? this.gifUrl,
       completed: completed ?? this.completed,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2233,6 +2269,9 @@ class WorkoutPlanExerciseCompanion
     if (exerciseOrder.present) {
       map['exercise_order'] = Variable<int>(exerciseOrder.value);
     }
+    if (gifUrl.present) {
+      map['gif_url'] = Variable<String>(gifUrl.value);
+    }
     if (completed.present) {
       map['completed'] = Variable<bool>(completed.value);
     }
@@ -2256,6 +2295,7 @@ class WorkoutPlanExerciseCompanion
           ..write('dayId: $dayId, ')
           ..write('code: $code, ')
           ..write('exerciseOrder: $exerciseOrder, ')
+          ..write('gifUrl: $gifUrl, ')
           ..write('completed: $completed, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -2849,6 +2889,14 @@ class $BaseExerciseTable extends BaseExercise
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _gifUrlMeta = const VerificationMeta('gifUrl');
+  @override
+  late final GeneratedColumn<String> gifUrl = GeneratedColumn<String>(
+      'gif_url', aliasedName, true,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -2906,6 +2954,7 @@ class $BaseExerciseTable extends BaseExercise
         code,
         category,
         muscleGroup,
+        gifUrl,
         name,
         reps,
         duration,
@@ -2949,6 +2998,10 @@ class $BaseExerciseTable extends BaseExercise
               data['muscle_group']!, _muscleGroupMeta));
     } else if (isInserting) {
       context.missing(_muscleGroupMeta);
+    }
+    if (data.containsKey('gif_url')) {
+      context.handle(_gifUrlMeta,
+          gifUrl.isAcceptableOrUnknown(data['gif_url']!, _gifUrlMeta));
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -2995,6 +3048,8 @@ class $BaseExerciseTable extends BaseExercise
           .read(DriftSqlType.string, data['${effectivePrefix}category']),
       muscleGroup: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}muscle_group'])!,
+      gifUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gif_url']),
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       reps: attachedDatabase.typeMapping
@@ -3023,6 +3078,7 @@ class BaseExerciseData extends DataClass
   final String code;
   final String? category;
   final String muscleGroup;
+  final String? gifUrl;
   final String name;
   final bool reps;
   final bool duration;
@@ -3035,6 +3091,7 @@ class BaseExerciseData extends DataClass
       required this.code,
       this.category,
       required this.muscleGroup,
+      this.gifUrl,
       required this.name,
       required this.reps,
       required this.duration,
@@ -3053,6 +3110,9 @@ class BaseExerciseData extends DataClass
       map['category'] = Variable<String>(category);
     }
     map['muscle_group'] = Variable<String>(muscleGroup);
+    if (!nullToAbsent || gifUrl != null) {
+      map['gif_url'] = Variable<String>(gifUrl);
+    }
     map['name'] = Variable<String>(name);
     map['reps'] = Variable<bool>(reps);
     map['duration'] = Variable<bool>(duration);
@@ -3075,6 +3135,8 @@ class BaseExerciseData extends DataClass
           ? const Value.absent()
           : Value(category),
       muscleGroup: Value(muscleGroup),
+      gifUrl:
+          gifUrl == null && nullToAbsent ? const Value.absent() : Value(gifUrl),
       name: Value(name),
       reps: Value(reps),
       duration: Value(duration),
@@ -3095,6 +3157,7 @@ class BaseExerciseData extends DataClass
       code: serializer.fromJson<String>(json['code']),
       category: serializer.fromJson<String?>(json['category']),
       muscleGroup: serializer.fromJson<String>(json['muscleGroup']),
+      gifUrl: serializer.fromJson<String?>(json['gifUrl']),
       name: serializer.fromJson<String>(json['name']),
       reps: serializer.fromJson<bool>(json['reps']),
       duration: serializer.fromJson<bool>(json['duration']),
@@ -3112,6 +3175,7 @@ class BaseExerciseData extends DataClass
       'code': serializer.toJson<String>(code),
       'category': serializer.toJson<String?>(category),
       'muscleGroup': serializer.toJson<String>(muscleGroup),
+      'gifUrl': serializer.toJson<String?>(gifUrl),
       'name': serializer.toJson<String>(name),
       'reps': serializer.toJson<bool>(reps),
       'duration': serializer.toJson<bool>(duration),
@@ -3127,6 +3191,7 @@ class BaseExerciseData extends DataClass
           String? code,
           Value<String?> category = const Value.absent(),
           String? muscleGroup,
+          Value<String?> gifUrl = const Value.absent(),
           String? name,
           bool? reps,
           bool? duration,
@@ -3139,6 +3204,7 @@ class BaseExerciseData extends DataClass
         code: code ?? this.code,
         category: category.present ? category.value : this.category,
         muscleGroup: muscleGroup ?? this.muscleGroup,
+        gifUrl: gifUrl.present ? gifUrl.value : this.gifUrl,
         name: name ?? this.name,
         reps: reps ?? this.reps,
         duration: duration ?? this.duration,
@@ -3154,6 +3220,7 @@ class BaseExerciseData extends DataClass
       category: data.category.present ? data.category.value : this.category,
       muscleGroup:
           data.muscleGroup.present ? data.muscleGroup.value : this.muscleGroup,
+      gifUrl: data.gifUrl.present ? data.gifUrl.value : this.gifUrl,
       name: data.name.present ? data.name.value : this.name,
       reps: data.reps.present ? data.reps.value : this.reps,
       duration: data.duration.present ? data.duration.value : this.duration,
@@ -3171,6 +3238,7 @@ class BaseExerciseData extends DataClass
           ..write('code: $code, ')
           ..write('category: $category, ')
           ..write('muscleGroup: $muscleGroup, ')
+          ..write('gifUrl: $gifUrl, ')
           ..write('name: $name, ')
           ..write('reps: $reps, ')
           ..write('duration: $duration, ')
@@ -3183,7 +3251,7 @@ class BaseExerciseData extends DataClass
 
   @override
   int get hashCode => Object.hash(id, clientId, code, category, muscleGroup,
-      name, reps, duration, weight, createdAt, updatedAt);
+      gifUrl, name, reps, duration, weight, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3193,6 +3261,7 @@ class BaseExerciseData extends DataClass
           other.code == this.code &&
           other.category == this.category &&
           other.muscleGroup == this.muscleGroup &&
+          other.gifUrl == this.gifUrl &&
           other.name == this.name &&
           other.reps == this.reps &&
           other.duration == this.duration &&
@@ -3207,6 +3276,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
   final Value<String> code;
   final Value<String?> category;
   final Value<String> muscleGroup;
+  final Value<String?> gifUrl;
   final Value<String> name;
   final Value<bool> reps;
   final Value<bool> duration;
@@ -3220,6 +3290,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     this.code = const Value.absent(),
     this.category = const Value.absent(),
     this.muscleGroup = const Value.absent(),
+    this.gifUrl = const Value.absent(),
     this.name = const Value.absent(),
     this.reps = const Value.absent(),
     this.duration = const Value.absent(),
@@ -3234,6 +3305,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     required String code,
     this.category = const Value.absent(),
     required String muscleGroup,
+    this.gifUrl = const Value.absent(),
     required String name,
     this.reps = const Value.absent(),
     this.duration = const Value.absent(),
@@ -3251,6 +3323,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     Expression<String>? code,
     Expression<String>? category,
     Expression<String>? muscleGroup,
+    Expression<String>? gifUrl,
     Expression<String>? name,
     Expression<bool>? reps,
     Expression<bool>? duration,
@@ -3265,6 +3338,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
       if (code != null) 'code': code,
       if (category != null) 'category': category,
       if (muscleGroup != null) 'muscle_group': muscleGroup,
+      if (gifUrl != null) 'gif_url': gifUrl,
       if (name != null) 'name': name,
       if (reps != null) 'reps': reps,
       if (duration != null) 'duration': duration,
@@ -3281,6 +3355,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
       Value<String>? code,
       Value<String?>? category,
       Value<String>? muscleGroup,
+      Value<String?>? gifUrl,
       Value<String>? name,
       Value<bool>? reps,
       Value<bool>? duration,
@@ -3294,6 +3369,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
       code: code ?? this.code,
       category: category ?? this.category,
       muscleGroup: muscleGroup ?? this.muscleGroup,
+      gifUrl: gifUrl ?? this.gifUrl,
       name: name ?? this.name,
       reps: reps ?? this.reps,
       duration: duration ?? this.duration,
@@ -3321,6 +3397,9 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     }
     if (muscleGroup.present) {
       map['muscle_group'] = Variable<String>(muscleGroup.value);
+    }
+    if (gifUrl.present) {
+      map['gif_url'] = Variable<String>(gifUrl.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -3354,6 +3433,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
           ..write('code: $code, ')
           ..write('category: $category, ')
           ..write('muscleGroup: $muscleGroup, ')
+          ..write('gifUrl: $gifUrl, ')
           ..write('name: $name, ')
           ..write('reps: $reps, ')
           ..write('duration: $duration, ')
@@ -3815,6 +3895,14 @@ class $WorkoutHistoryExerciseTable extends WorkoutHistoryExercise
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 255),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _gifUrlMeta = const VerificationMeta('gifUrl');
+  @override
+  late final GeneratedColumn<String> gifUrl = GeneratedColumn<String>(
+      'gif_url', aliasedName, true,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -3842,6 +3930,7 @@ class $WorkoutHistoryExerciseTable extends WorkoutHistoryExercise
         category,
         muscleGroup,
         name,
+        gifUrl,
         createdAt,
         updatedAt
       ];
@@ -3913,6 +4002,10 @@ class $WorkoutHistoryExerciseTable extends WorkoutHistoryExercise
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('gif_url')) {
+      context.handle(_gifUrlMeta,
+          gifUrl.isAcceptableOrUnknown(data['gif_url']!, _gifUrlMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -3953,6 +4046,8 @@ class $WorkoutHistoryExerciseTable extends WorkoutHistoryExercise
           .read(DriftSqlType.string, data['${effectivePrefix}muscle_group'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      gifUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gif_url']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -3979,6 +4074,7 @@ class WorkoutHistoryExerciseData extends DataClass
   final String? category;
   final String muscleGroup;
   final String name;
+  final String? gifUrl;
   final int createdAt;
   final int? updatedAt;
   const WorkoutHistoryExerciseData(
@@ -3993,6 +4089,7 @@ class WorkoutHistoryExerciseData extends DataClass
       this.category,
       required this.muscleGroup,
       required this.name,
+      this.gifUrl,
       required this.createdAt,
       this.updatedAt});
   @override
@@ -4013,6 +4110,9 @@ class WorkoutHistoryExerciseData extends DataClass
     }
     map['muscle_group'] = Variable<String>(muscleGroup);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || gifUrl != null) {
+      map['gif_url'] = Variable<String>(gifUrl);
+    }
     map['created_at'] = Variable<int>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<int>(updatedAt);
@@ -4037,6 +4137,8 @@ class WorkoutHistoryExerciseData extends DataClass
           : Value(category),
       muscleGroup: Value(muscleGroup),
       name: Value(name),
+      gifUrl:
+          gifUrl == null && nullToAbsent ? const Value.absent() : Value(gifUrl),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -4059,6 +4161,7 @@ class WorkoutHistoryExerciseData extends DataClass
       category: serializer.fromJson<String?>(json['category']),
       muscleGroup: serializer.fromJson<String>(json['muscleGroup']),
       name: serializer.fromJson<String>(json['name']),
+      gifUrl: serializer.fromJson<String?>(json['gifUrl']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int?>(json['updatedAt']),
     );
@@ -4078,6 +4181,7 @@ class WorkoutHistoryExerciseData extends DataClass
       'category': serializer.toJson<String?>(category),
       'muscleGroup': serializer.toJson<String>(muscleGroup),
       'name': serializer.toJson<String>(name),
+      'gifUrl': serializer.toJson<String?>(gifUrl),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int?>(updatedAt),
     };
@@ -4095,6 +4199,7 @@ class WorkoutHistoryExerciseData extends DataClass
           Value<String?> category = const Value.absent(),
           String? muscleGroup,
           String? name,
+          Value<String?> gifUrl = const Value.absent(),
           int? createdAt,
           Value<int?> updatedAt = const Value.absent()}) =>
       WorkoutHistoryExerciseData(
@@ -4109,6 +4214,7 @@ class WorkoutHistoryExerciseData extends DataClass
         category: category.present ? category.value : this.category,
         muscleGroup: muscleGroup ?? this.muscleGroup,
         name: name ?? this.name,
+        gifUrl: gifUrl.present ? gifUrl.value : this.gifUrl,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
       );
@@ -4129,6 +4235,7 @@ class WorkoutHistoryExerciseData extends DataClass
       muscleGroup:
           data.muscleGroup.present ? data.muscleGroup.value : this.muscleGroup,
       name: data.name.present ? data.name.value : this.name,
+      gifUrl: data.gifUrl.present ? data.gifUrl.value : this.gifUrl,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4148,6 +4255,7 @@ class WorkoutHistoryExerciseData extends DataClass
           ..write('category: $category, ')
           ..write('muscleGroup: $muscleGroup, ')
           ..write('name: $name, ')
+          ..write('gifUrl: $gifUrl, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4167,6 +4275,7 @@ class WorkoutHistoryExerciseData extends DataClass
       category,
       muscleGroup,
       name,
+      gifUrl,
       createdAt,
       updatedAt);
   @override
@@ -4184,6 +4293,7 @@ class WorkoutHistoryExerciseData extends DataClass
           other.category == this.category &&
           other.muscleGroup == this.muscleGroup &&
           other.name == this.name &&
+          other.gifUrl == this.gifUrl &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4201,6 +4311,7 @@ class WorkoutHistoryExerciseCompanion
   final Value<String?> category;
   final Value<String> muscleGroup;
   final Value<String> name;
+  final Value<String?> gifUrl;
   final Value<int> createdAt;
   final Value<int?> updatedAt;
   final Value<int> rowid;
@@ -4216,6 +4327,7 @@ class WorkoutHistoryExerciseCompanion
     this.category = const Value.absent(),
     this.muscleGroup = const Value.absent(),
     this.name = const Value.absent(),
+    this.gifUrl = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4232,6 +4344,7 @@ class WorkoutHistoryExerciseCompanion
     this.category = const Value.absent(),
     required String muscleGroup,
     required String name,
+    this.gifUrl = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -4252,6 +4365,7 @@ class WorkoutHistoryExerciseCompanion
     Expression<String>? category,
     Expression<String>? muscleGroup,
     Expression<String>? name,
+    Expression<String>? gifUrl,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
@@ -4268,6 +4382,7 @@ class WorkoutHistoryExerciseCompanion
       if (category != null) 'category': category,
       if (muscleGroup != null) 'muscle_group': muscleGroup,
       if (name != null) 'name': name,
+      if (gifUrl != null) 'gif_url': gifUrl,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -4286,6 +4401,7 @@ class WorkoutHistoryExerciseCompanion
       Value<String?>? category,
       Value<String>? muscleGroup,
       Value<String>? name,
+      Value<String?>? gifUrl,
       Value<int>? createdAt,
       Value<int?>? updatedAt,
       Value<int>? rowid}) {
@@ -4301,6 +4417,7 @@ class WorkoutHistoryExerciseCompanion
       category: category ?? this.category,
       muscleGroup: muscleGroup ?? this.muscleGroup,
       name: name ?? this.name,
+      gifUrl: gifUrl ?? this.gifUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -4343,6 +4460,9 @@ class WorkoutHistoryExerciseCompanion
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (gifUrl.present) {
+      map['gif_url'] = Variable<String>(gifUrl.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
     }
@@ -4369,6 +4489,7 @@ class WorkoutHistoryExerciseCompanion
           ..write('category: $category, ')
           ..write('muscleGroup: $muscleGroup, ')
           ..write('name: $name, ')
+          ..write('gifUrl: $gifUrl, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -7515,6 +7636,7 @@ typedef $$WorkoutPlanExerciseTableCreateCompanionBuilder
   required String dayId,
   required String code,
   required int exerciseOrder,
+  Value<String?> gifUrl,
   Value<bool> completed,
   Value<int> createdAt,
   Value<int?> updatedAt,
@@ -7527,6 +7649,7 @@ typedef $$WorkoutPlanExerciseTableUpdateCompanionBuilder
   Value<String> dayId,
   Value<String> code,
   Value<int> exerciseOrder,
+  Value<String?> gifUrl,
   Value<bool> completed,
   Value<int> createdAt,
   Value<int?> updatedAt,
@@ -7598,6 +7721,9 @@ class $$WorkoutPlanExerciseTableFilterComposer
 
   ColumnFilters<int> get exerciseOrder => $composableBuilder(
       column: $table.exerciseOrder, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnFilters(column));
@@ -7689,6 +7815,9 @@ class $$WorkoutPlanExerciseTableOrderingComposer
       column: $table.exerciseOrder,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnOrderings(column));
 
@@ -7756,6 +7885,9 @@ class $$WorkoutPlanExerciseTableAnnotationComposer
 
   GeneratedColumn<int> get exerciseOrder => $composableBuilder(
       column: $table.exerciseOrder, builder: (column) => column);
+
+  GeneratedColumn<String> get gifUrl =>
+      $composableBuilder(column: $table.gifUrl, builder: (column) => column);
 
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
@@ -7860,6 +7992,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             Value<String> dayId = const Value.absent(),
             Value<String> code = const Value.absent(),
             Value<int> exerciseOrder = const Value.absent(),
+            Value<String?> gifUrl = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
@@ -7871,6 +8004,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             dayId: dayId,
             code: code,
             exerciseOrder: exerciseOrder,
+            gifUrl: gifUrl,
             completed: completed,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -7882,6 +8016,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             required String dayId,
             required String code,
             required int exerciseOrder,
+            Value<String?> gifUrl = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
@@ -7893,6 +8028,7 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
             dayId: dayId,
             code: code,
             exerciseOrder: exerciseOrder,
+            gifUrl: gifUrl,
             completed: completed,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -8416,6 +8552,7 @@ typedef $$BaseExerciseTableCreateCompanionBuilder = BaseExerciseCompanion
   required String code,
   Value<String?> category,
   required String muscleGroup,
+  Value<String?> gifUrl,
   required String name,
   Value<bool> reps,
   Value<bool> duration,
@@ -8431,6 +8568,7 @@ typedef $$BaseExerciseTableUpdateCompanionBuilder = BaseExerciseCompanion
   Value<String> code,
   Value<String?> category,
   Value<String> muscleGroup,
+  Value<String?> gifUrl,
   Value<String> name,
   Value<bool> reps,
   Value<bool> duration,
@@ -8479,6 +8617,9 @@ class $$BaseExerciseTableFilterComposer
 
   ColumnFilters<String> get muscleGroup => $composableBuilder(
       column: $table.muscleGroup, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
@@ -8540,6 +8681,9 @@ class $$BaseExerciseTableOrderingComposer
   ColumnOrderings<String> get muscleGroup => $composableBuilder(
       column: $table.muscleGroup, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
@@ -8599,6 +8743,9 @@ class $$BaseExerciseTableAnnotationComposer
 
   GeneratedColumn<String> get muscleGroup => $composableBuilder(
       column: $table.muscleGroup, builder: (column) => column);
+
+  GeneratedColumn<String> get gifUrl =>
+      $composableBuilder(column: $table.gifUrl, builder: (column) => column);
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
@@ -8667,6 +8814,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             Value<String> code = const Value.absent(),
             Value<String?> category = const Value.absent(),
             Value<String> muscleGroup = const Value.absent(),
+            Value<String?> gifUrl = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<bool> reps = const Value.absent(),
             Value<bool> duration = const Value.absent(),
@@ -8681,6 +8829,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             code: code,
             category: category,
             muscleGroup: muscleGroup,
+            gifUrl: gifUrl,
             name: name,
             reps: reps,
             duration: duration,
@@ -8695,6 +8844,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             required String code,
             Value<String?> category = const Value.absent(),
             required String muscleGroup,
+            Value<String?> gifUrl = const Value.absent(),
             required String name,
             Value<bool> reps = const Value.absent(),
             Value<bool> duration = const Value.absent(),
@@ -8709,6 +8859,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             code: code,
             category: category,
             muscleGroup: muscleGroup,
+            gifUrl: gifUrl,
             name: name,
             reps: reps,
             duration: duration,
@@ -8974,6 +9125,7 @@ typedef $$WorkoutHistoryExerciseTableCreateCompanionBuilder
   Value<String?> category,
   required String muscleGroup,
   required String name,
+  Value<String?> gifUrl,
   Value<int> createdAt,
   Value<int?> updatedAt,
   Value<int> rowid,
@@ -8991,6 +9143,7 @@ typedef $$WorkoutHistoryExerciseTableUpdateCompanionBuilder
   Value<String?> category,
   Value<String> muscleGroup,
   Value<String> name,
+  Value<String?> gifUrl,
   Value<int> createdAt,
   Value<int?> updatedAt,
   Value<int> rowid,
@@ -9072,6 +9225,9 @@ class $$WorkoutHistoryExerciseTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -9161,6 +9317,9 @@ class $$WorkoutHistoryExerciseTableOrderingComposer
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -9226,6 +9385,9 @@ class $$WorkoutHistoryExerciseTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get gifUrl =>
+      $composableBuilder(column: $table.gifUrl, builder: (column) => column);
 
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -9314,6 +9476,7 @@ class $$WorkoutHistoryExerciseTableTableManager extends RootTableManager<
             Value<String?> category = const Value.absent(),
             Value<String> muscleGroup = const Value.absent(),
             Value<String> name = const Value.absent(),
+            Value<String?> gifUrl = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -9330,6 +9493,7 @@ class $$WorkoutHistoryExerciseTableTableManager extends RootTableManager<
             category: category,
             muscleGroup: muscleGroup,
             name: name,
+            gifUrl: gifUrl,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -9346,6 +9510,7 @@ class $$WorkoutHistoryExerciseTableTableManager extends RootTableManager<
             Value<String?> category = const Value.absent(),
             required String muscleGroup,
             required String name,
+            Value<String?> gifUrl = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -9362,6 +9527,7 @@ class $$WorkoutHistoryExerciseTableTableManager extends RootTableManager<
             category: category,
             muscleGroup: muscleGroup,
             name: name,
+            gifUrl: gifUrl,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,

@@ -398,6 +398,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "gif",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/gif-2.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "glob",
       "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/glob-2.1.2",
       "packageUri": "lib/",
@@ -884,10 +890,10 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-12-30T18:28:01.235747Z",
+  "generated": "2025-01-23T13:31:31.064425Z",
   "generator": "pub",
-  "generatorVersion": "3.6.0",
+  "generatorVersion": "3.6.1",
   "flutterRoot": "file:///Users/apple/development/flutter",
-  "flutterVersion": "3.27.1",
+  "flutterVersion": "3.27.2",
   "pubCache": "file:///Users/apple/.pub-cache"
 }
