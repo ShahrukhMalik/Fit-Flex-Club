@@ -165,9 +165,13 @@ class WorkoutPlanManagementRemotedatasourceImpl
   @override
   Future<List<ExerciseBpModel>?>? getExercises() async {
     try {
+      print(
+          "Request reached remote db: ${DateTime.now().millisecondsSinceEpoch}");
       final CollectionReference ref = db.collection('Exercises');
       final documents = await ref.get();
 
+      print(
+          "Response from remote db: ${DateTime.now().millisecondsSinceEpoch}");
       // Using await in the map to ensure async calls complete
       final List<ExerciseBpModel> exercises = documents.docs
           .map(
@@ -177,7 +181,8 @@ class WorkoutPlanManagementRemotedatasourceImpl
             ),
           )
           .toList();
-
+      print(
+          "Response from remote db processed to models: ${DateTime.now().millisecondsSinceEpoch}");
       return exercises;
     } on FirebaseException catch (err) {
       throw ServerException(
@@ -361,7 +366,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
           'clientId': workoutPlanModel.clientId,
           'eventType': ListenerEvents.updateAssignedWorkoutPlan.name,
           'timestamp': DateTime.now().millisecondsSinceEpoch,
-               'isListendAlready': false,
+          'isListendAlready': false,
         },
       );
       await mainBatch.commit();
@@ -386,7 +391,7 @@ class WorkoutPlanManagementRemotedatasourceImpl
         'clientId': workoutPlan.clientId,
         'eventType': ListenerEvents.deleteAssignedWorkoutPlan.name,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
-             'isListendAlready': false,
+        'isListendAlready': false,
       });
     } on FirebaseException catch (err) {
       throw ServerException(

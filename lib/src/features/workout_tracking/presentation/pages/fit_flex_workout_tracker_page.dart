@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
+import 'package:fit_flex_club/src/core/util/api/api_service.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
@@ -10,11 +13,13 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/set_mo
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gif/gif.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 class FitFlexWorkoutTrackerPage extends StatefulWidget {
   static const route = "workout-tracker";
@@ -38,10 +43,18 @@ class FitFlexWorkoutTrackerPage extends StatefulWidget {
 class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
     with WidgetsBindingObserver {
   bool isKeyboardVisible = false;
+  final ValueNotifier<String?> _gifUrl = ValueNotifier(null);
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // fetchExerciseData();
+    ApiService.fetchGifUrl(widget.exercise.code ?? '').then(
+      (url) {
+        _gifUrl.value = url;
+      },
+    );
   }
 
   @override
@@ -106,28 +119,39 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
           children: [
             if (!isKeyboardVisible) ...[
               Container(
-                  color: Colors.white,
-                  width: double.maxFinite,
-                  height: 250,
-                  // width: double.maxFinite,
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Gif(
-                      alignment: Alignment.center,
-                      // fit: BoxFit.fitWidth,
-                      fps: 15,
-                      autostart: Autostart.loop,
-                      image: NetworkImage(
-                        widget.exercise.gifUrl ?? '',
-                      ),
-                    ),
-                  )
-
-                  // Image.network(
-                  //   widget.exercise.gifUrl ?? '',
-                  //   fit: BoxFit.cover,
-                  // ),
+                color: Colors.white,
+                width: double.maxFinite,
+                height: 250,
+                // width: double.maxFinite,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ValueListenableBuilder(
+                    valueListenable: _gifUrl,
+                    builder: (context, url, _) {
+                      // final data = snapshot.data;
+                      if (url?.isNotEmpty ?? false) {
+                        // if (snapshot.hasData) {
+                        if (url != null) {
+                          return Gif(
+                            placeholder: (context) =>
+                                CupertinoActivityIndicator(),
+                            alignment: Alignment.center,
+                            autostart: Autostart.loop,
+                            useCache: true,
+                            image: NetworkImage(
+                              url,
+                            ),
+                          );
+                        } else {
+                          return Text('No GIF available');
+                        }
+                      } else {
+                        return Text('No data available');
+                      }
+                    },
                   ),
+                ),
+              ),
               Align(
                 alignment: Alignment.center,
                 child: SizedBox(

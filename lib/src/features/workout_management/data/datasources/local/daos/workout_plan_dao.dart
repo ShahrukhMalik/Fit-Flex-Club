@@ -172,47 +172,95 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
     final insertedIds = <int>[];
 
     try {
-      for (final exercise in exercisesBp) {
-        // Ensure exerciseBp.parameters is not null, and provide a default empty map if it is.
-        final parameters = exercise.parameters ?? {};
-
-        // Extract values safely from the parameters map
-        final reps = parameters['reps'];
-        final duration = parameters['duration'];
-        final weight = parameters['weight'];
-
-        // Insert the exercise
-        final id = await into(baseExercise).insert(
-          BaseExerciseCompanion(
-                        gifUrl: exercise.gifUrl != null
+      await batch((batch) {
+        batch.insertAll(
+          baseExercise,
+          exercisesBp.map((exercise) {
+            final parameters = exercise.parameters ?? {};
+            return BaseExerciseCompanion(
+              gifUrl: exercise.gifUrl != null
                   ? Value(exercise.gifUrl!)
                   : Value.absent(),
-            id: Value(exercise.id ?? UUIDv4().toString()),
-            code:
-                exercise.code == null ? Value.absent() : Value(exercise.code!),
-            category: exercise.category == null
-                ? Value.absent()
-                : Value(exercise.category!),
-            muscleGroup: exercise.muscleGroup == null
-                ? Value.absent()
-                : Value(exercise.muscleGroup!),
-            name:
-                exercise.name == null ? Value.absent() : Value(exercise.name!),
-            reps: reps == null ? Value.absent() : Value(reps),
-            duration: duration == null ? Value.absent() : Value(duration),
-            weight: weight == null ? Value.absent() : Value(weight),
-            createdAt: Value(DateTime.now().millisecondsSinceEpoch),
-          ),
+              id: Value(exercise.id ?? UUIDv4().toString()),
+              code: exercise.code == null
+                  ? Value.absent()
+                  : Value(exercise.code!),
+              category: exercise.category == null
+                  ? Value.absent()
+                  : Value(exercise.category!),
+              muscleGroup: exercise.muscleGroup == null
+                  ? Value.absent()
+                  : Value(exercise.muscleGroup!),
+              name: exercise.name == null
+                  ? Value.absent()
+                  : Value(exercise.name!),
+              reps: parameters['reps'] == null
+                  ? Value.absent()
+                  : Value(parameters['reps']),
+              duration: parameters['duration'] == null
+                  ? Value.absent()
+                  : Value(parameters['duration']),
+              weight: parameters['weight'] == null
+                  ? Value.absent()
+                  : Value(parameters['weight']),
+              createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+            );
+          }).toList(),
         );
-
-        insertedIds.add(id);
-      }
-      return insertedIds;
+      });
     } catch (e) {
       print('Error inserting ExerciseBp: $e');
       rethrow;
     }
+
+    return insertedIds;
   }
+
+  // Future<List<int>> insertExerciseBps(List<ExerciseBpModel> exercisesBp) async {
+  //   final insertedIds = <int>[];
+
+  //   try {
+  //     for (final exercise in exercisesBp) {
+  //       // Ensure exerciseBp.parameters is not null, and provide a default empty map if it is.
+  //       final parameters = exercise.parameters ?? {};
+
+  //       // Extract values safely from the parameters map
+  //       final reps = parameters['reps'];
+  //       final duration = parameters['duration'];
+  //       final weight = parameters['weight'];
+
+  //       // Insert the exercise
+  //       final id = await into(baseExercise).insert(
+  //         BaseExerciseCompanion(
+  //                       gifUrl: exercise.gifUrl != null
+  //                 ? Value(exercise.gifUrl!)
+  //                 : Value.absent(),
+  //           id: Value(exercise.id ?? UUIDv4().toString()),
+  //           code:
+  //               exercise.code == null ? Value.absent() : Value(exercise.code!),
+  //           category: exercise.category == null
+  //               ? Value.absent()
+  //               : Value(exercise.category!),
+  //           muscleGroup: exercise.muscleGroup == null
+  //               ? Value.absent()
+  //               : Value(exercise.muscleGroup!),
+  //           name:
+  //               exercise.name == null ? Value.absent() : Value(exercise.name!),
+  //           reps: reps == null ? Value.absent() : Value(reps),
+  //           duration: duration == null ? Value.absent() : Value(duration),
+  //           weight: weight == null ? Value.absent() : Value(weight),
+  //           createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+  //         ),
+  //       );
+
+  //       insertedIds.add(id);
+  //     }
+  //     return insertedIds;
+  //   } catch (e) {
+  //     print('Error inserting ExerciseBp: $e');
+  //     rethrow;
+  //   }
+  // }
 
   Future<List<BaseExerciseData>> getAllExercises() async {
     try {
@@ -254,7 +302,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           ),
         ),
       );
-  
+
       if (workoutPlan.clientId != null) return Future.value(0);
       // Insert Weeks for the WorkoutPlan
       for (final week in workoutPlan.weeks) {
@@ -267,7 +315,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
             id: Value(week.id),
           ),
         );
-  
+
         // Insert Days for each Week
         for (final day in week.days) {
           await into(days).insert(
@@ -279,7 +327,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
               id: Value(day.id),
             ),
           );
-  
+
           // Insert Exercises for each Day
           for (final exercise in day.exercises) {
             final exerciseId = await into(workoutPlanExercise).insert(
@@ -300,13 +348,14 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
                 ),
               ),
             );
-  
+
             // Insert Sets for each Exercise
             for (final set in exercise.sets) {
               await into(exerciseSets).insert(
                 ExerciseSetsCompanion(
-                  clientId:
-                      set.clientId != null ? Value(set.clientId) : Value.absent(),
+                  clientId: set.clientId != null
+                      ? Value(set.clientId)
+                      : Value.absent(),
                   exerciseId: Value(exercise.id!),
                   targetReps: Value(set.targetReps),
                   targetWeight: Value(set.targetWeight),
@@ -322,7 +371,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           }
         }
       }
-  
+
       return workoutPlanId;
     } catch (err) {
       print(err);

@@ -1,4 +1,3 @@
-
 import 'package:fit_flex_club/src/core/common/widgets/fit_flex_loader_page.dart';
 import 'package:fit_flex_club/src/core/common/widgets/transition_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
@@ -21,6 +20,7 @@ import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fi
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_add_exercise_bottom_sheet.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_picker_widget.dart';
 import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
 import 'package:flutter/material.dart';
@@ -165,8 +165,9 @@ GoRouter goRouter(appState) {
           final showBottomNavBar = (route == FitFlexTrainerProfilePage.route) ||
               (route == FitFlexTrainerWorkoutPage.route);
           return FitFlexTrainerDashboardPage(
-              navigationShell: navigationShell,
-              showBottomNavBar: showBottomNavBar);
+            navigationShell: navigationShell,
+            showBottomNavBar: showBottomNavBar,
+          );
         },
         branches: [
           StatefulShellBranch(
@@ -253,6 +254,27 @@ GoRouter goRouter(appState) {
                         ),
                       );
                     },
+                    routes: [
+                      GoRoute(
+                        path: FitFlexAddExercisePage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexAddExercisePage(
+                              editExercise: extraData?['editExercise'],
+                              dayId: extraData?['dayId'],
+                              reps: extraData?['reps'],
+                              duration: extraData?['duration'],
+                              exercise: extraData?['exercise'],
+                              weight: extraData?['weight'],
+                              sets: extraData?['sets'],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               )

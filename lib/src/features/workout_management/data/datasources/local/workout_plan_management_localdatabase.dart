@@ -108,6 +108,8 @@ class WorkoutPlanManagementLocaldatasourceImpl
   @override
   Future<Either<bool, List<ExerciseBpModel>?>?> getExercises() async {
     try {
+      print(
+          "Request reached local db : ${DateTime.now().millisecondsSinceEpoch}");
       final exercises = await dao.getAllExercises();
       if (exercises.isEmpty) {
         return Left(false);
@@ -123,7 +125,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
       return Right(
         exercises
             .map((e) => ExerciseBpModel(
-              gifUrl: e.gifUrl,
+                  gifUrl: e.gifUrl,
                   code: e.code,
                   category: e.category,
                   muscleGroup: e.muscleGroup,
@@ -147,6 +149,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
   @override
   Future<void> insertExercises(List<ExerciseBpModel> exercises) async {
     try {
+      print("Request to insert in db: ${DateTime.now().millisecondsSinceEpoch}");
       return Future(() async => await dao.insertExerciseBps(exercises));
     } catch (err) {
       throw CacheException(

@@ -4,6 +4,7 @@ import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/usecases/get_exercises_usecase.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 part 'getexercises_state.dart';
@@ -14,8 +15,14 @@ class GetexercisesCubit extends Cubit<GetexercisesState> {
   GetexercisesCubit(this.getExercisesUsecase) : super(GetexercisesInitial());
 
   Future<void> getExercises() async {
+    if (kDebugMode) {
+      print("Request reached cubit : ${DateTime.now().millisecondsSinceEpoch}");
+    }
     emit(GetexercisesLoading());
     final result = await getExercisesUsecase(NoParams());
+    if (kDebugMode) {
+      print("Response from usecase : ${DateTime.now().millisecondsSinceEpoch}");
+    }
 
     if (result == null) {
       emit(

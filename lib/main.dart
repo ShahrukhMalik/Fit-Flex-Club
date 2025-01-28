@@ -19,8 +19,8 @@ void main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-
-      statusBarColor: globalColorScheme.tertiary.withOpacity(0.4), // Background color of the status bar
+      statusBarColor: globalColorScheme.tertiary
+          .withOpacity(0.4), // Background color of the status bar
       statusBarIconBrightness:
           Brightness.light, // Light icons (for dark background)
     ),

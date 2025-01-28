@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
@@ -96,37 +97,37 @@ class _FitFlexClubCreateWorkoutPlanPageState
     }
   }
 
-  Future _showExerciseSetSheet(
-    BuildContext context, [
-    ExerciseBpModel? exercise,
-    ExerciseModel? editExercise,
-  ]) {
-    // if (Platform.isIOS) {
-    return PlatformDialog.showCustomDialog(
-      barrierDismissible: false,
-      onlyUseContent: true,
-      actions: [],
-      context: context,
-      title: 'Workout Plan',
-      content: AddExerciseBottomSheetWidget(
-        editExercise: editExercise,
-        dayId: _currentDay.value!.id,
-        reps: exercise?.parameters?['reps'] ??
-            editExercise?.parameters?['reps'] ??
-            false,
-        duration: exercise?.parameters?['duration'] ??
-            editExercise?.parameters?['duration'] ??
-            false,
-        exercise: exercise,
-        sets: exercise?.parameters?['sets'] ??
-            editExercise?.parameters?['sets'] ??
-            false,
-        weight: exercise?.parameters?['weight'] ??
-            editExercise?.parameters?['weight'] ??
-            false,
-      ),
-    );
-  }
+  // Future _showExerciseSetSheet(
+  //   BuildContext context, [
+  //   ExerciseBpModel? exercise,
+  //   ExerciseModel? editExercise,
+  // ]) {
+  //   // if (Platform.isIOS) {
+  //   return PlatformDialog.showCustomDialog(
+  //     barrierDismissible: false,
+  //     onlyUseContent: true,
+  //     actions: [],
+  //     context: context,
+  //     title: 'Workout Plan',
+  //     content: AddExerciseBottomSheetWidget(
+  //       editExercise: editExercise,
+  //       dayId: _currentDay.value!.id,
+  //       reps: exercise?.parameters?['reps'] ??
+  //           editExercise?.parameters?['reps'] ??
+  //           false,
+  //       duration: exercise?.parameters?['duration'] ??
+  //           editExercise?.parameters?['duration'] ??
+  //           false,
+  //       exercise: exercise,
+  //       sets: exercise?.parameters?['sets'] ??
+  //           editExercise?.parameters?['sets'] ??
+  //           false,
+  //       weight: exercise?.parameters?['weight'] ??
+  //           editExercise?.parameters?['weight'] ??
+  //           false,
+  //     ),
+  //   );
+  // }
 
   void _updateDaysForCurrentWeek({
     required String weekId,
@@ -590,13 +591,33 @@ class _FitFlexClubCreateWorkoutPlanPageState
                 if (result != null) {
                   // ignore: use_build_context_synchronously
                   if (result != null) {
-                    _showExerciseSetSheet(context, result).then(
+                    final exercise = result;
+                    // ignore: use_build_context_synchronously
+                    context.push<ExerciseModel>(
+                        '${FitFlexTrainerWorkoutPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}/${FitFlexAddExercisePage.route}',
+                        extra: {
+                          'dayId': _currentDay.value!.id,
+                          'reps': exercise?.parameters?['reps'] ?? false,
+                          'duration': exercise?.parameters?['duration'] ?? false,
+                          'exercise': exercise,
+                          'sets': exercise?.parameters?['sets'] ?? false,
+                          'weight': exercise?.parameters?['weight'] ?? false,
+                        }).then(
                       (value) async {
-                        await _updateExercises(
-                          value,
-                        );
+                        if (value != null) {
+                          await _updateExercises(
+                            value,
+                          );
+                        }
                       },
                     );
+                    // _showExerciseSetSheet(context, result).then(
+                    //   (value) async {
+                    //     await _updateExercises(
+                    //       value,
+                    //     );
+                    //   },
+                    // );
                   }
                 }
               }
@@ -742,13 +763,32 @@ class _FitFlexClubCreateWorkoutPlanPageState
                       if (delete)
                         _updateExercises(editExercise, edit, delete)
                       else
-                        _showExerciseSetSheet(context, null, editExercise).then(
-                          (value) {
+                        context.push<ExerciseModel>(
+                            '${FitFlexTrainerWorkoutPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}/${FitFlexAddExercisePage.route}',
+                            extra: {
+                              'dayId': _currentDay.value!.id,
+                              'reps': editExercise.parameters?['reps'] ?? false,
+                              'duration': editExercise.parameters?['duration'] ?? false,
+                              'editExercise': editExercise,
+                              'sets': editExercise.parameters?['sets'] ?? false,
+                              'weight': editExercise.parameters?['weight'] ?? false,
+                            }).then(
+                          (value) async {
                             if (value != null) {
-                              _updateExercises(value, edit, delete);
+                              await _updateExercises(
+                                value,
+                              );
                             }
                           },
                         )
+
+                      // _showExerciseSetSheet(context, null, editExercise).then(
+                      //   (value) {
+                      //     if (value != null) {
+                      //       _updateExercises(value, edit, delete);
+                      //     }
+                      //   },
+                      // )
                     },
                     key: UniqueKey(),
                     currentDay: _currentDay,

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
@@ -65,7 +66,11 @@ class AuthenticationBloc
         await _forgotPassword(event: event, emit: emit);
       }
       if (event is ListenToEvents) {
-        await _listenToEvents(event: event, emit: emit);
+        if (getIt<FirebaseAuth>().currentUser != null) {
+          await _listenToEvents(event: event, emit: emit);
+        } else {
+          add(AuthenticateUserEvent());
+        }
       }
     });
   }

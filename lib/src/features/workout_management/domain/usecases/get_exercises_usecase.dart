@@ -18,6 +18,7 @@ class GetExercisesUsecaseImpl extends GetExercisesUsecase {
 
   @override
   Future<Either<Failures, List<ExerciseEntity>?>?>? call(NoParams params) {
+    print("Request reached usecase : ${DateTime.now().millisecondsSinceEpoch}");
     return workoutManagementRepository.getExercises();
   }
 }

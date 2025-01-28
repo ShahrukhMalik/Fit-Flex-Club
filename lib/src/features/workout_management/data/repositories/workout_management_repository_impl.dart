@@ -16,9 +16,10 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
   final NetworkInfo networkInfo;
   final WorkoutPlanManagementLocaldatasource local;
   final WorkoutPlanManagementRemotedatasource remote;
-    final SyncQueueDao syncQueueDao;
+  final SyncQueueDao syncQueueDao;
 
-  WorkoutManagementRepositoryImpl(this.syncQueueDao, {
+  WorkoutManagementRepositoryImpl(
+    this.syncQueueDao, {
     required this.networkInfo,
     required this.local,
     required this.remote,
@@ -105,10 +106,13 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
 
   @override
   Future<Either<Failures, List<ExerciseBpModel>?>?>? getExercises() async {
+    print("Request reached repo : ${DateTime.now().millisecondsSinceEpoch}");
     final isNetworkConnected = await networkInfo.isConnected;
 
     try {
       final cache = await local.getExercises();
+      print(
+          "Request from local db concluded: ${DateTime.now().millisecondsSinceEpoch}");
 
       return cache?.fold(
         (l) async {
@@ -117,9 +121,15 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
               NetworkFailure(message: 'No internet Connection'),
             );
           } else {
+            print(
+                "Request to remote db: ${DateTime.now().millisecondsSinceEpoch}");
             final remoteExercises = await remote.getExercises();
+            print(
+                "Response from remote db: ${DateTime.now().millisecondsSinceEpoch}");
             if (remoteExercises != null && remoteExercises.isNotEmpty) {
               await local.insertExercises(remoteExercises);
+              print(
+                  "Insert in db concluded: ${DateTime.now().millisecondsSinceEpoch}");
             }
             return Right(
               remoteExercises,

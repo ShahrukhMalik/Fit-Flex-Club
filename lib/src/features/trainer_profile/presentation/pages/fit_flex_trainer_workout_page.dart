@@ -9,6 +9,7 @@ import 'package:fit_flex_club/src/features/workout_management/domain/entities/ex
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -181,8 +182,15 @@ class _FitFlexTrainerWorkoutPageState extends State<FitFlexTrainerWorkoutPage> {
   @override
   void initState() {
     super.initState();
+    if (kDebugMode) {
+      print("Requesting exercises : ${DateTime.now().millisecondsSinceEpoch}");
+    }
     context.read<GetexercisesCubit>().getExercises().then(
       (value) {
+        if (kDebugMode) {
+          print(
+              "Response from cubit : ${DateTime.now().millisecondsSinceEpoch}");
+        }
         context.read<WorkoutManagementBloc>().add(GetWorkoutPlansEvent());
       },
     );
