@@ -217,7 +217,6 @@ class _FitFlexClubCreateWorkoutPlanPageState
         final copiedExercises = sourceDay.exercises.map((exercise) {
           final newExerciseId = UUIDv4().toString();
           return ExerciseModel(
-            gifUrl: exercise.gifUrl,
             id: newExerciseId,
             code: exercise.code,
             name: exercise.name,

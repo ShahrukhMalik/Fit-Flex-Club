@@ -89,6 +89,9 @@ class PlatformAppbar {
           fontSize: 20,
         ),
       ),
+      iconTheme: IconThemeData(
+        color: Color(0xFFFFCD7C),
+      ),
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       actions: [trailing ?? SizedBox()],

@@ -219,7 +219,6 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
           setModels,
           clientId: exercise.clientId,
           id: exercise.id,
-          gifUrl: exercise.gifUrl,
           code: exercise.code,
           completed: exercise.completed,
           exerciseOrder: exercise.exerciseOrder,

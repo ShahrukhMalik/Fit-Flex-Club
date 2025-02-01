@@ -129,15 +129,14 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                     valueListenable: _gifUrl,
                     builder: (context, url, _) {
                       // final data = snapshot.data;
-                      if (url?.isNotEmpty ?? false) {
-                        // if (snapshot.hasData) {
-                        if (url != null) {
+                      if (url != null) {
+                        if (url.isNotEmpty) {
+                          // if (snapshot.hasData) {
                           return Gif(
                             placeholder: (context) =>
                                 CupertinoActivityIndicator(),
                             alignment: Alignment.center,
                             autostart: Autostart.loop,
-                            useCache: true,
                             image: NetworkImage(
                               url,
                             ),
@@ -146,7 +145,7 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                           return Text('No GIF available');
                         }
                       } else {
-                        return Text('No data available');
+                        return CupertinoActivityIndicator();
                       }
                     },
                   ),

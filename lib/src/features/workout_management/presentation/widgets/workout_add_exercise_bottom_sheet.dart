@@ -11,6 +11,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/set_mo
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_debounce_textfield_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gif/gif.dart';
 import 'package:go_router/go_router.dart';
@@ -840,21 +841,40 @@ class FitFlexAddExercisePage extends StatefulWidget {
   State<FitFlexAddExercisePage> createState() => _FitFlexAddExercisePageState();
 }
 
-class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
+class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
+    with WidgetsBindingObserver {
+  bool isKeyboardVisible = false;
   late final ValueNotifier<ExerciseModel?> exerciseModel;
   late final ValueNotifier<List<SetModel>> sets;
   late final TextEditingController durationController;
   final ValueNotifier<String?> gifUrl = ValueNotifier<String?>(null);
+  final ValueNotifier<bool> isKeyboardOpen = ValueNotifier<bool>(false);
   final Map<String, TextEditingController> _controllers = {};
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    // Ensure the widget is still active before updating state
+    if (!mounted) return;
+
+    // Use the updated way to access the render view
+    final bottomInset = RendererBinding
+        .instance.renderViews.first.flutterView.viewInsets.bottom;
+
+    // Update state based on the keyboard visibility
+    isKeyboardOpen.value = bottomInset > 0;
+  }
 
   @override
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addObserver(this);
+
     // Initialize exercise model
     exerciseModel = ValueNotifier(widget.editExercise ??
         ExerciseModel(
-          gifUrl: widget.exercise?.gifUrl ?? '',
           dayId: widget.dayId,
           [],
           code: widget.exercise!.code,
@@ -923,8 +943,28 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
 
   void _addSet(SetModel newSet, [bool addNew = true, bool repeat = false]) {
     if (repeat) {
-      final lastSet = sets.value.last;
+      SetModel lastSet = sets.value.last;
       final newId = UUIDv4().toString();
+      List<SetModel> updatedSets = sets.value;
+      if (lastSet.targetDistance == null &&
+          lastSet.targetReps == null &&
+          lastSet.targetTime == null &&
+          lastSet.targetWeight == null) {
+        updatedSets.removeLast();
+        lastSet = updatedSets.last.copyWith(id: newId);
+        updatedSets.add(lastSet);
+        sets.value = updatedSets
+            .map(
+              (e) => e,
+            )
+            .toList();
+        // Create controllers for the new set
+        _controllers['${newId}_reps'] =
+            TextEditingController(text: lastSet.targetReps?.toString() ?? '');
+        _controllers['${newId}_weight'] =
+            TextEditingController(text: lastSet.targetWeight?.toString() ?? '');
+        return;
+      }
 
       // Create controllers for the new set
       _controllers['${newId}_reps'] =
@@ -1114,40 +1154,85 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
     final repsController = _controllers['${set.id}_reps'];
     final weightController = _controllers['${set.id}_weight'];
 
+    // if (widget.weight) {
+    //   if (repsController?.text.isEmpty ?? true) {
+    //     Fluttertoast.showToast(
+    //       msg: "Please input all the fields before adding new set",
+    //       backgroundColor: globalColorScheme.onErrorContainer,
+    //       textColor: globalColorScheme.primary,
+    //     );
+    //     return;
+    //   }
+    // } else if (widget.reps && !widget.weight) {
+    //   if (repsController?.text.isEmpty ?? true) {
+    //     Fluttertoast.showToast(
+    //       msg: "Please input all the fields before adding new set",
+    //       backgroundColor: globalColorScheme.onErrorContainer,
+    //       textColor: globalColorScheme.primary,
+    //     );
+    //     return;
+    //   }
+    // }
+
     if (widget.weight) {
-      if (repsController?.text.isEmpty ?? true) {
+      if (repsController!.text.isEmpty || weightController!.text.isEmpty) {
         Fluttertoast.showToast(
           msg: "Please input all the fields before adding new set",
           backgroundColor: globalColorScheme.onErrorContainer,
           textColor: globalColorScheme.primary,
         );
-        return;
+      } else {
+        _addSet(
+          SetModel(
+            clientId: set.clientId,
+            exerciseId: set.exerciseId,
+            id: set.id,
+            targetReps: int.tryParse(
+              repsController.text,
+            ),
+            targetWeight: double.tryParse(
+              weightController.text,
+            ),
+          ),
+        );
       }
     } else if (widget.reps && !widget.weight) {
-      if (repsController?.text.isEmpty ?? true) {
+      if (repsController!.text.isEmpty) {
         Fluttertoast.showToast(
           msg: "Please input all the fields before adding new set",
           backgroundColor: globalColorScheme.onErrorContainer,
           textColor: globalColorScheme.primary,
         );
-        return;
+      } else {
+        _addSet(
+          SetModel(
+            clientId: set.clientId,
+            exerciseId: set.exerciseId,
+            id: set.id,
+            targetReps: int.tryParse(
+              repsController.text,
+            ),
+          ),
+        );
       }
     }
 
-    _addSet(SetModel(
-      clientId: set.clientId,
-      exerciseId: set.exerciseId,
-      id: set.id,
-      targetReps: int.tryParse(repsController?.text ?? ''),
-      targetWeight: double.tryParse(weightController?.text ?? ''),
-    ));
+    // _addSet(SetModel(
+    //   clientId: set.clientId,
+    //   exerciseId: set.exerciseId,
+    //   id: set.id,
+    //   targetReps: int.tryParse(repsController?.text ?? ''),
+    //   targetWeight: double.tryParse(weightController?.text ?? ''),
+    // ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: PlatformAppbar.basicAppBar(
         // automaticallyImplyLeading: false,
+        onLeadingPressed: context.pop,
         backgroundColor: globalColorScheme.onPrimaryContainer,
         title: "Add Exercise",
         context: context,
@@ -1205,7 +1290,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
                                   text: 'Repeat Set',
                                   onPressed: () {
                                     _addSet(
-                                        sets![sets.length - 2]
+                                        sets[sets.length - 2]
                                             .copyWith(id: UUIDv4().toString()),
                                         false,
                                         true);
@@ -1244,7 +1329,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
                                 }
                               } else {
                                 if (widget.reps && !widget.weight) {
-                                  if (sets.value?.first.targetReps == null) {
+                                  if (sets.value.first.targetReps == null) {
                                     Fluttertoast.showToast(
                                       msg:
                                           "Please input reps for the first set",
@@ -1262,8 +1347,8 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
                                 }
 
                                 if (widget.reps && widget.weight) {
-                                  if (sets.value?.first.targetReps == null ||
-                                      sets.value?.first.targetWeight == null) {
+                                  if (sets.value.first.targetReps == null ||
+                                      sets.value.first.targetWeight == null) {
                                     Fluttertoast.showToast(
                                       msg:
                                           "Please input reps and sets for the first set",
@@ -1296,30 +1381,86 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage> {
   }
 
   Widget _buildGifPreview() {
-    return Container(
-      color: Colors.white,
-      width: double.maxFinite,
-      height: 250,
-      child: Align(
-        alignment: Alignment.center,
-        child: ValueListenableBuilder(
-          valueListenable: gifUrl,
-          builder: (context, url, _) {
-            if (url?.isNotEmpty ?? false) {
-              return Gif(
-                placeholder: (context) => CupertinoActivityIndicator(),
+    return ValueListenableBuilder(
+      valueListenable: isKeyboardOpen,
+      builder: (context, isKeyboardVisible, child) {
+        if (!isKeyboardVisible) {
+          return Column(
+            children: [
+              Container(
+                color: Colors.white,
+                width: double.maxFinite,
+                height: 250,
+                // width: double.maxFinite,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ValueListenableBuilder(
+                    valueListenable: gifUrl,
+                    builder: (context, url, _) {
+                      // final data = snapshot.data;
+                      if (url != null) {
+                        if (url.isNotEmpty) {
+                          // if (snapshot.hasData) {
+                          return Gif(
+                            placeholder: (context) =>
+                                CupertinoActivityIndicator(),
+                            alignment: Alignment.center,
+                            autostart: Autostart.loop,
+                            image: NetworkImage(
+                              url,
+                            ),
+                          );
+                        } else {
+                          return Text('No GIF available');
+                        }
+                      } else {
+                        return CupertinoActivityIndicator();
+                      }
+                    },
+                  ),
+                ),
+              ),
+              Align(
                 alignment: Alignment.center,
-                autostart: Autostart.loop,
-                useCache: true,
-                image: NetworkImage(url!),
-              );
-            } else {
-              return Text('No Gif available');
-            }
-          },
-        ),
-      ),
+                child: SizedBox(
+                  width: 40,
+                  child: Divider(
+                    // indent: 10,
+                    thickness: 3,
+                  ),
+                ),
+              ),
+            ],
+          );
+        } else {
+          return SizedBox();
+        }
+      },
     );
+    // return Container(
+    //   color: Colors.white,
+    //   width: double.maxFinite,
+    //   height: 250,
+    //   child: Align(
+    //     alignment: Alignment.center,
+    //     child: ValueListenableBuilder(
+    //       valueListenable: gifUrl,
+    //       builder: (context, url, _) {
+    //         if (url?.isNotEmpty ?? false) {
+    //           return Gif(
+    //             placeholder: (context) => CupertinoActivityIndicator(),
+    //             alignment: Alignment.center,
+    //             autostart: Autostart.loop,
+    //             useCache: true,
+    //             image: NetworkImage(url!),
+    //           );
+    //         } else {
+    //           return Text('No Gif available');
+    //         }
+    //       },
+    //     ),
+    //   ),
+    // );
   }
 
   _buildExerciseHeader() {

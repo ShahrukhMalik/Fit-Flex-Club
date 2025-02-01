@@ -77,7 +77,7 @@ class AppDatabase extends _$AppDatabase {
           // Handle schema version upgrades (when schemaVersion changes)
 
           // Example for migrating from version 1 to version 2:
-          if (from == 8 && to == 9) {
+          if (from == 9 && to == 10) {
             await m.createTable(workoutPlans);
             await m.createTable(weeks);
             await m.createTable(days);
@@ -130,7 +130,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

@@ -9,7 +9,6 @@ class ExerciseEntity extends Equatable {
   final String? targetMuscle;
   final List<String>? secondaryMuscles;
   final List<String>? instructions;
-  final String? gifUrl;
   final String? name;
   final Map<String, dynamic>? parameters;
 
@@ -22,7 +21,7 @@ class ExerciseEntity extends Equatable {
     this.targetMuscle,
     this.secondaryMuscles,
     this.instructions,
-    this.gifUrl,
+
     required this.id,
     this.exerciseOrder,
   });

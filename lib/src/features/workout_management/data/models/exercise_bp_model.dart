@@ -9,7 +9,6 @@ class ExerciseBpModel extends ExerciseEntity {
     required super.name,
     required super.parameters,
     required super.id,
-    required super.gifUrl,
     super.instructions,
     super.secondaryMuscles,
     super.targetMuscle,
@@ -22,7 +21,6 @@ class ExerciseBpModel extends ExerciseEntity {
     String id,
   ) {
     return ExerciseBpModel(
-      gifUrl: data['gifUrl'],
       instructions: (data['instructions'] as List)
           .map(
             (e) => e.toString(),
@@ -46,7 +44,6 @@ class ExerciseBpModel extends ExerciseEntity {
   // Method to convert an instance to Firestore data
   Map<String, dynamic> toFirestore() {
     return {
-      'gifUrl': gifUrl,
       'instructions': instructions,
       'secondaryMuscles': secondaryMuscles,
       'targetMuscle': targetMuscle,

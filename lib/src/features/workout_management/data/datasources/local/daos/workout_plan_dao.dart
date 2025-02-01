@@ -79,9 +79,6 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
                   // Insert new exercise
                   await into(workoutPlanExercise).insert(
                     WorkoutPlanExerciseCompanion(
-                      gifUrl: exercise.gifUrl != null
-                          ? Value(exercise.gifUrl!)
-                          : Value.absent(),
                       dayId: Value(day.id),
                       code: Value(exercise.code!),
                       id: Value(exercise.id!),
@@ -178,9 +175,6 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           exercisesBp.map((exercise) {
             final parameters = exercise.parameters ?? {};
             return BaseExerciseCompanion(
-              gifUrl: exercise.gifUrl != null
-                  ? Value(exercise.gifUrl!)
-                  : Value.absent(),
               id: Value(exercise.id ?? UUIDv4().toString()),
               code: exercise.code == null
                   ? Value.absent()
@@ -332,9 +326,6 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           for (final exercise in day.exercises) {
             final exerciseId = await into(workoutPlanExercise).insert(
               WorkoutPlanExerciseCompanion(
-                gifUrl: exercise.gifUrl != null
-                    ? Value(exercise.gifUrl!)
-                    : Value.absent(),
                 clientId: exercise.clientId != null
                     ? Value(exercise.clientId)
                     : Value.absent(),
@@ -484,9 +475,6 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         for (final exercise in day.exercises) {
           final exerciseId = await into(workoutPlanExercise).insert(
             WorkoutPlanExerciseCompanion(
-              gifUrl: exercise.gifUrl != null
-                  ? Value(exercise.gifUrl!)
-                  : Value.absent(),
               clientId: exercise.clientId != null
                   ? Value(exercise.clientId)
                   : Value.absent(),
