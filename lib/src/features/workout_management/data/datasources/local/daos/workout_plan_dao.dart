@@ -78,6 +78,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
                     .any((existing) => existing.id == exercise.id)) {
                   // Insert new exercise
                   await into(workoutPlanExercise).insert(
+                    mode: InsertMode.insertOrReplace,
                     WorkoutPlanExerciseCompanion(
                       dayId: Value(day.id),
                       code: Value(exercise.code!),
@@ -133,6 +134,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
               } else {
                 // Insert new set
                 await into(exerciseSets).insert(
+                  mode: InsertMode.insertOrReplace,
                   ExerciseSetsCompanion(
                     exerciseId: Value(exercise.id!),
                     targetReps: Value(set.targetReps),

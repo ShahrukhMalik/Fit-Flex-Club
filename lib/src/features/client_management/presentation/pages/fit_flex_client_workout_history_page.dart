@@ -87,7 +87,7 @@ class _FitFlexClientWorkoutHistoryPageState
       appBar: PreferredSize(
         preferredSize: Size(
           width,
-          height * 0.2,
+          160,
         ),
         child: _buildDateSelector(),
       ),

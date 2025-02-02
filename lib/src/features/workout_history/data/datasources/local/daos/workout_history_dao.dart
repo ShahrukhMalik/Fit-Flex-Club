@@ -30,6 +30,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
     required String exerciseUid,
   }) async {
     await into(workoutHistorySet).insert(
+      mode: InsertMode.insertOrReplace,
       WorkoutHistorySetCompanion(
         id: Value(setModel.id),
         clientId: Value(clientUid),
@@ -62,6 +63,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
         await batch(
           (batch) {
             batch.insertAll(
+              mode: InsertMode.insertOrReplace,
               workoutHistorySet,
               exerciseModel.sets.map(
                 (setModel) => WorkoutHistorySetCompanion(
@@ -83,6 +85,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
         );
 
         await into(workoutHistoryExercise).insert(
+          mode: InsertMode.insertOrReplace,
           WorkoutHistoryExerciseCompanion(
             reps: Value(exerciseModel.parameters?['reps']),
             weight: Value(exerciseModel.parameters?['weight']),
@@ -111,6 +114,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
             await batch(
               (batch) {
                 batch.insertAll(
+                  mode: InsertMode.insertOrReplace,
                   workoutHistorySet,
                   exercise.sets.map(
                     (setModel) => WorkoutHistorySetCompanion(
@@ -142,6 +146,7 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
               ),
             );
             await into(workoutHistoryExercise).insert(
+              mode: InsertMode.insertOrReplace,
               WorkoutHistoryExerciseCompanion(
                 createdAt: Value(exercise.createdAt ?? 0),
                 reps: Value(exercise.parameters?['reps']),
@@ -206,7 +211,6 @@ class WorkoutHistoryDao extends DatabaseAccessor<AppDatabase>
         }).toList();
 
         return ExerciseModel(
-
           dayId: '',
           parameters: {
             'duration': exercise.duration,

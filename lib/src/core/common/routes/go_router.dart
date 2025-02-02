@@ -208,6 +208,27 @@ GoRouter goRouter(appState) {
                             ),
                           );
                         },
+                        routes: [
+                          GoRoute(
+                            path: FitFlexAddExercisePage.route,
+                            pageBuilder: (context, state) {
+                              final extraData =
+                                  state.extra as Map<String, dynamic>?;
+                              return TransitionPage(
+                                key: state.pageKey,
+                                child: FitFlexAddExercisePage(
+                                  editExercise: extraData?['editExercise'],
+                                  dayId: extraData?['dayId'],
+                                  reps: extraData?['reps'],
+                                  duration: extraData?['duration'],
+                                  exercise: extraData?['exercise'],
+                                  weight: extraData?['weight'],
+                                  sets: extraData?['sets'],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                       GoRoute(
                         path: FitFlexTrainerHistoryPage.route,

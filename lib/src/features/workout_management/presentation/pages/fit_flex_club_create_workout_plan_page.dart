@@ -776,6 +776,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
                             if (value != null) {
                               await _updateExercises(
                                 value,
+                                true
                               );
                             }
                           },

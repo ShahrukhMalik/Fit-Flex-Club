@@ -13,6 +13,7 @@ import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_
 import 'package:fit_flex_club/src/features/syncmanager/presentation/bloc/syncmanager_bloc.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/getgifurl/getgifurl_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/getworkoutplan/getworkoutplan_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
@@ -154,6 +155,8 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
         BlocProvider(
             create: (context) => getIt<GetexercisesCubit>()),
+        BlocProvider(
+            create: (context) => getIt<GetgifurlCubit>()),
         BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
       ],

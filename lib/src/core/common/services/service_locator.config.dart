@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -135,6 +136,8 @@ import '../../../features/workout_management/domain/usecases/update_assigned_wor
     as _i661;
 import '../../../features/workout_management/domain/usecases/update_workout_plan_usecase.dart'
     as _i430;
+import '../../../features/workout_management/presentation/bloc/getgifurl/getgifurl_cubit.dart'
+    as _i449;
 import '../../../features/workout_management/presentation/bloc/getworkoutplan/getworkoutplan_cubit.dart'
     as _i441;
 import '../../../features/workout_management/presentation/bloc/workout_management_bloc.dart'
@@ -168,6 +171,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i59.FirebaseAuth>(() => registerModule.auth);
     gh.factory<_i974.FirebaseFirestore>(() => registerModule.db);
+    gh.factory<_i449.GetgifurlCubit>(() => _i449.GetgifurlCubit());
     gh.singleton<_i987.AppDatabase>(() => registerModule.localDb);
     gh.singleton<_i769.PlatformButton>(() => _i769.PlatformButton());
     gh.singleton<_i826.WorkoutPlanManagementRemotedatasource>(

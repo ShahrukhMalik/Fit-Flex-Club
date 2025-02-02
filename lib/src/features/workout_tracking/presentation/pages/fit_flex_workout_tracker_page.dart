@@ -8,10 +8,12 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/core/util/api/api_service.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_gif_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/getgifurl/getgifurl_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,18 +45,15 @@ class FitFlexWorkoutTrackerPage extends StatefulWidget {
 class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
     with WidgetsBindingObserver {
   bool isKeyboardVisible = false;
-  final ValueNotifier<String?> _gifUrl = ValueNotifier(null);
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     // fetchExerciseData();
-    ApiService.fetchGifUrl(widget.exercise.code ?? '').then(
-      (url) {
-        _gifUrl.value = url;
-      },
-    );
+    context.read<GetgifurlCubit>().getExerciseGif(
+          widget.exercise.code ?? '',
+        );
   }
 
   @override
@@ -125,28 +124,49 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                 // width: double.maxFinite,
                 child: Align(
                   alignment: Alignment.center,
-                  child: ValueListenableBuilder(
-                    valueListenable: _gifUrl,
-                    builder: (context, url, _) {
-                      // final data = snapshot.data;
-                      if (url != null) {
-                        if (url.isNotEmpty) {
-                          // if (snapshot.hasData) {
-                          return Gif(
-                            placeholder: (context) =>
-                                CupertinoActivityIndicator(),
-                            alignment: Alignment.center,
-                            autostart: Autostart.loop,
-                            image: NetworkImage(
-                              url,
-                            ),
-                          );
-                        } else {
-                          return Text('No GIF available');
-                        }
-                      } else {
-                        return CupertinoActivityIndicator();
+                  child: BlocBuilder<GetgifurlCubit, GetgifurlState>(
+                    builder: (context, state) {
+                      if (state is GetgifurlLoading) {
+                        return Center(
+                          child: CupertinoActivityIndicator(),
+                        );
                       }
+                      if (state is GetgifurlError) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 10,
+                          children: [
+                            Text(
+                              state.failures.message ??
+                                  "Something went wrong, please try again",
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                'Retry',
+                              ),
+                            )
+                          ],
+                        );
+                      }
+                      if (state is GetgifurlComplete) {
+                        final ExerciseGifModel exerciseGifModel =
+                            state.exerciseGifModel;
+                        return Gif(
+                          useCache: true,
+                          placeholder: (context) =>
+                              CupertinoActivityIndicator(),
+                          alignment: Alignment.center,
+                          autostart: Autostart.loop,
+                          image: NetworkImage(
+                            exerciseGifModel.gifUrl,
+                          ),
+                        );
+                      }
+                      return Center(
+                        child: CupertinoActivityIndicator(),
+                      );
+                      // return Loading();
                     },
                   ),
                 ),
