@@ -200,6 +200,13 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
                   ? Value.absent()
                   : Value(parameters['weight']),
               createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+              instructions: exercise.instructions != null
+                  ? Value(
+                      exercise.instructions!.join(
+                        '-/-',
+                      ),
+                    )
+                  : Value.absent(),
             );
           }).toList(),
         );

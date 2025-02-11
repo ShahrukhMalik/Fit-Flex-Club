@@ -8,8 +8,8 @@ class ExerciseModel extends Exercise {
   final int? createdAt;
   final int? updatedAt;
   const ExerciseModel(
-
     super.sets, {
+    super.instructions,
     required super.code,
     required super.id,
     super.exerciseOrder,
@@ -24,11 +24,10 @@ class ExerciseModel extends Exercise {
     this.completed,
   });
 
-
   factory ExerciseModel.fromMap(Map<String, dynamic> data) {
     // print(data['completed']);
     return ExerciseModel(
-
+      instructions: data['instructions'],
       completed: data['completed'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
@@ -81,8 +80,10 @@ class ExerciseModel extends Exercise {
     int? createdAt,
     int? updatedAt,
     String? gifUrl,
+    List<String>? instructions,
   }) {
     return ExerciseModel(
+      instructions: instructions ?? this.instructions,
       createdAt: createdAt ??
           this.createdAt, // Keep the same createdAt timestamp as before.
       updatedAt: updatedAt ?? this.updatedAt,

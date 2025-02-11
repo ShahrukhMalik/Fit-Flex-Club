@@ -11,6 +11,7 @@ class BaseExercise extends Table {
   TextColumn get muscleGroup =>
       text().withLength(min: 1, max: 100)(); // Muscle group
   TextColumn get name => text().withLength(min: 1, max: 255)(); // Exercise name
+  TextColumn get instructions => text()(); // Exercise name
   // Additional Boolean fields
   BoolColumn get reps =>
       boolean().withDefault(Constant(false))(); // Defaults to true

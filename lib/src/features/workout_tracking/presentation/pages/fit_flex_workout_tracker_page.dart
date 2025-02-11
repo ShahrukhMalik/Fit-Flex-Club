@@ -46,6 +46,8 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
     with WidgetsBindingObserver {
   bool isKeyboardVisible = false;
 
+  final ValueNotifier<int> currentIndex = ValueNotifier(0);
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +79,8 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
   Widget build(BuildContext context) {
     // final bottomInsets = MediaQuery.of(context).viewInsets.bottom;
     // bool isKeyboardOpen = bottomInsets != 0;
+
+    final colorScheme = Theme.of(context).colorScheme;
 
     return PopScope(
       canPop: false,
@@ -141,7 +145,10 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                                   "Something went wrong, please try again",
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () =>
+                                  context.read<GetgifurlCubit>().getExerciseGif(
+                                        widget.exercise.code ?? '',
+                                      ),
                               child: Text(
                                 'Retry',
                               ),
@@ -174,7 +181,7 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
               Align(
                 alignment: Alignment.center,
                 child: SizedBox(
-                  width: 40,
+                  width: 30,
                   child: Divider(
                     // indent: 10,
                     thickness: 3,
@@ -183,98 +190,174 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
               ),
             ],
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                width: double.maxFinite,
-                height: double.maxFinite,
-                color: globalColorScheme.surface,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Day ${widget.day.dayNumber}',
-                      style: TextStyle(
-                        color: globalColorScheme.primaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      widget.workoutPlan.name,
-                      style: TextStyle(
-                          color: globalColorScheme.onSurfaceVariant,
-                          // fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      '${widget.exercise.name}',
-                      style: TextStyle(
-                        color: globalColorScheme.tertiaryContainer,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    BlocListener<WorkoutManagementBloc, WorkoutManagementState>(
-                      listener: (context, state) {
-                        // if (state is GetWorkoutPlansForClientComplete) {
-                        //   context.pop();
-                        //   context.pop(
-                        //     widget.exercise.copyWith(
-                        //       completed: true,
-                        //     ),
-                        //   );
-                        // }
-                      },
-                      child: SizedBox(height: 10),
-                    ),
-                    BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
-                      listener: (context, state) {
-                        if (state is LogWorkoutHistoryLoading) {
-                          PlatformDialog.showLoadingDialog(
+              child: ValueListenableBuilder(
+                  valueListenable: currentIndex,
+                  builder: (context, index, _) {
+                    return Column(
+                      children: [
+                        if (widget.exercise.instructions != null)
+                          PlatformButton().buildButton(
+                            type: ButtonType.primary,
+                            // backgroundColor: globalColorScheme.secondary.withOpacity(0.1),
+                            foregroundColor:
+                                globalColorScheme.onPrimaryContainer,
                             context: context,
-                            message: "Saving your progress..",
-                          );
-                        }
-                        if (state is LogWorkoutHistoryComplete) {
-                          context.pop();
-                          context.pop(
-                            widget.exercise.copyWith(
-                              completed: true,
-                            ),
-                          );
-                          // context.read<WorkoutManagementBloc>().add(
-                          //       GetWorkoutPlansForClientEvent(
-                          //         clientId:
-                          //             getIt<FirebaseAuth>().currentUser!.uid,
-                          //       ),
-                          //     );
-                        }
-                      },
-                      child: Expanded(
-                        child: SetTrakerWidget(
-                          showSubmit: !isKeyboardVisible,
-                          onConfirmExit: () {
-                            context.pop(
-                                widget.exercise.copyWith(completed: false));
-                          },
-                          onSubmit: (sets) {
-                            context.read<WorkoutHistoryBloc>().add(
-                                  LogWorkoutHistoryEvent(
-                                    widget.exercise.copyWith(sets: sets),
+                            textStyle: TextStyle(
+                                color: globalColorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold),
+                            onPressed: () {
+                              if (index == 0) {
+                                currentIndex.value = 1;
+                              } else {
+                                currentIndex.value = 0;
+                              }
+                            },
+                            text: switch (index) {
+                              0 => "View Instructions",
+                              1 => "Back to tracker",
+                              _ =>
+                                "Unknown", // Default case to handle unexpected values
+                            },
+                          )!,
+                        Expanded(
+                          child: IndexedStack(
+                            index: index,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(20.0),
+                                width: double.maxFinite,
+                                height: double.maxFinite,
+                                color: globalColorScheme.surface,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Day ${widget.day.dayNumber}',
+                                      style: TextStyle(
+                                        color:
+                                            globalColorScheme.primaryContainer,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      widget.workoutPlan.name,
+                                      style: TextStyle(
+                                          color: globalColorScheme
+                                              .onSurfaceVariant,
+                                          // fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${widget.exercise.name}',
+                                      style: TextStyle(
+                                        color:
+                                            globalColorScheme.tertiaryContainer,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    BlocListener<WorkoutManagementBloc,
+                                        WorkoutManagementState>(
+                                      listener: (context, state) {
+                                        // if (state is GetWorkoutPlansForClientComplete) {
+                                        //   context.pop();
+                                        //   context.pop(
+                                        //     widget.exercise.copyWith(
+                                        //       completed: true,
+                                        //     ),
+                                        //   );
+                                        // }
+                                      },
+                                      child: SizedBox(height: 10),
+                                    ),
+                                    BlocListener<WorkoutHistoryBloc,
+                                        WorkoutHistoryState>(
+                                      listener: (context, state) {
+                                        if (state is LogWorkoutHistoryLoading) {
+                                          PlatformDialog.showLoadingDialog(
+                                            context: context,
+                                            message: "Saving your progress..",
+                                          );
+                                        }
+                                        if (state
+                                            is LogWorkoutHistoryComplete) {
+                                          context.pop();
+                                          context.pop(
+                                            widget.exercise.copyWith(
+                                              completed: true,
+                                            ),
+                                          );
+                                          // context.read<WorkoutManagementBloc>().add(
+                                          //       GetWorkoutPlansForClientEvent(
+                                          //         clientId:
+                                          //             getIt<FirebaseAuth>().currentUser!.uid,
+                                          //       ),
+                                          //     );
+                                        }
+                                      },
+                                      child: Expanded(
+                                        child: SetTrakerWidget(
+                                          showSubmit: !isKeyboardVisible,
+                                          onConfirmExit: () {
+                                            context.pop(widget.exercise
+                                                .copyWith(completed: false));
+                                          },
+                                          onSubmit: (sets) {
+                                            context
+                                                .read<WorkoutHistoryBloc>()
+                                                .add(
+                                                  LogWorkoutHistoryEvent(
+                                                    widget.exercise
+                                                        .copyWith(sets: sets),
+                                                  ),
+                                                );
+                                          },
+                                          sets: widget.exercise.sets,
+                                          showReps: widget
+                                              .exercise.parameters?['reps'],
+                                          showTime: widget
+                                              .exercise.parameters?['duration'],
+                                          showWeight: widget
+                                              .exercise.parameters?['weight'],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (widget.exercise.instructions != null)
+                                Visibility(
+                                  visible: widget.exercise.instructions != null,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: widget.exercise.instructions!
+                                          .map(
+                                            (e) => ListTile(
+                                              leading: CircleAvatar(
+                                                child: Text(
+                                                  '${widget.exercise.instructions?.indexOf(e)}',
+                                                  style: TextStyle(
+                                                    color: globalColorScheme
+                                                        .secondary,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Text(e.replaceAll(
+                                                  RegExp('["\']'), '')),
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
                                   ),
-                                );
-                          },
-                          sets: widget.exercise.sets,
-                          showReps: widget.exercise.parameters?['reps'],
-                          showTime: widget.exercise.parameters?['duration'],
-                          showWeight: widget.exercise.parameters?['weight'],
+                                )
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                      ],
+                    );
+                  }),
             ),
           ],
         ),

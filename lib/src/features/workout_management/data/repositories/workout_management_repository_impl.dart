@@ -364,7 +364,7 @@ class WorkoutManagementRepositoryImpl extends WorkoutManagementRepository {
       if (isNetworkConnected == null || !isNetworkConnected) {
         return Right(
           await syncQueueDao.logSyncAction(
-            ListenerEvents.deleteWorkoutPlan.name,
+            ListenerEvents.deleteWorkoutPlan.name,  
             'WorkoutPlans',
             workoutPlan.toMap(),
           ),

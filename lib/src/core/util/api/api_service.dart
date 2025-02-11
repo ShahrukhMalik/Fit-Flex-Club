@@ -25,13 +25,17 @@ class ApiService {
         return ExerciseGifModel.fromJson(json.decode(response.body));
       } else {
         throw ServerException(
-          errorMessage: "Something went wrong, please try again",
+          errorMessage: json.decode(response.body)['message'],
         );
       }
     } catch (e) {
-      throw ServerException(
-        errorMessage: "Something went wrong, please try again",
-      );
+      if (e.runtimeType == ServerException) {
+        throw ServerException(
+          errorMessage: (e as ServerException).errorMessage,
+        );
+      } else {
+        throw ServerException(errorMessage: e.toString());
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
@@ -125,7 +126,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
       return Right(
         exercises
             .map((e) => ExerciseBpModel(
-              
+                  instructions: e.instructions.split('-/-'),
                   code: e.code,
                   category: e.category,
                   muscleGroup: e.muscleGroup,
@@ -149,7 +150,8 @@ class WorkoutPlanManagementLocaldatasourceImpl
   @override
   Future<void> insertExercises(List<ExerciseBpModel> exercises) async {
     try {
-      print("Request to insert in db: ${DateTime.now().millisecondsSinceEpoch}");
+      print(
+          "Request to insert in db: ${DateTime.now().millisecondsSinceEpoch}");
       return Future(() async => await dao.insertExerciseBps(exercises));
     } catch (err) {
       throw CacheException(
@@ -227,6 +229,8 @@ class WorkoutPlanManagementLocaldatasourceImpl
   }
 }
 
+// Isolate.r
+
 // Function to process workout plan in a separate isolate
 WorkoutPlanModel processWorkoutPlanModel(String encodedInput) {
   // if (encodedInput != null) {
@@ -246,6 +250,7 @@ WorkoutPlanModel processWorkoutPlanModel(String encodedInput) {
     if (!exerciseGroups.containsKey(workoutExercise['id'])) {
       exerciseGroups[workoutExercise['id']] = {
         'exercise': ExerciseModel(
+          instructions: base['instructions']?.split('-/-'),
           completed: workoutExercise['completed'],
           clientId: workoutExercise['clientId'],
           dayId: workoutExercise['dayId'],

@@ -2857,6 +2857,12 @@ class $BaseExerciseTable extends BaseExercise
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 255),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _instructionsMeta =
+      const VerificationMeta('instructions');
+  @override
+  late final GeneratedColumn<String> instructions = GeneratedColumn<String>(
+      'instructions', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _repsMeta = const VerificationMeta('reps');
   @override
   late final GeneratedColumn<bool> reps = GeneratedColumn<bool>(
@@ -2907,6 +2913,7 @@ class $BaseExerciseTable extends BaseExercise
         category,
         muscleGroup,
         name,
+        instructions,
         reps,
         duration,
         weight,
@@ -2956,6 +2963,14 @@ class $BaseExerciseTable extends BaseExercise
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('instructions')) {
+      context.handle(
+          _instructionsMeta,
+          instructions.isAcceptableOrUnknown(
+              data['instructions']!, _instructionsMeta));
+    } else if (isInserting) {
+      context.missing(_instructionsMeta);
+    }
     if (data.containsKey('reps')) {
       context.handle(
           _repsMeta, reps.isAcceptableOrUnknown(data['reps']!, _repsMeta));
@@ -2997,6 +3012,8 @@ class $BaseExerciseTable extends BaseExercise
           .read(DriftSqlType.string, data['${effectivePrefix}muscle_group'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      instructions: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}instructions'])!,
       reps: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}reps'])!,
       duration: attachedDatabase.typeMapping
@@ -3024,6 +3041,7 @@ class BaseExerciseData extends DataClass
   final String? category;
   final String muscleGroup;
   final String name;
+  final String instructions;
   final bool reps;
   final bool duration;
   final bool weight;
@@ -3036,6 +3054,7 @@ class BaseExerciseData extends DataClass
       this.category,
       required this.muscleGroup,
       required this.name,
+      required this.instructions,
       required this.reps,
       required this.duration,
       required this.weight,
@@ -3054,6 +3073,7 @@ class BaseExerciseData extends DataClass
     }
     map['muscle_group'] = Variable<String>(muscleGroup);
     map['name'] = Variable<String>(name);
+    map['instructions'] = Variable<String>(instructions);
     map['reps'] = Variable<bool>(reps);
     map['duration'] = Variable<bool>(duration);
     map['weight'] = Variable<bool>(weight);
@@ -3076,6 +3096,7 @@ class BaseExerciseData extends DataClass
           : Value(category),
       muscleGroup: Value(muscleGroup),
       name: Value(name),
+      instructions: Value(instructions),
       reps: Value(reps),
       duration: Value(duration),
       weight: Value(weight),
@@ -3096,6 +3117,7 @@ class BaseExerciseData extends DataClass
       category: serializer.fromJson<String?>(json['category']),
       muscleGroup: serializer.fromJson<String>(json['muscleGroup']),
       name: serializer.fromJson<String>(json['name']),
+      instructions: serializer.fromJson<String>(json['instructions']),
       reps: serializer.fromJson<bool>(json['reps']),
       duration: serializer.fromJson<bool>(json['duration']),
       weight: serializer.fromJson<bool>(json['weight']),
@@ -3113,6 +3135,7 @@ class BaseExerciseData extends DataClass
       'category': serializer.toJson<String?>(category),
       'muscleGroup': serializer.toJson<String>(muscleGroup),
       'name': serializer.toJson<String>(name),
+      'instructions': serializer.toJson<String>(instructions),
       'reps': serializer.toJson<bool>(reps),
       'duration': serializer.toJson<bool>(duration),
       'weight': serializer.toJson<bool>(weight),
@@ -3128,6 +3151,7 @@ class BaseExerciseData extends DataClass
           Value<String?> category = const Value.absent(),
           String? muscleGroup,
           String? name,
+          String? instructions,
           bool? reps,
           bool? duration,
           bool? weight,
@@ -3140,6 +3164,7 @@ class BaseExerciseData extends DataClass
         category: category.present ? category.value : this.category,
         muscleGroup: muscleGroup ?? this.muscleGroup,
         name: name ?? this.name,
+        instructions: instructions ?? this.instructions,
         reps: reps ?? this.reps,
         duration: duration ?? this.duration,
         weight: weight ?? this.weight,
@@ -3155,6 +3180,9 @@ class BaseExerciseData extends DataClass
       muscleGroup:
           data.muscleGroup.present ? data.muscleGroup.value : this.muscleGroup,
       name: data.name.present ? data.name.value : this.name,
+      instructions: data.instructions.present
+          ? data.instructions.value
+          : this.instructions,
       reps: data.reps.present ? data.reps.value : this.reps,
       duration: data.duration.present ? data.duration.value : this.duration,
       weight: data.weight.present ? data.weight.value : this.weight,
@@ -3172,6 +3200,7 @@ class BaseExerciseData extends DataClass
           ..write('category: $category, ')
           ..write('muscleGroup: $muscleGroup, ')
           ..write('name: $name, ')
+          ..write('instructions: $instructions, ')
           ..write('reps: $reps, ')
           ..write('duration: $duration, ')
           ..write('weight: $weight, ')
@@ -3183,7 +3212,7 @@ class BaseExerciseData extends DataClass
 
   @override
   int get hashCode => Object.hash(id, clientId, code, category, muscleGroup,
-      name, reps, duration, weight, createdAt, updatedAt);
+      name, instructions, reps, duration, weight, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3194,6 +3223,7 @@ class BaseExerciseData extends DataClass
           other.category == this.category &&
           other.muscleGroup == this.muscleGroup &&
           other.name == this.name &&
+          other.instructions == this.instructions &&
           other.reps == this.reps &&
           other.duration == this.duration &&
           other.weight == this.weight &&
@@ -3208,6 +3238,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
   final Value<String?> category;
   final Value<String> muscleGroup;
   final Value<String> name;
+  final Value<String> instructions;
   final Value<bool> reps;
   final Value<bool> duration;
   final Value<bool> weight;
@@ -3221,6 +3252,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     this.category = const Value.absent(),
     this.muscleGroup = const Value.absent(),
     this.name = const Value.absent(),
+    this.instructions = const Value.absent(),
     this.reps = const Value.absent(),
     this.duration = const Value.absent(),
     this.weight = const Value.absent(),
@@ -3235,6 +3267,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     this.category = const Value.absent(),
     required String muscleGroup,
     required String name,
+    required String instructions,
     this.reps = const Value.absent(),
     this.duration = const Value.absent(),
     this.weight = const Value.absent(),
@@ -3244,7 +3277,8 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
   })  : id = Value(id),
         code = Value(code),
         muscleGroup = Value(muscleGroup),
-        name = Value(name);
+        name = Value(name),
+        instructions = Value(instructions);
   static Insertable<BaseExerciseData> custom({
     Expression<String>? id,
     Expression<String>? clientId,
@@ -3252,6 +3286,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     Expression<String>? category,
     Expression<String>? muscleGroup,
     Expression<String>? name,
+    Expression<String>? instructions,
     Expression<bool>? reps,
     Expression<bool>? duration,
     Expression<bool>? weight,
@@ -3266,6 +3301,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
       if (category != null) 'category': category,
       if (muscleGroup != null) 'muscle_group': muscleGroup,
       if (name != null) 'name': name,
+      if (instructions != null) 'instructions': instructions,
       if (reps != null) 'reps': reps,
       if (duration != null) 'duration': duration,
       if (weight != null) 'weight': weight,
@@ -3282,6 +3318,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
       Value<String?>? category,
       Value<String>? muscleGroup,
       Value<String>? name,
+      Value<String>? instructions,
       Value<bool>? reps,
       Value<bool>? duration,
       Value<bool>? weight,
@@ -3295,6 +3332,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
       category: category ?? this.category,
       muscleGroup: muscleGroup ?? this.muscleGroup,
       name: name ?? this.name,
+      instructions: instructions ?? this.instructions,
       reps: reps ?? this.reps,
       duration: duration ?? this.duration,
       weight: weight ?? this.weight,
@@ -3324,6 +3362,9 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (instructions.present) {
+      map['instructions'] = Variable<String>(instructions.value);
     }
     if (reps.present) {
       map['reps'] = Variable<bool>(reps.value);
@@ -3355,6 +3396,7 @@ class BaseExerciseCompanion extends UpdateCompanion<BaseExerciseData> {
           ..write('category: $category, ')
           ..write('muscleGroup: $muscleGroup, ')
           ..write('name: $name, ')
+          ..write('instructions: $instructions, ')
           ..write('reps: $reps, ')
           ..write('duration: $duration, ')
           ..write('weight: $weight, ')
@@ -8467,6 +8509,7 @@ typedef $$BaseExerciseTableCreateCompanionBuilder = BaseExerciseCompanion
   Value<String?> category,
   required String muscleGroup,
   required String name,
+  required String instructions,
   Value<bool> reps,
   Value<bool> duration,
   Value<bool> weight,
@@ -8482,6 +8525,7 @@ typedef $$BaseExerciseTableUpdateCompanionBuilder = BaseExerciseCompanion
   Value<String?> category,
   Value<String> muscleGroup,
   Value<String> name,
+  Value<String> instructions,
   Value<bool> reps,
   Value<bool> duration,
   Value<bool> weight,
@@ -8533,6 +8577,9 @@ class $$BaseExerciseTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get instructions => $composableBuilder(
+      column: $table.instructions, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get reps => $composableBuilder(
       column: $table.reps, builder: (column) => ColumnFilters(column));
@@ -8594,6 +8641,10 @@ class $$BaseExerciseTableOrderingComposer
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get instructions => $composableBuilder(
+      column: $table.instructions,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get reps => $composableBuilder(
       column: $table.reps, builder: (column) => ColumnOrderings(column));
 
@@ -8653,6 +8704,9 @@ class $$BaseExerciseTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get instructions => $composableBuilder(
+      column: $table.instructions, builder: (column) => column);
 
   GeneratedColumn<bool> get reps =>
       $composableBuilder(column: $table.reps, builder: (column) => column);
@@ -8719,6 +8773,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             Value<String?> category = const Value.absent(),
             Value<String> muscleGroup = const Value.absent(),
             Value<String> name = const Value.absent(),
+            Value<String> instructions = const Value.absent(),
             Value<bool> reps = const Value.absent(),
             Value<bool> duration = const Value.absent(),
             Value<bool> weight = const Value.absent(),
@@ -8733,6 +8788,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             category: category,
             muscleGroup: muscleGroup,
             name: name,
+            instructions: instructions,
             reps: reps,
             duration: duration,
             weight: weight,
@@ -8747,6 +8803,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             Value<String?> category = const Value.absent(),
             required String muscleGroup,
             required String name,
+            required String instructions,
             Value<bool> reps = const Value.absent(),
             Value<bool> duration = const Value.absent(),
             Value<bool> weight = const Value.absent(),
@@ -8761,6 +8818,7 @@ class $$BaseExerciseTableTableManager extends RootTableManager<
             category: category,
             muscleGroup: muscleGroup,
             name: name,
+            instructions: instructions,
             reps: reps,
             duration: duration,
             weight: weight,

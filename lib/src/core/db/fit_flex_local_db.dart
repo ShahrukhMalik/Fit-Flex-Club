@@ -77,7 +77,30 @@ class AppDatabase extends _$AppDatabase {
           // Handle schema version upgrades (when schemaVersion changes)
 
           // Example for migrating from version 1 to version 2:
-          if (from == 9 && to == 10) {
+          if ((from == 1 ||
+                  from == 2 ||
+                  from == 3 ||
+                  from == 4 ||
+                  from == 5 ||
+                  from == 6 ||
+                  from == 7 ||
+                  from == 8 ||
+                  from == 9 ||
+                  from == 10 ||
+                  from == 11) &&
+              to == 12) {
+            await m.drop(workoutPlans);
+            await m.drop(weeks);
+            await m.drop(days);
+            await m.drop(workoutPlanExercise);
+            await m.drop(exerciseSets);
+            await m.drop(baseExercise);
+            await m.drop(clients);
+            await m.drop(clientWeight);
+            await m.drop(workoutHistorySet);
+            await m.drop(syncQueue);
+            await m.drop(workoutHistoryExercise);
+            /////////////////
             await m.createTable(workoutPlans);
             await m.createTable(weeks);
             await m.createTable(days);
@@ -130,7 +153,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 12;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');
