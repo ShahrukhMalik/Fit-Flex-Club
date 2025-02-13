@@ -1,22 +1,22 @@
 class ExerciseGifModel {
-  final String bodyPart;
-  final String equipment;
-  final String gifUrl;
-  final String id;
-  final String name;
-  final String target;
-  final List<String> secondaryMuscles;
-  final List<String> instructions;
+  final String? bodyPart;
+  final String? equipment;
+  final String? gifUrl;
+  final String? id;
+  final String? name;
+  final String? target;
+  final List<String>? secondaryMuscles;
+  final List<String>? instructions;
 
   ExerciseGifModel({
-    required this.bodyPart,
-    required this.equipment,
-    required this.gifUrl,
-    required this.id,
-    required this.name,
-    required this.target,
-    required this.secondaryMuscles,
-    required this.instructions,
+    this.bodyPart,
+    this.equipment,
+    this.gifUrl,
+    this.id,
+    this.name,
+    this.target,
+    this.secondaryMuscles,
+    this.instructions,
   });
 
   factory ExerciseGifModel.fromJson(Map<String, dynamic> json) {

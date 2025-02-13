@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gif/gif.dart';
+import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
@@ -166,7 +167,7 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                           alignment: Alignment.center,
                           autostart: Autostart.loop,
                           image: NetworkImage(
-                            exerciseGifModel.gifUrl,
+                            exerciseGifModel.gifUrl ?? '',
                           ),
                         );
                       }
@@ -197,7 +198,7 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                       children: [
                         if (widget.exercise.instructions != null)
                           PlatformButton().buildButton(
-                            type: ButtonType.primary,
+                            type: ButtonType.text,
                             // backgroundColor: globalColorScheme.secondary.withOpacity(0.1),
                             foregroundColor:
                                 globalColorScheme.onPrimaryContainer,
@@ -344,8 +345,13 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                                                   ),
                                                 ),
                                               ),
-                                              title: Text(e.replaceAll(
-                                                  RegExp('["\']'), '')),
+                                              title: Text(
+                                                toBeginningOfSentenceCase(
+                                                    e.replaceAll(
+                                                  RegExp('["\']'),
+                                                  '',
+                                                )),
+                                              ),
                                             ),
                                           )
                                           .toList(),

@@ -33,7 +33,7 @@ class ExerciseBpModel extends ExerciseEntity {
           .toList(),
       targetMuscle: data['targetMuscle'],
       id: id,
-      code: data['code'],
+      code: data['code'].toString(),
       category: data['category'],
       muscleGroup: data['muscleGroup'],
       name: data['name'],

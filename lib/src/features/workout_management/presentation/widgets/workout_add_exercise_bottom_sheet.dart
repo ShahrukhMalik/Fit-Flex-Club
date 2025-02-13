@@ -1428,7 +1428,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
                           alignment: Alignment.center,
                           autostart: Autostart.loop,
                           image: NetworkImage(
-                            exerciseGifModel.gifUrl,
+                            exerciseGifModel.gifUrl ?? '',
                           ),
                         );
                       }
