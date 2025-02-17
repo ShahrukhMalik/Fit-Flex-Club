@@ -347,10 +347,11 @@ class _FitFlexWorkoutTrackerPageState extends State<FitFlexWorkoutTrackerPage>
                                               ),
                                               title: Text(
                                                 toBeginningOfSentenceCase(
-                                                    e.replaceAll(
-                                                  RegExp('["\']'),
-                                                  '',
-                                                )),
+                                                  e.replaceAll(
+                                                    RegExp('["\']'),
+                                                    '',
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           )

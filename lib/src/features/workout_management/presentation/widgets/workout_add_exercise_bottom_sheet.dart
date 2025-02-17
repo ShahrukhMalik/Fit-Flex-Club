@@ -849,7 +849,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
   bool isKeyboardVisible = false;
   late final ValueNotifier<ExerciseModel?> exerciseModel;
   late final ValueNotifier<List<SetModel>> sets;
-  late final TextEditingController durationController;
+  // late final TextEditingController durationController;
 
   final ValueNotifier<bool> isKeyboardOpen = ValueNotifier<bool>(false);
   final Map<String, TextEditingController> _controllers = {};
@@ -897,10 +897,10 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
           ),
         ]);
 
-    // Initialize controllers
-    durationController = TextEditingController(
-        text: widget.editExercise?.sets.firstOrNull?.targetTime?.inMinutes
-            .toString());
+    // // Initialize controllers
+    // durationController = TextEditingController(
+    //     text: widget.editExercise?.sets.firstOrNull?.targetTime?.inMinutes
+    //         .toString());
 
     context.read<GetgifurlCubit>().getExerciseGif(
           widget.exercise?.code ?? widget.editExercise?.code ?? '',
@@ -919,6 +919,8 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
           TextEditingController(text: set.targetReps?.toString() ?? '');
       _controllers['${set.id}_weight'] =
           TextEditingController(text: set.targetWeight?.toString() ?? '');
+      _controllers['${set.id}_duration'] = TextEditingController(
+          text: set.targetTime?.inMinutes.toString() ?? '');
     }
   }
 
@@ -926,6 +928,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
     // Remove controllers for the deleted set
     _controllers.remove('${setId}_reps');
     _controllers.remove('${setId}_weight');
+    _controllers.remove('${setId}_duration');
 
     final updatedSets = sets.value.where((set) => set.id != setId).toList();
     sets.value = updatedSets;
@@ -959,10 +962,15 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
             )
             .toList();
         // Create controllers for the new set
-        _controllers['${newId}_reps'] =
-            TextEditingController(text: lastSet.targetReps?.toString() ?? '');
-        _controllers['${newId}_weight'] =
-            TextEditingController(text: lastSet.targetWeight?.toString() ?? '');
+        _controllers['${newId}_reps'] = TextEditingController(
+          text: lastSet.targetReps?.toString() ?? '',
+        );
+        _controllers['${newId}_weight'] = TextEditingController(
+          text: lastSet.targetWeight?.toString() ?? '',
+        );
+        _controllers['${newId}_duration'] = TextEditingController(
+          text: lastSet.targetTime?.inMinutes.toString() ?? '',
+        );
         return;
       }
 
@@ -971,6 +979,9 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
           TextEditingController(text: lastSet.targetReps?.toString() ?? '');
       _controllers['${newId}_weight'] =
           TextEditingController(text: lastSet.targetWeight?.toString() ?? '');
+      _controllers['${newId}_duration'] = TextEditingController(
+        text: lastSet.targetTime?.inMinutes.toString() ?? '',
+      );
 
       sets.value = [...sets.value, lastSet.copyWith(id: newId)];
       return;
@@ -993,6 +1004,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
     final newId = UUIDv4().toString();
     _controllers['${newId}_reps'] = TextEditingController();
     _controllers['${newId}_weight'] = TextEditingController();
+    _controllers['${newId}_duration'] = TextEditingController();
 
     updatedSets.add(SetModel(
       clientId: newSet.clientId,
@@ -1007,7 +1019,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
   void dispose() {
     exerciseModel.dispose();
     sets.dispose();
-    durationController.dispose();
+    // durationController.dispose();
 
     // Dispose all set controllers
     for (final controller in _controllers.values) {
@@ -1024,33 +1036,64 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
           return SingleChildScrollView(
             child: Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              columnWidths: widget.weight
-                  ? {
-                      0: FlexColumnWidth(1),
-                      1: FlexColumnWidth(3),
-                      2: FlexColumnWidth(3),
-                      3: FlexColumnWidth(2),
-                    }
-                  : {
-                      0: FlexColumnWidth(1),
-                      1: FlexColumnWidth(2),
-                      2: FlexColumnWidth(1),
-                    },
+              // columnWidths: widget.weight
+              //     ? {
+              //         0: FlexColumnWidth(1),
+              //         1: FlexColumnWidth(3),
+              //         2: FlexColumnWidth(3),
+              //         3: FlexColumnWidth(2),
+              //       }
+              //     : {
+              //         0: FlexColumnWidth(1),
+              //         1: FlexColumnWidth(2),
+              //         2: FlexColumnWidth(1),
+              //       },
               children: [
                 TableRow(
                   children: [
                     Center(
-                        child: Text('Set',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
+                      child: Text(
+                        'Set',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                     if (widget.reps)
                       Center(
-                          child: Text('Reps',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
+                        child: Text(
+                          'Reps',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     if (widget.weight)
                       Center(
-                          child: Text('Weight',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                    Center(child: Text('')),
+                        child: Text(
+                          'Weight',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    if (widget.duration)
+                      Center(
+                        child: Text(
+                          'Duration',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    Center(
+                      child: Text(
+                        '',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 ...updatedSets.asMap().entries.map((entry) {
@@ -1062,6 +1105,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
                       _buildSetNumber(index),
                       if (widget.reps) _buildRepsField(set),
                       if (widget.weight) _buildWeightField(set),
+                      if (widget.duration) _buildDurationField(set),
                       _buildSetActions(set),
                     ],
                   );
@@ -1120,6 +1164,23 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
     );
   }
 
+  Widget _buildDurationField(SetModel set) {
+    return DebouncedTextField(
+      controller: _controllers['${set.id}_duration']!,
+      onChanged: (value) {
+        _editSet(
+          SetModel(
+            exerciseId: set.exerciseId,
+            id: set.id,
+            targetReps: set.targetReps,
+            targetWeight: double.tryParse(value),
+            targetTime: Duration(minutes: int.tryParse(value) ?? 0),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildSetActions(SetModel set) {
     return Center(
       child: Row(
@@ -1152,6 +1213,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
   void _handleAddSet(SetModel set) {
     final repsController = _controllers['${set.id}_reps'];
     final weightController = _controllers['${set.id}_weight'];
+    final durationController = _controllers['${set.id}_duration'];
 
     // if (widget.weight) {
     //   if (repsController?.text.isEmpty ?? true) {
@@ -1172,6 +1234,31 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
     //     return;
     //   }
     // }
+
+    if (widget.duration) {
+      if ((durationController ?? TextEditingController()).text.isEmpty) {
+        Fluttertoast.showToast(
+          msg: "Please input all the fields before adding new set",
+          backgroundColor: globalColorScheme.onErrorContainer,
+          textColor: globalColorScheme.primary,
+        );
+      } else {
+        _addSet(
+          SetModel(
+            clientId: set.clientId,
+            exerciseId: set.exerciseId,
+            id: set.id,
+            targetWeight: set.targetWeight,
+            targetTime: Duration(
+              minutes: int.tryParse(
+                    (durationController ?? TextEditingController()).text,
+                  ) ??
+                  0,
+            ),
+          ),
+        );
+      }
+    }
 
     if (widget.weight) {
       if (repsController!.text.isEmpty || weightController!.text.isEmpty) {
@@ -1312,7 +1399,10 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
                             text: 'Submit',
                             onPressed: () {
                               if (widget.duration) {
-                                if (durationController.text.isEmpty) {
+                                if ((sets.value.first.targetTime ??
+                                            Duration(minutes: 0))
+                                        .inMinutes <=
+                                    0) {
                                   Fluttertoast.showToast(
                                     msg: "Duration is not entered",
                                     backgroundColor:
