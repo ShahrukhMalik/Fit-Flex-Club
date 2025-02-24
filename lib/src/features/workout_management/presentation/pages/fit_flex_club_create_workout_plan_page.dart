@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
@@ -26,6 +30,7 @@ import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:uuid_v4/uuid_v4.dart';
@@ -60,7 +65,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
     with SingleTickerProviderStateMixin {
   bool isProgramEdited = false;
   late ValueNotifier<WorkoutPlanModel> _workoutPlanBp = ValueNotifier(
-    WorkoutPlanModel(name: "", weeks: [], uid: ''),
+    WorkoutPlanModel(name: "", weeks: [], uid: '', dietPlanBase64: null),
   );
   // final ValueNotifier<List<ExerciseEntity> ?> = ValueNotifier(null);
   final ValueNotifier<List<DayModel>> _days = ValueNotifier([]);
@@ -277,6 +282,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
           name: '',
           weeks: weeks,
           uid: workoutPlanId,
+          dietPlanBase64: workoutPlanModel?.dietPlanBase64,
         ),
       );
     } else {
@@ -747,69 +753,8 @@ class _FitFlexClubCreateWorkoutPlanPageState
               ),
 
               //
-              Container(
-                padding: const EdgeInsets.all(10),
-                // width: 130,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: globalColorScheme.surface,
-                  border: Border.all(
-                    width: 1,
-                    color: globalColorScheme.primaryContainer,
-                  ),
-                ),
-                margin: const EdgeInsets.all(10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          // Padding(
-                          //   padding: const EdgeInsets.only(right: 8.0),
-                          //   child: CircleAvatar(
-                          //     child: Icon(Icons.food_bank_sharp),
-                          //   ),
-                          // ),
-                          Expanded(
-                            child: Text(
-                              'Checkout Your Diet Plan',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: globalColorScheme.tertiaryContainer,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          style: IconButton.styleFrom(
-                              backgroundColor: globalColorScheme.inversePrimary,
-                              foregroundColor:
-                                  globalColorScheme.tertiary),
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.edit,
-                          ),
-                        ),
-                        IconButton(
-                          style: IconButton.styleFrom(
-                              backgroundColor: globalColorScheme.inversePrimary,
-                              foregroundColor:
-                                  globalColorScheme.tertiary),
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.arrow_forward_ios,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+              DietPlanWidget(
+                workoutPlanModel: _workoutPlanBp,
               ),
               // Week Selector
               AutoScrollWeeksWidget(
@@ -893,6 +838,176 @@ class _FitFlexClubCreateWorkoutPlanPageState
           )!,
         ),
       ],
+    );
+  }
+}
+
+class DietPlanWidget extends StatefulWidget {
+  final ValueNotifier<WorkoutPlanModel> workoutPlanModel;
+  const DietPlanWidget({
+    super.key,
+    required this.workoutPlanModel,
+  });
+
+  @override
+  State<DietPlanWidget> createState() => _DietPlanWidgetState();
+}
+
+class _DietPlanWidgetState extends State<DietPlanWidget> {
+  Future<String?> _pickAndConvertPdfToBase64() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        File file = File(result.files.single.path!);
+        List<int> fileBytes = await file.readAsBytes();
+        String base64String = base64Encode(fileBytes);
+        return base64String;
+      } else {
+        // User canceled the picker
+        return null;
+      }
+    } catch (e) {
+      print("Error picking file: $e");
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isTrainer =
+        getIt<SharedPrefsUtil>().getAuthEntity()?.isTrainer ?? false;
+    return ValueListenableBuilder(
+      valueListenable: widget.workoutPlanModel,
+      builder: (context, workOutPlan, _) {
+        if (isTrainer) {
+          return Container(
+            padding: const EdgeInsets.all(10),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: globalColorScheme.surface,
+              border: Border.all(
+                width: 1,
+                color: globalColorScheme.primaryContainer,
+              ),
+            ),
+            margin: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Expanded(
+                    child: Text(
+                      isTrainer ? "Diet Plan" : 'Checkout Your Diet Plan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: globalColorScheme.tertiaryContainer,
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    if (workOutPlan.dietPlanBase64 != null) ...[
+                      IconButton(
+                        style: IconButton.styleFrom(
+                            backgroundColor: globalColorScheme.inversePrimary,
+                            foregroundColor: globalColorScheme.tertiary),
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.edit,
+                        ),
+                      ),
+                      IconButton(
+                        style: IconButton.styleFrom(
+                            backgroundColor: globalColorScheme.inversePrimary,
+                            foregroundColor: globalColorScheme.tertiary),
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                        ),
+                      ),
+                    ] else
+                      IconButton(
+                        style: IconButton.styleFrom(
+                          backgroundColor: globalColorScheme.inversePrimary,
+                          foregroundColor: globalColorScheme.tertiary,
+                        ),
+                        onPressed: () async {
+                          final dietPlanBase64 =
+                              await _pickAndConvertPdfToBase64();
+                          if (dietPlanBase64 != null) {
+                            widget.workoutPlanModel.value = widget
+                                .workoutPlanModel.value
+                                .copyWith(dietPlanBase64: dietPlanBase64);
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: "File type is not supported",
+                              backgroundColor: globalColorScheme.secondary,
+                              textColor: globalColorScheme.onPrimaryContainer,
+                              fontSize: 18,
+                              gravity: ToastGravity.TOP,
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.add,
+                        ),
+                      )
+                  ],
+                )
+              ],
+            ),
+          );
+        } else {
+          if (workOutPlan.dietPlanBase64 != null) {
+            return Container(
+              padding: const EdgeInsets.all(10),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: globalColorScheme.surface,
+                border: Border.all(
+                  width: 1,
+                  color: globalColorScheme.primaryContainer,
+                ),
+              ),
+              margin: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Expanded(
+                      child: Text(
+                        'Checkout Your Diet Plan',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: globalColorScheme.tertiaryContainer,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                        backgroundColor: globalColorScheme.inversePrimary,
+                        foregroundColor: globalColorScheme.tertiary),
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.arrow_forward_ios,
+                    ),
+                  )
+                ],
+              ),
+            );
+          } else {
+            return SizedBox.shrink();
+          }
+        }
+      },
     );
   }
 }

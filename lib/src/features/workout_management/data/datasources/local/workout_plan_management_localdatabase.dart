@@ -325,6 +325,7 @@ WorkoutPlanModel processWorkoutPlanModel(String encodedInput) {
     name: workoutPlan['name'],
     weeks: weekModels,
     uid: workoutPlan['uid'],
+    dietPlanBase64: workoutPlan['dietPlanBase64'],
   );
   // } else {
   //   return null;

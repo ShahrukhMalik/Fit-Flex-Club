@@ -813,6 +813,12 @@ class $WorkoutPlansTable extends WorkoutPlans
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 255),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _dietPlanBase64Meta =
+      const VerificationMeta('dietPlanBase64');
+  @override
+  late final GeneratedColumn<String> dietPlanBase64 = GeneratedColumn<String>(
+      'diet_plan_base64', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -838,7 +844,7 @@ class $WorkoutPlansTable extends WorkoutPlans
           GeneratedColumn.constraintIsAlways('REFERENCES clients (id)'));
   @override
   List<GeneratedColumn> get $columns =>
-      [uid, name, createdAt, updatedAt, clientId];
+      [uid, name, dietPlanBase64, createdAt, updatedAt, clientId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -860,6 +866,12 @@ class $WorkoutPlansTable extends WorkoutPlans
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('diet_plan_base64')) {
+      context.handle(
+          _dietPlanBase64Meta,
+          dietPlanBase64.isAcceptableOrUnknown(
+              data['diet_plan_base64']!, _dietPlanBase64Meta));
     }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
@@ -886,6 +898,8 @@ class $WorkoutPlansTable extends WorkoutPlans
           .read(DriftSqlType.string, data['${effectivePrefix}uid'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      dietPlanBase64: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}diet_plan_base64']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -904,12 +918,14 @@ class $WorkoutPlansTable extends WorkoutPlans
 class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
   final String uid;
   final String name;
+  final String? dietPlanBase64;
   final int createdAt;
   final int? updatedAt;
   final String? clientId;
   const WorkoutPlan(
       {required this.uid,
       required this.name,
+      this.dietPlanBase64,
       required this.createdAt,
       this.updatedAt,
       this.clientId});
@@ -918,6 +934,9 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
     final map = <String, Expression>{};
     map['uid'] = Variable<String>(uid);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || dietPlanBase64 != null) {
+      map['diet_plan_base64'] = Variable<String>(dietPlanBase64);
+    }
     map['created_at'] = Variable<int>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<int>(updatedAt);
@@ -932,6 +951,9 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
     return WorkoutPlansCompanion(
       uid: Value(uid),
       name: Value(name),
+      dietPlanBase64: dietPlanBase64 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dietPlanBase64),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -948,6 +970,7 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
     return WorkoutPlan(
       uid: serializer.fromJson<String>(json['uid']),
       name: serializer.fromJson<String>(json['name']),
+      dietPlanBase64: serializer.fromJson<String?>(json['dietPlanBase64']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int?>(json['updatedAt']),
       clientId: serializer.fromJson<String?>(json['clientId']),
@@ -959,6 +982,7 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
     return <String, dynamic>{
       'uid': serializer.toJson<String>(uid),
       'name': serializer.toJson<String>(name),
+      'dietPlanBase64': serializer.toJson<String?>(dietPlanBase64),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int?>(updatedAt),
       'clientId': serializer.toJson<String?>(clientId),
@@ -968,12 +992,15 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
   WorkoutPlan copyWith(
           {String? uid,
           String? name,
+          Value<String?> dietPlanBase64 = const Value.absent(),
           int? createdAt,
           Value<int?> updatedAt = const Value.absent(),
           Value<String?> clientId = const Value.absent()}) =>
       WorkoutPlan(
         uid: uid ?? this.uid,
         name: name ?? this.name,
+        dietPlanBase64:
+            dietPlanBase64.present ? dietPlanBase64.value : this.dietPlanBase64,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
         clientId: clientId.present ? clientId.value : this.clientId,
@@ -982,6 +1009,9 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
     return WorkoutPlan(
       uid: data.uid.present ? data.uid.value : this.uid,
       name: data.name.present ? data.name.value : this.name,
+      dietPlanBase64: data.dietPlanBase64.present
+          ? data.dietPlanBase64.value
+          : this.dietPlanBase64,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       clientId: data.clientId.present ? data.clientId.value : this.clientId,
@@ -993,6 +1023,7 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
     return (StringBuffer('WorkoutPlan(')
           ..write('uid: $uid, ')
           ..write('name: $name, ')
+          ..write('dietPlanBase64: $dietPlanBase64, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('clientId: $clientId')
@@ -1001,13 +1032,15 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
   }
 
   @override
-  int get hashCode => Object.hash(uid, name, createdAt, updatedAt, clientId);
+  int get hashCode =>
+      Object.hash(uid, name, dietPlanBase64, createdAt, updatedAt, clientId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WorkoutPlan &&
           other.uid == this.uid &&
           other.name == this.name &&
+          other.dietPlanBase64 == this.dietPlanBase64 &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.clientId == this.clientId);
@@ -1016,6 +1049,7 @@ class WorkoutPlan extends DataClass implements Insertable<WorkoutPlan> {
 class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
   final Value<String> uid;
   final Value<String> name;
+  final Value<String?> dietPlanBase64;
   final Value<int> createdAt;
   final Value<int?> updatedAt;
   final Value<String?> clientId;
@@ -1023,6 +1057,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
   const WorkoutPlansCompanion({
     this.uid = const Value.absent(),
     this.name = const Value.absent(),
+    this.dietPlanBase64 = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.clientId = const Value.absent(),
@@ -1031,6 +1066,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
   WorkoutPlansCompanion.insert({
     required String uid,
     required String name,
+    this.dietPlanBase64 = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.clientId = const Value.absent(),
@@ -1040,6 +1076,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
   static Insertable<WorkoutPlan> custom({
     Expression<String>? uid,
     Expression<String>? name,
+    Expression<String>? dietPlanBase64,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
     Expression<String>? clientId,
@@ -1048,6 +1085,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
     return RawValuesInsertable({
       if (uid != null) 'uid': uid,
       if (name != null) 'name': name,
+      if (dietPlanBase64 != null) 'diet_plan_base64': dietPlanBase64,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (clientId != null) 'client_id': clientId,
@@ -1058,6 +1096,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
   WorkoutPlansCompanion copyWith(
       {Value<String>? uid,
       Value<String>? name,
+      Value<String?>? dietPlanBase64,
       Value<int>? createdAt,
       Value<int?>? updatedAt,
       Value<String?>? clientId,
@@ -1065,6 +1104,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
     return WorkoutPlansCompanion(
       uid: uid ?? this.uid,
       name: name ?? this.name,
+      dietPlanBase64: dietPlanBase64 ?? this.dietPlanBase64,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       clientId: clientId ?? this.clientId,
@@ -1080,6 +1120,9 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (dietPlanBase64.present) {
+      map['diet_plan_base64'] = Variable<String>(dietPlanBase64.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
@@ -1101,6 +1144,7 @@ class WorkoutPlansCompanion extends UpdateCompanion<WorkoutPlan> {
     return (StringBuffer('WorkoutPlansCompanion(')
           ..write('uid: $uid, ')
           ..write('name: $name, ')
+          ..write('dietPlanBase64: $dietPlanBase64, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('clientId: $clientId, ')
@@ -6389,6 +6433,7 @@ typedef $$WorkoutPlansTableCreateCompanionBuilder = WorkoutPlansCompanion
     Function({
   required String uid,
   required String name,
+  Value<String?> dietPlanBase64,
   Value<int> createdAt,
   Value<int?> updatedAt,
   Value<String?> clientId,
@@ -6398,6 +6443,7 @@ typedef $$WorkoutPlansTableUpdateCompanionBuilder = WorkoutPlansCompanion
     Function({
   Value<String> uid,
   Value<String> name,
+  Value<String?> dietPlanBase64,
   Value<int> createdAt,
   Value<int?> updatedAt,
   Value<String?> clientId,
@@ -6453,6 +6499,10 @@ class $$WorkoutPlansTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dietPlanBase64 => $composableBuilder(
+      column: $table.dietPlanBase64,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -6517,6 +6567,10 @@ class $$WorkoutPlansTableOrderingComposer
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get dietPlanBase64 => $composableBuilder(
+      column: $table.dietPlanBase64,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -6558,6 +6612,9 @@ class $$WorkoutPlansTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get dietPlanBase64 => $composableBuilder(
+      column: $table.dietPlanBase64, builder: (column) => column);
 
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -6632,6 +6689,7 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<String> uid = const Value.absent(),
             Value<String> name = const Value.absent(),
+            Value<String?> dietPlanBase64 = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<String?> clientId = const Value.absent(),
@@ -6640,6 +6698,7 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
               WorkoutPlansCompanion(
             uid: uid,
             name: name,
+            dietPlanBase64: dietPlanBase64,
             createdAt: createdAt,
             updatedAt: updatedAt,
             clientId: clientId,
@@ -6648,6 +6707,7 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             required String uid,
             required String name,
+            Value<String?> dietPlanBase64 = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
             Value<int?> updatedAt = const Value.absent(),
             Value<String?> clientId = const Value.absent(),
@@ -6656,6 +6716,7 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
               WorkoutPlansCompanion.insert(
             uid: uid,
             name: name,
+            dietPlanBase64: dietPlanBase64,
             createdAt: createdAt,
             updatedAt: updatedAt,
             clientId: clientId,

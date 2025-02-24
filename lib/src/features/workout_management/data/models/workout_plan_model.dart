@@ -13,6 +13,7 @@ class WorkoutPlanModel extends WorkoutPlan {
 
   const WorkoutPlanModel({
     required super.name,
+    required super.dietPlanBase64,
     required super.weeks,
     required super.uid,
     this.createdAt,
@@ -20,9 +21,12 @@ class WorkoutPlanModel extends WorkoutPlan {
     this.clientId,
   });
 
-  factory WorkoutPlanModel.fromMap(Map<String, dynamic> data,
-      [bool isFromModel = false]) {
+  factory WorkoutPlanModel.fromMap(
+    Map<String, dynamic> data, [
+    bool isFromModel = false,
+  ]) {
     return WorkoutPlanModel(
+      dietPlanBase64: data['dietPlanBase64'],
       name: data['name'],
       weeks: data['weeks'] != null
           ? isFromModel
@@ -126,8 +130,10 @@ class WorkoutPlanModel extends WorkoutPlan {
     String? clientId,
     int? createdAt,
     int? updatedAt,
+    String? dietPlanBase64,
   }) {
     return WorkoutPlanModel(
+      dietPlanBase64: dietPlanBase64 ?? this.dietPlanBase64,
       clientId: clientId ?? this.clientId,
       name: name ?? this.name,
       weeks: weeks ?? this.weeks,
@@ -140,6 +146,7 @@ class WorkoutPlanModel extends WorkoutPlan {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
+      'dietPlanBase64': dietPlanBase64,
       'uid': uid,
       'clientId': clientId,
       'createdAt': createdAt,

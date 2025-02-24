@@ -140,6 +140,7 @@ class _FitFlexClientAssignedWorkoutPlanPageState
           name: '',
           weeks: weeks,
           uid: workoutPlanId,
+          dietPlanBase64: null
         ),
       );
     } else {
