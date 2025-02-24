@@ -597,7 +597,8 @@ class _FitFlexClubCreateWorkoutPlanPageState
                         extra: {
                           'dayId': _currentDay.value!.id,
                           'reps': exercise?.parameters?['reps'] ?? false,
-                          'duration': exercise?.parameters?['duration'] ?? false,
+                          'duration':
+                              exercise?.parameters?['duration'] ?? false,
                           'exercise': exercise,
                           'sets': exercise?.parameters?['sets'] ?? false,
                           'weight': exercise?.parameters?['weight'] ?? false,
@@ -745,6 +746,71 @@ class _FitFlexClubCreateWorkoutPlanPageState
                 },
               ),
 
+              //
+              Container(
+                padding: const EdgeInsets.all(10),
+                // width: 130,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: globalColorScheme.surface,
+                  border: Border.all(
+                    width: 1,
+                    color: globalColorScheme.primaryContainer,
+                  ),
+                ),
+                margin: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          // Padding(
+                          //   padding: const EdgeInsets.only(right: 8.0),
+                          //   child: CircleAvatar(
+                          //     child: Icon(Icons.food_bank_sharp),
+                          //   ),
+                          // ),
+                          Expanded(
+                            child: Text(
+                              'Checkout Your Diet Plan',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: globalColorScheme.tertiaryContainer,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          style: IconButton.styleFrom(
+                              backgroundColor: globalColorScheme.inversePrimary,
+                              foregroundColor:
+                                  globalColorScheme.tertiary),
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.edit,
+                          ),
+                        ),
+                        IconButton(
+                          style: IconButton.styleFrom(
+                              backgroundColor: globalColorScheme.inversePrimary,
+                              foregroundColor:
+                                  globalColorScheme.tertiary),
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.arrow_forward_ios,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
               // Week Selector
               AutoScrollWeeksWidget(
                 weeks: _weeks,
@@ -767,17 +833,16 @@ class _FitFlexClubCreateWorkoutPlanPageState
                             extra: {
                               'dayId': _currentDay.value!.id,
                               'reps': editExercise.parameters?['reps'] ?? false,
-                              'duration': editExercise.parameters?['duration'] ?? false,
+                              'duration':
+                                  editExercise.parameters?['duration'] ?? false,
                               'editExercise': editExercise,
                               'sets': editExercise.parameters?['sets'] ?? false,
-                              'weight': editExercise.parameters?['weight'] ?? false,
+                              'weight':
+                                  editExercise.parameters?['weight'] ?? false,
                             }).then(
                           (value) async {
                             if (value != null) {
-                              await _updateExercises(
-                                value,
-                                true
-                              );
+                              await _updateExercises(value, true);
                             }
                           },
                         )
