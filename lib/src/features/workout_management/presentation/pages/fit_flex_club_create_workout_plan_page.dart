@@ -3,19 +3,24 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_bottomsheet.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
+import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/day_model.dart';
-import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/set_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/week_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/domain/entities/exercise_bp_entity.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_diet_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_add_exercise_bottom_sheet.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scroll_tabs_widget.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scrollweeks_widget.dart';
@@ -45,6 +50,7 @@ class FitFlexClubCreateWorkoutPlanPage extends StatefulWidget {
   final bool update;
   final WorkoutPlanModel? workoutPlanModel;
   final ClientEntity? clientEntity;
+  final bool showDietPlan;
   final List<ExerciseEntity>? exercises;
   const FitFlexClubCreateWorkoutPlanPage({
     super.key,
@@ -52,6 +58,7 @@ class FitFlexClubCreateWorkoutPlanPage extends StatefulWidget {
     this.workoutPlanModel,
     this.clientEntity,
     this.exercises,
+    this.showDietPlan = false,
   });
 
   @override
@@ -63,7 +70,7 @@ class FitFlexClubCreateWorkoutPlanPage extends StatefulWidget {
 class _FitFlexClubCreateWorkoutPlanPageState
     extends State<FitFlexClubCreateWorkoutPlanPage>
     with SingleTickerProviderStateMixin {
-  bool isProgramEdited = false;
+  ValueNotifier<bool> isProgramEdited = ValueNotifier(false);
   late ValueNotifier<WorkoutPlanModel> _workoutPlanBp = ValueNotifier(
     WorkoutPlanModel(name: "", weeks: [], uid: '', dietPlanBase64: null),
   );
@@ -289,6 +296,31 @@ class _FitFlexClubCreateWorkoutPlanPageState
       _workoutPlanBp.value = workoutPlanModel;
       _weeks.value = workoutPlanModel.weeks;
     }
+
+    _currentWeek.value = _weeks.value.firstWhere(
+      (element) => element.weekNumber == 1,
+    );
+    _currentDay.value = _currentWeek.value?.days.firstWhere(
+      (element) => element.dayNumber == 1,
+    );
+    _days.value = _currentWeek.value!.days;
+    _exercises.value = _weeks.value
+        .firstWhere(
+          (element) => element.weekNumber == 1,
+        )
+        .days
+        .firstWhere(
+          (element) => element.dayNumber == 1,
+        )
+        .exercises;
+    _tabController = TabController(length: 6, vsync: this);
+    workoutProgramNameController.addListener(
+      () {
+        _workoutPlanBp.value = _workoutPlanBp.value.copyWith(
+          name: workoutProgramNameController.text,
+        );
+      },
+    );
   }
 
   @override
@@ -324,30 +356,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
     //     if (!widget.update) _show(context);
     //   },
     // );
-    _currentWeek.value = _weeks.value.firstWhere(
-      (element) => element.weekNumber == 1,
-    );
-    _currentDay.value = _currentWeek.value?.days.firstWhere(
-      (element) => element.dayNumber == 1,
-    );
-    _days.value = _currentWeek.value!.days;
-    _exercises.value = _weeks.value
-        .firstWhere(
-          (element) => element.weekNumber == 1,
-        )
-        .days
-        .firstWhere(
-          (element) => element.dayNumber == 1,
-        )
-        .exercises;
-    _tabController = TabController(length: 6, vsync: this);
-    workoutProgramNameController.addListener(
-      () {
-        _workoutPlanBp.value = _workoutPlanBp.value.copyWith(
-          name: workoutProgramNameController.text,
-        );
-      },
-    );
+
     // _exercises.addListener(
     //   () {
     //     isProgramEdited = true;
@@ -423,7 +432,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
     if (widget.update ||
         widget.clientEntity != null ||
         widget.workoutPlanModel != null) {
-      isProgramEdited = true;
+      isProgramEdited.value = true;
     }
   }
 
@@ -462,7 +471,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
 
       if (isProgramReady) {
         if (widget.update) {
-          if (isProgramEdited) {
+          if (isProgramEdited.value) {
             if (widget.clientEntity == null) {
               context.read<WorkoutManagementBloc>().add(
                     UpdateWorkoutPlanEvent(
@@ -519,7 +528,7 @@ class _FitFlexClubCreateWorkoutPlanPageState
             _workoutPlanBp.value =
                 _workoutPlanBp.value.copyWith(weeks: _weeks.value);
             if (widget.update) {
-              if (isProgramEdited) {
+              if (isProgramEdited.value) {
                 context.read<WorkoutManagementBloc>().add(
                       UpdateWorkoutPlanEvent(
                         workoutPlan: _workoutPlanBp.value,
@@ -704,14 +713,15 @@ class _FitFlexClubCreateWorkoutPlanPageState
                 );
               }
             },
-            child: _buildContent(context),
+            child: _buildContent(context, isProgramEdited),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(
+      BuildContext context, ValueNotifier<bool> isProgramEdited) {
     return Column(
       children: [
         Expanded(
@@ -753,9 +763,15 @@ class _FitFlexClubCreateWorkoutPlanPageState
               ),
 
               //
-              DietPlanWidget(
-                workoutPlanModel: _workoutPlanBp,
-              ),
+              if (widget.showDietPlan)
+                DietPlanWidget(
+                  workoutPlanModel: _workoutPlanBp,
+                  isAssignedWorkoutPage: false,
+                  onPop: () => _createWorkOutBpObject(),
+                  onEdit: () {
+                    isProgramEdited.value = true;
+                  },
+                ),
               // Week Selector
               AutoScrollWeeksWidget(
                 weeks: _weeks,
@@ -843,10 +859,16 @@ class _FitFlexClubCreateWorkoutPlanPageState
 }
 
 class DietPlanWidget extends StatefulWidget {
-  final ValueNotifier<WorkoutPlanModel> workoutPlanModel;
+  final ValueNotifier<WorkoutPlanModel?> workoutPlanModel;
+  final VoidCallback onPop;
+  final bool isAssignedWorkoutPage;
+  final VoidCallback onEdit;
   const DietPlanWidget({
     super.key,
     required this.workoutPlanModel,
+    this.isAssignedWorkoutPage = false,
+    required this.onPop,
+    required this.onEdit,
   });
 
   @override
@@ -854,6 +876,13 @@ class DietPlanWidget extends StatefulWidget {
 }
 
 class _DietPlanWidgetState extends State<DietPlanWidget> {
+  final ValueNotifier<WorkoutPlanModel?> _workout = ValueNotifier(null);
+  @override
+  void initState() {
+    super.initState();
+    _workout.value = widget.workoutPlanModel.value;
+  }
+
   Future<String?> _pickAndConvertPdfToBase64() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -881,12 +910,11 @@ class _DietPlanWidgetState extends State<DietPlanWidget> {
     final isTrainer =
         getIt<SharedPrefsUtil>().getAuthEntity()?.isTrainer ?? false;
     return ValueListenableBuilder(
-      valueListenable: widget.workoutPlanModel,
+      valueListenable: _workout,
       builder: (context, workOutPlan, _) {
         if (isTrainer) {
           return Container(
             padding: const EdgeInsets.all(10),
-            alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
               color: globalColorScheme.surface,
@@ -899,25 +927,75 @@ class _DietPlanWidgetState extends State<DietPlanWidget> {
             child: Row(
               children: [
                 Expanded(
-                  child: Expanded(
-                    child: Text(
-                      isTrainer ? "Diet Plan" : 'Checkout Your Diet Plan',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: globalColorScheme.tertiaryContainer,
-                      ),
+                  child: Text(
+                    isTrainer ? "Diet Plan" : 'Checkout Your Diet Plan',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: globalColorScheme.tertiaryContainer,
                     ),
                   ),
                 ),
                 Row(
                   children: [
-                    if (workOutPlan.dietPlanBase64 != null) ...[
+                    if (workOutPlan?.dietPlanBase64 != null) ...[
                       IconButton(
                         style: IconButton.styleFrom(
-                            backgroundColor: globalColorScheme.inversePrimary,
-                            foregroundColor: globalColorScheme.tertiary),
-                        onPressed: () {},
+                          backgroundColor: globalColorScheme.inversePrimary,
+                          foregroundColor: globalColorScheme.tertiary,
+                        ),
+                        onPressed: () {
+                          PlatformBottomSheet.show(
+                            context,
+                            onUpload: () async {
+                              final dietPlanBase64 =
+                                  await _pickAndConvertPdfToBase64();
+                              if (dietPlanBase64 != null) {
+                                widget.workoutPlanModel.value = widget
+                                    .workoutPlanModel.value!
+                                    .copyWith(dietPlanBase64: dietPlanBase64);
+                                _workout.value = _workout.value!
+                                    .copyWith(dietPlanBase64: dietPlanBase64);
+                                widget.onEdit();
+                                context.pop();
+                                Fluttertoast.showToast(
+                                  msg:
+                                      "Diet plan is added, kindly submit to save the changes.",
+                                  backgroundColor: globalColorScheme.secondary,
+                                  textColor:
+                                      globalColorScheme.onPrimaryContainer,
+                                  fontSize: 18,
+                                  gravity: ToastGravity.TOP,
+                                );
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: "File type is not supported",
+                                  backgroundColor: globalColorScheme.secondary,
+                                  textColor:
+                                      globalColorScheme.onPrimaryContainer,
+                                  fontSize: 18,
+                                  gravity: ToastGravity.TOP,
+                                );
+                              }
+                            },
+                            onDelete: () {
+                              widget.workoutPlanModel.value =
+                                  widget.workoutPlanModel.value!.copyWith(
+                                dietPlanBase64: null,
+                              );
+                              context.pop();
+                              widget.onEdit();
+                              Fluttertoast.showToast(
+                                msg:
+                                    "Diet plan is deleted, kindly submit to save the changes.",
+                                backgroundColor: globalColorScheme.secondary,
+                                textColor: globalColorScheme.onPrimaryContainer,
+                                fontSize: 18,
+                                gravity: ToastGravity.TOP,
+                              );
+                            },
+                          );
+                        },
                         icon: Icon(
                           Icons.edit,
                         ),
@@ -926,7 +1004,29 @@ class _DietPlanWidgetState extends State<DietPlanWidget> {
                         style: IconButton.styleFrom(
                             backgroundColor: globalColorScheme.inversePrimary,
                             foregroundColor: globalColorScheme.tertiary),
-                        onPressed: () {},
+                        onPressed: () async {
+                          final dietPlan = _workout.value?.dietPlanBase64;
+                          if (dietPlan != null) {
+                            await context.push(
+                              '${FitFlexTrainerProfilePage.route}/${FitFlexTrainerClientDetailsPage.route}/${FitFlexClubCreateWorkoutPlanPage.route}/${FitFlexDietPlanPage.route}',
+                              extra: {
+                                'dietPlan': dietPlan,
+                              },
+                            ).then(
+                              (value) {
+                                widget.onPop();
+                              },
+                            );
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: 'No diet plan available',
+                              backgroundColor: globalColorScheme.secondary,
+                              textColor: globalColorScheme.onPrimaryContainer,
+                              fontSize: 18,
+                              gravity: ToastGravity.TOP,
+                            );
+                          }
+                        },
                         icon: Icon(
                           Icons.arrow_forward_ios,
                         ),
@@ -942,8 +1042,11 @@ class _DietPlanWidgetState extends State<DietPlanWidget> {
                               await _pickAndConvertPdfToBase64();
                           if (dietPlanBase64 != null) {
                             widget.workoutPlanModel.value = widget
-                                .workoutPlanModel.value
+                                .workoutPlanModel.value!
                                 .copyWith(dietPlanBase64: dietPlanBase64);
+                            _workout.value = _workout.value!
+                                .copyWith(dietPlanBase64: dietPlanBase64);
+                            widget.onEdit();
                           } else {
                             Fluttertoast.showToast(
                               msg: "File type is not supported",
@@ -964,10 +1067,9 @@ class _DietPlanWidgetState extends State<DietPlanWidget> {
             ),
           );
         } else {
-          if (workOutPlan.dietPlanBase64 != null) {
+          if (workOutPlan?.dietPlanBase64 != null) {
             return Container(
               padding: const EdgeInsets.all(10),
-              alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 color: globalColorScheme.surface,
@@ -980,22 +1082,39 @@ class _DietPlanWidgetState extends State<DietPlanWidget> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Expanded(
-                      child: Text(
-                        'Checkout Your Diet Plan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: globalColorScheme.tertiaryContainer,
-                        ),
+                    child: Text(
+                      'Checkout Your Diet Plan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: globalColorScheme.tertiaryContainer,
                       ),
                     ),
                   ),
                   IconButton(
                     style: IconButton.styleFrom(
-                        backgroundColor: globalColorScheme.inversePrimary,
-                        foregroundColor: globalColorScheme.tertiary),
-                    onPressed: () {},
+                      backgroundColor: globalColorScheme.inversePrimary,
+                      foregroundColor: globalColorScheme.tertiary,
+                    ),
+                    onPressed: () {
+                      final dietPlan = workOutPlan?.dietPlanBase64;
+                      if (dietPlan != null) {
+                        context.go(
+                          '${FitFlexClientProfilePage.route}/${FitFlexClientAssignedWorkoutPlanPage.route}/${FitFlexDietPlanPage.route}',
+                          extra: {
+                            'dietPlan': dietPlan,
+                          },
+                        );
+                      } else {
+                        Fluttertoast.showToast(
+                          msg: 'No diet plan available',
+                          backgroundColor: globalColorScheme.secondary,
+                          textColor: globalColorScheme.onPrimaryContainer,
+                          fontSize: 18,
+                          gravity: ToastGravity.TOP,
+                        );
+                      }
+                    },
                     icon: Icon(
                       Icons.arrow_forward_ios,
                     ),

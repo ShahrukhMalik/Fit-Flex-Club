@@ -10,6 +10,7 @@ import 'package:fit_flex_club/src/features/workout_management/data/models/week_m
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/getexercises/getexercises_cubit.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scroll_tabs_widget.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_auto_scrollweeks_widget.dart';
 import 'package:flutter/material.dart';
@@ -137,11 +138,7 @@ class _FitFlexClientAssignedWorkoutPlanPageState
       _weeks.value = weeks;
       _workoutPlanBp = ValueNotifier(
         WorkoutPlanModel(
-          name: '',
-          weeks: weeks,
-          uid: workoutPlanId,
-          dietPlanBase64: null
-        ),
+            name: '', weeks: weeks, uid: workoutPlanId, dietPlanBase64: null),
       );
     } else {
       _workoutPlanBp.value = workoutPlanModel;
@@ -341,6 +338,16 @@ class _FitFlexClientAssignedWorkoutPlanPageState
                                         ),
                                   ),
                                 );
+                        },
+                      ),
+
+                      //
+                      DietPlanWidget(
+                        workoutPlanModel: _workoutPlanBp,
+                        isAssignedWorkoutPage: true,
+                        onPop: () => _initialzeWorkoutPlan(),
+                        onEdit: () {
+                          
                         },
                       ),
 

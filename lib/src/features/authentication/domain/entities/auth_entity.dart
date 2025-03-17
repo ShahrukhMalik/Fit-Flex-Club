@@ -10,7 +10,6 @@ class AuthEntity extends Equatable {
   final bool? isLoggedIn;
   final bool? mailSent;
   final DateTime? timeStamp;
-  // final bool? authenticate;
   final bool? isUserActive;
   final bool? isTrainer;
   final bool? isProfileCreated;
@@ -40,7 +39,6 @@ class AuthEntity extends Equatable {
         isSignedUp,
         mailSent,
         isTrainer
-        // authenticate
       ];
 
   Map<String, dynamic> toMap() {

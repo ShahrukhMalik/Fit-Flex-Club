@@ -20,6 +20,7 @@ import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fi
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_profile_page.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_workout_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_club_create_workout_plan_page.dart';
+import 'package:fit_flex_club/src/features/workout_management/presentation/pages/fit_flex_diet_plan_page.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_add_exercise_bottom_sheet.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/widgets/workout_exercise_picker_widget.dart';
 import 'package:fit_flex_club/src/features/workout_tracking/presentation/pages/fit_flex_workout_tracker_page.dart';
@@ -201,6 +202,7 @@ GoRouter goRouter(appState) {
                           return TransitionPage(
                             key: state.pageKey,
                             child: FitFlexClubCreateWorkoutPlanPage(
+                              showDietPlan: true,
                               update: extraData?['updateData'] ?? false,
                               workoutPlanModel: extraData?['workoutPlan'],
                               clientEntity: extraData?['clientEntity'],
@@ -224,6 +226,19 @@ GoRouter goRouter(appState) {
                                   exercise: extraData?['exercise'],
                                   weight: extraData?['weight'],
                                   sets: extraData?['sets'],
+                                ),
+                              );
+                            },
+                          ),
+                          GoRoute(
+                            path: FitFlexDietPlanPage.route,
+                            pageBuilder: (context, state) {
+                              final extraData =
+                                  state.extra as Map<String, dynamic>?;
+                              return TransitionPage(
+                                key: state.pageKey,
+                                child: FitFlexDietPlanPage(
+                                  dietPlan: extraData?['dietPlan'],
                                 ),
                               );
                             },
@@ -277,6 +292,19 @@ GoRouter goRouter(appState) {
                     },
                     routes: [
                       GoRoute(
+                        path: FitFlexDietPlanPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexDietPlanPage(
+                              dietPlan: extraData?['dietPlan'],
+                            ),
+                          );
+                        },
+                      ),
+                      GoRoute(
                         path: FitFlexAddExercisePage.route,
                         pageBuilder: (context, state) {
                           final extraData =
@@ -329,6 +357,19 @@ GoRouter goRouter(appState) {
                   GoRoute(
                     path: FitFlexClientAssignedWorkoutPlanPage.route,
                     routes: [
+                      GoRoute(
+                        path: FitFlexDietPlanPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexDietPlanPage(
+                              dietPlan: extraData?['dietPlan'],
+                            ),
+                          );
+                        },
+                      ),
                       GoRoute(
                         path: FitFlexWorkoutTrackerPage.route,
                         pageBuilder: (context, state) {

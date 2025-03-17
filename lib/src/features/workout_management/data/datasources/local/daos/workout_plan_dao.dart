@@ -49,6 +49,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
               updatedAt: Value(
                 workoutPlan.updatedAt ?? DateTime.now().millisecondsSinceEpoch,
               ),
+              dietPlanBase64: Value( workoutPlan.dietPlanBase64)
             ),
           );
 
@@ -303,6 +304,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
           createdAt: Value(
             DateTime.now().millisecondsSinceEpoch,
           ),
+          dietPlanBase64: Value(workoutPlan.dietPlanBase64),
         ),
       );
 
@@ -376,6 +378,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
     } catch (err) {
       print(err);
     }
+    return null;
   }
 
   Future<void> deleteWorkoutPlan(WorkoutPlanModel workoutPlan) async {
@@ -455,6 +458,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
         createdAt: Value(
           DateTime.now().millisecondsSinceEpoch,
         ),
+        dietPlanBase64: Value(workoutPlan.dietPlanBase64),
       ),
     );
 

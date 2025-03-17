@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
@@ -66,7 +65,7 @@ class WorkoutPlanManagementLocaldatasourceImpl
         return Left(false);
       }
       if (isDataStale(
-        Duration(seconds: 1).inSeconds,
+        Duration(days: 1).inSeconds,
         workoutPlans.first.createdAt!,
         workoutPlans.first.updatedAt,
       )) {

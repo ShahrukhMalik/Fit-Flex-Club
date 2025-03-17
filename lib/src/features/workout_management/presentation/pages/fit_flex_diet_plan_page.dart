@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FitFlexDietPlanPage extends StatefulWidget {
@@ -18,7 +20,7 @@ class FitFlexDietPlanPage extends StatefulWidget {
 }
 
 class _FitFlexDietPlanPageState extends State<FitFlexDietPlanPage> {
-  String? _pdfFilePath;
+  final ValueNotifier<String?> _pdfFilePath = ValueNotifier(null);
   int _totalPages = 0;
   int _currentPage = 0;
   late PDFViewController _pdfController;
@@ -38,9 +40,9 @@ class _FitFlexDietPlanPageState extends State<FitFlexDietPlanPage> {
       File tempFile = File("${tempDir.path}/diet_plan.pdf");
 
       await tempFile.writeAsBytes(bytes, flush: true);
-      setState(() {
-        _pdfFilePath = tempFile.path;
-      });
+      // setState(() {
+      _pdfFilePath.value = tempFile.path;
+      // });
     } catch (e) {
       setState(() {
         errorMessage = "Failed to load PDF: $e";
@@ -56,41 +58,54 @@ class _FitFlexDietPlanPageState extends State<FitFlexDietPlanPage> {
         title: "Diet Plan",
         context: context,
         backgroundColor: colorScheme.onPrimaryContainer,
+        onLeadingPressed: () => context.pop(),
       ),
-      body: _pdfFilePath == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
+      body: ValueListenableBuilder(
+        valueListenable: _pdfFilePath,
+        builder: (context, pdfFilePath, _) {
+          if (pdfFilePath == null) {
+            return Center(
+              child: PlatformLoader().buildLoader(
+                type: LoaderType.circular,
+              ),
+            );
+          } else {
+            return Column(
               children: [
-                PDFView(
-                  filePath: _pdfFilePath!,
-                  enableSwipe: true,
-                  swipeHorizontal: false,
-                  autoSpacing: true,
-                  pageFling: true,
-                  onRender: (pages) {
-                    setState(() {
-                      _totalPages = pages ?? 0;
-                      _isReady = true;
-                    });
-                  },
-                  onError: (error) {
-                    setState(() {
-                      errorMessage = error.toString();
-                    });
-                  },
-                  onPageChanged: (page, total) {
-                    setState(() {
-                      _currentPage = page ?? 0;
-                      _totalPages = total ?? 0;
-                    });
-                  },
-                  onViewCreated: (PDFViewController pdfViewController) {
-                    setState(() {
-                      _pdfController = pdfViewController;
-                    });
-                  },
+                Expanded(
+                  child: PDFView(
+                    filePath: pdfFilePath,
+                    enableSwipe: true,
+                    swipeHorizontal: false,
+                    autoSpacing: true,
+                    pageFling: true,
+                    onRender: (pages) {
+                      setState(() {
+                        _totalPages = pages ?? 0;
+                        _isReady = true;
+                      });
+                    },
+                    onError: (error) {
+                      setState(() {
+                        errorMessage = error.toString();
+                      });
+                    },
+                    onPageChanged: (page, total) {
+                      setState(() {
+                        _currentPage = page ?? 0;
+                        _totalPages = total ?? 0;
+                      });
+                    },
+                    onViewCreated: (PDFViewController pdfViewController) {
+                      setState(() {
+                        _pdfController = pdfViewController;
+                      });
+                    },
+                  ),
                 ),
                 Row(
+                  spacing: 10,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
@@ -108,7 +123,10 @@ class _FitFlexDietPlanPageState extends State<FitFlexDietPlanPage> {
                   ],
                 )
               ],
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 }

@@ -15,5 +15,5 @@ class WorkoutPlan extends Equatable {
   });
 
   @override
-  List<Object?> get props => [name, weeks];
+  List<Object?> get props => [name, weeks, uid, dietPlanBase64];
 }

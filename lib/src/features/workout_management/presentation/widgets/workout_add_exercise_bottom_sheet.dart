@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
-import 'package:fit_flex_club/src/core/util/api/api_service.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_bp_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_gif_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_model.dart';
