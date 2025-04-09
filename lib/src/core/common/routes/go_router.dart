@@ -5,6 +5,8 @@ import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
@@ -352,14 +354,42 @@ GoRouter goRouter(appState) {
                     routes: [
                       GoRoute(
                         path: FitFlexSelectClientsPage.route,
-                        pageBuilder: (context, state) => TransitionPage(
-                          key: state.pageKey,
-                          child: FitFlexSelectClientsPage(),
-                        ),
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexSelectClientsPage(
+                              selectedClients: extraData?['selectedClients'],
+                            ),
+                          );
+                        },
                         routes: [],
                       )
                     ],
-                  )
+                  ),
+                  GoRoute(
+                    path: FitFlexAnnouncementsPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexAnnouncementsPage(),
+                      );
+                    },
+                    routes: [],
+                  ),
+                  GoRoute(
+                    path: FitFlexOneToOneChatPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexOneToOneChatPage(),
+                      );
+                    },
+                    routes: [],
+                  ),
                 ],
               )
             ],

@@ -36,7 +36,7 @@ class PlatformAppbar {
 
   // Basic AppBar with title
   static PreferredSizeWidget basicAppBar({
-    required String title,
+    required dynamic title,
     Color? backgroundColor,
     Color? foregroundColor,
     bool automaticallyImplyLeading = true,
@@ -55,14 +55,16 @@ class PlatformAppbar {
         ),
         child: CupertinoNavigationBar(
           padding: padding,
-          middle: Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: foregroundColor ?? Color(0xFFFFCD7C),
-              fontSize: 22,
-            ),
-          ),
+          middle: title.runtimeType != String
+              ? title
+              : Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: foregroundColor ?? Color(0xFFFFCD7C),
+                    fontSize: 22,
+                  ),
+                ),
           trailing: trailing,
           backgroundColor: backgroundColor,
           automaticallyImplyLeading: automaticallyImplyLeading,
@@ -81,14 +83,16 @@ class PlatformAppbar {
     }
 
     return AppBar(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Color(0xFFFFCD7C),
-          fontSize: 20,
-        ),
-      ),
+      title: title.runtimeType != String
+          ? title
+          : Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFFFCD7C),
+                fontSize: 20,
+              ),
+            ),
       iconTheme: IconThemeData(
         color: Color(0xFFFFCD7C),
       ),

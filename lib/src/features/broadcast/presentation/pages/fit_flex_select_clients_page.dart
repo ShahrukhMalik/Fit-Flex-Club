@@ -1,3 +1,8 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
@@ -6,28 +11,30 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 class FitFlexSelectClientsPage extends StatelessWidget {
+  final List<ClientEntity?> selectedClients;
   static const route = 'select_clients_page';
-  const FitFlexSelectClientsPage({super.key});
+  const FitFlexSelectClientsPage({
+    super.key,
+    required this.selectedClients,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GymClientsDashboard(
-      colorScheme: globalColorScheme,
-    );
+        colorScheme: globalColorScheme, selectedClients: selectedClients);
   }
 }
 
 class GymClientsDashboard extends StatefulWidget {
   final ColorScheme colorScheme;
+  final List<ClientEntity?> selectedClients;
 
   const GymClientsDashboard({
     super.key,
     required this.colorScheme,
+    required this.selectedClients,
   });
 
   @override
@@ -43,6 +50,7 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
   void initState() {
     super.initState();
     context.read<TrainerProfileBloc>().add(TrainerProfileGetClientsEvent());
+    _selectedClients.value = widget.selectedClients.toSet();
   }
 
   void _filterClients(String? searchQuery) {
@@ -70,41 +78,58 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
     // Sample data with gender added
 
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         print(didPop);
+        if (!didPop && context.canPop()) {
+          context.pop(_selectedClients.value.toList());
+        }
       },
       child: Scaffold(
         backgroundColor: widget.colorScheme.onTertiary,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => context.pop(_selectedClients.value.toList()),
+          child: Icon(Icons.add_circle_outline),
+        ),
         appBar: PlatformAppbar.basicAppBar(
           automaticallyImplyLeading: true,
           backgroundColor: globalColorScheme.onPrimaryContainer,
-          title: "Select Clients",
+          title: ValueListenableBuilder(
+            valueListenable: _selectedClients,
+            builder: (context, selectedIndex, _) {
+              final count = selectedIndex.length;
+              if (count > 0) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    count.toString(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFFFCD7C),
+                      fontSize: 20,
+                    ),
+                  ),
+                );
+              } else {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Select Clients",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFFFCD7C),
+                      fontSize: 20,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
           context: context,
         ),
         body: SafeArea(
           child: Column(
             children: [
-              ValueListenableBuilder(
-                valueListenable: _selectedClients,
-                builder: (context, selectedIndex, _) {
-                  final count = selectedIndex.length;
-                  return Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 10,
-                        right: 10,
-                        top: 10,
-                      ),
-                      child: Text(
-                        'No Clients Selected: $count',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
-                  );
-                },
-              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,8 +166,12 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                           );
                         }
                         if (state is TrainerProfileComplete) {
-                          clients.value = state.entities;
-                          _originalList = state.entities;
+                          _originalList = state.entities
+                              .where(
+                                (element) => element.fcmToken != null,
+                              )
+                              .toList();
+                          clients.value = _originalList;
                           print(
                             "Complete state received at UI: "
                             '${DateTime.now().millisecondsSinceEpoch}',
@@ -158,7 +187,7 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                   if (clients?.isEmpty ?? false) {
                                     return Center(
                                       child: Text(
-                                        "No Clients Added Yet",
+                                        "No Clients Found Eligible to receive a notification.",
                                       ),
                                     );
                                   }

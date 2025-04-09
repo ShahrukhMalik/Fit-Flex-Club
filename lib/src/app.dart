@@ -9,6 +9,7 @@ import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/sendnotification/sendnotification_cubit.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/clientweights/clientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
@@ -171,6 +172,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<GetgifurlCubit>()),
         BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
+        BlocProvider(create: (context) => getIt<SendNotificationCubit>()),
       ],
       child: localizations,
     );

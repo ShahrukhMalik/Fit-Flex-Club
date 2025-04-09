@@ -42,6 +42,16 @@ import '../../../features/authentication/domain/usecases/logout_usecase.dart'
     as _i447;
 import '../../../features/authentication/presentation/bloc/authentication_bloc.dart'
     as _i70;
+import '../../../features/broadcast/data/datasources/broadcast_remote_datasource.dart'
+    as _i932;
+import '../../../features/broadcast/data/repositories/broadcast_repository_impl.dart'
+    as _i375;
+import '../../../features/broadcast/domain/repositories/broadcast_repository.dart'
+    as _i196;
+import '../../../features/broadcast/domain/usecases/send_notification_usecase.dart'
+    as _i92;
+import '../../../features/broadcast/presentation/cubit/sendnotification/sendnotification_cubit.dart'
+    as _i1041;
 import '../../../features/client_profile/data/datasources/local/client_profile_local_datasource.dart'
     as _i648;
 import '../../../features/client_profile/data/datasources/local/daos/client_dao.dart'
@@ -230,6 +240,11 @@ extension GetItInjectableX on _i174.GetIt {
               dao: gh<_i593.WorkoutHistoryDao>(),
               database: gh<_i987.AppDatabase>(),
             ));
+    gh.singleton<_i932.BroadcastRemoteDatasource>(
+        () => _i932.BroadcastRemoteDatasourceImpl(
+              auth: gh<_i59.FirebaseAuth>(),
+              remoteDb: gh<_i974.FirebaseFirestore>(),
+            ));
     gh.singleton<_i530.WorkoutManagementRepository>(
         () => _i1071.WorkoutManagementRepositoryImpl(
               gh<_i663.SyncQueueDao>(),
@@ -341,6 +356,13 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i596.GetclientweightsCubit(gh<_i535.GetClientWeightsUsecase>()));
     gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i196.BroadcastRepository>(() => _i375.BroadcastRepositoryImpl(
+          networkInfo: gh<_i228.NetworkInfo>(),
+          broadcastRemoteDatasource: gh<_i932.BroadcastRemoteDatasource>(),
+        ));
+    gh.singleton<_i92.SendNotificationUsecase>(() =>
+        _i92.SendNotificationUsecaseImpl(
+            broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.singleton<_i198.WorkoutHistoryRepository>(
         () => _i473.WorkoutHistoryRepositoryImpl(
               gh<_i663.SyncQueueDao>(),
@@ -388,6 +410,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i208.LogWorkoutHistoryUsecase>(),
           gh<_i119.GetWorkoutHistoryUsecase>(),
         ));
+    gh.factory<_i1041.SendNotificationCubit>(
+        () => _i1041.SendNotificationCubit(gh<_i92.SendNotificationUsecase>()));
     gh.factory<_i219.SyncmanagerBloc>(() => _i219.SyncmanagerBloc(
           gh<_i798.CheckConnectivityUsecase>(),
           gh<_i85.EventListenerUsecase>(),

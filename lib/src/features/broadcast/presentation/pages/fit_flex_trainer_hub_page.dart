@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -311,19 +313,23 @@ class FeaturesPage extends StatelessWidget {
           route:
               '${FitFlexTrainerHubPage.route}/${FitFlexPersonalizedNotificationPage.route}'),
       const Feature(
-          title: 'Announcements',
-          description:
-              'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
-          icon: Icons.campaign,
-          isPremium: true,
-          route: ''),
+        title: 'Announcements',
+        description:
+            'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
+        icon: Icons.campaign,
+        isPremium: true,
+        route:
+            '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}',
+      ),
       const Feature(
-          title: 'One-to-One Chat',
-          description:
-              'Build stronger relationships with your clients through private messaging. Provide personalized guidance, answer questions, and offer real-time support whenever needed.',
-          icon: Icons.chat_bubble,
-          isPremium: true,
-          route: ''),
+        title: 'One-to-One Chat',
+        description:
+            'Build stronger relationships with your clients through private messaging. Provide personalized guidance, answer questions, and offer real-time support whenever needed.',
+        icon: Icons.chat_bubble,
+        isPremium: true,
+        route:
+            '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}',
+      ),
     ];
 
     return Scaffold(
