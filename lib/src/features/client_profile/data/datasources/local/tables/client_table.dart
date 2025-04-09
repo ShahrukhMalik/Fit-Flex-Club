@@ -11,6 +11,7 @@ class Clients extends Table {
   BoolColumn get isTrainer => boolean()();
   BoolColumn get isUserActive => boolean()();
   TextColumn get username => text()();
+  TextColumn get fcmToken => text().nullable()();
   TextColumn get email => text().nullable()();
   TextColumn get phoneNumber => text().nullable()();
   TextColumn get countryCode => text().nullable()();

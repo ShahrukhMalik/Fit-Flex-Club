@@ -6,6 +6,7 @@ class ClientEntity extends Equatable {
   final String? email;
   final Map<String, dynamic>? phone;
   final int? age;
+  final String? fcmToken;
   final String? gender;
   final double? heightInFt;
   final double? heightInCm;
@@ -17,10 +18,11 @@ class ClientEntity extends Equatable {
   final String? currentWorkoutPlanName;
 
   const ClientEntity({
-    this.phone,
+    this.id,
     this.email,
-     this.id,
+    this.phone,
     this.age,
+    this.fcmToken,
     this.gender,
     this.heightInFt,
     this.heightInCm,
@@ -46,7 +48,8 @@ class ClientEntity extends Equatable {
       weightInKg,
       weightInLb,
       email,
-      currentWorkoutPlanName
+      currentWorkoutPlanName,
+      fcmToken
     ];
   }
 }

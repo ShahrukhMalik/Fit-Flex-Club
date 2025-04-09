@@ -89,31 +89,32 @@ class AppDatabase extends _$AppDatabase {
                   from == 10 ||
                   from == 11 ||
                   from == 12 ||
-                  from == 13) &&
-              to == 14) {
-            await m.drop(workoutPlans);
-            await m.drop(weeks);
-            await m.drop(days);
-            await m.drop(workoutPlanExercise);
-            await m.drop(exerciseSets);
-            await m.drop(baseExercise);
+                  from == 13 ||
+                  from == 14) &&
+              to == 15) {
+            // await m.drop(workoutPlans);
+            // await m.drop(weeks);
+            // await m.drop(days);
+            // await m.drop(workoutPlanExercise);
+            // await m.drop(exerciseSets);
+            // await m.drop(baseExercise);
             await m.drop(clients);
-            await m.drop(clientWeight);
-            await m.drop(workoutHistorySet);
-            await m.drop(syncQueue);
-            await m.drop(workoutHistoryExercise);
+            // await m.drop(clientWeight);
+            // await m.drop(workoutHistorySet);
+            // await m.drop(syncQueue);
+            // await m.drop(workoutHistoryExercise);
             /////////////////
-            await m.createTable(workoutPlans);
-            await m.createTable(weeks);
-            await m.createTable(days);
-            await m.createTable(workoutPlanExercise);
-            await m.createTable(exerciseSets);
-            await m.createTable(baseExercise);
+            // await m.createTable(workoutPlans);
+            // await m.createTable(weeks);
+            // await m.createTable(days);
+            // await m.createTable(workoutPlanExercise);
+            // await m.createTable(exerciseSets);
+            // await m.createTable(baseExercise);
             await m.createTable(clients);
-            await m.createTable(clientWeight);
-            await m.createTable(workoutHistorySet);
-            await m.createTable(syncQueue);
-            await m.createTable(workoutHistoryExercise);
+            // await m.createTable(clientWeight);
+            // await m.createTable(workoutHistorySet);
+            // await m.createTable(syncQueue);
+            // await m.createTable(workoutHistoryExercise);
             // Handle schema migration from version 1 to version 2
             // e.g., Add a new table, column, or index
             // Example: Adding a new column or table
@@ -155,7 +156,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

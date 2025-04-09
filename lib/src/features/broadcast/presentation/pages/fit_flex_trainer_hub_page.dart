@@ -1,9 +1,13 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart';
 
 class FitFlexTrainerHubPage extends StatelessWidget {
   static const route = '/trainer_hub';
@@ -280,6 +284,7 @@ class Feature {
   final IconData icon;
   final bool isPremium;
   final String comingSoon;
+  final String route;
 
   const Feature({
     required this.title,
@@ -287,6 +292,7 @@ class Feature {
     required this.icon,
     required this.isPremium,
     this.comingSoon = '',
+    required this.route,
   });
 }
 
@@ -297,26 +303,27 @@ class FeaturesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Feature> features = [
       const Feature(
-        title: 'Personalized Notifications',
-        description:
-            'Send targeted reminders, workout updates, and progress reports directly to your clients. Customize content and scheduling for each individual to boost engagement and results.',
-        icon: Icons.notifications_active,
-        isPremium: true,
-      ),
+          title: 'Personalized Notifications',
+          description:
+              'Send targeted reminders, workout updates, and progress reports directly to your clients. Customize content and scheduling for each individual to boost engagement and results.',
+          icon: Icons.notifications_active,
+          isPremium: true,
+          route:
+              '${FitFlexTrainerHubPage.route}/${FitFlexPersonalizedNotificationPage.route}'),
       const Feature(
-        title: 'Announcements',
-        description:
-            'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
-        icon: Icons.campaign,
-        isPremium: false,
-      ),
+          title: 'Announcements',
+          description:
+              'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
+          icon: Icons.campaign,
+          isPremium: true,
+          route: ''),
       const Feature(
-        title: 'One-to-One Chat',
-        description:
-            'Build stronger relationships with your clients through private messaging. Provide personalized guidance, answer questions, and offer real-time support whenever needed.',
-        icon: Icons.chat_bubble,
-        isPremium: true,
-      ),
+          title: 'One-to-One Chat',
+          description:
+              'Build stronger relationships with your clients through private messaging. Provide personalized guidance, answer questions, and offer real-time support whenever needed.',
+          icon: Icons.chat_bubble,
+          isPremium: true,
+          route: ''),
     ];
 
     return Scaffold(
@@ -369,7 +376,7 @@ class FeaturesPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              children:  [
+                              children: [
                                 Text(
                                   'Hello Trainer',
                                   style: TextStyle(
@@ -384,13 +391,13 @@ class FeaturesPage extends StatelessWidget {
                             Text(
                               DateFormat('EEEE, MMMM d, y')
                                   .format(DateTime.now()),
-                              style:  TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 color: globalColorScheme.onSecondary,
                               ),
                             ),
                             const SizedBox(height: 8),
-                             Text(
+                            Text(
                               'Stay connected with your clients through multiple channels',
                               style: TextStyle(
                                 fontSize: 14,
@@ -404,7 +411,6 @@ class FeaturesPage extends StatelessWidget {
                   },
                 ),
               ),
-
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
@@ -531,7 +537,8 @@ class FeaturesPage extends StatelessWidget {
                                 const SizedBox(height: 16),
                                 feature.isPremium
                                     ? ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () =>
+                                            context.go(feature.route),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.amber,
                                           foregroundColor: Colors.white,
@@ -560,41 +567,6 @@ class FeaturesPage extends StatelessWidget {
                       );
                     },
                     childCount: features.length,
-                  ),
-                ),
-              ),
-
-              // Footer CTA
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.grey[100],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Want to unlock all premium features?',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.amber,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        icon: const Icon(Icons.star),
-                        label: const Text('Upgrade to Premium'),
-                      ),
-                    ],
                   ),
                 ),
               ),
