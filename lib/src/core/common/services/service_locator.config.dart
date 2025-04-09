@@ -14,8 +14,6 @@ import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:internet_connection_checker/internet_connection_checker.dart'
-    as _i973;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
 import '../../../features/authentication/data/datasources/auth_remote_datasource.dart'
@@ -172,8 +170,6 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     final registerModule = _$RegisterModule();
-    gh.factory<_i973.InternetConnectionChecker>(
-        () => registerModule.internetConnectionChecker);
     gh.factory<_i895.Connectivity>(() => registerModule.connectivity);
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => registerModule.prefs,
