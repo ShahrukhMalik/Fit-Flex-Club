@@ -66,6 +66,11 @@ dependencies:
   gif: ^2.3.0
   file_picker: ^9.0.1
   flutter_pdfview: ^1.4.0
+  firebase_messaging: ^15.2.5
+  flutter_local_notifications: ^19.0.0
+  permission_handler: ^11.4.0
+  package_info_plus: ^8.3.0
+  device_info_plus: ^11.3.3
   # flutter_splash_screen: ^3.0.0
 
 dev_dependencies:

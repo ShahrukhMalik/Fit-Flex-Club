@@ -1,4 +1,3 @@
-
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:flutter/material.dart';
@@ -34,11 +33,11 @@ class _FitFlexTrainerDashboardPageState
   Widget _buildBottomNavOverlay(BuildContext context, double width) {
     return Positioned(
       bottom: 0,
-      left: 0,
-      right: 0,
+      left: width * 0.21,
+      right: width * 0.21,
       child: Container(
         margin: EdgeInsets.symmetric(
-          horizontal: width * 0.3,
+          // horizontal: width * 0.3,
           vertical: 30,
         ),
         padding: EdgeInsets.all(5),
@@ -63,7 +62,7 @@ class _FitFlexTrainerDashboardPageState
                 return AnimatedPositioned(
                   duration: Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                  left: currentIndex * (width * 0.24),
+                  left: currentIndex * (width * 0.23),
                   child: Container(
                     width: 50,
                     height: 50,
@@ -89,6 +88,12 @@ class _FitFlexTrainerDashboardPageState
                 _buildIcon(
                   1,
                   Icons.fitness_center,
+                  selectedIndex,
+                  widget.navigationShell,
+                ),
+                _buildIcon(
+                  2,
+                  Icons.campaign_rounded,
                   selectedIndex,
                   widget.navigationShell,
                 ),
