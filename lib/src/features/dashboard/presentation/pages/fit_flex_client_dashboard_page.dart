@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/fcm_service.dart';
+import 'package:fit_flex_club/src/core/common/services/local_notification_service.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +32,18 @@ class _FitFlexClientDashboardPageState
   @override
   void initState() {
     super.initState();
+    final savedContext = context;
+    getIt<NetworkInfo>().isConnected?.then(
+      (isConnected) async {
+        if (isConnected) {
+          LocalNotificationService.initialize(context).then(
+            (value) async {
+              await FCMService.initializeFCM();
+            },
+          );
+        }
+      },
+    );
     selectedIndex.value = widget.navigationShell.currentIndex;
   }
 

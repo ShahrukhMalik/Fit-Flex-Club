@@ -51,19 +51,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    final savedContext = context;
     initConnectivity();
-    getIt<NetworkInfo>().isConnected?.then(
-      (isConnected) {
-        if (isConnected) {
-          LocalNotificationService.initialize(savedContext).then(
-            (value) {
-              FCMService.initializeFCM();
-            },
-          );
-        }
-      },
-    );
+ 
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }

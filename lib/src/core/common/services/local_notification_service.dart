@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocalNotificationService {
@@ -11,24 +12,28 @@ class LocalNotificationService {
       _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize(BuildContext? context) async {
-    const AndroidInitializationSettings androidInitSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    final DarwinInitializationSettings iOSInitSettings =
-        DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    final InitializationSettings initSettings = InitializationSettings(
-      android: androidInitSettings,
-      iOS: iOSInitSettings,
-    );
-
-    // Request notification permission (only on Android 13+)
-    await _requestNotificationPermission();
-    await _flutterLocalNotificationsPlugin.initialize(initSettings);
+    try {
+      const AndroidInitializationSettings androidInitSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+  
+      final DarwinInitializationSettings iOSInitSettings =
+          DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
+  
+      final InitializationSettings initSettings = InitializationSettings(
+        android: androidInitSettings,
+        iOS: iOSInitSettings,
+      );
+  
+      // Request notification permission (only on Android 13+)
+      await _requestNotificationPermission();
+      await _flutterLocalNotificationsPlugin.initialize(initSettings);
+    } catch (err) {
+      Fluttertoast.showToast(msg: "Something went wrong, while setting up push notifications config.");
+    }
   }
 
   static Future<void> _requestNotificationPermission() async {

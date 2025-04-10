@@ -151,49 +151,53 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
           clientsList.map(
             (clientModel) {
               return ClientsCompanion(
-                  id: Value(clientModel.id!),
-                  age: clientModel.age != null
-                      ? Value(clientModel.age!)
-                      : Value.absent(),
-                  gender: clientModel.gender != null
-                      ? Value(clientModel.gender!)
-                      : Value.absent(),
-                  weightInKg: clientModel.weightInKg != null
-                      ? Value(clientModel.weightInKg!)
-                      : Value.absent(),
-                  weightInLb: clientModel.weightInLb != null
-                      ? Value(clientModel.weightInLb!)
-                      : Value.absent(),
-                  heightInCm: clientModel.heightInCm != null
-                      ? Value(clientModel.heightInCm!)
-                      : Value.absent(),
-                  heightInFt: clientModel.heightInFt != null
-                      ? Value(clientModel.heightInFt!)
-                      : Value.absent(),
-                  isTrainer: clientModel.isTrainer != null
-                      ? Value(clientModel.isTrainer!)
-                      : Value.absent(),
-                  isUserActive: clientModel.isUserActive != null
-                      ? Value(clientModel.isUserActive!)
-                      : Value.absent(),
-                  username: clientModel.username != null
-                      ? Value(clientModel.username!)
-                      : Value.absent(),
-                  email: clientModel.email != null
-                      ? Value(clientModel.email!)
-                      : Value.absent(),
-                  phoneNumber: clientModel.phone?['phoneNumber'] != null
-                      ? Value(clientModel.phone?['phoneNumber']!)
-                      : Value.absent(),
-                  countryCode: clientModel.phone?['countryCode'] != null
-                      ? Value(clientModel.phone?['countryCode']!)
-                      : Value.absent(),
-                  currentWorkoutPlanName:
-                      clientModel.currentWorkoutPlanName != null
-                          ? Value(clientModel.currentWorkoutPlanName!)
-                          : Value.absent(),
-                  createdAt: Value(DateTime.now().millisecondsSinceEpoch),
-                  updatedAt: Value.absent());
+                id: Value(clientModel.id!),
+                age: clientModel.age != null
+                    ? Value(clientModel.age!)
+                    : Value.absent(),
+                gender: clientModel.gender != null
+                    ? Value(clientModel.gender!)
+                    : Value.absent(),
+                weightInKg: clientModel.weightInKg != null
+                    ? Value(clientModel.weightInKg!)
+                    : Value.absent(),
+                weightInLb: clientModel.weightInLb != null
+                    ? Value(clientModel.weightInLb!)
+                    : Value.absent(),
+                heightInCm: clientModel.heightInCm != null
+                    ? Value(clientModel.heightInCm!)
+                    : Value.absent(),
+                heightInFt: clientModel.heightInFt != null
+                    ? Value(clientModel.heightInFt!)
+                    : Value.absent(),
+                isTrainer: clientModel.isTrainer != null
+                    ? Value(clientModel.isTrainer!)
+                    : Value.absent(),
+                isUserActive: clientModel.isUserActive != null
+                    ? Value(clientModel.isUserActive!)
+                    : Value.absent(),
+                username: clientModel.username != null
+                    ? Value(clientModel.username!)
+                    : Value.absent(),
+                email: clientModel.email != null
+                    ? Value(clientModel.email!)
+                    : Value.absent(),
+                phoneNumber: clientModel.phone?['phoneNumber'] != null
+                    ? Value(clientModel.phone?['phoneNumber']!)
+                    : Value.absent(),
+                countryCode: clientModel.phone?['countryCode'] != null
+                    ? Value(clientModel.phone?['countryCode']!)
+                    : Value.absent(),
+                currentWorkoutPlanName:
+                    clientModel.currentWorkoutPlanName != null
+                        ? Value(clientModel.currentWorkoutPlanName!)
+                        : Value.absent(),
+                createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+                updatedAt: Value.absent(),
+                fcmToken: Value(
+                  clientModel.fcmToken,
+                ),
+              );
             },
           ).toList(),
         );

@@ -90,8 +90,9 @@ class AppDatabase extends _$AppDatabase {
                   from == 11 ||
                   from == 12 ||
                   from == 13 ||
-                  from == 14) &&
-              to == 15) {
+                  from == 14 ||
+                  from == 15) &&
+              to == 16) {
             // await m.drop(workoutPlans);
             // await m.drop(weeks);
             // await m.drop(days);
@@ -156,7 +157,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

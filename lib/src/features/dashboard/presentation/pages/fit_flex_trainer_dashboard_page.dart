@@ -1,5 +1,9 @@
+import 'package:fit_flex_club/src/core/common/services/fcm_service.dart';
+import 'package:fit_flex_club/src/core/common/services/local_notification_service.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +31,17 @@ class _FitFlexTrainerDashboardPageState
   @override
   void initState() {
     super.initState();
+    getIt<NetworkInfo>().isConnected?.then(
+      (isConnected) async {
+        if (isConnected) {
+          LocalNotificationService.initialize(context).then(
+            (value) async {
+              await FCMService.initializeFCM();
+            },
+          );
+        }
+      },
+    );
     selectedIndex.value = widget.navigationShell.currentIndex;
   }
 
