@@ -71,6 +71,12 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
   late final GeneratedColumn<String> username = GeneratedColumn<String>(
       'username', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fcmTokenMeta =
+      const VerificationMeta('fcmToken');
+  @override
+  late final GeneratedColumn<String> fcmToken = GeneratedColumn<String>(
+      'fcm_token', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
   late final GeneratedColumn<String> email = GeneratedColumn<String>(
@@ -120,6 +126,7 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
         isTrainer,
         isUserActive,
         username,
+        fcmToken,
         email,
         phoneNumber,
         countryCode,
@@ -194,6 +201,10 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
     } else if (isInserting) {
       context.missing(_usernameMeta);
     }
+    if (data.containsKey('fcm_token')) {
+      context.handle(_fcmTokenMeta,
+          fcmToken.isAcceptableOrUnknown(data['fcm_token']!, _fcmTokenMeta));
+    }
     if (data.containsKey('email')) {
       context.handle(
           _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
@@ -253,6 +264,8 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
           .read(DriftSqlType.bool, data['${effectivePrefix}is_user_active'])!,
       username: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
+      fcmToken: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}fcm_token']),
       email: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}email']),
       phoneNumber: attachedDatabase.typeMapping
@@ -286,6 +299,7 @@ class Client extends DataClass implements Insertable<Client> {
   final bool isTrainer;
   final bool isUserActive;
   final String username;
+  final String? fcmToken;
   final String? email;
   final String? phoneNumber;
   final String? countryCode;
@@ -303,6 +317,7 @@ class Client extends DataClass implements Insertable<Client> {
       required this.isTrainer,
       required this.isUserActive,
       required this.username,
+      this.fcmToken,
       this.email,
       this.phoneNumber,
       this.countryCode,
@@ -334,6 +349,9 @@ class Client extends DataClass implements Insertable<Client> {
     map['is_trainer'] = Variable<bool>(isTrainer);
     map['is_user_active'] = Variable<bool>(isUserActive);
     map['username'] = Variable<String>(username);
+    if (!nullToAbsent || fcmToken != null) {
+      map['fcm_token'] = Variable<String>(fcmToken);
+    }
     if (!nullToAbsent || email != null) {
       map['email'] = Variable<String>(email);
     }
@@ -375,6 +393,9 @@ class Client extends DataClass implements Insertable<Client> {
       isTrainer: Value(isTrainer),
       isUserActive: Value(isUserActive),
       username: Value(username),
+      fcmToken: fcmToken == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fcmToken),
       email:
           email == null && nullToAbsent ? const Value.absent() : Value(email),
       phoneNumber: phoneNumber == null && nullToAbsent
@@ -407,6 +428,7 @@ class Client extends DataClass implements Insertable<Client> {
       isTrainer: serializer.fromJson<bool>(json['isTrainer']),
       isUserActive: serializer.fromJson<bool>(json['isUserActive']),
       username: serializer.fromJson<String>(json['username']),
+      fcmToken: serializer.fromJson<String?>(json['fcmToken']),
       email: serializer.fromJson<String?>(json['email']),
       phoneNumber: serializer.fromJson<String?>(json['phoneNumber']),
       countryCode: serializer.fromJson<String?>(json['countryCode']),
@@ -430,6 +452,7 @@ class Client extends DataClass implements Insertable<Client> {
       'isTrainer': serializer.toJson<bool>(isTrainer),
       'isUserActive': serializer.toJson<bool>(isUserActive),
       'username': serializer.toJson<String>(username),
+      'fcmToken': serializer.toJson<String?>(fcmToken),
       'email': serializer.toJson<String?>(email),
       'phoneNumber': serializer.toJson<String?>(phoneNumber),
       'countryCode': serializer.toJson<String?>(countryCode),
@@ -451,6 +474,7 @@ class Client extends DataClass implements Insertable<Client> {
           bool? isTrainer,
           bool? isUserActive,
           String? username,
+          Value<String?> fcmToken = const Value.absent(),
           Value<String?> email = const Value.absent(),
           Value<String?> phoneNumber = const Value.absent(),
           Value<String?> countryCode = const Value.absent(),
@@ -468,6 +492,7 @@ class Client extends DataClass implements Insertable<Client> {
         isTrainer: isTrainer ?? this.isTrainer,
         isUserActive: isUserActive ?? this.isUserActive,
         username: username ?? this.username,
+        fcmToken: fcmToken.present ? fcmToken.value : this.fcmToken,
         email: email.present ? email.value : this.email,
         phoneNumber: phoneNumber.present ? phoneNumber.value : this.phoneNumber,
         countryCode: countryCode.present ? countryCode.value : this.countryCode,
@@ -495,6 +520,7 @@ class Client extends DataClass implements Insertable<Client> {
           ? data.isUserActive.value
           : this.isUserActive,
       username: data.username.present ? data.username.value : this.username,
+      fcmToken: data.fcmToken.present ? data.fcmToken.value : this.fcmToken,
       email: data.email.present ? data.email.value : this.email,
       phoneNumber:
           data.phoneNumber.present ? data.phoneNumber.value : this.phoneNumber,
@@ -521,6 +547,7 @@ class Client extends DataClass implements Insertable<Client> {
           ..write('isTrainer: $isTrainer, ')
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
+          ..write('fcmToken: $fcmToken, ')
           ..write('email: $email, ')
           ..write('phoneNumber: $phoneNumber, ')
           ..write('countryCode: $countryCode, ')
@@ -543,6 +570,7 @@ class Client extends DataClass implements Insertable<Client> {
       isTrainer,
       isUserActive,
       username,
+      fcmToken,
       email,
       phoneNumber,
       countryCode,
@@ -563,6 +591,7 @@ class Client extends DataClass implements Insertable<Client> {
           other.isTrainer == this.isTrainer &&
           other.isUserActive == this.isUserActive &&
           other.username == this.username &&
+          other.fcmToken == this.fcmToken &&
           other.email == this.email &&
           other.phoneNumber == this.phoneNumber &&
           other.countryCode == this.countryCode &&
@@ -582,6 +611,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
   final Value<bool> isTrainer;
   final Value<bool> isUserActive;
   final Value<String> username;
+  final Value<String?> fcmToken;
   final Value<String?> email;
   final Value<String?> phoneNumber;
   final Value<String?> countryCode;
@@ -600,6 +630,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     this.isTrainer = const Value.absent(),
     this.isUserActive = const Value.absent(),
     this.username = const Value.absent(),
+    this.fcmToken = const Value.absent(),
     this.email = const Value.absent(),
     this.phoneNumber = const Value.absent(),
     this.countryCode = const Value.absent(),
@@ -619,6 +650,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     required bool isTrainer,
     required bool isUserActive,
     required String username,
+    this.fcmToken = const Value.absent(),
     this.email = const Value.absent(),
     this.phoneNumber = const Value.absent(),
     this.countryCode = const Value.absent(),
@@ -641,6 +673,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     Expression<bool>? isTrainer,
     Expression<bool>? isUserActive,
     Expression<String>? username,
+    Expression<String>? fcmToken,
     Expression<String>? email,
     Expression<String>? phoneNumber,
     Expression<String>? countryCode,
@@ -660,6 +693,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       if (isTrainer != null) 'is_trainer': isTrainer,
       if (isUserActive != null) 'is_user_active': isUserActive,
       if (username != null) 'username': username,
+      if (fcmToken != null) 'fcm_token': fcmToken,
       if (email != null) 'email': email,
       if (phoneNumber != null) 'phone_number': phoneNumber,
       if (countryCode != null) 'country_code': countryCode,
@@ -682,6 +716,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       Value<bool>? isTrainer,
       Value<bool>? isUserActive,
       Value<String>? username,
+      Value<String?>? fcmToken,
       Value<String?>? email,
       Value<String?>? phoneNumber,
       Value<String?>? countryCode,
@@ -700,6 +735,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       isTrainer: isTrainer ?? this.isTrainer,
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
+      fcmToken: fcmToken ?? this.fcmToken,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       countryCode: countryCode ?? this.countryCode,
@@ -744,6 +780,9 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     if (username.present) {
       map['username'] = Variable<String>(username.value);
     }
+    if (fcmToken.present) {
+      map['fcm_token'] = Variable<String>(fcmToken.value);
+    }
     if (email.present) {
       map['email'] = Variable<String>(email.value);
     }
@@ -782,6 +821,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
           ..write('isTrainer: $isTrainer, ')
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
+          ..write('fcmToken: $fcmToken, ')
           ..write('email: $email, ')
           ..write('phoneNumber: $phoneNumber, ')
           ..write('countryCode: $countryCode, ')
@@ -5570,6 +5610,7 @@ typedef $$ClientsTableCreateCompanionBuilder = ClientsCompanion Function({
   required bool isTrainer,
   required bool isUserActive,
   required String username,
+  Value<String?> fcmToken,
   Value<String?> email,
   Value<String?> phoneNumber,
   Value<String?> countryCode,
@@ -5589,6 +5630,7 @@ typedef $$ClientsTableUpdateCompanionBuilder = ClientsCompanion Function({
   Value<bool> isTrainer,
   Value<bool> isUserActive,
   Value<String> username,
+  Value<String?> fcmToken,
   Value<String?> email,
   Value<String?> phoneNumber,
   Value<String?> countryCode,
@@ -5751,6 +5793,9 @@ class $$ClientsTableFilterComposer
 
   ColumnFilters<String> get username => $composableBuilder(
       column: $table.username, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fcmToken => $composableBuilder(
+      column: $table.fcmToken, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnFilters(column));
@@ -5961,6 +6006,9 @@ class $$ClientsTableOrderingComposer
   ColumnOrderings<String> get username => $composableBuilder(
       column: $table.username, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get fcmToken => $composableBuilder(
+      column: $table.fcmToken, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnOrderings(column));
 
@@ -6019,6 +6067,9 @@ class $$ClientsTableAnnotationComposer
 
   GeneratedColumn<String> get username =>
       $composableBuilder(column: $table.username, builder: (column) => column);
+
+  GeneratedColumn<String> get fcmToken =>
+      $composableBuilder(column: $table.fcmToken, builder: (column) => column);
 
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
@@ -6230,6 +6281,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             Value<bool> isTrainer = const Value.absent(),
             Value<bool> isUserActive = const Value.absent(),
             Value<String> username = const Value.absent(),
+            Value<String?> fcmToken = const Value.absent(),
             Value<String?> email = const Value.absent(),
             Value<String?> phoneNumber = const Value.absent(),
             Value<String?> countryCode = const Value.absent(),
@@ -6249,6 +6301,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             isTrainer: isTrainer,
             isUserActive: isUserActive,
             username: username,
+            fcmToken: fcmToken,
             email: email,
             phoneNumber: phoneNumber,
             countryCode: countryCode,
@@ -6268,6 +6321,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             required bool isTrainer,
             required bool isUserActive,
             required String username,
+            Value<String?> fcmToken = const Value.absent(),
             Value<String?> email = const Value.absent(),
             Value<String?> phoneNumber = const Value.absent(),
             Value<String?> countryCode = const Value.absent(),
@@ -6287,6 +6341,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             isTrainer: isTrainer,
             isUserActive: isUserActive,
             username: username,
+            fcmToken: fcmToken,
             email: email,
             phoneNumber: phoneNumber,
             countryCode: countryCode,
@@ -6322,7 +6377,8 @@ class $$ClientsTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (workoutPlansRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable,
+                            WorkoutPlan>(
                         currentTable: table,
                         referencedTable:
                             $$ClientsTableReferences._workoutPlansRefsTable(db),
@@ -6334,7 +6390,7 @@ class $$ClientsTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.clientId == item.id),
                         typedResults: items),
                   if (weeksRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable, Week>(
                         currentTable: table,
                         referencedTable:
                             $$ClientsTableReferences._weeksRefsTable(db),
@@ -6345,7 +6401,7 @@ class $$ClientsTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.clientId == item.id),
                         typedResults: items),
                   if (daysRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable, Day>(
                         currentTable: table,
                         referencedTable:
                             $$ClientsTableReferences._daysRefsTable(db),
@@ -6356,7 +6412,8 @@ class $$ClientsTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.clientId == item.id),
                         typedResults: items),
                   if (workoutPlanExerciseRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable,
+                            WorkoutPlanExerciseData>(
                         currentTable: table,
                         referencedTable: $$ClientsTableReferences
                             ._workoutPlanExerciseRefsTable(db),
@@ -6368,7 +6425,8 @@ class $$ClientsTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.clientId == item.id),
                         typedResults: items),
                   if (exerciseSetsRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable,
+                            ExerciseSet>(
                         currentTable: table,
                         referencedTable:
                             $$ClientsTableReferences._exerciseSetsRefsTable(db),
@@ -6380,7 +6438,8 @@ class $$ClientsTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.clientId == item.id),
                         typedResults: items),
                   if (baseExerciseRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable,
+                            BaseExerciseData>(
                         currentTable: table,
                         referencedTable:
                             $$ClientsTableReferences._baseExerciseRefsTable(db),
@@ -6392,7 +6451,7 @@ class $$ClientsTableTableManager extends RootTableManager<
                             referencedItems.where((e) => e.clientId == item.id),
                         typedResults: items),
                   if (workoutHistoryExerciseRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Client, $ClientsTable, WorkoutHistoryExerciseData>(
                         currentTable: table,
                         referencedTable: $$ClientsTableReferences
                             ._workoutHistoryExerciseRefsTable(db),
@@ -6761,7 +6820,8 @@ class $$WorkoutPlansTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (weeksRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<WorkoutPlan, $WorkoutPlansTable,
+                            Week>(
                         currentTable: table,
                         referencedTable:
                             $$WorkoutPlansTableReferences._weeksRefsTable(db),
@@ -7191,7 +7251,7 @@ class $$WeeksTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (daysRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Week, $WeeksTable, Day>(
                         currentTable: table,
                         referencedTable:
                             $$WeeksTableReferences._daysRefsTable(db),
@@ -7626,7 +7686,8 @@ class $$DaysTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (workoutPlanExerciseRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<Day, $DaysTable,
+                            WorkoutPlanExerciseData>(
                         currentTable: table,
                         referencedTable: $$DaysTableReferences
                             ._workoutPlanExerciseRefsTable(db),
@@ -8100,7 +8161,8 @@ class $$WorkoutPlanExerciseTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (exerciseSetsRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<WorkoutPlanExerciseData,
+                            $WorkoutPlanExerciseTable, ExerciseSet>(
                         currentTable: table,
                         referencedTable: $$WorkoutPlanExerciseTableReferences
                             ._exerciseSetsRefsTable(db),
@@ -9595,7 +9657,10 @@ class $$WorkoutHistoryExerciseTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (workoutHistorySetRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedData<
+                            WorkoutHistoryExerciseData,
+                            $WorkoutHistoryExerciseTable,
+                            WorkoutHistorySetData>(
                         currentTable: table,
                         referencedTable: $$WorkoutHistoryExerciseTableReferences
                             ._workoutHistorySetRefsTable(db),

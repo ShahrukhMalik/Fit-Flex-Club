@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
+import 'package:fit_flex_club/src/core/common/services/fcm_service.dart';
+import 'package:fit_flex_club/src/core/common/services/local_notification_service.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/sendnotification/sendnotification_cubit.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/bloc/client_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/clientweights/clientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
@@ -48,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initConnectivity();
-
+ 
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
@@ -153,12 +157,11 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<GetclientweightsCubit>()),
         BlocProvider(create: (context) => getIt<GetworkoutplanCubit>()),
         BlocProvider(create: (context) => getIt<TrainerProfileBloc>()),
-        BlocProvider(
-            create: (context) => getIt<GetexercisesCubit>()),
-        BlocProvider(
-            create: (context) => getIt<GetgifurlCubit>()),
+        BlocProvider(create: (context) => getIt<GetexercisesCubit>()),
+        BlocProvider(create: (context) => getIt<GetgifurlCubit>()),
         BlocProvider(create: (context) => getIt<WorkoutManagementBloc>()),
         BlocProvider(create: (context) => getIt<WorkoutHistoryBloc>()),
+        BlocProvider(create: (context) => getIt<SendNotificationCubit>()),
       ],
       child: localizations,
     );

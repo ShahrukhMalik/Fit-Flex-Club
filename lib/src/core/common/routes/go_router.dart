@@ -5,6 +5,11 @@ import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_landing_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_log_in_page.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_one_to_one_chat_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_measure_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
@@ -164,7 +169,8 @@ GoRouter goRouter(appState) {
         builder: (context, state, navigationShell) {
           final route = state.fullPath;
           final showBottomNavBar = (route == FitFlexTrainerProfilePage.route) ||
-              (route == FitFlexTrainerWorkoutPage.route);
+              (route == FitFlexTrainerWorkoutPage.route) ||
+              (route == FitFlexTrainerHubPage.route);
           return FitFlexTrainerDashboardPage(
             navigationShell: navigationShell,
             showBottomNavBar: showBottomNavBar,
@@ -324,6 +330,65 @@ GoRouter goRouter(appState) {
                         },
                       ),
                     ],
+                  ),
+                ],
+              )
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: GlobalKey<NavigatorState>(debugLabel: 'trainerHub'),
+            routes: [
+              GoRoute(
+                path: FitFlexTrainerHubPage.route,
+                pageBuilder: (context, state) => TransitionPage(
+                  key: state.pageKey,
+                  child: FitFlexTrainerHubPage(),
+                ),
+                routes: [
+                  GoRoute(
+                    path: FitFlexPersonalizedNotificationPage.route,
+                    pageBuilder: (context, state) => TransitionPage(
+                      key: state.pageKey,
+                      child: FitFlexPersonalizedNotificationPage(),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: FitFlexSelectClientsPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexSelectClientsPage(
+                              selectedClients: extraData?['selectedClients'],
+                            ),
+                          );
+                        },
+                        routes: [],
+                      )
+                    ],
+                  ),
+                  GoRoute(
+                    path: FitFlexAnnouncementsPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexAnnouncementsPage(),
+                      );
+                    },
+                    routes: [],
+                  ),
+                  GoRoute(
+                    path: FitFlexOneToOneChatPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexOneToOneChatPage(),
+                      );
+                    },
+                    routes: [],
                   ),
                 ],
               )

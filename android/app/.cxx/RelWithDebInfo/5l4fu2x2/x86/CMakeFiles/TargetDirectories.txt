@@ -1,0 +1,2 @@
+/Users/apple/development/projects/client/Fit-Flex-Club/fit_flex_club/android/app/.cxx/RelWithDebInfo/5l4fu2x2/x86/CMakeFiles/edit_cache.dir
+/Users/apple/development/projects/client/Fit-Flex-Club/fit_flex_club/android/app/.cxx/RelWithDebInfo/5l4fu2x2/x86/CMakeFiles/rebuild_cache.dir

@@ -1,1 +1,54 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"fitflexclub-fa604","appId":"1:608017073256:android:f1bf49be9dd066797667dd","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"fitflexclub-fa604","appId":"1:608017073256:ios:d373fe1c3e95ba4f7667dd","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"fitflexclub-fa604","appId":"1:608017073256:ios:d373fe1c3e95ba4f7667dd","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"fitflexclub-fa604","configurations":{"android":"1:608017073256:android:f1bf49be9dd066797667dd","ios":"1:608017073256:ios:d373fe1c3e95ba4f7667dd","macos":"1:608017073256:ios:d373fe1c3e95ba4f7667dd","web":"1:608017073256:web:d349487b1236f5ea7667dd","windows":"1:608017073256:web:2a5025857f99bd2d7667dd"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "fitflexclub-fa604",
+          "appId": "1:608017073256:android:f1bf49be9dd066797667dd",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "fitflexclub-fa604",
+          "appId": "1:608017073256:ios:d373fe1c3e95ba4f7667dd",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "fitflexclub-fa604",
+          "appId": "1:608017073256:ios:d373fe1c3e95ba4f7667dd",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "fitflexclub-fa604",
+          "configurations": {
+            "android": "1:608017073256:android:f1bf49be9dd066797667dd",
+            "ios": "1:608017073256:ios:d373fe1c3e95ba4f7667dd",
+            "macos": "1:608017073256:ios:d373fe1c3e95ba4f7667dd",
+            "web": "1:608017073256:web:d349487b1236f5ea7667dd",
+            "windows": "1:608017073256:web:2a5025857f99bd2d7667dd"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}

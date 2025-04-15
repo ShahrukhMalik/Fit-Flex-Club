@@ -16,6 +16,7 @@ class ClientModel extends ClientEntity {
     super.username,
     super.email,
     super.phone,
+    super.fcmToken,
     super.currentWorkoutPlanName,
   });
   @override
@@ -32,6 +33,7 @@ class ClientModel extends ClientEntity {
       isUserActive,
       username,
       phone,
+      fcmToken,
       currentWorkoutPlanName
     ];
   }
@@ -48,6 +50,7 @@ class ClientModel extends ClientEntity {
     bool? isUserActive,
     String? username,
     String? email,
+    String? fcmToken,
     String? currentWorkoutPlanName,
     Map<String, dynamic>? phone,
   }) {
@@ -66,6 +69,7 @@ class ClientModel extends ClientEntity {
       isTrainer: isTrainer ?? this.isTrainer,
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
+      fcmToken: fcmToken ?? this.fcmToken 
     );
   }
 
@@ -81,6 +85,7 @@ class ClientModel extends ClientEntity {
       'isTrainer': isTrainer,
       'isUserActive': isUserActive,
       'username': username,
+      'fcmToken': fcmToken,
     };
   }
 
@@ -102,6 +107,7 @@ class ClientModel extends ClientEntity {
       isTrainer: map['isTrainer'],
       isUserActive: map['isUserActive'],
       username: map['username'],
+      fcmToken: map['fcmToken'],
     );
   }
 
@@ -124,6 +130,7 @@ class ClientModel extends ClientEntity {
       isTrainer: data?['isTrainer'],
       isUserActive: data?['isUserActive'],
       username: data?['username'],
+      fcmToken: data?['fcmToken']
     );
   }
 
@@ -142,6 +149,7 @@ class ClientModel extends ClientEntity {
       isTrainer: clientEntity.isTrainer,
       isUserActive: clientEntity.isUserActive,
       username: clientEntity.username,
+      fcmToken: clientEntity.fcmToken
     );
   }
 
@@ -178,6 +186,7 @@ class ClientModel extends ClientEntity {
     if (username != null) data['username'] = username;
     if (email != null) data['email'] = email;
     if (phone != null) data['phone'] = phone;
+    if (fcmToken != null) data['fcmToken'] = fcmToken;
 
     return data;
   }
