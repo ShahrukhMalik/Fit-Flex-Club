@@ -1,5 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/local/converters/converters.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/local/dao/chat_dao.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/local/tables/chats_table.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/local/tables/messages_table.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/tables/sync_queue_table.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/daos/client_dao.dart';
@@ -29,6 +33,8 @@ part 'fit_flex_local_db.g.dart';
     ClientWeight,
     WorkoutHistorySet,
     SyncQueue,
+    Chats,
+    Messages,
     WorkoutHistoryExercise
   ],
   daos: [
@@ -36,6 +42,7 @@ part 'fit_flex_local_db.g.dart';
     ClientsDao,
     WorkoutHistoryDao,
     SyncQueueDao,
+    ChatDao
   ],
 )
 class AppDatabase extends _$AppDatabase {

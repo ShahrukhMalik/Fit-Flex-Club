@@ -19,6 +19,7 @@ class NotificationModel extends NotificationEntity {
             'fcmToken': selectedClient?.fcmToken,
             'remark': null,
             'notification_sent_at': null,
+            'is_sent': false,
             'client_id': selectedClient?.id,
           };
         },
