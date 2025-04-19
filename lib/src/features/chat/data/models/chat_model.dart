@@ -17,7 +17,17 @@ class ChatModel extends ChatEntity {
       members: List<Map<String, dynamic>>.from(data['members']),
       lastMessage: data['lastMessage'] ?? '',
       lastSender: data['lastSender'] ?? '',
-      lastTimestamp: (data['lastTimestamp'] as Timestamp).toDate(),
+      lastTimestamp: DateTime.fromMillisecondsSinceEpoch(data['lastTimestamp']),
+      unreadCount: Map<String, int>.from(data['unreadCount'] ?? {}),
+    );
+  }
+  factory ChatModel.fromLocal(Map<String, dynamic> data) {
+    return ChatModel(
+      id: data['id'],
+      members: List<Map<String, dynamic>>.from(data['members']),
+      lastMessage: data['lastMessage'] ?? '',
+      lastSender: data['lastSender'] ?? '',
+      lastTimestamp: DateTime.fromMillisecondsSinceEpoch(data['lastTimestamp']),
       unreadCount: Map<String, int>.from(data['unreadCount'] ?? {}),
     );
   }
@@ -32,7 +42,7 @@ class ChatModel extends ChatEntity {
           .toList(),
       'lastMessage': lastMessage,
       'lastSender': lastSender,
-      'lastTimestamp': lastTimestamp,
+      'lastTimestamp': lastTimestamp.millisecondsSinceEpoch,
       'unreadCount': unreadCount,
     };
   }

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 class MessageEntity extends Equatable {
   final String id;
+  final String chatId;
   final String senderId;
   final String messageText;
   final DateTime timestamp;
@@ -13,6 +14,7 @@ class MessageEntity extends Equatable {
 
   const MessageEntity({
     required this.id,
+    required this.chatId,
     required this.senderId,
     required this.messageText,
     required this.timestamp,
@@ -30,6 +32,7 @@ class MessageEntity extends Equatable {
   @override
   List<Object?> get props => [
         id,
+        chatId,
         senderId,
         messageText,
         timestamp,

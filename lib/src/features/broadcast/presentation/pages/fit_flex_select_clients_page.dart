@@ -13,28 +13,35 @@ import 'package:fit_flex_club/src/features/client_profile/domain/entities/client
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 
 class FitFlexSelectClientsPage extends StatelessWidget {
-  final List<ClientEntity?> selectedClients;
+  final List<ClientEntity?>? selectedClients;
+  final bool forChat;
   static const route = 'select_clients_page';
   const FitFlexSelectClientsPage({
     super.key,
     required this.selectedClients,
+    this.forChat = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GymClientsDashboard(
-        colorScheme: globalColorScheme, selectedClients: selectedClients);
+      colorScheme: globalColorScheme,
+      selectedClients: selectedClients,
+      forChat: forChat,
+    );
   }
 }
 
 class GymClientsDashboard extends StatefulWidget {
   final ColorScheme colorScheme;
-  final List<ClientEntity?> selectedClients;
+  final List<ClientEntity?>? selectedClients;
+  final bool forChat;
 
   const GymClientsDashboard({
     super.key,
     required this.colorScheme,
     required this.selectedClients,
+    this.forChat = false,
   });
 
   @override
@@ -50,7 +57,10 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
   void initState() {
     super.initState();
     context.read<TrainerProfileBloc>().add(TrainerProfileGetClientsEvent());
-    _selectedClients.value = widget.selectedClients.toSet();
+    final selectedClients = widget.selectedClients;
+    if (selectedClients != null) {
+      _selectedClients.value = selectedClients.toSet();
+    }
   }
 
   void _filterClients(String? searchQuery) {
@@ -87,10 +97,12 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
       },
       child: Scaffold(
         backgroundColor: widget.colorScheme.onTertiary,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => context.pop(_selectedClients.value.toList()),
-          child: Icon(Icons.add_circle_outline),
-        ),
+        floatingActionButton: widget.forChat
+            ? null
+            : FloatingActionButton(
+                onPressed: () => context.pop(_selectedClients.value.toList()),
+                child: Icon(Icons.add_circle_outline),
+              ),
         appBar: PlatformAppbar.basicAppBar(
           automaticallyImplyLeading: true,
           backgroundColor: globalColorScheme.onPrimaryContainer,
@@ -202,32 +214,40 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                             builder:
                                                 (context, selectedClients, _) {
                                               return InkWell(
-                                                onLongPress: () {
-                                                  if (selectedClients
-                                                      .contains(client)) {
-                                                    return;
-                                                  } else {
-                                                    selectedClients.add(client);
-                                                    _selectedClients.value =
-                                                        selectedClients
-                                                            .map(
-                                                              (e) => e,
-                                                            )
-                                                            .toSet();
-                                                  }
-                                                },
+                                                onLongPress: widget.forChat
+                                                    ? null
+                                                    : () {
+                                                        if (selectedClients
+                                                            .contains(client)) {
+                                                          return;
+                                                        } else {
+                                                          selectedClients
+                                                              .add(client);
+                                                          _selectedClients
+                                                                  .value =
+                                                              selectedClients
+                                                                  .map(
+                                                                    (e) => e,
+                                                                  )
+                                                                  .toSet();
+                                                        }
+                                                      },
                                                 onTap: () {
                                                   // Optional: reset long-press if tapped again
-                                                  if (selectedClients
-                                                      .contains(client)) {
-                                                    selectedClients
-                                                        .remove(client);
-                                                    _selectedClients.value =
-                                                        selectedClients
-                                                            .map(
-                                                              (e) => e,
-                                                            )
-                                                            .toSet();
+                                                  if (widget.forChat) {
+                                                    context.pop(client);
+                                                  } else {
+                                                    if (selectedClients
+                                                        .contains(client)) {
+                                                      selectedClients
+                                                          .remove(client);
+                                                      _selectedClients.value =
+                                                          selectedClients
+                                                              .map(
+                                                                (e) => e,
+                                                              )
+                                                              .toSet();
+                                                    }
                                                   }
                                                 },
                                                 child: AnimatedContainer(

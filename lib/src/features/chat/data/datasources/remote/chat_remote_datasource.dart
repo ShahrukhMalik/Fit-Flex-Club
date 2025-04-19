@@ -31,6 +31,12 @@ abstract class ChatRemoteDatasource {
     required MessageModel message,
     required ChatModel chat,
   });
+
+  ///
+  Future<void> updateMessageStatus({
+    required MessageModel message,
+    required ChatModel chat,
+  });
 }
 
 @Singleton(as: ChatRemoteDatasource)
@@ -89,7 +95,7 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
   Future<void> startChat({required ChatModel chat}) async {
     try {
       final CollectionReference ref = remoteDb.collection('chats');
-      await ref.add(chat.toMap());
+      await ref.doc(chat.id).set(chat.toMap());
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -130,7 +136,7 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
   }
 
   @override
-  Future<Stream<List<MessageEntity>>> watchMessagesByChatId({
+  Future<Stream<List<MessageModel>>> watchMessagesByChatId({
     required String chatId,
   }) async {
     try {
@@ -145,6 +151,50 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
               .toList());
 
       return messageStream;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<void> updateMessageStatus({
+    required MessageEntity message,
+    required ChatEntity chat,
+  }) async {
+    try {
+      // Update message status
+      await remoteDb
+          .collection('chats')
+          .doc(chat.id)
+          .collection('messages')
+          .doc(message.id)
+          .update({
+        'readBy': message.readBy.map(
+          (obj) => {
+            'userId': obj,
+            'timestamp': DateTime.now().millisecondsSinceEpoch
+          },
+        ),
+        'deliveredTo': message.deliveredTo.map(
+          (obj) => {
+            'userId': obj,
+            'timestamp': DateTime.now().millisecondsSinceEpoch
+          },
+        ),
+      });
+      // Update chat status
+      await remoteDb.collection('chats').doc(chat.id).update({
+        'unreadCount': chat.unreadCount.entries.map(
+          (obj) {
+            final currentCount = obj.value;
+            final updatedCount = (currentCount - 1).clamp(0, currentCount);
+            return {obj.key: updatedCount};
+          },
+        ),
+      });
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

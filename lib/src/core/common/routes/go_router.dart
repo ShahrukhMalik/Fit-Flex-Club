@@ -361,6 +361,7 @@ GoRouter goRouter(appState) {
                             key: state.pageKey,
                             child: FitFlexSelectClientsPage(
                               selectedClients: extraData?['selectedClients'],
+                              forChat: extraData?['forChat'],
                             ),
                           );
                         },
@@ -385,10 +386,28 @@ GoRouter goRouter(appState) {
                       final extraData = state.extra as Map<String, dynamic>?;
                       return TransitionPage(
                         key: state.pageKey,
-                        child: FitFlexOneToOneChatPage(),
+                        child: FitFlexOneToOneChatPage(
+                          currentUserId: extraData?['currentUserId'],
+                        ),
                       );
                     },
-                    routes: [],
+                    routes: [
+                      GoRoute(
+                        path: FitFlexSelectClientsPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexSelectClientsPage(
+                              selectedClients: extraData?['selectedClients'],
+                              forChat: extraData?['forChat'],
+                            ),
+                          );
+                        },
+                        routes: [],
+                      )
+                    ],
                   ),
                 ],
               )

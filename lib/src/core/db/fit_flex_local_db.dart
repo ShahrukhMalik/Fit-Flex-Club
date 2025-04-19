@@ -37,13 +37,7 @@ part 'fit_flex_local_db.g.dart';
     Messages,
     WorkoutHistoryExercise
   ],
-  daos: [
-    WorkoutPlanDao,
-    ClientsDao,
-    WorkoutHistoryDao,
-    SyncQueueDao,
-    ChatDao
-  ],
+  daos: [WorkoutPlanDao, ClientsDao, WorkoutHistoryDao, SyncQueueDao, ChatDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -98,15 +92,19 @@ class AppDatabase extends _$AppDatabase {
                   from == 12 ||
                   from == 13 ||
                   from == 14 ||
-                  from == 15) &&
-              to == 16) {
+                  from == 15 ||
+                  from == 16 ||
+                  from == 17) &&
+              to == 18) {
             // await m.drop(workoutPlans);
             // await m.drop(weeks);
             // await m.drop(days);
             // await m.drop(workoutPlanExercise);
             // await m.drop(exerciseSets);
             // await m.drop(baseExercise);
-            await m.drop(clients);
+            // await m.drop(clients);
+            await m.drop(chats);
+            await m.drop(messages);
             // await m.drop(clientWeight);
             // await m.drop(workoutHistorySet);
             // await m.drop(syncQueue);
@@ -118,7 +116,9 @@ class AppDatabase extends _$AppDatabase {
             // await m.createTable(workoutPlanExercise);
             // await m.createTable(exerciseSets);
             // await m.createTable(baseExercise);
-            await m.createTable(clients);
+            // await m.createTable(clients);
+            await m.createTable(chats);
+            await m.createTable(messages);
             // await m.createTable(clientWeight);
             // await m.createTable(workoutHistorySet);
             // await m.createTable(syncQueue);
@@ -164,7 +164,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 18;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

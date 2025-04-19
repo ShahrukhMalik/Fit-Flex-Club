@@ -3,9 +3,11 @@ import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/chat/data/datasources/local/tables/chats_table.dart';
 import 'package:fit_flex_club/src/features/chat/data/datasources/local/tables/messages_table.dart';
+import 'package:injectable/injectable.dart';
 part 'chat_dao.g.dart';
 
 @DriftAccessor(tables: [Chats, Messages])
+@injectable
 class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
   ChatDao(super.db);
 
@@ -33,6 +35,19 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
       batch.insertAll(
         messages,
         messagesList,
+        mode: InsertMode.insertOrReplace,
+      );
+    });
+  }
+
+  // 👉 Batch insert chats and their messages
+  Future<void> batchInsertChats(
+    List<ChatsCompanion> chatsList,
+  ) async {
+    await batch((batch) {
+      batch.insertAll(
+        chats,
+        chatsList,
         mode: InsertMode.insertOrReplace,
       );
     });

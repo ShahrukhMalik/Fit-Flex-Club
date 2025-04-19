@@ -5582,17 +5582,16 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
   static const VerificationMeta _lastTimestampMeta =
       const VerificationMeta('lastTimestamp');
   @override
-  late final GeneratedColumn<DateTime> lastTimestamp =
-      GeneratedColumn<DateTime>('last_timestamp', aliasedName, false,
-          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  late final GeneratedColumn<int> lastTimestamp = GeneratedColumn<int>(
+      'last_timestamp', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _membersMeta =
       const VerificationMeta('members');
   @override
-  late final GeneratedColumnWithTypeConverter<List<Map<String, String>>, String>
-      members = GeneratedColumn<String>('members', aliasedName, false,
-              type: DriftSqlType.string, requiredDuringInsert: true)
-          .withConverter<List<Map<String, String>>>(
-              $ChatsTable.$convertermembers);
+  late final GeneratedColumnWithTypeConverter<List<Map<String, dynamic>>,
+      String> members = GeneratedColumn<String>('members', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true)
+      .withConverter<List<Map<String, dynamic>>>($ChatsTable.$convertermembers);
   static const VerificationMeta _unreadCountMeta =
       const VerificationMeta('unreadCount');
   @override
@@ -5657,8 +5656,8 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
           .read(DriftSqlType.string, data['${effectivePrefix}last_message']),
       lastSender: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}last_sender'])!,
-      lastTimestamp: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}last_timestamp'])!,
+      lastTimestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}last_timestamp'])!,
       members: $ChatsTable.$convertermembers.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}members'])!),
@@ -5673,7 +5672,7 @@ class $ChatsTable extends Chats with TableInfo<$ChatsTable, Chat> {
     return $ChatsTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<Map<String, String>>, String> $convertermembers =
+  static TypeConverter<List<Map<String, dynamic>>, String> $convertermembers =
       const MemberListMapConverter();
   static TypeConverter<Map<String, int>, String> $converterunreadCount =
       const StringIntMapConverter();
@@ -5683,8 +5682,8 @@ class Chat extends DataClass implements Insertable<Chat> {
   final String id;
   final String? lastMessage;
   final String lastSender;
-  final DateTime lastTimestamp;
-  final List<Map<String, String>> members;
+  final int lastTimestamp;
+  final List<Map<String, dynamic>> members;
   final Map<String, int> unreadCount;
   const Chat(
       {required this.id,
@@ -5701,7 +5700,7 @@ class Chat extends DataClass implements Insertable<Chat> {
       map['last_message'] = Variable<String>(lastMessage);
     }
     map['last_sender'] = Variable<String>(lastSender);
-    map['last_timestamp'] = Variable<DateTime>(lastTimestamp);
+    map['last_timestamp'] = Variable<int>(lastTimestamp);
     {
       map['members'] =
           Variable<String>($ChatsTable.$convertermembers.toSql(members));
@@ -5733,8 +5732,8 @@ class Chat extends DataClass implements Insertable<Chat> {
       id: serializer.fromJson<String>(json['id']),
       lastMessage: serializer.fromJson<String?>(json['lastMessage']),
       lastSender: serializer.fromJson<String>(json['lastSender']),
-      lastTimestamp: serializer.fromJson<DateTime>(json['lastTimestamp']),
-      members: serializer.fromJson<List<Map<String, String>>>(json['members']),
+      lastTimestamp: serializer.fromJson<int>(json['lastTimestamp']),
+      members: serializer.fromJson<List<Map<String, dynamic>>>(json['members']),
       unreadCount: serializer.fromJson<Map<String, int>>(json['unreadCount']),
     );
   }
@@ -5745,8 +5744,8 @@ class Chat extends DataClass implements Insertable<Chat> {
       'id': serializer.toJson<String>(id),
       'lastMessage': serializer.toJson<String?>(lastMessage),
       'lastSender': serializer.toJson<String>(lastSender),
-      'lastTimestamp': serializer.toJson<DateTime>(lastTimestamp),
-      'members': serializer.toJson<List<Map<String, String>>>(members),
+      'lastTimestamp': serializer.toJson<int>(lastTimestamp),
+      'members': serializer.toJson<List<Map<String, dynamic>>>(members),
       'unreadCount': serializer.toJson<Map<String, int>>(unreadCount),
     };
   }
@@ -5755,8 +5754,8 @@ class Chat extends DataClass implements Insertable<Chat> {
           {String? id,
           Value<String?> lastMessage = const Value.absent(),
           String? lastSender,
-          DateTime? lastTimestamp,
-          List<Map<String, String>>? members,
+          int? lastTimestamp,
+          List<Map<String, dynamic>>? members,
           Map<String, int>? unreadCount}) =>
       Chat(
         id: id ?? this.id,
@@ -5814,8 +5813,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
   final Value<String> id;
   final Value<String?> lastMessage;
   final Value<String> lastSender;
-  final Value<DateTime> lastTimestamp;
-  final Value<List<Map<String, String>>> members;
+  final Value<int> lastTimestamp;
+  final Value<List<Map<String, dynamic>>> members;
   final Value<Map<String, int>> unreadCount;
   final Value<int> rowid;
   const ChatsCompanion({
@@ -5831,8 +5830,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     required String id,
     this.lastMessage = const Value.absent(),
     required String lastSender,
-    required DateTime lastTimestamp,
-    required List<Map<String, String>> members,
+    required int lastTimestamp,
+    required List<Map<String, dynamic>> members,
     required Map<String, int> unreadCount,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -5844,7 +5843,7 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
     Expression<String>? id,
     Expression<String>? lastMessage,
     Expression<String>? lastSender,
-    Expression<DateTime>? lastTimestamp,
+    Expression<int>? lastTimestamp,
     Expression<String>? members,
     Expression<String>? unreadCount,
     Expression<int>? rowid,
@@ -5864,8 +5863,8 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
       {Value<String>? id,
       Value<String?>? lastMessage,
       Value<String>? lastSender,
-      Value<DateTime>? lastTimestamp,
-      Value<List<Map<String, String>>>? members,
+      Value<int>? lastTimestamp,
+      Value<List<Map<String, dynamic>>>? members,
       Value<Map<String, int>>? unreadCount,
       Value<int>? rowid}) {
     return ChatsCompanion(
@@ -5892,7 +5891,7 @@ class ChatsCompanion extends UpdateCompanion<Chat> {
       map['last_sender'] = Variable<String>(lastSender.value);
     }
     if (lastTimestamp.present) {
-      map['last_timestamp'] = Variable<DateTime>(lastTimestamp.value);
+      map['last_timestamp'] = Variable<int>(lastTimestamp.value);
     }
     if (members.present) {
       map['members'] =
@@ -11135,8 +11134,8 @@ typedef $$ChatsTableCreateCompanionBuilder = ChatsCompanion Function({
   required String id,
   Value<String?> lastMessage,
   required String lastSender,
-  required DateTime lastTimestamp,
-  required List<Map<String, String>> members,
+  required int lastTimestamp,
+  required List<Map<String, dynamic>> members,
   required Map<String, int> unreadCount,
   Value<int> rowid,
 });
@@ -11144,8 +11143,8 @@ typedef $$ChatsTableUpdateCompanionBuilder = ChatsCompanion Function({
   Value<String> id,
   Value<String?> lastMessage,
   Value<String> lastSender,
-  Value<DateTime> lastTimestamp,
-  Value<List<Map<String, String>>> members,
+  Value<int> lastTimestamp,
+  Value<List<Map<String, dynamic>>> members,
   Value<Map<String, int>> unreadCount,
   Value<int> rowid,
 });
@@ -11186,11 +11185,11 @@ class $$ChatsTableFilterComposer extends Composer<_$AppDatabase, $ChatsTable> {
   ColumnFilters<String> get lastSender => $composableBuilder(
       column: $table.lastSender, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get lastTimestamp => $composableBuilder(
+  ColumnFilters<int> get lastTimestamp => $composableBuilder(
       column: $table.lastTimestamp, builder: (column) => ColumnFilters(column));
 
-  ColumnWithTypeConverterFilters<List<Map<String, String>>,
-          List<Map<String, String>>, String>
+  ColumnWithTypeConverterFilters<List<Map<String, dynamic>>,
+          List<Map<String, dynamic>>, String>
       get members => $composableBuilder(
           column: $table.members,
           builder: (column) => ColumnWithTypeConverterFilters(column));
@@ -11240,7 +11239,7 @@ class $$ChatsTableOrderingComposer
   ColumnOrderings<String> get lastSender => $composableBuilder(
       column: $table.lastSender, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get lastTimestamp => $composableBuilder(
+  ColumnOrderings<int> get lastTimestamp => $composableBuilder(
       column: $table.lastTimestamp,
       builder: (column) => ColumnOrderings(column));
 
@@ -11269,10 +11268,10 @@ class $$ChatsTableAnnotationComposer
   GeneratedColumn<String> get lastSender => $composableBuilder(
       column: $table.lastSender, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get lastTimestamp => $composableBuilder(
+  GeneratedColumn<int> get lastTimestamp => $composableBuilder(
       column: $table.lastTimestamp, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<List<Map<String, String>>, String>
+  GeneratedColumnWithTypeConverter<List<Map<String, dynamic>>, String>
       get members => $composableBuilder(
           column: $table.members, builder: (column) => column);
 
@@ -11328,8 +11327,8 @@ class $$ChatsTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String?> lastMessage = const Value.absent(),
             Value<String> lastSender = const Value.absent(),
-            Value<DateTime> lastTimestamp = const Value.absent(),
-            Value<List<Map<String, String>>> members = const Value.absent(),
+            Value<int> lastTimestamp = const Value.absent(),
+            Value<List<Map<String, dynamic>>> members = const Value.absent(),
             Value<Map<String, int>> unreadCount = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -11346,8 +11345,8 @@ class $$ChatsTableTableManager extends RootTableManager<
             required String id,
             Value<String?> lastMessage = const Value.absent(),
             required String lastSender,
-            required DateTime lastTimestamp,
-            required List<Map<String, String>> members,
+            required int lastTimestamp,
+            required List<Map<String, dynamic>> members,
             required Map<String, int> unreadCount,
             Value<int> rowid = const Value.absent(),
           }) =>

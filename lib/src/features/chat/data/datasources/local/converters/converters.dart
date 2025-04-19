@@ -24,19 +24,19 @@ class StringIntMapConverter extends TypeConverter<Map<String, int>, String> {
   String toSql(Map<String, int> value) => jsonEncode(value);
 }
 
-class MemberListMapConverter extends TypeConverter<List<Map<String, String>>, String> {
+class MemberListMapConverter extends TypeConverter<List<Map<String, dynamic>>, String> {
   const MemberListMapConverter();
 
   @override
-  List<Map<String, String>> fromSql(String fromDb) {
+  List<Map<String, dynamic>> fromSql(String fromDb) {
     final decoded = jsonDecode(fromDb);
-    return List<Map<String, String>>.from(
-      decoded.map((item) => Map<String, String>.from(item)),
+    return List<Map<String, dynamic>>.from(
+      decoded.map((item) => Map<String, dynamic>.from(item)),
     );
   }
 
   @override
-  String toSql(List<Map<String, String>> value) {
+  String toSql(List<Map<String, dynamic>> value) {
     return jsonEncode(value);
   }
 }

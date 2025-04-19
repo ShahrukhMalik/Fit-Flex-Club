@@ -5,7 +5,7 @@ class Chats extends Table {
   TextColumn get id => text()(); // chatId: sorted combination of user IDs
   TextColumn get lastMessage => text().nullable()();
   TextColumn get lastSender => text()();
-  DateTimeColumn get lastTimestamp => dateTime()();
+  IntColumn get lastTimestamp => integer()();
   // List of 2 members (UIDs)
   TextColumn get members => text().map(const MemberListMapConverter())();
   // unreadCount as Map<String, int>

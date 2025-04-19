@@ -50,6 +50,24 @@ import '../../../features/broadcast/domain/usecases/send_notification_usecase.da
     as _i92;
 import '../../../features/broadcast/presentation/cubit/sendnotification/sendnotification_cubit.dart'
     as _i1041;
+import '../../../features/chat/data/datasources/local/chat_local_datasource.dart'
+    as _i392;
+import '../../../features/chat/data/datasources/local/dao/chat_dao.dart'
+    as _i729;
+import '../../../features/chat/data/datasources/remote/chat_remote_datasource.dart'
+    as _i572;
+import '../../../features/chat/data/repositories/chat_repository_impl.dart'
+    as _i399;
+import '../../../features/chat/domain/repositories/chat_repository.dart'
+    as _i75;
+import '../../../features/chat/domain/usecases/start_chat_usecase.dart'
+    as _i680;
+import '../../../features/chat/domain/usecases/watch_chat_stream_usecase.dart'
+    as _i212;
+import '../../../features/chat/presentation/cubit/startchat/startchat_cubit.dart'
+    as _i556;
+import '../../../features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart'
+    as _i962;
 import '../../../features/client_profile/data/datasources/local/client_profile_local_datasource.dart'
     as _i648;
 import '../../../features/client_profile/data/datasources/local/daos/client_dao.dart'
@@ -187,6 +205,7 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.singleton<_i878.SharedPrefsUtil>(
         () => _i878.SharedPrefsUtil(gh<_i460.SharedPreferences>()));
+    gh.factory<_i729.ChatDao>(() => _i729.ChatDao(gh<_i987.AppDatabase>()));
     gh.factory<_i593.WorkoutHistoryDao>(
         () => _i593.WorkoutHistoryDao(gh<_i987.AppDatabase>()));
     gh.factory<_i663.SyncQueueDao>(
@@ -197,6 +216,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i987.AppDatabase>(),
           auth: gh<_i59.FirebaseAuth>(),
         ));
+    gh.singleton<_i392.ChatLocalDatasource>(
+        () => _i392.ChatLocalDatasourceImpl(chatDao: gh<_i729.ChatDao>()));
     gh.singleton<_i588.ClientProfileRemoteDatasource>(
         () => _i588.ClientProfileRemoteDatasourceImpl(
               auth: gh<_i59.FirebaseAuth>(),
@@ -210,6 +231,11 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i648.ClientLocalDatasourceImpl(
               dao: gh<_i899.ClientsDao>(),
               database: gh<_i987.AppDatabase>(),
+            ));
+    gh.singleton<_i572.ChatRemoteDatasource>(
+        () => _i572.ChatRemoteDatasourceImpl(
+              auth: gh<_i59.FirebaseAuth>(),
+              remoteDb: gh<_i974.FirebaseFirestore>(),
             ));
     gh.singleton<_i352.WorkoutHistoryRemoteDataSource>(() =>
         _i352.WorkoutHistoryRemoteDataSourceImpl(
@@ -343,6 +369,12 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i677.ClientweightsCubit(gh<_i702.AddClientWeightUsecase>()));
     gh.singleton<_i899.IsUserActiveUsecase>(() => _i899.IsUserActiveUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i75.ChatRepository>(() => _i399.ChatRepositoryImpl(
+          networkInfo: gh<_i228.NetworkInfo>(),
+          localDb: gh<_i392.ChatLocalDatasource>(),
+          remoteDb: gh<_i572.ChatRemoteDatasource>(),
+          syncQueue: gh<_i663.SyncQueueDao>(),
+        ));
     gh.singleton<_i781.GetClientsUsecaseUsecase>(() =>
         _i781.GetClientsUsecaseUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
@@ -402,6 +434,13 @@ extension GetItInjectableX on _i174.GetIt {
           forgotPasswordUsecase: gh<_i988.ForgotPasswordUsecase>(),
           listenToEventsUsecase: gh<_i645.ListenToEventsUsecase>(),
         ));
+    gh.singleton<_i212.WatchChatStreamUsecase>(() =>
+        _i212.WatchChatStreamUsecaseImpl(
+            chatRepository: gh<_i75.ChatRepository>()));
+    gh.singleton<_i680.StartChatUsecase>(() =>
+        _i680.StartChatUsecaseImpl(chatRepository: gh<_i75.ChatRepository>()));
+    gh.factory<_i556.StartChatCubit>(
+        () => _i556.StartChatCubit(gh<_i680.StartChatUsecase>()));
     gh.factory<_i942.WorkoutHistoryBloc>(() => _i942.WorkoutHistoryBloc(
           gh<_i208.LogWorkoutHistoryUsecase>(),
           gh<_i119.GetWorkoutHistoryUsecase>(),
@@ -413,6 +452,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i85.EventListenerUsecase>(),
           gh<_i177.MarkEventListenedUsecase>(),
         ));
+    gh.factory<_i962.WatchChatStreamCubit>(
+        () => _i962.WatchChatStreamCubit(gh<_i212.WatchChatStreamUsecase>()));
     return this;
   }
 }

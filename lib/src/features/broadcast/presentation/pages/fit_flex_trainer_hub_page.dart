@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
@@ -543,8 +545,15 @@ class FeaturesPage extends StatelessWidget {
                                 const SizedBox(height: 16),
                                 feature.isPremium
                                     ? ElevatedButton(
-                                        onPressed: () =>
-                                            context.go(feature.route),
+                                        onPressed: () async => context.go(
+                                          feature.route,
+                                          extra: {
+                                            'currentUserId':
+                                                getIt<FirebaseAuth>()
+                                                    .currentUser
+                                                    ?.uid
+                                          },
+                                        ),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.amber,
                                           foregroundColor: Colors.white,
