@@ -51,9 +51,10 @@ class PlatformAppbar {
       return PreferredSize(
         preferredSize: Size(
           width ?? double.maxFinite,
-          height ?? 100,
+          height ?? 120,
         ),
         child: CupertinoNavigationBar(
+          enableBackgroundFilterBlur: true,
           padding: padding,
           middle: title.runtimeType != String
               ? title
@@ -66,6 +67,9 @@ class PlatformAppbar {
                   ),
                 ),
           trailing: trailing,
+          border: Border.all(
+            width: 0
+          ),
           backgroundColor: backgroundColor,
           automaticallyImplyLeading: automaticallyImplyLeading,
           leading: automaticallyImplyLeading

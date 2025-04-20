@@ -10,6 +10,7 @@ import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_measure_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
@@ -392,6 +393,20 @@ GoRouter goRouter(appState) {
                       );
                     },
                     routes: [
+                      GoRoute(
+                        path: FitFlexChatWindowPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexChatWindowPage(
+                              chat: extraData?['chat'],
+                            ),
+                          );
+                        },
+                        routes: [],
+                      ),
                       GoRoute(
                         path: FitFlexSelectClientsPage.route,
                         pageBuilder: (context, state) {

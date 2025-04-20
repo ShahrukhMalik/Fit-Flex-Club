@@ -95,7 +95,7 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
   Future<void> startChat({required ChatModel chat}) async {
     try {
       final CollectionReference ref = remoteDb.collection('chats');
-      await ref.doc(chat.id).set(chat.toMap());
+      await ref.doc(chat.id).set(chat.toMap(),SetOptions(merge: true));
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

@@ -6,6 +6,7 @@ import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +78,6 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
         title: "ChatApp",
         context: context,
         backgroundColor: globalColorScheme.surface,
-        
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: onAddChat,
@@ -118,33 +118,39 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
           },
           builder: (context, state) {
             if (state is WatchChatStreamComplete) {
+              print('--------');
               final chats = state.chats;
               if (chats.isNotEmpty) {
+                print('--------');
                 return ListView.builder(
                   itemCount: chats.length,
                   itemBuilder: (context, index) {
+                    print('--------');
                     final chat = chats[index];
-                    final userName = chat.members
-                        .where(
-                          (element) =>
-                              element['userId'] != widget.currentUserId,
-                        )
-                        .first['userName'];
+                    final userName = chat.members.firstWhere(
+                      (element) => element['userId'] != widget.currentUserId,
+                    )['userName'];
+
                     final unreadCount =
                         (chat.unreadCount[widget.currentUserId] ?? 0) > 0
-                            ? (chat.unreadCount[widget.currentUserId] ?? 0)
-                                .toString()
+                            ? chat.unreadCount[widget.currentUserId].toString()
                             : '';
+
                     final formattedTime =
                         DateFormat.Hm().format(chat.lastTimestamp);
+
                     return ListTile(
-                      leading: IconButton.filledTonal(
-                        onPressed: () {
-                          
-                        },
-                        icon: Icon(
-                          Icons.fitness_center_rounded,
-                        ),
+                      onTap: () {
+                        print('--------');
+                        context.go(
+                          '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}/${FitFlexChatWindowPage.route}',
+                          extra: {
+                            'chat': chat,
+                          },
+                        );
+                      },
+                      leading: Icon(
+                        Icons.fitness_center_rounded,
                       ),
                       title: Text(userName),
                       subtitle: Text(chat.lastMessage),
@@ -156,17 +162,12 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
                             CircleAvatar(
                               backgroundColor:
                                   globalColorScheme.secondaryContainer,
-                              maxRadius: 15,
-                              minRadius: 12,
-                              child: Center(
-                                child: Text(
-                                  unreadCount,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
+                              radius: 20,
+                              child: Text(
+                                unreadCount,
+                                style: const TextStyle(color: Colors.white),
                               ),
-                            )
+                            ),
                         ],
                       ),
                     );
