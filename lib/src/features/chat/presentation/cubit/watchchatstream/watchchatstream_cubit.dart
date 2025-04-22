@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
@@ -13,6 +15,8 @@ part 'watchchatstream_state.dart';
 @injectable
 class WatchChatStreamCubit extends Cubit<WatchChatStreamState> {
   final WatchChatStreamUsecase watchChatStreamUsecase;
+
+  StreamSubscription<List<ChatEntity>>? _chatSubscription;
   WatchChatStreamCubit(
     this.watchChatStreamUsecase,
   ) : super(WatchChatStreamInitial());
@@ -23,15 +27,26 @@ class WatchChatStreamCubit extends Cubit<WatchChatStreamState> {
       (l) {
         emit(WatchChatStreamError(failure: l));
       },
-      (chatsStream) async {
-        await for (final chats in chatsStream) {
-          emit(
-            WatchChatStreamComplete(
-              chats,
-            ),
-          );
-        }
+      (chatsStream) {
+        _chatSubscription = chatsStream.listen(
+          (messages) {
+            emit(WatchChatStreamComplete(messages));
+          },
+          onError: (error) {
+            emit(
+              WatchChatStreamError(
+                failure: CacheFailure(message: error.toString()),
+              ),
+            );
+          },
+        );
       },
     );
+  }
+
+  @override
+  Future<void> close() {
+    _chatSubscription?.cancel();
+    return super.close();
   }
 }

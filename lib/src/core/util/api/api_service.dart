@@ -9,7 +9,7 @@ class ApiService {
       "https://exercisedb.p.rapidapi.com/exercises/exercise/"; // Replace 0001 with your desired ID
   static final String _apiHost = "exercisedb.p.rapidapi.com";
   static final String _apiKey =
-      "d0a92c1ffbmsh240211b39e80da0p195d4ajsnce119cd2d091";
+      "04d6975ed8msh7c8bb7174f49a66p182d6ejsn39dfe364c0a5";
 
   static Future<ExerciseGifModel> fetchGifUrl(String exerciseCode) async {
     try {

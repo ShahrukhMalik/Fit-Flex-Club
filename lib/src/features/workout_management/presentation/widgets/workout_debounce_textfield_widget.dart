@@ -49,7 +49,7 @@ class _DebouncedTextFieldState extends State<DebouncedTextField> {
       controller: widget.controller,
       textAlign: TextAlign.center,
       onChanged: _onTextChanged,
-      uniqueKey: UniqueKey(),
+      // uniqueKey: UniqueKey(),
       keyboardType: TextInputType.phone,
       style: TextStyle(
         color: globalColorScheme.onPrimaryContainer,

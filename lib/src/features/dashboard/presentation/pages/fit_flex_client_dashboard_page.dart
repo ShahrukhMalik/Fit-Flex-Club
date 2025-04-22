@@ -4,8 +4,15 @@ import 'package:fit_flex_club/src/core/common/services/local_notification_servic
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
+import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/cubit/getchat/getchat_cubit.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_client_chat_window_page.dart';
+import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,11 +21,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class FitFlexClientDashboardPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
   final bool showBottomNavBar;
+  final bool showFloatingAction;
 
-  const FitFlexClientDashboardPage(
-      {super.key,
-      required this.navigationShell,
-      this.showBottomNavBar = false});
+  const FitFlexClientDashboardPage({
+    super.key,
+    required this.navigationShell,
+    this.showBottomNavBar = false,
+    this.showFloatingAction = false,
+  });
 
   @override
   State<FitFlexClientDashboardPage> createState() =>
@@ -45,11 +55,12 @@ class _FitFlexClientDashboardPageState
       },
     );
     selectedIndex.value = widget.navigationShell.currentIndex;
+    context.read<WatchChatStreamCubit>().getChats();
   }
 
   Widget _buildBottomNavOverlay(BuildContext context, double width) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: width * 0.3, vertical: 10),
+      margin: EdgeInsets.symmetric(horizontal: 75, vertical: 10),
       padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: globalColorScheme.onPrimaryContainer,
@@ -72,7 +83,7 @@ class _FitFlexClientDashboardPageState
               return AnimatedPositioned(
                 duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                left: currentIndex * (width * 0.24),
+                left: currentIndex * (width * 0.245),
                 child: Container(
                   width: 50,
                   height: 50,
@@ -97,6 +108,12 @@ class _FitFlexClientDashboardPageState
               _buildIcon(
                 1,
                 Icons.history_rounded,
+                selectedIndex,
+                widget.navigationShell,
+              ),
+              _buildIcon(
+                2,
+                Icons.campaign_rounded,
                 selectedIndex,
                 widget.navigationShell,
               ),
@@ -178,6 +195,78 @@ class _FitFlexClientDashboardPageState
     final double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      floatingActionButton: !widget.showFloatingAction
+          ? null
+          : FloatingActionButton(
+              onPressed: () {},
+              child: BlocConsumer<WatchChatStreamCubit, WatchChatStreamState>(
+                listener: (context, state) {},
+                builder: (context, state) {
+                  // if (state is SubjectFailed) {
+                  //   return ErrorOutput(message: state.message);
+                  // }
+                  if (state is WatchChatStreamComplete) {
+                    final currentUserId =
+                        getIt<FirebaseAuth>().currentUser?.uid;
+
+                    final chats = state.chats
+                        .where(
+                          (chat) => chat.members.any(
+                            (member) => member['userId'] == currentUserId,
+                          ),
+                        )
+                        .toList();
+                    String unreadCount = '';
+                    ChatEntity? chat;
+
+                    if (chats.isNotEmpty) {
+                      chat = chats[0];
+                      unreadCount = (chat.unreadCount[
+                                      getIt<FirebaseAuth>().currentUser?.uid] ??
+                                  0) >
+                              0
+                          ? (chat.unreadCount[
+                                      getIt<FirebaseAuth>().currentUser?.uid] ??
+                                  0)
+                              .toString()
+                          : '';
+                    }
+                    return Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () => context.push(
+                            '${FitFlexClientProfilePage.route}/${FitFlexClientChatWindowPage.route}',
+                            extra: {
+                              'chat': chat,
+                            },
+                          ),
+                          icon: Icon(Icons.chat_bubble),
+                        ),
+                        if (unreadCount.isNotEmpty)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: CircleAvatar(
+                              backgroundColor:
+                                  globalColorScheme.secondaryContainer,
+                              minRadius: 12,
+                              child: Center(
+                                child: Text(
+                                  unreadCount,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                      ],
+                    );
+                  }
+                  return CupertinoActivityIndicator();
+                },
+              ),
+            ),
       body: Column(
         children: [
           // Main content

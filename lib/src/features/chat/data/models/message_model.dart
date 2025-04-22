@@ -36,12 +36,25 @@ class MessageModel extends MessageEntity {
           []),
     );
   }
+  factory MessageModel.fromLocal(Map<String, dynamic> data) {
+    return MessageModel(
+      chatId: data['chatId'],
+      id: data['id'],
+      senderId: data['senderId'] as String,
+      messageText: data['messageText'] as String? ?? '',
+      timestamp: DateTime.fromMillisecondsSinceEpoch(data['timestamp']),
+      type: data['type'] as String? ?? 'text',
+      sentTo: data['sentTo'],
+      deliveredTo: data['deliveredTo'],
+      readBy: data['readBy'],
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'chatId': chatId,
       'senderId': senderId,
-      'text': messageText,
+      'messageText': messageText,
       'timestamp': timestamp.millisecondsSinceEpoch,
       'type': type,
       'sentTo': sentTo.map(
@@ -57,5 +70,43 @@ class MessageModel extends MessageEntity {
             {'userId': e, 'timestamp': DateTime.now().millisecondsSinceEpoch},
       ),
     };
+  }
+
+  MessageModel copyWith({
+    String? id,
+    String? chatId,
+    String? senderId,
+    String? messageText,
+    DateTime? timestamp,
+    String? type,
+    List<String>? sentTo,
+    List<String>? deliveredTo,
+    List<String>? readBy,
+  }) {
+    return MessageModel(
+      id: id ?? this.id,
+      chatId: chatId ?? this.chatId,
+      senderId: senderId ?? this.senderId,
+      messageText: messageText ?? this.messageText,
+      timestamp: timestamp ?? this.timestamp,
+      type: type ?? this.type,
+      sentTo: sentTo ?? this.sentTo,
+      deliveredTo: deliveredTo ?? this.deliveredTo,
+      readBy: readBy ?? this.readBy,
+    );
+  }
+
+  factory MessageModel.fromEntity(MessageEntity entity) {
+    return MessageModel(
+      id: entity.id,
+      chatId: entity.chatId,
+      senderId: entity.senderId,
+      messageText: entity.messageText,
+      timestamp: entity.timestamp,
+      type: entity.type,
+      sentTo: List<String>.from(entity.sentTo),
+      deliveredTo: List<String>.from(entity.deliveredTo),
+      readBy: List<String>.from(entity.readBy),
+    );
   }
 }

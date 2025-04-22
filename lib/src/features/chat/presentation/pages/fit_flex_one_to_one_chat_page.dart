@@ -35,6 +35,23 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
     context.read<WatchChatStreamCubit>().getChats();
   }
 
+  String _formatChatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime).inDays;
+
+    if (difference == 0 &&
+        now.day == dateTime.day &&
+        now.month == dateTime.month &&
+        now.year == dateTime.year) {
+      return "Today";
+    } else if (difference == 1 ||
+        (difference == 0 && now.day != dateTime.day)) {
+      return "Yesterday";
+    } else {
+      return DateFormat('dd/MM/yyyy').format(dateTime);
+    }
+  }
+
   Future<void> onAddChat() async {
     final result = await context.push(
       '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}/${FitFlexSelectClientsPage.route}',
@@ -80,8 +97,9 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
         backgroundColor: globalColorScheme.surface,
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: globalColorScheme.primary,
         onPressed: onAddChat,
-        child: IconButton.filledTonal(
+        child: IconButton.filled(
           onPressed: onAddChat,
           icon: Stack(
             alignment: Alignment.bottomRight,
@@ -118,42 +136,52 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
           },
           builder: (context, state) {
             if (state is WatchChatStreamComplete) {
-              print('--------');
               final chats = state.chats;
               if (chats.isNotEmpty) {
-                print('--------');
+           
                 return ListView.builder(
                   itemCount: chats.length,
                   itemBuilder: (context, index) {
-                    print('--------');
                     final chat = chats[index];
-                    final userName = chat.members.firstWhere(
-                      (element) => element['userId'] != widget.currentUserId,
-                    )['userName'];
-
+                    final userName = chat.members
+                        .where(
+                          (element) =>
+                              element['userId'] != widget.currentUserId,
+                        )
+                        .first['userName'];
                     final unreadCount =
                         (chat.unreadCount[widget.currentUserId] ?? 0) > 0
-                            ? chat.unreadCount[widget.currentUserId].toString()
+                            ? (chat.unreadCount[widget.currentUserId] ?? 0)
+                                .toString()
                             : '';
-
                     final formattedTime =
                         DateFormat.Hm().format(chat.lastTimestamp);
-
+                    print('-----');
                     return ListTile(
                       onTap: () {
-                        print('--------');
-                        context.go(
+                        context.push(
                           '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}/${FitFlexChatWindowPage.route}',
                           extra: {
                             'chat': chat,
+                            'currentUserId': widget.currentUserId
                           },
                         );
                       },
-                      leading: Icon(
-                        Icons.fitness_center_rounded,
+                      leading: IconButton.filled(
+
+                        onPressed: () {
+                          print('-------');
+                        },
+                        icon: Icon(
+                          Icons.fitness_center_rounded,
+                        ),
                       ),
                       title: Text(userName),
-                      subtitle: Text(chat.lastMessage),
+                      subtitle: Text(
+                        chat.lastMessage,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -162,12 +190,17 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
                             CircleAvatar(
                               backgroundColor:
                                   globalColorScheme.secondaryContainer,
-                              radius: 20,
-                              child: Text(
-                                unreadCount,
-                                style: const TextStyle(color: Colors.white),
+                              maxRadius: 15,
+                              minRadius: 12,
+                              child: Center(
+                                child: Text(
+                                  unreadCount,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                            ),
+                            )
                         ],
                       ),
                     );

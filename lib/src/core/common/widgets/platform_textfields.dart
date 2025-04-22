@@ -44,7 +44,6 @@ class AppTextFields {
 
           return null;
         },
-
         style: style ??
             TextStyle(
               color: Color(0xFFFFCD7C),
@@ -71,7 +70,6 @@ class AppTextFields {
       textInputAction: TextInputAction.done,
       key: uniqueKey,
       initialValue: initialValue,
-
       textAlign: TextAlign.center,
       inputFormatters: textInputFormatter,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -279,60 +277,69 @@ class AppTextFields {
     );
   }
 
-  static Widget prefixSuffixTextField({
-    String? labelText,
-    Widget? prefix,
-    Widget? suffix,
-    TextInputType? keyboardType,
-    TextStyle? style,
-    TextEditingController? controller,
-    void Function(String)? onChanged,
-  }) {
+  static Widget prefixSuffixTextField(
+      {String? labelText,
+      Widget? prefix,
+      Widget? suffix,
+      TextInputType? keyboardType,
+      TextStyle? style,
+      Color? filledColor,
+      TextEditingController? controller,
+      void Function(String)? onChanged,
+      void Function(String)? onFieldSubmitted}) {
     if (Platform.isIOS) {
-      return CupertinoTextFormFieldRow(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        validator: (value) {
-          if (value == null) {
-            return 'Please enter weight';
-          } else if (value.isEmpty) {
-            return 'Please enter weight';
-          }
-
-          return null;
-        },
-        style: style,
-        keyboardType: keyboardType,
-        controller: controller,
-        placeholder: labelText,
-        onChanged: onChanged,
-        padding: const EdgeInsets.all(12),
-        prefix: prefix != null
-            ? Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: prefix,
-              )
-            : null,
-        // suffix: suffix != null
-        //     ? Padding(
-        //         padding: const EdgeInsets.only(right: 8),
-        //         child: suffix,
-        //       )
-        //     : null,
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
         decoration: BoxDecoration(
-          border: Border.all(color: CupertinoColors.systemGrey),
-          borderRadius: BorderRadius.circular(8),
+          color: filledColor ?? CupertinoColors.systemGrey4,
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(color: filledColor ?? CupertinoColors.systemGrey4),
+        ),
+        child: CupertinoTextFormFieldRow(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          onFieldSubmitted: onFieldSubmitted,
+          validator: (value) {
+            // if (value == null || value.isEmpty) {
+            //   return 'Please enter weight';
+            // }
+            return null;
+          },
+          style: style ?? const TextStyle(fontSize: 16),
+          keyboardType: keyboardType,
+          controller: controller,
+          placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
+          placeholder: labelText ?? "Type a message",
+          onChanged: onChanged,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          prefix: prefix != null
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: prefix,
+                )
+              : null,
+          // : suffix != null
+          //     ? Padding(
+          //         padding: const EdgeInsets.only(right: 8),
+          //         child: suffix,
+          //       )
+          //     : null,
+          decoration: BoxDecoration(
+            color: filledColor ?? CupertinoColors.systemGrey5,
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
       );
     }
 
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      onFieldSubmitted: onFieldSubmitted,
       validator: (value) {
-        if (value == null) {
-          return 'Please enter weight';
-        } else if (value.isEmpty) {
-          return 'Please enter weight';
-        }
+        // if (value == null) {
+        //   return 'Please enter weight';
+        // } else if (value.isEmpty) {
+        //   return 'Please enter weight';
+        // }
 
         return null;
       },
@@ -341,8 +348,13 @@ class AppTextFields {
       keyboardType: keyboardType,
       onChanged: onChanged,
       decoration: InputDecoration(
+        filled: true,
+        fillColor: filledColor ?? CupertinoColors.systemGrey5,
         labelText: labelText,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide.none,
+        ),
         prefixIcon: prefix,
         suffixIcon: suffix,
       ),

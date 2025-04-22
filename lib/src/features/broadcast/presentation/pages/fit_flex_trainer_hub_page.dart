@@ -2,8 +2,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
-import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';

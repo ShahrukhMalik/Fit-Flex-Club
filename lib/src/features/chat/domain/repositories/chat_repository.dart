@@ -8,7 +8,7 @@ abstract class ChatRepository {
   Future<Either<Failures, Stream<List<ChatEntity>>>> watchChats();
 
   ///
-  Future<Either<Failures, ChatEntity>> getChat();
+  Future<Either<Failures, Stream<ChatEntity?>>> getChat();
 
   ///
   Future<Either<Failures, Stream<List<MessageEntity>>>> watchMessagesByChatId({

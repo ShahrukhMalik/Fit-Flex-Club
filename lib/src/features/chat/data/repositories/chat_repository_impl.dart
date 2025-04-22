@@ -9,12 +9,14 @@ import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/chat/data/datasources/local/chat_local_datasource.dart';
 import 'package:fit_flex_club/src/features/chat/data/datasources/remote/chat_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/chat/data/models/chat_model.dart';
+import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
 import 'package:fit_flex_club/src/features/chat/domain/repositories/chat_repository.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/tables/sync_queue_table.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uuid_v4/uuid_v4.dart';
 
 @Singleton(as: ChatRepository)
 class ChatRepositoryImpl extends ChatRepository {
@@ -30,9 +32,62 @@ class ChatRepositoryImpl extends ChatRepository {
     required this.syncQueue,
   });
   @override
-  Future<Either<Failures, ChatEntity>> getChat() {
-    // TODO: implement getChat
-    throw UnimplementedError();
+  Future<Either<Failures, Stream<ChatEntity?>>> getChat() async {
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      final authId = getIt<FirebaseAuth>().currentUser?.uid;
+      if (authId == null) {
+        return Left(
+          ServerFailure(
+            code: '07',
+            message: 'Auth ID not found',
+          ),
+        );
+      }
+
+      final chatStream = await localDb.getChat(userId: authId);
+
+      if (isConnected) {
+        final remoteChatStream = await remoteDb.getChat();
+        // if (remoteChat != null) {
+        await for (final chat in remoteChatStream) {
+          if (chat != null) {
+            await localDb.startChat(chat: chat);
+          }
+        }
+        // }
+      }
+
+      return Right(
+        chatStream.map(
+          (chat) {
+            if (chat == null) return null;
+            return ChatEntity(
+              id: chat.id,
+              members: chat.members,
+              lastMessage: chat.lastMessage,
+              lastSender: chat.lastSender,
+              lastTimestamp: chat.lastTimestamp,
+              unreadCount: chat.unreadCount,
+            );
+          },
+        ),
+      );
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 
   @override
@@ -40,8 +95,78 @@ class ChatRepositoryImpl extends ChatRepository {
     required MessageEntity message,
     required ChatEntity chat,
   }) async {
-    // TODO: implement sendMessage
-    throw UnimplementedError();
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      final authId = getIt<FirebaseAuth>().currentUser?.uid;
+      if (authId == null) {
+        return Left(ServerFailure(code: '07', message: 'Auth ID not found'));
+      }
+
+      final messageId = 'message_${chat.id}_${UUIDv4().toString()}';
+      final messageModel = MessageModel(
+        id: messageId,
+        chatId: chat.id,
+        senderId: authId,
+        messageText: message.messageText,
+        timestamp: DateTime.now(),
+        type: message.type,
+        sentTo: List<String>.from(chat.members
+            .map(
+              (member) => member['userId'],
+            )
+            .where(
+              (element) => element != authId,
+            )
+            .toList()),
+        deliveredTo: [],
+        readBy: [],
+      );
+      await localDb.startMessage(
+        message: messageModel,
+      );
+      if (isConnected) {
+        final updatedUnreadCount = Map<String, int>.from(chat.unreadCount);
+
+        updatedUnreadCount.updateAll((key, value) {
+          return key == authId ? value : value + 1;
+        });
+        return Right(
+          await remoteDb.sendMessage(
+            message: messageModel,
+            chat: ChatModel(
+              id: chat.id,
+              members: chat.members,
+              lastMessage: message.messageText,
+              lastSender: authId,
+              lastTimestamp: DateTime.now(),
+              unreadCount: updatedUnreadCount,
+            ),
+          ),
+        );
+      } else {
+        return Right(
+          await syncQueue.logSyncAction(
+            ChatEvents.startMessage.name,
+            "Messages",
+            messageModel.toMap(),
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 
   @override
@@ -151,8 +276,45 @@ class ChatRepositoryImpl extends ChatRepository {
   Future<Either<Failures, Stream<List<MessageEntity>>>> watchMessagesByChatId({
     required String chatId,
   }) async {
-    // TODO: implement watchMessagesByChatId
-    throw UnimplementedError();
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      final localMessagesByChatIdStream =
+          await localDb.getMessagesByChatStream(chatId);
+
+      if (isConnected) {
+        final remoteMessagesByChatIdStream =
+            await remoteDb.watchMessagesByChatId(chatId: chatId);
+
+        // Listen without awaiting the full stream
+        remoteMessagesByChatIdStream.listen(
+          (remoteMessages) async {
+            await localDb.insertMessages(
+                messages: remoteMessages); // ✅ update local
+          },
+          onError: (e) {
+            // optional: handle remote stream errors
+          },
+          cancelOnError: false, // keep syncing even after recoverable errors
+        );
+      }
+
+      // ✅ Always return the local stream
+      return Right(localMessagesByChatIdStream);
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 
   @override
@@ -160,9 +322,85 @@ class ChatRepositoryImpl extends ChatRepository {
     required MessageEntity message,
     required ChatEntity chat,
   }) async {
-    // TODO: implement updateMessageStatus
-    throw UnimplementedError();
+    try {
+      final authId = getIt<FirebaseAuth>().currentUser?.uid;
+      if (authId == null) {
+        return Left(ServerFailure(code: '07', message: 'Auth ID not found'));
+      }
+      final isConnected = await networkInfo.isConnected ?? false;
+      await localDb.updateMessageStatus(
+        message: MessageModel.fromEntity(message),
+        chat: ChatModel.fromEntity(chat),
+      );
+      if (isConnected) {
+        return Right(await remoteDb.updateMessageStatus(
+          message: MessageModel.fromEntity(message).copyWith(
+            deliveredTo: [
+              authId,
+              ...message.deliveredTo,
+            ],
+            readBy: [
+              authId,
+              ...message.deliveredTo,
+            ],
+          ),
+          chat: ChatModel.fromEntity(
+            chat,
+          ),
+        ));
+      } else {
+        return Right(
+          await syncQueue.logSyncAction(
+            ChatEvents.updateMessage.name,
+            "Update Message Status",
+            {
+              'message': {
+                'readBy': [authId, ...message.readBy].map(
+                  (obj) => {
+                    'userId': obj,
+                    'timestamp': DateTime.now().millisecondsSinceEpoch
+                  },
+                ),
+                'deliveredTo': [authId, ...message.deliveredTo].map(
+                  (obj) => {
+                    'userId': obj,
+                    'timestamp': DateTime.now().millisecondsSinceEpoch
+                  },
+                ),
+              },
+              'chat': {
+                {
+                  'unreadCount': Map.fromEntries(
+                    chat.unreadCount.entries.map((obj) {
+                      final currentCount = obj.value;
+                      final updatedCount = obj.key == authId
+                          ? (currentCount - 1).clamp(0, currentCount)
+                          : currentCount;
+                      return MapEntry(obj.key, updatedCount);
+                    }),
+                  ),
+                }
+              }
+            },
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
   }
 }
 
-enum ChatEvents { startChat }
+enum ChatEvents { startChat, startMessage, updateMessage }

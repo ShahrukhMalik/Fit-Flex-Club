@@ -1034,18 +1034,6 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
           return SingleChildScrollView(
             child: Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              // columnWidths: widget.weight
-              //     ? {
-              //         0: FlexColumnWidth(1),
-              //         1: FlexColumnWidth(3),
-              //         2: FlexColumnWidth(3),
-              //         3: FlexColumnWidth(2),
-              //       }
-              //     : {
-              //         0: FlexColumnWidth(1),
-              //         1: FlexColumnWidth(2),
-              //         2: FlexColumnWidth(1),
-              //       },
               children: [
                 TableRow(
                   children: [
@@ -1213,26 +1201,6 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
     final weightController = _controllers['${set.id}_weight'];
     final durationController = _controllers['${set.id}_duration'];
 
-    // if (widget.weight) {
-    //   if (repsController?.text.isEmpty ?? true) {
-    //     Fluttertoast.showToast(
-    //       msg: "Please input all the fields before adding new set",
-    //       backgroundColor: globalColorScheme.onErrorContainer,
-    //       textColor: globalColorScheme.primary,
-    //     );
-    //     return;
-    //   }
-    // } else if (widget.reps && !widget.weight) {
-    //   if (repsController?.text.isEmpty ?? true) {
-    //     Fluttertoast.showToast(
-    //       msg: "Please input all the fields before adding new set",
-    //       backgroundColor: globalColorScheme.onErrorContainer,
-    //       textColor: globalColorScheme.primary,
-    //     );
-    //     return;
-    //   }
-    // }
-
     if (widget.duration) {
       if ((durationController ?? TextEditingController()).text.isEmpty) {
         Fluttertoast.showToast(
@@ -1300,14 +1268,6 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
         );
       }
     }
-
-    // _addSet(SetModel(
-    //   clientId: set.clientId,
-    //   exerciseId: set.exerciseId,
-    //   id: set.id,
-    //   targetReps: int.tryParse(repsController?.text ?? ''),
-    //   targetWeight: double.tryParse(weightController?.text ?? ''),
-    // ));
   }
 
   @override
@@ -1320,14 +1280,6 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
         backgroundColor: globalColorScheme.onPrimaryContainer,
         title: "Add Exercise",
         context: context,
-        // trailing: PlatformButton().buildButton(
-        //   foregroundColor: globalColorScheme.primary,
-        //   context: context,
-        //   type: ButtonType.icon,
-        //   icon: Icons.logout,
-        //   text: "",
-        //   onPressed: () => context.pop(),
-        // )!,
       ),
       body: SafeArea(
         child: Container(
@@ -1545,30 +1497,6 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
         }
       },
     );
-    // return Container(
-    //   color: Colors.white,
-    //   width: double.maxFinite,
-    //   height: 250,
-    //   child: Align(
-    //     alignment: Alignment.center,
-    //     child: ValueListenableBuilder(
-    //       valueListenable: gifUrl,
-    //       builder: (context, url, _) {
-    //         if (url?.isNotEmpty ?? false) {
-    //           return Gif(
-    //             placeholder: (context) => CupertinoActivityIndicator(),
-    //             alignment: Alignment.center,
-    //             autostart: Autostart.loop,
-    //             useCache: true,
-    //             image: NetworkImage(url!),
-    //           );
-    //         } else {
-    //           return Text('No Gif available');
-    //         }
-    //       },
-    //     ),
-    //   ),
-    // );
   }
 
   _buildExerciseHeader() {
@@ -1694,6 +1622,4 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
       ],
     );
   }
-
-  // ... Rest of the UI building methods follow the same pattern
 }

@@ -53,9 +53,49 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
     });
   }
 
+  // 👉 Batch insert chats and their messages
+  Future<void> batchInsertMessages(
+    List<MessagesCompanion> messagesList,
+  ) async {
+    await batch((batch) {
+      batch.insertAll(
+        messages,
+        messagesList,
+        mode: InsertMode.insertOrReplace,
+      );
+    });
+  }
+
   // 👉 Get all chats
   Future<List<Chat>> getAllChats() {
     return select(chats).get();
+  }
+
+  // Future<Chat?> getLatestChatByMemberId(String userId) async {
+  //   final allChats = await (select(chats)
+  //         ..orderBy([
+  //           (tbl) => OrderingTerm(
+  //               expression: tbl.lastTimestamp, mode: OrderingMode.desc)
+  //         ])
+  //         ..limit(1))
+  //       .get();
+
+  //   for (final chat in allChats) {
+  //     if (chat.members.any((member) => member['userId'] == userId)) {
+  //       return chat;
+  //     }
+  //   }
+  //   return null;
+  // }
+
+  Stream<List<Chat?>> watchLatestChatByMemberId(String userId) {
+    return (select(chats)
+          ..orderBy([
+            (tbl) => OrderingTerm(
+                expression: tbl.lastTimestamp, mode: OrderingMode.desc)
+          ]))
+        .watch()
+        ; // Only emit if chat is not null
   }
 
   // 👉 Watch all chats
@@ -70,7 +110,14 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
 
   // 👉 Stream chat messages for live updates
   Stream<List<Message>> watchMessagesByChatId(String chatId) {
-    return (select(messages)..where((m) => m.chatId.equals(chatId))).watch();
+    print("🔍 Listening to messages for chatId: $chatId");
+    return (select(messages)
+          ..where((m) => m.chatId.equals(chatId))
+          ..orderBy([
+            (m) =>
+                OrderingTerm(expression: m.timestamp, mode: OrderingMode.desc),
+          ]))
+        .watch();
   }
 
   // 👉 Delete a chat (automatically deletes messages if cascade is set)

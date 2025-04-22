@@ -16,10 +16,10 @@ abstract class ChatRemoteDatasource {
   Future<Stream<List<ChatModel>>> watchChats();
 
   ///
-  Future<ChatModel> getChat();
+  Future<Stream<ChatModel?>> getChat();
 
   ///
-  Future<Stream<List<MessageEntity>>> watchMessagesByChatId({
+  Future<Stream<List<MessageModel>>> watchMessagesByChatId({
     required String chatId,
   });
 
@@ -48,31 +48,26 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
     required this.remoteDb,
   });
   @override
-  Future<ChatModel> getChat() async {
-    try {
-      final authId = auth.currentUser?.uid;
-      if (authId == null) {
-        throw ServerException(
-          errorMessage: "Auth ID not found",
-        );
-      }
-      final snapshots = await remoteDb
-          .collection('chats')
-          .where('memberIds', arrayContains: authId)
-          .get();
-      final doc = snapshots.docs.first;
-
-      if (!doc.exists) {
-        throw Exception("Chat does not exist.");
-      }
-
-      return ChatModel.fromMap(doc.id, doc.data());
-    } on FirebaseException catch (err) {
-      throw ServerException(
-        errorMessage: err.message ?? "Something went wrong!",
-        errorCode: err.code,
-      );
+  Future<Stream<ChatModel?>> getChat() async {
+    final authId = auth.currentUser?.uid;
+    if (authId == null) {
+      throw ServerException(errorMessage: "Auth ID not found");
     }
+
+    // Optional: You can do some one-time await setup here if needed
+
+    final stream = remoteDb
+        .collection('chats')
+        .where('memberIds', arrayContains: authId)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isEmpty) return null;
+
+      final doc = snapshot.docs.first;
+      return ChatModel.fromMap(doc.id, doc.data());
+    });
+
+    return stream;
   }
 
   @override
@@ -82,7 +77,16 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
   }) async {
     try {
       final CollectionReference chatRef = remoteDb.collection('chats');
-      await chatRef.doc(chat.id).collection('messages').add(message.toMap());
+      await chatRef
+          .doc(chat.id)
+          .collection('messages')
+          .doc(message.id)
+          .set(message.toMap());
+      await chatRef.doc(chat.id).set(
+          chat.toMap(),
+          SetOptions(
+            merge: true,
+          ));
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -95,7 +99,7 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
   Future<void> startChat({required ChatModel chat}) async {
     try {
       final CollectionReference ref = remoteDb.collection('chats');
-      await ref.doc(chat.id).set(chat.toMap(),SetOptions(merge: true));
+      await ref.doc(chat.id).set(chat.toMap(), SetOptions(merge: true));
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -165,6 +169,7 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
     required ChatEntity chat,
   }) async {
     try {
+      final currentUserId = auth.currentUser?.uid;
       // Update message status
       await remoteDb
           .collection('chats')
@@ -187,12 +192,14 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
       });
       // Update chat status
       await remoteDb.collection('chats').doc(chat.id).update({
-        'unreadCount': chat.unreadCount.entries.map(
-          (obj) {
+        'unreadCount': Map.fromEntries(
+          chat.unreadCount.entries.map((obj) {
             final currentCount = obj.value;
-            final updatedCount = (currentCount - 1).clamp(0, currentCount);
-            return {obj.key: updatedCount};
-          },
+            final updatedCount = obj.key == currentUserId
+                ? (currentCount - 1).clamp(0, currentCount)
+                : currentCount;
+            return MapEntry(obj.key, updatedCount);
+          }),
         ),
       });
     } on FirebaseException catch (err) {

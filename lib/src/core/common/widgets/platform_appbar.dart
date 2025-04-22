@@ -46,6 +46,7 @@ class PlatformAppbar {
     EdgeInsetsDirectional? padding,
     double? width,
     double? height,
+    Widget? leadingWidget,
   }) {
     if (Platform.isIOS) {
       return PreferredSize(
@@ -66,19 +67,25 @@ class PlatformAppbar {
                     fontSize: 22,
                   ),
                 ),
+          automaticallyImplyMiddle: true,
           trailing: trailing,
-          border: Border.all(
-            width: 0
-          ),
+          border: Border.all(width: 0),
           backgroundColor: backgroundColor,
           automaticallyImplyLeading: automaticallyImplyLeading,
           leading: automaticallyImplyLeading
-              ? CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: onLeadingPressed ?? () => context.pop(),
-                  child: Icon(
-                    CupertinoIcons.back,
-                    color: foregroundColor,
+              ? InkWell(
+                  onTap: onLeadingPressed,
+                  child: SizedBox(
+                    width: 60, // or 44.0 (standard iOS)
+                    child: leadingWidget ??
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: onLeadingPressed ?? () => context.pop(),
+                          child: Icon(
+                            CupertinoIcons.back,
+                            color: foregroundColor,
+                          ),
+                        ),
                   ),
                 )
               : null,

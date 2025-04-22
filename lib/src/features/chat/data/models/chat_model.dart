@@ -10,6 +10,16 @@ class ChatModel extends ChatEntity {
     required super.lastTimestamp,
     required super.unreadCount,
   });
+  factory ChatModel.fromEntity(ChatEntity entity) {
+    return ChatModel(
+      id: entity.id,
+      members: List<Map<String, dynamic>>.from(entity.members),
+      lastMessage: entity.lastMessage,
+      lastSender: entity.lastSender,
+      lastTimestamp: entity.lastTimestamp,
+      unreadCount: Map<String, int>.from(entity.unreadCount),
+    );
+  }
 
   factory ChatModel.fromMap(String id, Map<String, dynamic> data) {
     return ChatModel(
@@ -33,6 +43,9 @@ class ChatModel extends ChatEntity {
   }
 
   Map<String, dynamic> toMap() {
+    // final unreadCount = {
+    //   for (var member in members) member['userId']: 0,
+    // };
     return {
       'members': members,
       'memberIds': members
@@ -43,7 +56,7 @@ class ChatModel extends ChatEntity {
       'lastMessage': lastMessage,
       'lastSender': lastSender,
       'lastTimestamp': lastTimestamp.millisecondsSinceEpoch,
-      'unreadCount': unreadCount,
+      'unreadCount': unreadCount
     };
   }
 }
