@@ -5,6 +5,10 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/remote/chat_remote_datasource.dart';
+import 'package:fit_flex_club/src/features/chat/data/models/chat_model.dart';
+import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
+import 'package:fit_flex_club/src/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/remote/client_profile_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
@@ -41,14 +45,15 @@ class SyncManagerRemoteDatasourceImpl extends SyncManagerRemoteDatasource {
   final WorkoutPlanManagementRemotedatasource
       workoutPlanManagementRemotedatasource;
   final WorkoutHistoryRemoteDataSource workoutHistoryRemoteDataSource;
-
+  final ChatRemoteDatasource chatRemoteDatasource;
   SyncManagerRemoteDatasourceImpl(
     this.auth,
     this.remoteDb,
     this.syncQueueDao,
     this.clientProfileRemoteDatasource,
     this.workoutPlanManagementRemotedatasource,
-    this.workoutHistoryRemoteDataSource, {
+    this.workoutHistoryRemoteDataSource,
+    this.chatRemoteDatasource, {
     required this.connectivity,
   });
   @override
@@ -144,6 +149,32 @@ class SyncManagerRemoteDatasourceImpl extends SyncManagerRemoteDatasource {
                   (e) => SetModel.fromMap(e),
                 )
                 .toList(),
+          );
+          await syncQueueDao.markDataAsSynced(dataRow.id);
+        }
+        if (dataRow.event == ChatEvents.startChat.name) {
+          final historyData = jsonDecode(dataRow.data);
+          final chat = ChatModel.fromLocal(historyData);
+          await chatRemoteDatasource.startChat(chat: chat);
+          await syncQueueDao.markDataAsSynced(dataRow.id);
+        }
+        if (dataRow.event == ChatEvents.startMessage.name) {
+          final historyData = jsonDecode(dataRow.data);
+          final message = MessageModel.fromLocal(historyData['message']);
+          final chat = ChatModel.fromLocal(historyData['chat']);
+          await chatRemoteDatasource.sendMessage(
+            message: message,
+            chat: chat,
+          );
+          await syncQueueDao.markDataAsSynced(dataRow.id);
+        }
+        if (dataRow.event == ChatEvents.updateMessage.name) {
+          final historyData = jsonDecode(dataRow.data);
+          final message = MessageModel.fromLocal(historyData['message']);
+          final chat = ChatModel.fromLocal(historyData['chat']);
+          await chatRemoteDatasource.updateMessageStatus(
+            message: message,
+            chat: chat,
           );
           await syncQueueDao.markDataAsSynced(dataRow.id);
         }

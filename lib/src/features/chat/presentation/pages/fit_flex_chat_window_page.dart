@@ -90,11 +90,12 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                 if (state is WatchMessagesbyChatIdComplete) {
                   final messages = state.messages;
                   for (final message in messages) {
-                    if (message.deliveredTo.isEmpty || message.readBy.isEmpty) {
-                      context.read<UpdateMessageCubit>().updateMessageStatus(
-                            message: message,
-                            chat: widget.chat,
-                          );
+                    if (!(message.deliveredTo.contains(widget.currentUserId) ||
+                        message.readBy.contains(widget.currentUserId))) {
+                      // context.read<UpdateMessageCubit>().updateMessageStatus(
+                      //       message: message,
+                      //       chat: widget.chat,
+                      //     );
                     }
                   }
                 }

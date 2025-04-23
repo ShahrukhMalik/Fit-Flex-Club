@@ -255,16 +255,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i352.WorkoutHistoryRemoteDataSource>(() =>
         _i352.WorkoutHistoryRemoteDataSourceImpl(
             db: gh<_i974.FirebaseFirestore>()));
-    gh.singleton<_i843.SyncManagerRemoteDatasource>(
-        () => _i843.SyncManagerRemoteDatasourceImpl(
-              gh<_i59.FirebaseAuth>(),
-              gh<_i974.FirebaseFirestore>(),
-              gh<_i663.SyncQueueDao>(),
-              gh<_i588.ClientProfileRemoteDatasource>(),
-              gh<_i826.WorkoutPlanManagementRemotedatasource>(),
-              gh<_i352.WorkoutHistoryRemoteDataSource>(),
-              connectivity: gh<_i895.Connectivity>(),
-            ));
     gh.singleton<_i228.NetworkInfo>(
         () => _i228.NetworkInfoImpl(gh<_i895.Connectivity>()));
     gh.singleton<_i415.WorkoutPlanManagementLocaldatasource>(
@@ -323,6 +313,17 @@ extension GetItInjectableX on _i174.GetIt {
         _i91.GetWorkoutPlansForClientUsecaseImpl(
             workoutManagementRepository:
                 gh<_i530.WorkoutManagementRepository>()));
+    gh.singleton<_i843.SyncManagerRemoteDatasource>(
+        () => _i843.SyncManagerRemoteDatasourceImpl(
+              gh<_i59.FirebaseAuth>(),
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i663.SyncQueueDao>(),
+              gh<_i588.ClientProfileRemoteDatasource>(),
+              gh<_i826.WorkoutPlanManagementRemotedatasource>(),
+              gh<_i352.WorkoutHistoryRemoteDataSource>(),
+              gh<_i572.ChatRemoteDatasource>(),
+              connectivity: gh<_i895.Connectivity>(),
+            ));
     gh.factory<_i29.GetexercisesCubit>(
         () => _i29.GetexercisesCubit(gh<_i139.GetExercisesUsecase>()));
     gh.singleton<_i661.UpdateAssignedWorkoutPlanUsecase>(() =>

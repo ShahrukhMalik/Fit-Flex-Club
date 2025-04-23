@@ -68,3 +68,6 @@ local.properties
 CMakeLists.txt.user
 
 # Firebase r
+
+# FVM Version Cache
+.fvm/

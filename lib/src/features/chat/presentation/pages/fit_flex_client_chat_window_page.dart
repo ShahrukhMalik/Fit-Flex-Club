@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/cubit/updatemessage/updatemessage_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -122,8 +123,24 @@ class _FitFlexClientChatWindowPageState
               if (chat != null) ...[
                 Positioned.fill(
                   bottom: 70,
-                  child: BlocBuilder<WatchMessagesbyChatIdCubit,
+                  child: BlocConsumer<WatchMessagesbyChatIdCubit,
                       WatchMessagesbyChatIdState>(
+                    listener: (context, state) {
+                      if (state is WatchMessagesbyChatIdComplete) {
+                        final messages = state.messages;
+                        for (final message in messages) {
+                          if (!(message.deliveredTo.contains(currentUserId) ||
+                              message.readBy.contains(currentUserId))) {
+                            context
+                                .read<UpdateMessageCubit>()
+                                .updateMessageStatus(
+                                  message: message,
+                                  chat: chat!,
+                                );
+                          }
+                        }
+                      }
+                    },
                     builder: (context, state) {
                       if (state is WatchMessagesbyChatIdLoading) {
                         return Center(child: CircularProgressIndicator());

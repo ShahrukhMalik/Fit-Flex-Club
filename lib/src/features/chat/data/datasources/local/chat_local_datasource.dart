@@ -14,6 +14,9 @@ abstract class ChatLocalDatasource {
   Future<void> startChat({required ChatModel chat});
 
   ///
+  Future<ChatModel> getChatById({required String chatId});
+
+  ///
   Future<Stream<ChatModel?>> getChat({required String userId});
 
   ///
@@ -207,8 +210,22 @@ class ChatLocalDatasourceImpl extends ChatLocalDatasource {
   Future<void> updateMessageStatus({
     required MessageModel message,
     required ChatModel chat,
-  }) {
-    // TODO: implement updateMessageStatus
-    throw UnimplementedError();
+  }) async {
+    try {
+      await chatDao.updateMessageStatus(message: message, chat: chat);
+    } catch (err) {
+      throw CacheException(errorMessage: err.toString());
+    }
+  }
+
+  @override
+  Future<ChatModel> getChatById({required String chatId}) async {
+    try {
+      final chat = await chatDao.getChat(chatId);
+      if (chat == null) throw CacheException(errorMessage: "Chat Not Found");
+      return ChatModel.fromLocal(chat.toJson());
+    } catch (err) {
+      throw CacheException(errorMessage: err.toString());
+    }
   }
 }

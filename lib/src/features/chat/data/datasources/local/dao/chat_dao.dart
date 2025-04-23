@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/core/db/fit_flex_local_db.dart';
 import 'package:fit_flex_club/src/features/chat/data/datasources/local/tables/chats_table.dart';
 import 'package:fit_flex_club/src/features/chat/data/datasources/local/tables/messages_table.dart';
+import 'package:fit_flex_club/src/features/chat/data/models/chat_model.dart';
+import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
 import 'package:injectable/injectable.dart';
 part 'chat_dao.g.dart';
 
@@ -10,6 +12,31 @@ part 'chat_dao.g.dart';
 @injectable
 class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
   ChatDao(super.db);
+
+  Future<void> updateMessageStatus({
+    required MessageModel message,
+    required ChatModel chat,
+  }) async {
+    await (update(messages)..where((tbl) => tbl.id.equals(message.id))).write(
+      MessagesCompanion(
+        deliveredTo: Value(
+          message.deliveredTo,
+        ),
+        readBy: Value(
+          message.readBy,
+        ),
+      ),
+    );
+    await (update(chats)..where((tbl) => tbl.id.equals(message.id))).write(
+      ChatsCompanion(
+        lastMessage: Value(chat.lastMessage),
+        lastSender: Value(chat.lastSender),
+        unreadCount: Value(
+          chat.unreadCount,
+        ),
+      ),
+    );
+  }
 
   // 👉 Insert a single chat
   Future<void> insertChat(ChatsCompanion chat) async {
@@ -19,6 +46,13 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
   // 👉 Insert a message
   Future<void> insertMessage(MessagesCompanion message) async {
     await into(messages).insert(message);
+    await (update(chats)..where((tbl) => tbl.id.equals(message.chatId.value!)))
+        .write(
+      ChatsCompanion(
+        lastMessage: Value(message.messageText.value),
+        lastSender: Value(message.senderId.value),
+      ),
+    );
   }
 
   // 👉 Batch insert chats and their messages
@@ -71,6 +105,10 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
     return select(chats).get();
   }
 
+  Future<Chat?> getChat(String chatId) {
+    return (select(chats)..where((tbl) => tbl.id.equals(chatId))).getSingleOrNull();
+  }
+
   // Future<Chat?> getLatestChatByMemberId(String userId) async {
   //   final allChats = await (select(chats)
   //         ..orderBy([
@@ -94,8 +132,7 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
             (tbl) => OrderingTerm(
                 expression: tbl.lastTimestamp, mode: OrderingMode.desc)
           ]))
-        .watch()
-        ; // Only emit if chat is not null
+        .watch(); // Only emit if chat is not null
   }
 
   // 👉 Watch all chats

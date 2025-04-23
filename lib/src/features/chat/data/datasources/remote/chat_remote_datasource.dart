@@ -76,17 +76,19 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
     required ChatModel chat,
   }) async {
     try {
+      final authId = auth.currentUser?.uid;
+      if (authId == null) {
+        throw ServerException(errorMessage: "Auth ID not found");
+      }
       final CollectionReference chatRef = remoteDb.collection('chats');
+      await chatRef.doc(chat.id).set(
+            chat.toMap(),
+          );
       await chatRef
           .doc(chat.id)
           .collection('messages')
           .doc(message.id)
           .set(message.toMap());
-      await chatRef.doc(chat.id).set(
-          chat.toMap(),
-          SetOptions(
-            merge: true,
-          ));
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -165,8 +167,8 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
 
   @override
   Future<void> updateMessageStatus({
-    required MessageEntity message,
-    required ChatEntity chat,
+    required MessageModel message,
+    required ChatModel chat,
   }) async {
     try {
       final currentUserId = auth.currentUser?.uid;
@@ -191,17 +193,9 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
         ),
       });
       // Update chat status
-      await remoteDb.collection('chats').doc(chat.id).update({
-        'unreadCount': Map.fromEntries(
-          chat.unreadCount.entries.map((obj) {
-            final currentCount = obj.value;
-            final updatedCount = obj.key == currentUserId
-                ? (currentCount - 1).clamp(0, currentCount)
-                : currentCount;
-            return MapEntry(obj.key, updatedCount);
-          }),
-        ),
-      });
+      await remoteDb.collection('chats').doc(chat.id).set(
+            chat.toMap(),
+          );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

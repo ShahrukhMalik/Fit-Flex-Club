@@ -10,6 +10,25 @@ class ChatModel extends ChatEntity {
     required super.lastTimestamp,
     required super.unreadCount,
   });
+
+  ChatModel copyWith({
+    String? id,
+    List<Map<String, dynamic>>? members,
+    String? lastMessage,
+    String? lastSender,
+    DateTime? lastTimestamp,
+    Map<String, int>? unreadCount,
+  }) {
+    return ChatModel(
+      id: id ?? this.id,
+      members: members ?? List<Map<String, dynamic>>.from(this.members),
+      lastMessage: lastMessage ?? this.lastMessage,
+      lastSender: lastSender ?? this.lastSender,
+      lastTimestamp: lastTimestamp ?? this.lastTimestamp,
+      unreadCount: unreadCount ?? Map<String, int>.from(this.unreadCount),
+    );
+  }
+
   factory ChatModel.fromEntity(ChatEntity entity) {
     return ChatModel(
       id: entity.id,

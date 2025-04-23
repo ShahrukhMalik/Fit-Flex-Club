@@ -330,33 +330,36 @@ class AppTextFields {
         ),
       );
     }
-
-    return TextFormField(
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      onFieldSubmitted: onFieldSubmitted,
-      validator: (value) {
-        // if (value == null) {
-        //   return 'Please enter weight';
-        // } else if (value.isEmpty) {
-        //   return 'Please enter weight';
-        // }
-
-        return null;
-      },
-      style: style,
-      controller: controller,
-      keyboardType: keyboardType,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: filledColor ?? CupertinoColors.systemGrey5,
-        labelText: labelText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25),
-          borderSide: BorderSide.none,
-        ),
-        prefixIcon: prefix,
-        suffixIcon: suffix,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: filledColor ?? CupertinoColors.systemGrey5,
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        children: [
+          if (prefix != null) prefix,
+          Expanded(
+            child: TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              onFieldSubmitted: onFieldSubmitted,
+              validator: (value) => null,
+              style: style,
+              controller: controller,
+              keyboardType: keyboardType,
+              onChanged: onChanged,
+              decoration: InputDecoration(
+                hintText: labelText ?? 'Type a message',
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                border: InputBorder.none,
+                isCollapsed: true,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
+          ),
+          if (suffix != null) suffix,
+        ],
       ),
     );
   }

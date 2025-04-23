@@ -30,7 +30,7 @@ class UpdateMessageUsecaseImpl extends UpdateMessageUsecase {
   UpdateMessageUsecaseImpl({required this.chatRepository});
   @override
   Future<Either<Failures, void>>? call(Params params) {
-    return chatRepository.sendMessage(
+    return chatRepository.updateMessageStatus(
       chat: params.chat,
       message: params.message,
     );

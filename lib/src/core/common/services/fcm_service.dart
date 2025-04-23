@@ -143,6 +143,6 @@ class FCMService {
     // return Platform.isIOS &&
     //     !Platform.isMacOS &&
     //     Platform.environment.containsKey('SIMULATOR_DEVICE_NAME');
-    return true;
+    return false;
   }
 }

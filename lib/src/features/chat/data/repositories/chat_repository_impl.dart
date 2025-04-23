@@ -103,6 +103,7 @@ class ChatRepositoryImpl extends ChatRepository {
       }
 
       final messageId = 'message_${chat.id}_${UUIDv4().toString()}';
+      final retrievedChat = await localDb.getChatById(chatId: chat.id);
       final messageModel = MessageModel(
         id: messageId,
         chatId: chat.id,
@@ -124,23 +125,26 @@ class ChatRepositoryImpl extends ChatRepository {
       await localDb.startMessage(
         message: messageModel,
       );
-      if (isConnected) {
-        final updatedUnreadCount = Map<String, int>.from(chat.unreadCount);
+      final updatedUnreadCount =
+          Map<String, int>.from(retrievedChat.unreadCount);
 
-        updatedUnreadCount.updateAll((key, value) {
-          return key == authId ? value : value + 1;
-        });
+      updatedUnreadCount.updateAll((key, value) {
+        return key == authId ? value : value + 1;
+      });
+
+      final updatedChat = ChatModel(
+        id: chat.id,
+        members: chat.members,
+        lastMessage: message.messageText,
+        lastSender: authId,
+        lastTimestamp: DateTime.now(),
+        unreadCount: updatedUnreadCount,
+      );
+      if (isConnected) {
         return Right(
           await remoteDb.sendMessage(
             message: messageModel,
-            chat: ChatModel(
-              id: chat.id,
-              members: chat.members,
-              lastMessage: message.messageText,
-              lastSender: authId,
-              lastTimestamp: DateTime.now(),
-              unreadCount: updatedUnreadCount,
-            ),
+            chat: updatedChat,
           ),
         );
       } else {
@@ -148,7 +152,10 @@ class ChatRepositoryImpl extends ChatRepository {
           await syncQueue.logSyncAction(
             ChatEvents.startMessage.name,
             "Messages",
-            messageModel.toMap(),
+            {
+              'chat': updatedChat.toMap(),
+              'message': messageModel.toMap(),
+            },
           ),
         );
       }
@@ -328,59 +335,57 @@ class ChatRepositoryImpl extends ChatRepository {
         return Left(ServerFailure(code: '07', message: 'Auth ID not found'));
       }
       final isConnected = await networkInfo.isConnected ?? false;
+      final updatedMessageModel = MessageModel.fromEntity(message).copyWith(
+        deliveredTo: [
+          authId,
+          ...message.deliveredTo,
+        ],
+        readBy: [
+          authId,
+          ...message.deliveredTo,
+        ],
+      );
+
+      final retrievedChat = await localDb.getChatById(chatId: chat.id);
+      final updatedChat = retrievedChat.copyWith(
+        unreadCount: Map.fromEntries(
+          chat.unreadCount.entries.map(
+            (obj) {
+              if (chat.lastSender != authId) {
+                final currentCount = obj.value;
+                final updatedCount = obj.key == authId
+                    ? (currentCount - 1).clamp(0, currentCount)
+                    : currentCount;
+                return MapEntry(obj.key, updatedCount);
+              } else {
+                return MapEntry(obj.key, obj.value);
+              }
+            },
+          ),
+        ),
+        lastMessage: updatedMessageModel.messageText,
+        lastSender: authId,
+      );
+
       await localDb.updateMessageStatus(
-        message: MessageModel.fromEntity(message),
-        chat: ChatModel.fromEntity(chat),
+        message: updatedMessageModel,
+        chat: updatedChat,
       );
       if (isConnected) {
-        return Right(await remoteDb.updateMessageStatus(
-          message: MessageModel.fromEntity(message).copyWith(
-            deliveredTo: [
-              authId,
-              ...message.deliveredTo,
-            ],
-            readBy: [
-              authId,
-              ...message.deliveredTo,
-            ],
+        return Right(
+          await remoteDb.updateMessageStatus(
+            message: updatedMessageModel,
+            chat: updatedChat,
           ),
-          chat: ChatModel.fromEntity(
-            chat,
-          ),
-        ));
+        );
       } else {
         return Right(
           await syncQueue.logSyncAction(
             ChatEvents.updateMessage.name,
             "Update Message Status",
             {
-              'message': {
-                'readBy': [authId, ...message.readBy].map(
-                  (obj) => {
-                    'userId': obj,
-                    'timestamp': DateTime.now().millisecondsSinceEpoch
-                  },
-                ),
-                'deliveredTo': [authId, ...message.deliveredTo].map(
-                  (obj) => {
-                    'userId': obj,
-                    'timestamp': DateTime.now().millisecondsSinceEpoch
-                  },
-                ),
-              },
-              'chat': {
-                {
-                  'unreadCount': Map.fromEntries(
-                    chat.unreadCount.entries.map((obj) {
-                      final currentCount = obj.value;
-                      final updatedCount = obj.key == authId
-                          ? (currentCount - 1).clamp(0, currentCount)
-                          : currentCount;
-                      return MapEntry(obj.key, updatedCount);
-                    }),
-                  ),
-                }
-              }
+              'message': updatedMessageModel.toMap(),
+              'chat': updatedChat.toMap()
             },
           ),
         );
