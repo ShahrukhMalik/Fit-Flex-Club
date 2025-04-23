@@ -170,13 +170,21 @@ class SyncManagerRemoteDatasourceImpl extends SyncManagerRemoteDatasource {
         }
         if (dataRow.event == ChatEvents.updateMessage.name) {
           final historyData = jsonDecode(dataRow.data);
-          final message = MessageModel.fromLocal(historyData['message']);
+          final unReadMessages = (historyData['unreadMessages'] as List?)
+              ?.map(
+                (localObj) => MessageModel.fromLocal(historyData['localObj']),
+              )
+              .toList();
           final chat = ChatModel.fromLocal(historyData['chat']);
-          await chatRemoteDatasource.updateMessageStatus(
-            message: message,
-            chat: chat,
-          );
-          await syncQueueDao.markDataAsSynced(dataRow.id);
+          if (unReadMessages != null) {
+            await chatRemoteDatasource.updateMessageStatus(
+              unReadMessages: unReadMessages,
+              chat: chat,
+            );
+            await syncQueueDao.markDataAsSynced(dataRow.id);
+          } else {
+            // throw CacheException(errorMessage: 'Messages ')
+          }
         }
       }
     } on ServerException catch (err) {

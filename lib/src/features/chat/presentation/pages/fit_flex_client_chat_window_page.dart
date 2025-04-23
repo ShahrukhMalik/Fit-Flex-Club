@@ -128,17 +128,20 @@ class _FitFlexClientChatWindowPageState
                     listener: (context, state) {
                       if (state is WatchMessagesbyChatIdComplete) {
                         final messages = state.messages;
-                        for (final message in messages) {
-                          if (!(message.deliveredTo.contains(currentUserId) ||
-                              message.readBy.contains(currentUserId))) {
-                            context
-                                .read<UpdateMessageCubit>()
-                                .updateMessageStatus(
-                                  message: message,
-                                  chat: chat!,
-                                );
-                          }
-                        }
+                        final unReadMessages = messages.where(
+                          (message) {
+                            if (!(message.readBy.contains(currentUserId))) {
+                              return true;
+                            } else {
+                              return false;
+                            }
+                          },
+                        ).toList();
+
+                        context.read<UpdateMessageCubit>().updateMessageStatus(
+                              unReadMessages: unReadMessages,
+                              chat: chat!,
+                            );
                       }
                     },
                     builder: (context, state) {
@@ -335,20 +338,22 @@ class _FitFlexClientChatWindowPageState
                       Expanded(
                         child: AppTextFields.prefixSuffixTextField(
                           onFieldSubmitted: (message) {
-                            context.read<SendMessageCubit>().sendMessage(
-                                  message: MessageEntity(
-                                    id: '',
-                                    chatId: chat!.id,
-                                    senderId: currentUserId ?? '',
-                                    messageText: message,
-                                    timestamp: DateTime.now(),
-                                    type: 'text',
-                                    sentTo: [],
-                                    deliveredTo: [],
-                                    readBy: [],
-                                  ),
-                                  chat: chat!,
-                                );
+                            if (_messageController.text.isNotEmpty) {
+                              context.read<SendMessageCubit>().sendMessage(
+                                    message: MessageEntity(
+                                      id: '',
+                                      chatId: chat!.id,
+                                      senderId: currentUserId ?? '',
+                                      messageText: message,
+                                      timestamp: DateTime.now(),
+                                      type: 'text',
+                                      sentTo: [],
+                                      deliveredTo: [],
+                                      readBy: [],
+                                    ),
+                                    chat: chat!,
+                                  );
+                            }
                             _messageController.clear();
                           },
                           controller: _messageController,
@@ -368,20 +373,22 @@ class _FitFlexClientChatWindowPageState
                           color: globalColorScheme.onPrimaryContainer,
                         ),
                         onPressed: () {
-                          context.read<SendMessageCubit>().sendMessage(
-                                message: MessageEntity(
-                                  id: '',
-                                  chatId: chat!.id,
-                                  senderId: '',
-                                  messageText: _messageController.text.trim(),
-                                  timestamp: DateTime.now(),
-                                  type: 'text',
-                                  sentTo: [],
-                                  deliveredTo: [],
-                                  readBy: [],
-                                ),
-                                chat: chat!,
-                              );
+                          if (_messageController.text.isNotEmpty) {
+                            context.read<SendMessageCubit>().sendMessage(
+                                  message: MessageEntity(
+                                    id: '',
+                                    chatId: chat!.id,
+                                    senderId: '',
+                                    messageText: _messageController.text.trim(),
+                                    timestamp: DateTime.now(),
+                                    type: 'text',
+                                    sentTo: [],
+                                    deliveredTo: [],
+                                    readBy: [],
+                                  ),
+                                  chat: chat!,
+                                );
+                          }
                           _messageController.clear();
                         },
                       ),

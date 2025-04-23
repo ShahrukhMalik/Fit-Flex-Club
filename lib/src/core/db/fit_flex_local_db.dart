@@ -54,6 +54,9 @@ class AppDatabase extends _$AppDatabase {
       baseExercise.deleteAll(),
       workoutHistorySet.deleteAll(),
       workoutHistoryExercise.deleteAll(),
+      chats.deleteAll(),
+      messages.deleteAll(),
+      syncQueue.deleteAll()
     ]);
   }
 
@@ -107,8 +110,10 @@ class AppDatabase extends _$AppDatabase {
                   from == 25 ||
                   from == 26 ||
                   from == 27 ||
-                  from == 28) &&
-              to == 29) {
+                  from == 28 ||
+                  from == 29 ||
+                  from == 30) &&
+              to == 31) {
             // await m.drop(workoutPlans);
             // await m.drop(weeks);
             // await m.drop(days);
@@ -177,7 +182,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 29;
+  int get schemaVersion => 31;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

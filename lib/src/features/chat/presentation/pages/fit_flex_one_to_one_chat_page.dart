@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
+import 'package:fit_flex_club/src/features/chat/domain/repositories/chat_repository.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
@@ -17,10 +21,9 @@ import 'package:intl/intl.dart';
 
 class FitFlexOneToOneChatPage extends StatefulWidget {
   static const route = 'one_to_one_chat';
-  final String currentUserId;
+
   const FitFlexOneToOneChatPage({
     super.key,
-    required this.currentUserId,
   });
 
   @override
@@ -29,9 +32,13 @@ class FitFlexOneToOneChatPage extends StatefulWidget {
 }
 
 class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
+  final ValueNotifier<List<ChatEntity>> chatsNotifier = ValueNotifier([]);
+
+  late String currentUserId;
   @override
   void initState() {
     super.initState();
+    currentUserId = getIt<FirebaseAuth>().currentUser!.uid;
     context.read<WatchChatStreamCubit>().getChats();
   }
 
@@ -58,6 +65,7 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
       extra: {
         'forChat': true,
         'selectedClients': null,
+        'currentChats': chatsNotifier.value
       },
     );
 
@@ -75,14 +83,14 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
             'userName': client.username,
           },
           {
-            'userId': widget.currentUserId,
+            'userId': currentUserId,
             'userName': "Trainer",
           },
         ],
         lastMessage: 'No messages yet..',
-        lastSender: widget.currentUserId,
+        lastSender: currentUserId,
         lastTimestamp: DateTime.now(),
-        unreadCount: {client.id ?? 'N/A': 0, widget.currentUserId: 0},
+        unreadCount: {client.id ?? 'N/A': 0, currentUserId: 0},
       );
       context.read<StartChatCubit>().startChat(chat);
     }
@@ -133,26 +141,39 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
         child: BlocConsumer<WatchChatStreamCubit, WatchChatStreamState>(
           listener: (context, state) {
             // TODO: implement listener
+
+            if (state is WatchChatStreamComplete) {
+              final chats = state.chats;
+
+              if (chats.isEmpty) {
+                try {
+                  getIt<ChatRepository>().getAllChats();
+                } on ServerException catch (error) {
+                  Fluttertoast.showToast(msg: error.errorMessage);
+                } on CacheException catch (error) {
+                  Fluttertoast.showToast(msg: error.errorMessage);
+                }
+              } else {
+                chatsNotifier.value = chats;
+              }
+            }
           },
           builder: (context, state) {
             if (state is WatchChatStreamComplete) {
               final chats = state.chats;
               if (chats.isNotEmpty) {
-           
                 return ListView.builder(
                   itemCount: chats.length,
                   itemBuilder: (context, index) {
                     final chat = chats[index];
                     final userName = chat.members
                         .where(
-                          (element) =>
-                              element['userId'] != widget.currentUserId,
+                          (element) => element['userId'] != currentUserId,
                         )
                         .first['userName'];
                     final unreadCount =
-                        (chat.unreadCount[widget.currentUserId] ?? 0) > 0
-                            ? (chat.unreadCount[widget.currentUserId] ?? 0)
-                                .toString()
+                        (chat.unreadCount[currentUserId] ?? 0) > 0
+                            ? (chat.unreadCount[currentUserId] ?? 0).toString()
                             : '';
                     final formattedTime =
                         DateFormat.Hm().format(chat.lastTimestamp);
@@ -161,14 +182,10 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
                       onTap: () {
                         context.push(
                           '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}/${FitFlexChatWindowPage.route}',
-                          extra: {
-                            'chat': chat,
-                            'currentUserId': widget.currentUserId
-                          },
+                          extra: {'chat': chat, 'currentUserId': currentUserId},
                         );
                       },
                       leading: IconButton.filled(
-
                         onPressed: () {
                           print('-------');
                         },

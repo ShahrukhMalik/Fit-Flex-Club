@@ -11,6 +11,9 @@ abstract class ChatRepository {
   Future<Either<Failures, Stream<ChatEntity?>>> getChat();
 
   ///
+  Future<Either<Failures, List<ChatEntity>>> getAllChats();
+
+  ///
   Future<Either<Failures, Stream<List<MessageEntity>>>> watchMessagesByChatId({
     required String chatId,
   });
@@ -26,7 +29,7 @@ abstract class ChatRepository {
 
   ///
   Future<Either<Failures, void>> updateMessageStatus({
-    required MessageEntity message,
+    required List<MessageEntity> unReadMessages,
     required ChatEntity chat,
   });
 }

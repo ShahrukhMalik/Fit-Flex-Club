@@ -362,9 +362,9 @@ GoRouter goRouter(appState) {
                           return TransitionPage(
                             key: state.pageKey,
                             child: FitFlexSelectClientsPage(
-                              selectedClients: extraData?['selectedClients'],
-                              forChat: extraData?['forChat'],
-                            ),
+                                selectedClients: extraData?['selectedClients'],
+                                forChat: extraData?['forChat'],
+                                currentChats: extraData?['currentChats']),
                           );
                         },
                         routes: [],
@@ -388,9 +388,7 @@ GoRouter goRouter(appState) {
                       final extraData = state.extra as Map<String, dynamic>?;
                       return TransitionPage(
                         key: state.pageKey,
-                        child: FitFlexOneToOneChatPage(
-                          currentUserId: extraData?['currentUserId'],
-                        ),
+                        child: FitFlexOneToOneChatPage(),
                       );
                     },
                     routes: [
@@ -404,7 +402,7 @@ GoRouter goRouter(appState) {
                             child: FitFlexChatWindowPage(
                               key: UniqueKey(),
                               chat: extraData?['chat'],
-                              currentUserId: extraData?['currentUserId'],
+                              // currentUserId: extraData?['currentUserId'],
                             ),
                           );
                         },
@@ -420,6 +418,7 @@ GoRouter goRouter(appState) {
                             child: FitFlexSelectClientsPage(
                               selectedClients: extraData?['selectedClients'],
                               forChat: extraData?['forChat'],
+                              currentChats: extraData?['currentChats'],
                             ),
                           );
                         },

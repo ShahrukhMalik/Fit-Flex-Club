@@ -307,21 +307,13 @@ class FeaturesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Feature> features = [
       const Feature(
-          title: 'Personalized Notifications',
-          description:
-              'Send targeted reminders, workout updates, and progress reports directly to your clients. Customize content and scheduling for each individual to boost engagement and results.',
-          icon: Icons.notifications_active,
-          isPremium: true,
-          route:
-              '${FitFlexTrainerHubPage.route}/${FitFlexPersonalizedNotificationPage.route}'),
-      const Feature(
-        title: 'Announcements',
+        title: 'Personalized Notifications',
         description:
-            'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
-        icon: Icons.campaign,
+            'Send targeted reminders, workout updates, and progress reports directly to your clients. Customize content and scheduling for each individual to boost engagement and results.',
+        icon: Icons.notifications_active,
         isPremium: true,
         route:
-            '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}',
+            '${FitFlexTrainerHubPage.route}/${FitFlexPersonalizedNotificationPage.route}',
       ),
       const Feature(
         title: 'One-to-One Chat',
@@ -332,8 +324,16 @@ class FeaturesPage extends StatelessWidget {
         route:
             '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}',
       ),
+      const Feature(
+        title: 'Announcements',
+        description:
+            'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
+        icon: Icons.campaign,
+        isPremium: true,
+        route:
+            '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}',
+      ),
     ];
-
     return Scaffold(
       body: Localizations(
         locale: const Locale('en'),

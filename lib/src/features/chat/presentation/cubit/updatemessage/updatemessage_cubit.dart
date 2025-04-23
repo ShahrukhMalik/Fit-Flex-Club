@@ -17,7 +17,7 @@ class UpdateMessageCubit extends Cubit<UpdateMessageState> {
   ) : super(UpdateMessageInitial());
 
   Future<void> updateMessageStatus({
-    required MessageEntity message,
+    required  List<MessageEntity> unReadMessages,
     required ChatEntity chat,
   }) async {
     if (state is! UpdateMessageInitial) {
@@ -26,7 +26,7 @@ class UpdateMessageCubit extends Cubit<UpdateMessageState> {
     final result = await updateMessageUsecase(
       Params(
         chat: chat,
-        message: message,
+        unReadMessages: unReadMessages,
       ),
     );
 

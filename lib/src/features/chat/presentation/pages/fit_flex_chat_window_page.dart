@@ -1,4 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, curly_braces_in_flow_control_structures
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
@@ -17,13 +20,11 @@ import 'package:intl/intl.dart';
 
 class FitFlexChatWindowPage extends StatefulWidget {
   static const route = 'chat_window';
-
   final ChatEntity chat;
-  final String currentUserId;
   const FitFlexChatWindowPage({
     super.key,
     required this.chat,
-    required this.currentUserId,
+
   });
 
   @override
@@ -34,17 +35,21 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
   final _messageController = TextEditingController();
   @override
   void initState() {
+    currentUserId = getIt<FirebaseAuth>().currentUser!.uid;
     super.initState();
     context
         .read<WatchMessagesbyChatIdCubit>()
         .getMessagesByChatId(widget.chat.id);
   }
 
+  late String currentUserId;
+
   @override
   Widget build(BuildContext context) {
+
     final userName = widget.chat.members
         .where(
-          (element) => element['userId'] != widget.currentUserId,
+          (element) => element['userId'] != currentUserId,
         )
         .first['userName'];
     return Scaffold(
@@ -89,15 +94,19 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
               listener: (context, state) {
                 if (state is WatchMessagesbyChatIdComplete) {
                   final messages = state.messages;
-                  for (final message in messages) {
-                    if (!(message.deliveredTo.contains(widget.currentUserId) ||
-                        message.readBy.contains(widget.currentUserId))) {
-                      // context.read<UpdateMessageCubit>().updateMessageStatus(
-                      //       message: message,
-                      //       chat: widget.chat,
-                      //     );
-                    }
-                  }
+                  final unReadMessages = messages.where(
+                    (message) {
+                      if (!(message.readBy.contains(currentUserId))) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    },
+                  ).toList();
+                  context.read<UpdateMessageCubit>().updateMessageStatus(
+                        unReadMessages: unReadMessages,
+                        chat: widget.chat,
+                      );
                 }
               },
               builder: (context, state) {
@@ -182,7 +191,7 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                         // Message bubble rendering
                         final message = item as MessageEntity;
                         final isCurrentUser =
-                            message.senderId == widget.currentUserId;
+                            message.senderId == currentUserId;
                         final formattedTime =
                             DateFormat.Hm().format(message.timestamp);
 
@@ -245,7 +254,7 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                     //     final message = messages[index];
 
                     //     final isCurrentUser =
-                    //         message.senderId == widget.currentUserId;
+                    //         message.senderId == currentUserId;
                     //     final formattedTime =
                     //         DateFormat.Hm().format(message.timestamp);
                     //     return Align(
@@ -310,7 +319,7 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                   }
                 }
 
-                return Center(child: Text('No messages'));
+                return Center(child: CupertinoActivityIndicator());
               },
             ),
           ),
@@ -326,20 +335,22 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                 Expanded(
                   child: AppTextFields.prefixSuffixTextField(
                     onFieldSubmitted: (message) {
-                      context.read<SendMessageCubit>().sendMessage(
-                            message: MessageEntity(
-                              id: '',
-                              chatId: widget.chat.id,
-                              senderId: widget.currentUserId,
-                              messageText: message,
-                              timestamp: DateTime.now(),
-                              type: 'text',
-                              sentTo: [],
-                              deliveredTo: [],
-                              readBy: [],
-                            ),
-                            chat: widget.chat,
-                          );
+                      if (_messageController.text.isNotEmpty) {
+                        context.read<SendMessageCubit>().sendMessage(
+                              message: MessageEntity(
+                                id: '',
+                                chatId: widget.chat.id,
+                                senderId: currentUserId,
+                                messageText: message,
+                                timestamp: DateTime.now(),
+                                type: 'text',
+                                sentTo: [],
+                                deliveredTo: [],
+                                readBy: [],
+                              ),
+                              chat: widget.chat,
+                            );
+                      }
                       _messageController.clear();
                     },
                     controller: _messageController,
@@ -359,20 +370,22 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                     color: globalColorScheme.onPrimaryContainer,
                   ),
                   onPressed: () {
-                    context.read<SendMessageCubit>().sendMessage(
-                          message: MessageEntity(
-                            id: '',
-                            chatId: widget.chat.id,
-                            senderId: widget.currentUserId,
-                            messageText: _messageController.text.trim(),
-                            timestamp: DateTime.now(),
-                            type: 'text',
-                            sentTo: [],
-                            deliveredTo: [],
-                            readBy: [],
-                          ),
-                          chat: widget.chat,
-                        );
+                    if (_messageController.text.isNotEmpty) {
+                      context.read<SendMessageCubit>().sendMessage(
+                            message: MessageEntity(
+                              id: '',
+                              chatId: widget.chat.id,
+                              senderId: currentUserId,
+                              messageText: _messageController.text.trim(),
+                              timestamp: DateTime.now(),
+                              type: 'text',
+                              sentTo: [],
+                              deliveredTo: [],
+                              readBy: [],
+                            ),
+                            chat: widget.chat,
+                          );
+                    }
                     _messageController.clear();
                   },
                 ),

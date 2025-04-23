@@ -12,16 +12,16 @@ abstract class UpdateMessageUsecase extends ChatUsecase
     implements UseCase<void, Params> {}
 
 class Params extends Equatable {
-  final MessageEntity message;
+final List<MessageEntity> unReadMessages;
   final ChatEntity chat;
 
   const Params({
     required this.chat,
-    required this.message,
+    required this.unReadMessages,
   });
 
   @override
-  List<Object?> get props => [chat, message];
+  List<Object?> get props => [chat, unReadMessages];
 }
 
 @Singleton(as: UpdateMessageUsecase)
@@ -32,7 +32,7 @@ class UpdateMessageUsecaseImpl extends UpdateMessageUsecase {
   Future<Either<Failures, void>>? call(Params params) {
     return chatRepository.updateMessageStatus(
       chat: params.chat,
-      message: params.message,
+      unReadMessages: params.unReadMessages,
     );
   }
 }

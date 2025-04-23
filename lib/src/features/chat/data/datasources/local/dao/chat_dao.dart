@@ -14,23 +14,23 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
   ChatDao(super.db);
 
   Future<void> updateMessageStatus({
-    required MessageModel message,
+    required List<MessageModel> unReadMessages,
     required ChatModel chat,
   }) async {
-    await (update(messages)..where((tbl) => tbl.id.equals(message.id))).write(
-      MessagesCompanion(
-        deliveredTo: Value(
-          message.deliveredTo,
+    for (final message in unReadMessages) {
+      await (update(messages)..where((tbl) => tbl.id.equals(message.id))).write(
+        MessagesCompanion(
+          deliveredTo: Value(
+            message.deliveredTo,
+          ),
+          readBy: Value(
+            message.readBy,
+          ),
         ),
-        readBy: Value(
-          message.readBy,
-        ),
-      ),
-    );
-    await (update(chats)..where((tbl) => tbl.id.equals(message.id))).write(
+      );
+    }
+    await (update(chats)..where((tbl) => tbl.id.equals(chat.id))).write(
       ChatsCompanion(
-        lastMessage: Value(chat.lastMessage),
-        lastSender: Value(chat.lastSender),
         unreadCount: Value(
           chat.unreadCount,
         ),
@@ -106,7 +106,8 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
   }
 
   Future<Chat?> getChat(String chatId) {
-    return (select(chats)..where((tbl) => tbl.id.equals(chatId))).getSingleOrNull();
+    return (select(chats)..where((tbl) => tbl.id.equals(chatId)))
+        .getSingleOrNull();
   }
 
   // Future<Chat?> getLatestChatByMemberId(String userId) async {

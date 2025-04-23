@@ -1,4 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
+import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -14,11 +18,13 @@ import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/tra
 
 class FitFlexSelectClientsPage extends StatelessWidget {
   final List<ClientEntity?>? selectedClients;
+  final List<ChatEntity>? currentChats;
   final bool forChat;
   static const route = 'select_clients_page';
   const FitFlexSelectClientsPage({
     super.key,
     required this.selectedClients,
+    this.currentChats,
     this.forChat = false,
   });
 
@@ -28,6 +34,7 @@ class FitFlexSelectClientsPage extends StatelessWidget {
       colorScheme: globalColorScheme,
       selectedClients: selectedClients,
       forChat: forChat,
+      currentChats: currentChats,
     );
   }
 }
@@ -36,11 +43,13 @@ class GymClientsDashboard extends StatefulWidget {
   final ColorScheme colorScheme;
   final List<ClientEntity?>? selectedClients;
   final bool forChat;
+  final List<ChatEntity>? currentChats;
 
   const GymClientsDashboard({
     super.key,
     required this.colorScheme,
     required this.selectedClients,
+    this.currentChats,
     this.forChat = false,
   });
 
@@ -51,6 +60,17 @@ class GymClientsDashboard extends StatefulWidget {
 class _GymClientsDashboardState extends State<GymClientsDashboard> {
   final ValueNotifier<List<ClientEntity>?> clients = ValueNotifier(null);
   final ValueNotifier<Set<ClientEntity?>> _selectedClients = ValueNotifier({});
+
+  ChatEntity? findChatByUserId(List<ChatEntity> chatList, String userId) {
+    try {
+      return chatList.firstWhere(
+        (chat) => chat.members.any((member) => member['userId'] == userId),
+      );
+    } catch (e) {
+      // If not found, return null
+      return null;
+    }
+  }
 
   List<ClientEntity> _originalList = [];
   @override
@@ -235,7 +255,21 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
                                                 onTap: () {
                                                   // Optional: reset long-press if tapped again
                                                   if (widget.forChat) {
-                                                    context.pop(client);
+                                                    final chat =
+                                                        findChatByUserId(
+                                                      widget.currentChats!,
+                                                      client!.id!,
+                                                    );
+                                                    if (chat == null) {
+                                                      context.pop(client);
+                                                    } else {
+                                                      context.go(
+                                                        '${FitFlexTrainerHubPage.route}/${FitFlexOneToOneChatPage.route}/${FitFlexChatWindowPage.route}',
+                                                        extra: {
+                                                          'chat': chat,
+                                                        },
+                                                      );
+                                                    }
                                                   } else {
                                                     if (selectedClients
                                                         .contains(client)) {

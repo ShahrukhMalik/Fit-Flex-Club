@@ -19,6 +19,9 @@ abstract class ChatRemoteDatasource {
   Future<Stream<ChatModel?>> getChat();
 
   ///
+  Future<List<ChatModel>> getAllChats();
+
+  ///
   Future<Stream<List<MessageModel>>> watchMessagesByChatId({
     required String chatId,
   });
@@ -34,7 +37,7 @@ abstract class ChatRemoteDatasource {
 
   ///
   Future<void> updateMessageStatus({
-    required MessageModel message,
+    required List<MessageModel> unReadMessages,
     required ChatModel chat,
   });
 }
@@ -167,35 +170,53 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
 
   @override
   Future<void> updateMessageStatus({
-    required MessageModel message,
+    required List<MessageModel> unReadMessages,
     required ChatModel chat,
   }) async {
     try {
-      final currentUserId = auth.currentUser?.uid;
+      final authId = auth.currentUser?.uid;
       // Update message status
-      await remoteDb
-          .collection('chats')
-          .doc(chat.id)
-          .collection('messages')
-          .doc(message.id)
-          .update({
-        'readBy': message.readBy.map(
-          (obj) => {
-            'userId': obj,
-            'timestamp': DateTime.now().millisecondsSinceEpoch
-          },
-        ),
-        'deliveredTo': message.deliveredTo.map(
-          (obj) => {
-            'userId': obj,
-            'timestamp': DateTime.now().millisecondsSinceEpoch
-          },
-        ),
-      });
+      for (final unReadMessage in unReadMessages) {
+        await remoteDb
+            .collection('chats')
+            .doc(chat.id)
+            .collection('messages')
+            .doc(unReadMessage.id)
+            .update({
+          'readBy': unReadMessage.readBy.map(
+            (obj) => {
+              'userId': obj,
+              'timestamp': DateTime.now().millisecondsSinceEpoch
+            },
+          ),
+        });
+      }
       // Update chat status
-      await remoteDb.collection('chats').doc(chat.id).set(
-            chat.toMap(),
-          );
+      await remoteDb.collection('chats').doc(chat.id).update(
+        {'unreadCount.$authId': 0},
+      );
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<List<ChatModel>> getAllChats() async {
+    try {
+      final snapShot = await remoteDb.collection('chats').get();
+
+      if (snapShot.docs.isEmpty) {
+        return [];
+      }
+
+      return snapShot.docs.map((doc) {
+        final data = doc.data();
+        // Assuming ChatModel has a `fromJson` factory constructor
+        return ChatModel.fromMap(doc.id, data);
+      }).toList();
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

@@ -326,7 +326,7 @@ class ChatRepositoryImpl extends ChatRepository {
 
   @override
   Future<Either<Failures, void>> updateMessageStatus({
-    required MessageEntity message,
+    required List<MessageEntity> unReadMessages,
     required ChatEntity chat,
   }) async {
     try {
@@ -335,46 +335,40 @@ class ChatRepositoryImpl extends ChatRepository {
         return Left(ServerFailure(code: '07', message: 'Auth ID not found'));
       }
       final isConnected = await networkInfo.isConnected ?? false;
-      final updatedMessageModel = MessageModel.fromEntity(message).copyWith(
-        deliveredTo: [
-          authId,
-          ...message.deliveredTo,
-        ],
-        readBy: [
-          authId,
-          ...message.deliveredTo,
-        ],
-      );
+      final updatedMessageModel = unReadMessages
+          .map(
+            (message) => MessageModel.fromEntity(message).copyWith(
+              readBy: [
+                authId,
+                ...message.readBy,
+              ],
+            ),
+          )
+          .toList();
 
       final retrievedChat = await localDb.getChatById(chatId: chat.id);
       final updatedChat = retrievedChat.copyWith(
         unreadCount: Map.fromEntries(
           chat.unreadCount.entries.map(
             (obj) {
-              if (chat.lastSender != authId) {
-                final currentCount = obj.value;
-                final updatedCount = obj.key == authId
-                    ? (currentCount - 1).clamp(0, currentCount)
-                    : currentCount;
-                return MapEntry(obj.key, updatedCount);
+              if (obj.key == authId) {
+                return MapEntry(obj.key, 0);
               } else {
                 return MapEntry(obj.key, obj.value);
               }
             },
           ),
         ),
-        lastMessage: updatedMessageModel.messageText,
-        lastSender: authId,
       );
 
-      await localDb.updateMessageStatus(
-        message: updatedMessageModel,
-        chat: updatedChat,
-      );
+      // await localDb.updateMessageStatus(
+      //   unReadMessages: updatedMessageModel,
+      //   chat: updatedChat,
+      // );
       if (isConnected) {
         return Right(
           await remoteDb.updateMessageStatus(
-            message: updatedMessageModel,
+            unReadMessages: updatedMessageModel,
             chat: updatedChat,
           ),
         );
@@ -384,10 +378,44 @@ class ChatRepositoryImpl extends ChatRepository {
             ChatEvents.updateMessage.name,
             "Update Message Status",
             {
-              'message': updatedMessageModel.toMap(),
+              'unreadMessages': updatedMessageModel
+                  .map(
+                    (e) => e.toMap(),
+                  )
+                  .toList(),
               'chat': updatedChat.toMap()
             },
           ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, List<ChatEntity>>> getAllChats() async {
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      final remoteChats = await remoteDb.getAllChats();
+      await localDb.insertChats(chats: remoteChats);
+      if (isConnected) {
+        return Right(remoteChats);
+      } else {
+        throw ServerException(
+          errorMessage: "No Internet Connection",
         );
       }
     } on ServerException catch (error) {

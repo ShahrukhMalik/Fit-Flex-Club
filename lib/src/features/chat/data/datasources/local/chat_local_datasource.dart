@@ -29,8 +29,10 @@ abstract class ChatLocalDatasource {
   Future<void> insertMessages({required List<MessageModel> messages});
 
   ///
-  Future<void> updateMessageStatus(
-      {required MessageModel message, required ChatModel chat});
+  Future<void> updateMessageStatus({
+    required List<MessageModel> unReadMessages,
+    required ChatModel chat,
+  });
 
   ///
   Future<Stream<List<ChatModel>>> getChatStream();
@@ -208,11 +210,14 @@ class ChatLocalDatasourceImpl extends ChatLocalDatasource {
 
   @override
   Future<void> updateMessageStatus({
-    required MessageModel message,
+    required List<MessageModel> unReadMessages,
     required ChatModel chat,
   }) async {
     try {
-      await chatDao.updateMessageStatus(message: message, chat: chat);
+      await chatDao.updateMessageStatus(
+        unReadMessages: unReadMessages,
+        chat: chat,
+      );
     } catch (err) {
       throw CacheException(errorMessage: err.toString());
     }
