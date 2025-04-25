@@ -362,9 +362,9 @@ GoRouter goRouter(appState) {
                           return TransitionPage(
                             key: state.pageKey,
                             child: FitFlexSelectClientsPage(
-                                selectedClients: extraData?['selectedClients'],
-                                forChat: extraData?['forChat'],
-                                currentChats: extraData?['currentChats']),
+                              selectedClients: extraData?['selectedClients'],
+                              // currentChats: extraData?['currentChats'],
+                            ),
                           );
                         },
                         routes: [],
