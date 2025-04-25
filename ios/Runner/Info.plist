@@ -31,6 +31,16 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>FirebaseMessagingAutoInitEnabled</key>
+	<true/>
+	<key>UIApplicationExitsOnSuspend</key>
+	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fit Flex requires access to the phone's library so that you are able to save profile picture for you.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
