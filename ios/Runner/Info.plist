@@ -39,8 +39,6 @@
 	</array>
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<true/>
-	<key>UIApplicationExitsOnSuspend</key>
-	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fit Flex requires access to the phone's library so that you are able to save profile picture for you.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

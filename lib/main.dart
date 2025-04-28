@@ -18,6 +18,20 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown, // Optional: Lock to both portrait up & down
   ]);
+  // Show the system status bar
+  await SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.top],
+  );
+
+  // Optional: Set the style (dark icons or light icons)
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // Make it blend with your app
+      statusBarIconBrightness:
+          Brightness.dark, // Use Brightness.light for white icons
+    ),
+  );
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
