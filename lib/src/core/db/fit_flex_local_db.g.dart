@@ -6401,6 +6401,1098 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   }
 }
 
+class $AnnouncementsTable extends Announcements
+    with TableInfo<$AnnouncementsTable, Announcement> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AnnouncementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _trainerIdMeta =
+      const VerificationMeta('trainerId');
+  @override
+  late final GeneratedColumn<String> trainerId = GeneratedColumn<String>(
+      'trainer_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _trainerNameMeta =
+      const VerificationMeta('trainerName');
+  @override
+  late final GeneratedColumn<String> trainerName = GeneratedColumn<String>(
+      'trainer_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _contentMeta =
+      const VerificationMeta('content');
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+      'content', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _mediaUrlMeta =
+      const VerificationMeta('mediaUrl');
+  @override
+  late final GeneratedColumn<String> mediaUrl = GeneratedColumn<String>(
+      'media_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postTypeMeta =
+      const VerificationMeta('postType');
+  @override
+  late final GeneratedColumn<String> postType = GeneratedColumn<String>(
+      'post_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, trainerId, trainerName, content, mediaUrl, postType, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'announcements';
+  @override
+  VerificationContext validateIntegrity(Insertable<Announcement> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('trainer_id')) {
+      context.handle(_trainerIdMeta,
+          trainerId.isAcceptableOrUnknown(data['trainer_id']!, _trainerIdMeta));
+    } else if (isInserting) {
+      context.missing(_trainerIdMeta);
+    }
+    if (data.containsKey('trainer_name')) {
+      context.handle(
+          _trainerNameMeta,
+          trainerName.isAcceptableOrUnknown(
+              data['trainer_name']!, _trainerNameMeta));
+    } else if (isInserting) {
+      context.missing(_trainerNameMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(_contentMeta,
+          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('media_url')) {
+      context.handle(_mediaUrlMeta,
+          mediaUrl.isAcceptableOrUnknown(data['media_url']!, _mediaUrlMeta));
+    }
+    if (data.containsKey('post_type')) {
+      context.handle(_postTypeMeta,
+          postType.isAcceptableOrUnknown(data['post_type']!, _postTypeMeta));
+    } else if (isInserting) {
+      context.missing(_postTypeMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Announcement map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Announcement(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      trainerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}trainer_id'])!,
+      trainerName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}trainer_name'])!,
+      content: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
+      mediaUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}media_url']),
+      postType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}post_type'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $AnnouncementsTable createAlias(String alias) {
+    return $AnnouncementsTable(attachedDatabase, alias);
+  }
+}
+
+class Announcement extends DataClass implements Insertable<Announcement> {
+  final String id;
+  final String trainerId;
+  final String trainerName;
+  final String content;
+  final String? mediaUrl;
+  final String postType;
+  final DateTime createdAt;
+  const Announcement(
+      {required this.id,
+      required this.trainerId,
+      required this.trainerName,
+      required this.content,
+      this.mediaUrl,
+      required this.postType,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['trainer_id'] = Variable<String>(trainerId);
+    map['trainer_name'] = Variable<String>(trainerName);
+    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || mediaUrl != null) {
+      map['media_url'] = Variable<String>(mediaUrl);
+    }
+    map['post_type'] = Variable<String>(postType);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  AnnouncementsCompanion toCompanion(bool nullToAbsent) {
+    return AnnouncementsCompanion(
+      id: Value(id),
+      trainerId: Value(trainerId),
+      trainerName: Value(trainerName),
+      content: Value(content),
+      mediaUrl: mediaUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mediaUrl),
+      postType: Value(postType),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Announcement.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Announcement(
+      id: serializer.fromJson<String>(json['id']),
+      trainerId: serializer.fromJson<String>(json['trainerId']),
+      trainerName: serializer.fromJson<String>(json['trainerName']),
+      content: serializer.fromJson<String>(json['content']),
+      mediaUrl: serializer.fromJson<String?>(json['mediaUrl']),
+      postType: serializer.fromJson<String>(json['postType']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'trainerId': serializer.toJson<String>(trainerId),
+      'trainerName': serializer.toJson<String>(trainerName),
+      'content': serializer.toJson<String>(content),
+      'mediaUrl': serializer.toJson<String?>(mediaUrl),
+      'postType': serializer.toJson<String>(postType),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Announcement copyWith(
+          {String? id,
+          String? trainerId,
+          String? trainerName,
+          String? content,
+          Value<String?> mediaUrl = const Value.absent(),
+          String? postType,
+          DateTime? createdAt}) =>
+      Announcement(
+        id: id ?? this.id,
+        trainerId: trainerId ?? this.trainerId,
+        trainerName: trainerName ?? this.trainerName,
+        content: content ?? this.content,
+        mediaUrl: mediaUrl.present ? mediaUrl.value : this.mediaUrl,
+        postType: postType ?? this.postType,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  Announcement copyWithCompanion(AnnouncementsCompanion data) {
+    return Announcement(
+      id: data.id.present ? data.id.value : this.id,
+      trainerId: data.trainerId.present ? data.trainerId.value : this.trainerId,
+      trainerName:
+          data.trainerName.present ? data.trainerName.value : this.trainerName,
+      content: data.content.present ? data.content.value : this.content,
+      mediaUrl: data.mediaUrl.present ? data.mediaUrl.value : this.mediaUrl,
+      postType: data.postType.present ? data.postType.value : this.postType,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Announcement(')
+          ..write('id: $id, ')
+          ..write('trainerId: $trainerId, ')
+          ..write('trainerName: $trainerName, ')
+          ..write('content: $content, ')
+          ..write('mediaUrl: $mediaUrl, ')
+          ..write('postType: $postType, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, trainerId, trainerName, content, mediaUrl, postType, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Announcement &&
+          other.id == this.id &&
+          other.trainerId == this.trainerId &&
+          other.trainerName == this.trainerName &&
+          other.content == this.content &&
+          other.mediaUrl == this.mediaUrl &&
+          other.postType == this.postType &&
+          other.createdAt == this.createdAt);
+}
+
+class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
+  final Value<String> id;
+  final Value<String> trainerId;
+  final Value<String> trainerName;
+  final Value<String> content;
+  final Value<String?> mediaUrl;
+  final Value<String> postType;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const AnnouncementsCompanion({
+    this.id = const Value.absent(),
+    this.trainerId = const Value.absent(),
+    this.trainerName = const Value.absent(),
+    this.content = const Value.absent(),
+    this.mediaUrl = const Value.absent(),
+    this.postType = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AnnouncementsCompanion.insert({
+    required String id,
+    required String trainerId,
+    required String trainerName,
+    required String content,
+    this.mediaUrl = const Value.absent(),
+    required String postType,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        trainerId = Value(trainerId),
+        trainerName = Value(trainerName),
+        content = Value(content),
+        postType = Value(postType),
+        createdAt = Value(createdAt);
+  static Insertable<Announcement> custom({
+    Expression<String>? id,
+    Expression<String>? trainerId,
+    Expression<String>? trainerName,
+    Expression<String>? content,
+    Expression<String>? mediaUrl,
+    Expression<String>? postType,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (trainerId != null) 'trainer_id': trainerId,
+      if (trainerName != null) 'trainer_name': trainerName,
+      if (content != null) 'content': content,
+      if (mediaUrl != null) 'media_url': mediaUrl,
+      if (postType != null) 'post_type': postType,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AnnouncementsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? trainerId,
+      Value<String>? trainerName,
+      Value<String>? content,
+      Value<String?>? mediaUrl,
+      Value<String>? postType,
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
+    return AnnouncementsCompanion(
+      id: id ?? this.id,
+      trainerId: trainerId ?? this.trainerId,
+      trainerName: trainerName ?? this.trainerName,
+      content: content ?? this.content,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
+      postType: postType ?? this.postType,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (trainerId.present) {
+      map['trainer_id'] = Variable<String>(trainerId.value);
+    }
+    if (trainerName.present) {
+      map['trainer_name'] = Variable<String>(trainerName.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (mediaUrl.present) {
+      map['media_url'] = Variable<String>(mediaUrl.value);
+    }
+    if (postType.present) {
+      map['post_type'] = Variable<String>(postType.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AnnouncementsCompanion(')
+          ..write('id: $id, ')
+          ..write('trainerId: $trainerId, ')
+          ..write('trainerName: $trainerName, ')
+          ..write('content: $content, ')
+          ..write('mediaUrl: $mediaUrl, ')
+          ..write('postType: $postType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CommentsTable extends Comments with TableInfo<$CommentsTable, Comment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CommentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _announcementIdMeta =
+      const VerificationMeta('announcementId');
+  @override
+  late final GeneratedColumn<String> announcementId = GeneratedColumn<String>(
+      'announcement_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES announcements (id)'));
+  static const VerificationMeta _userNameMeta =
+      const VerificationMeta('userName');
+  @override
+  late final GeneratedColumn<String> userName = GeneratedColumn<String>(
+      'user_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _contentMeta =
+      const VerificationMeta('content');
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+      'content', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, announcementId, userName, content, timestamp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'comments';
+  @override
+  VerificationContext validateIntegrity(Insertable<Comment> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('announcement_id')) {
+      context.handle(
+          _announcementIdMeta,
+          announcementId.isAcceptableOrUnknown(
+              data['announcement_id']!, _announcementIdMeta));
+    } else if (isInserting) {
+      context.missing(_announcementIdMeta);
+    }
+    if (data.containsKey('user_name')) {
+      context.handle(_userNameMeta,
+          userName.isAcceptableOrUnknown(data['user_name']!, _userNameMeta));
+    } else if (isInserting) {
+      context.missing(_userNameMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(_contentMeta,
+          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Comment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Comment(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      announcementId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}announcement_id'])!,
+      userName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_name'])!,
+      content: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+    );
+  }
+
+  @override
+  $CommentsTable createAlias(String alias) {
+    return $CommentsTable(attachedDatabase, alias);
+  }
+}
+
+class Comment extends DataClass implements Insertable<Comment> {
+  final String id;
+  final String userId;
+  final String announcementId;
+  final String userName;
+  final String content;
+  final DateTime timestamp;
+  const Comment(
+      {required this.id,
+      required this.userId,
+      required this.announcementId,
+      required this.userName,
+      required this.content,
+      required this.timestamp});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['announcement_id'] = Variable<String>(announcementId);
+    map['user_name'] = Variable<String>(userName);
+    map['content'] = Variable<String>(content);
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    return map;
+  }
+
+  CommentsCompanion toCompanion(bool nullToAbsent) {
+    return CommentsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      announcementId: Value(announcementId),
+      userName: Value(userName),
+      content: Value(content),
+      timestamp: Value(timestamp),
+    );
+  }
+
+  factory Comment.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Comment(
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      announcementId: serializer.fromJson<String>(json['announcementId']),
+      userName: serializer.fromJson<String>(json['userName']),
+      content: serializer.fromJson<String>(json['content']),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'announcementId': serializer.toJson<String>(announcementId),
+      'userName': serializer.toJson<String>(userName),
+      'content': serializer.toJson<String>(content),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+    };
+  }
+
+  Comment copyWith(
+          {String? id,
+          String? userId,
+          String? announcementId,
+          String? userName,
+          String? content,
+          DateTime? timestamp}) =>
+      Comment(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        announcementId: announcementId ?? this.announcementId,
+        userName: userName ?? this.userName,
+        content: content ?? this.content,
+        timestamp: timestamp ?? this.timestamp,
+      );
+  Comment copyWithCompanion(CommentsCompanion data) {
+    return Comment(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      announcementId: data.announcementId.present
+          ? data.announcementId.value
+          : this.announcementId,
+      userName: data.userName.present ? data.userName.value : this.userName,
+      content: data.content.present ? data.content.value : this.content,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Comment(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('announcementId: $announcementId, ')
+          ..write('userName: $userName, ')
+          ..write('content: $content, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, userId, announcementId, userName, content, timestamp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Comment &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.announcementId == this.announcementId &&
+          other.userName == this.userName &&
+          other.content == this.content &&
+          other.timestamp == this.timestamp);
+}
+
+class CommentsCompanion extends UpdateCompanion<Comment> {
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<String> announcementId;
+  final Value<String> userName;
+  final Value<String> content;
+  final Value<DateTime> timestamp;
+  final Value<int> rowid;
+  const CommentsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.announcementId = const Value.absent(),
+    this.userName = const Value.absent(),
+    this.content = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CommentsCompanion.insert({
+    required String id,
+    required String userId,
+    required String announcementId,
+    required String userName,
+    required String content,
+    required DateTime timestamp,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        userId = Value(userId),
+        announcementId = Value(announcementId),
+        userName = Value(userName),
+        content = Value(content),
+        timestamp = Value(timestamp);
+  static Insertable<Comment> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<String>? announcementId,
+    Expression<String>? userName,
+    Expression<String>? content,
+    Expression<DateTime>? timestamp,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (announcementId != null) 'announcement_id': announcementId,
+      if (userName != null) 'user_name': userName,
+      if (content != null) 'content': content,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CommentsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? userId,
+      Value<String>? announcementId,
+      Value<String>? userName,
+      Value<String>? content,
+      Value<DateTime>? timestamp,
+      Value<int>? rowid}) {
+    return CommentsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      announcementId: announcementId ?? this.announcementId,
+      userName: userName ?? this.userName,
+      content: content ?? this.content,
+      timestamp: timestamp ?? this.timestamp,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (announcementId.present) {
+      map['announcement_id'] = Variable<String>(announcementId.value);
+    }
+    if (userName.present) {
+      map['user_name'] = Variable<String>(userName.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommentsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('announcementId: $announcementId, ')
+          ..write('userName: $userName, ')
+          ..write('content: $content, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReactionsTable extends Reactions
+    with TableInfo<$ReactionsTable, Reaction> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReactionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _announcementIdMeta =
+      const VerificationMeta('announcementId');
+  @override
+  late final GeneratedColumn<String> announcementId = GeneratedColumn<String>(
+      'announcement_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES announcements (id)'));
+  static const VerificationMeta _userNameMeta =
+      const VerificationMeta('userName');
+  @override
+  late final GeneratedColumn<String> userName = GeneratedColumn<String>(
+      'user_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _emojiMeta = const VerificationMeta('emoji');
+  @override
+  late final GeneratedColumn<String> emoji = GeneratedColumn<String>(
+      'emoji', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, announcementId, userName, emoji, timestamp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reactions';
+  @override
+  VerificationContext validateIntegrity(Insertable<Reaction> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('announcement_id')) {
+      context.handle(
+          _announcementIdMeta,
+          announcementId.isAcceptableOrUnknown(
+              data['announcement_id']!, _announcementIdMeta));
+    } else if (isInserting) {
+      context.missing(_announcementIdMeta);
+    }
+    if (data.containsKey('user_name')) {
+      context.handle(_userNameMeta,
+          userName.isAcceptableOrUnknown(data['user_name']!, _userNameMeta));
+    } else if (isInserting) {
+      context.missing(_userNameMeta);
+    }
+    if (data.containsKey('emoji')) {
+      context.handle(
+          _emojiMeta, emoji.isAcceptableOrUnknown(data['emoji']!, _emojiMeta));
+    } else if (isInserting) {
+      context.missing(_emojiMeta);
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Reaction map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Reaction(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      announcementId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}announcement_id'])!,
+      userName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_name'])!,
+      emoji: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}emoji'])!,
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+    );
+  }
+
+  @override
+  $ReactionsTable createAlias(String alias) {
+    return $ReactionsTable(attachedDatabase, alias);
+  }
+}
+
+class Reaction extends DataClass implements Insertable<Reaction> {
+  final String id;
+  final String userId;
+  final String announcementId;
+  final String userName;
+  final String emoji;
+  final DateTime timestamp;
+  const Reaction(
+      {required this.id,
+      required this.userId,
+      required this.announcementId,
+      required this.userName,
+      required this.emoji,
+      required this.timestamp});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['announcement_id'] = Variable<String>(announcementId);
+    map['user_name'] = Variable<String>(userName);
+    map['emoji'] = Variable<String>(emoji);
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    return map;
+  }
+
+  ReactionsCompanion toCompanion(bool nullToAbsent) {
+    return ReactionsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      announcementId: Value(announcementId),
+      userName: Value(userName),
+      emoji: Value(emoji),
+      timestamp: Value(timestamp),
+    );
+  }
+
+  factory Reaction.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Reaction(
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      announcementId: serializer.fromJson<String>(json['announcementId']),
+      userName: serializer.fromJson<String>(json['userName']),
+      emoji: serializer.fromJson<String>(json['emoji']),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'announcementId': serializer.toJson<String>(announcementId),
+      'userName': serializer.toJson<String>(userName),
+      'emoji': serializer.toJson<String>(emoji),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+    };
+  }
+
+  Reaction copyWith(
+          {String? id,
+          String? userId,
+          String? announcementId,
+          String? userName,
+          String? emoji,
+          DateTime? timestamp}) =>
+      Reaction(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        announcementId: announcementId ?? this.announcementId,
+        userName: userName ?? this.userName,
+        emoji: emoji ?? this.emoji,
+        timestamp: timestamp ?? this.timestamp,
+      );
+  Reaction copyWithCompanion(ReactionsCompanion data) {
+    return Reaction(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      announcementId: data.announcementId.present
+          ? data.announcementId.value
+          : this.announcementId,
+      userName: data.userName.present ? data.userName.value : this.userName,
+      emoji: data.emoji.present ? data.emoji.value : this.emoji,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Reaction(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('announcementId: $announcementId, ')
+          ..write('userName: $userName, ')
+          ..write('emoji: $emoji, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, userId, announcementId, userName, emoji, timestamp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Reaction &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.announcementId == this.announcementId &&
+          other.userName == this.userName &&
+          other.emoji == this.emoji &&
+          other.timestamp == this.timestamp);
+}
+
+class ReactionsCompanion extends UpdateCompanion<Reaction> {
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<String> announcementId;
+  final Value<String> userName;
+  final Value<String> emoji;
+  final Value<DateTime> timestamp;
+  final Value<int> rowid;
+  const ReactionsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.announcementId = const Value.absent(),
+    this.userName = const Value.absent(),
+    this.emoji = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ReactionsCompanion.insert({
+    required String id,
+    required String userId,
+    required String announcementId,
+    required String userName,
+    required String emoji,
+    required DateTime timestamp,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        userId = Value(userId),
+        announcementId = Value(announcementId),
+        userName = Value(userName),
+        emoji = Value(emoji),
+        timestamp = Value(timestamp);
+  static Insertable<Reaction> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<String>? announcementId,
+    Expression<String>? userName,
+    Expression<String>? emoji,
+    Expression<DateTime>? timestamp,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (announcementId != null) 'announcement_id': announcementId,
+      if (userName != null) 'user_name': userName,
+      if (emoji != null) 'emoji': emoji,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ReactionsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? userId,
+      Value<String>? announcementId,
+      Value<String>? userName,
+      Value<String>? emoji,
+      Value<DateTime>? timestamp,
+      Value<int>? rowid}) {
+    return ReactionsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      announcementId: announcementId ?? this.announcementId,
+      userName: userName ?? this.userName,
+      emoji: emoji ?? this.emoji,
+      timestamp: timestamp ?? this.timestamp,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (announcementId.present) {
+      map['announcement_id'] = Variable<String>(announcementId.value);
+    }
+    if (userName.present) {
+      map['user_name'] = Variable<String>(userName.value);
+    }
+    if (emoji.present) {
+      map['emoji'] = Variable<String>(emoji.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReactionsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('announcementId: $announcementId, ')
+          ..write('userName: $userName, ')
+          ..write('emoji: $emoji, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -6420,6 +7512,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SyncQueueTable syncQueue = $SyncQueueTable(this);
   late final $ChatsTable chats = $ChatsTable(this);
   late final $MessagesTable messages = $MessagesTable(this);
+  late final $AnnouncementsTable announcements = $AnnouncementsTable(this);
+  late final $CommentsTable comments = $CommentsTable(this);
+  late final $ReactionsTable reactions = $ReactionsTable(this);
   late final WorkoutPlanDao workoutPlanDao =
       WorkoutPlanDao(this as AppDatabase);
   late final ClientsDao clientsDao = ClientsDao(this as AppDatabase);
@@ -6427,6 +7522,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       WorkoutHistoryDao(this as AppDatabase);
   late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
   late final ChatDao chatDao = ChatDao(this as AppDatabase);
+  late final BroadcastDao broadcastDao = BroadcastDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6444,7 +7540,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         workoutHistorySet,
         syncQueue,
         chats,
-        messages
+        messages,
+        announcements,
+        comments,
+        reactions
       ];
 }
 
@@ -11736,6 +12835,940 @@ typedef $$MessagesTableProcessedTableManager = ProcessedTableManager<
     (Message, $$MessagesTableReferences),
     Message,
     PrefetchHooks Function({bool chatId})>;
+typedef $$AnnouncementsTableCreateCompanionBuilder = AnnouncementsCompanion
+    Function({
+  required String id,
+  required String trainerId,
+  required String trainerName,
+  required String content,
+  Value<String?> mediaUrl,
+  required String postType,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$AnnouncementsTableUpdateCompanionBuilder = AnnouncementsCompanion
+    Function({
+  Value<String> id,
+  Value<String> trainerId,
+  Value<String> trainerName,
+  Value<String> content,
+  Value<String?> mediaUrl,
+  Value<String> postType,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+final class $$AnnouncementsTableReferences
+    extends BaseReferences<_$AppDatabase, $AnnouncementsTable, Announcement> {
+  $$AnnouncementsTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$CommentsTable, List<Comment>> _commentsRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.comments,
+          aliasName: $_aliasNameGenerator(
+              db.announcements.id, db.comments.announcementId));
+
+  $$CommentsTableProcessedTableManager get commentsRefs {
+    final manager = $$CommentsTableTableManager($_db, $_db.comments).filter(
+        (f) => f.announcementId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_commentsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$ReactionsTable, List<Reaction>>
+      _reactionsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.reactions,
+              aliasName: $_aliasNameGenerator(
+                  db.announcements.id, db.reactions.announcementId));
+
+  $$ReactionsTableProcessedTableManager get reactionsRefs {
+    final manager = $$ReactionsTableTableManager($_db, $_db.reactions).filter(
+        (f) => f.announcementId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_reactionsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$AnnouncementsTableFilterComposer
+    extends Composer<_$AppDatabase, $AnnouncementsTable> {
+  $$AnnouncementsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get trainerId => $composableBuilder(
+      column: $table.trainerId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get trainerName => $composableBuilder(
+      column: $table.trainerName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mediaUrl => $composableBuilder(
+      column: $table.mediaUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postType => $composableBuilder(
+      column: $table.postType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> commentsRefs(
+      Expression<bool> Function($$CommentsTableFilterComposer f) f) {
+    final $$CommentsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.comments,
+        getReferencedColumn: (t) => t.announcementId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CommentsTableFilterComposer(
+              $db: $db,
+              $table: $db.comments,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> reactionsRefs(
+      Expression<bool> Function($$ReactionsTableFilterComposer f) f) {
+    final $$ReactionsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.reactions,
+        getReferencedColumn: (t) => t.announcementId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ReactionsTableFilterComposer(
+              $db: $db,
+              $table: $db.reactions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$AnnouncementsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AnnouncementsTable> {
+  $$AnnouncementsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get trainerId => $composableBuilder(
+      column: $table.trainerId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get trainerName => $composableBuilder(
+      column: $table.trainerName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mediaUrl => $composableBuilder(
+      column: $table.mediaUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postType => $composableBuilder(
+      column: $table.postType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$AnnouncementsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AnnouncementsTable> {
+  $$AnnouncementsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get trainerId =>
+      $composableBuilder(column: $table.trainerId, builder: (column) => column);
+
+  GeneratedColumn<String> get trainerName => $composableBuilder(
+      column: $table.trainerName, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaUrl =>
+      $composableBuilder(column: $table.mediaUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get postType =>
+      $composableBuilder(column: $table.postType, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  Expression<T> commentsRefs<T extends Object>(
+      Expression<T> Function($$CommentsTableAnnotationComposer a) f) {
+    final $$CommentsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.comments,
+        getReferencedColumn: (t) => t.announcementId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CommentsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.comments,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> reactionsRefs<T extends Object>(
+      Expression<T> Function($$ReactionsTableAnnotationComposer a) f) {
+    final $$ReactionsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.reactions,
+        getReferencedColumn: (t) => t.announcementId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ReactionsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.reactions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$AnnouncementsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $AnnouncementsTable,
+    Announcement,
+    $$AnnouncementsTableFilterComposer,
+    $$AnnouncementsTableOrderingComposer,
+    $$AnnouncementsTableAnnotationComposer,
+    $$AnnouncementsTableCreateCompanionBuilder,
+    $$AnnouncementsTableUpdateCompanionBuilder,
+    (Announcement, $$AnnouncementsTableReferences),
+    Announcement,
+    PrefetchHooks Function({bool commentsRefs, bool reactionsRefs})> {
+  $$AnnouncementsTableTableManager(_$AppDatabase db, $AnnouncementsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AnnouncementsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AnnouncementsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AnnouncementsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> trainerId = const Value.absent(),
+            Value<String> trainerName = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<String?> mediaUrl = const Value.absent(),
+            Value<String> postType = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AnnouncementsCompanion(
+            id: id,
+            trainerId: trainerId,
+            trainerName: trainerName,
+            content: content,
+            mediaUrl: mediaUrl,
+            postType: postType,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String trainerId,
+            required String trainerName,
+            required String content,
+            Value<String?> mediaUrl = const Value.absent(),
+            required String postType,
+            required DateTime createdAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AnnouncementsCompanion.insert(
+            id: id,
+            trainerId: trainerId,
+            trainerName: trainerName,
+            content: content,
+            mediaUrl: mediaUrl,
+            postType: postType,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$AnnouncementsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: (
+              {commentsRefs = false, reactionsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (commentsRefs) db.comments,
+                if (reactionsRefs) db.reactions
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (commentsRefs)
+                    await $_getPrefetchedData<Announcement, $AnnouncementsTable,
+                            Comment>(
+                        currentTable: table,
+                        referencedTable: $$AnnouncementsTableReferences
+                            ._commentsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$AnnouncementsTableReferences(db, table, p0)
+                                .commentsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.announcementId == item.id),
+                        typedResults: items),
+                  if (reactionsRefs)
+                    await $_getPrefetchedData<Announcement, $AnnouncementsTable,
+                            Reaction>(
+                        currentTable: table,
+                        referencedTable: $$AnnouncementsTableReferences
+                            ._reactionsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$AnnouncementsTableReferences(db, table, p0)
+                                .reactionsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.announcementId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$AnnouncementsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $AnnouncementsTable,
+    Announcement,
+    $$AnnouncementsTableFilterComposer,
+    $$AnnouncementsTableOrderingComposer,
+    $$AnnouncementsTableAnnotationComposer,
+    $$AnnouncementsTableCreateCompanionBuilder,
+    $$AnnouncementsTableUpdateCompanionBuilder,
+    (Announcement, $$AnnouncementsTableReferences),
+    Announcement,
+    PrefetchHooks Function({bool commentsRefs, bool reactionsRefs})>;
+typedef $$CommentsTableCreateCompanionBuilder = CommentsCompanion Function({
+  required String id,
+  required String userId,
+  required String announcementId,
+  required String userName,
+  required String content,
+  required DateTime timestamp,
+  Value<int> rowid,
+});
+typedef $$CommentsTableUpdateCompanionBuilder = CommentsCompanion Function({
+  Value<String> id,
+  Value<String> userId,
+  Value<String> announcementId,
+  Value<String> userName,
+  Value<String> content,
+  Value<DateTime> timestamp,
+  Value<int> rowid,
+});
+
+final class $$CommentsTableReferences
+    extends BaseReferences<_$AppDatabase, $CommentsTable, Comment> {
+  $$CommentsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $AnnouncementsTable _announcementIdTable(_$AppDatabase db) =>
+      db.announcements.createAlias($_aliasNameGenerator(
+          db.comments.announcementId, db.announcements.id));
+
+  $$AnnouncementsTableProcessedTableManager get announcementId {
+    final $_column = $_itemColumn<String>('announcement_id')!;
+
+    final manager = $$AnnouncementsTableTableManager($_db, $_db.announcements)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_announcementIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$CommentsTableFilterComposer
+    extends Composer<_$AppDatabase, $CommentsTable> {
+  $$CommentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userName => $composableBuilder(
+      column: $table.userName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+
+  $$AnnouncementsTableFilterComposer get announcementId {
+    final $$AnnouncementsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.announcementId,
+        referencedTable: $db.announcements,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AnnouncementsTableFilterComposer(
+              $db: $db,
+              $table: $db.announcements,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$CommentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CommentsTable> {
+  $$CommentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userName => $composableBuilder(
+      column: $table.userName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+
+  $$AnnouncementsTableOrderingComposer get announcementId {
+    final $$AnnouncementsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.announcementId,
+        referencedTable: $db.announcements,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AnnouncementsTableOrderingComposer(
+              $db: $db,
+              $table: $db.announcements,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$CommentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CommentsTable> {
+  $$CommentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get userName =>
+      $composableBuilder(column: $table.userName, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  $$AnnouncementsTableAnnotationComposer get announcementId {
+    final $$AnnouncementsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.announcementId,
+        referencedTable: $db.announcements,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AnnouncementsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.announcements,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$CommentsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CommentsTable,
+    Comment,
+    $$CommentsTableFilterComposer,
+    $$CommentsTableOrderingComposer,
+    $$CommentsTableAnnotationComposer,
+    $$CommentsTableCreateCompanionBuilder,
+    $$CommentsTableUpdateCompanionBuilder,
+    (Comment, $$CommentsTableReferences),
+    Comment,
+    PrefetchHooks Function({bool announcementId})> {
+  $$CommentsTableTableManager(_$AppDatabase db, $CommentsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CommentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CommentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CommentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<String> announcementId = const Value.absent(),
+            Value<String> userName = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<DateTime> timestamp = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CommentsCompanion(
+            id: id,
+            userId: userId,
+            announcementId: announcementId,
+            userName: userName,
+            content: content,
+            timestamp: timestamp,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String userId,
+            required String announcementId,
+            required String userName,
+            required String content,
+            required DateTime timestamp,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CommentsCompanion.insert(
+            id: id,
+            userId: userId,
+            announcementId: announcementId,
+            userName: userName,
+            content: content,
+            timestamp: timestamp,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$CommentsTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({announcementId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (announcementId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.announcementId,
+                    referencedTable:
+                        $$CommentsTableReferences._announcementIdTable(db),
+                    referencedColumn:
+                        $$CommentsTableReferences._announcementIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$CommentsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CommentsTable,
+    Comment,
+    $$CommentsTableFilterComposer,
+    $$CommentsTableOrderingComposer,
+    $$CommentsTableAnnotationComposer,
+    $$CommentsTableCreateCompanionBuilder,
+    $$CommentsTableUpdateCompanionBuilder,
+    (Comment, $$CommentsTableReferences),
+    Comment,
+    PrefetchHooks Function({bool announcementId})>;
+typedef $$ReactionsTableCreateCompanionBuilder = ReactionsCompanion Function({
+  required String id,
+  required String userId,
+  required String announcementId,
+  required String userName,
+  required String emoji,
+  required DateTime timestamp,
+  Value<int> rowid,
+});
+typedef $$ReactionsTableUpdateCompanionBuilder = ReactionsCompanion Function({
+  Value<String> id,
+  Value<String> userId,
+  Value<String> announcementId,
+  Value<String> userName,
+  Value<String> emoji,
+  Value<DateTime> timestamp,
+  Value<int> rowid,
+});
+
+final class $$ReactionsTableReferences
+    extends BaseReferences<_$AppDatabase, $ReactionsTable, Reaction> {
+  $$ReactionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $AnnouncementsTable _announcementIdTable(_$AppDatabase db) =>
+      db.announcements.createAlias($_aliasNameGenerator(
+          db.reactions.announcementId, db.announcements.id));
+
+  $$AnnouncementsTableProcessedTableManager get announcementId {
+    final $_column = $_itemColumn<String>('announcement_id')!;
+
+    final manager = $$AnnouncementsTableTableManager($_db, $_db.announcements)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_announcementIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$ReactionsTableFilterComposer
+    extends Composer<_$AppDatabase, $ReactionsTable> {
+  $$ReactionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userName => $composableBuilder(
+      column: $table.userName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get emoji => $composableBuilder(
+      column: $table.emoji, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+
+  $$AnnouncementsTableFilterComposer get announcementId {
+    final $$AnnouncementsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.announcementId,
+        referencedTable: $db.announcements,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AnnouncementsTableFilterComposer(
+              $db: $db,
+              $table: $db.announcements,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ReactionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReactionsTable> {
+  $$ReactionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userName => $composableBuilder(
+      column: $table.userName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get emoji => $composableBuilder(
+      column: $table.emoji, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+
+  $$AnnouncementsTableOrderingComposer get announcementId {
+    final $$AnnouncementsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.announcementId,
+        referencedTable: $db.announcements,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AnnouncementsTableOrderingComposer(
+              $db: $db,
+              $table: $db.announcements,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ReactionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReactionsTable> {
+  $$ReactionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get userName =>
+      $composableBuilder(column: $table.userName, builder: (column) => column);
+
+  GeneratedColumn<String> get emoji =>
+      $composableBuilder(column: $table.emoji, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  $$AnnouncementsTableAnnotationComposer get announcementId {
+    final $$AnnouncementsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.announcementId,
+        referencedTable: $db.announcements,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AnnouncementsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.announcements,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ReactionsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ReactionsTable,
+    Reaction,
+    $$ReactionsTableFilterComposer,
+    $$ReactionsTableOrderingComposer,
+    $$ReactionsTableAnnotationComposer,
+    $$ReactionsTableCreateCompanionBuilder,
+    $$ReactionsTableUpdateCompanionBuilder,
+    (Reaction, $$ReactionsTableReferences),
+    Reaction,
+    PrefetchHooks Function({bool announcementId})> {
+  $$ReactionsTableTableManager(_$AppDatabase db, $ReactionsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReactionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReactionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReactionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<String> announcementId = const Value.absent(),
+            Value<String> userName = const Value.absent(),
+            Value<String> emoji = const Value.absent(),
+            Value<DateTime> timestamp = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ReactionsCompanion(
+            id: id,
+            userId: userId,
+            announcementId: announcementId,
+            userName: userName,
+            emoji: emoji,
+            timestamp: timestamp,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String userId,
+            required String announcementId,
+            required String userName,
+            required String emoji,
+            required DateTime timestamp,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ReactionsCompanion.insert(
+            id: id,
+            userId: userId,
+            announcementId: announcementId,
+            userName: userName,
+            emoji: emoji,
+            timestamp: timestamp,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$ReactionsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({announcementId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (announcementId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.announcementId,
+                    referencedTable:
+                        $$ReactionsTableReferences._announcementIdTable(db),
+                    referencedColumn:
+                        $$ReactionsTableReferences._announcementIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$ReactionsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ReactionsTable,
+    Reaction,
+    $$ReactionsTableFilterComposer,
+    $$ReactionsTableOrderingComposer,
+    $$ReactionsTableAnnotationComposer,
+    $$ReactionsTableCreateCompanionBuilder,
+    $$ReactionsTableUpdateCompanionBuilder,
+    (Reaction, $$ReactionsTableReferences),
+    Reaction,
+    PrefetchHooks Function({bool announcementId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11766,4 +13799,10 @@ class $AppDatabaseManager {
       $$ChatsTableTableManager(_db, _db.chats);
   $$MessagesTableTableManager get messages =>
       $$MessagesTableTableManager(_db, _db.messages);
+  $$AnnouncementsTableTableManager get announcements =>
+      $$AnnouncementsTableTableManager(_db, _db.announcements);
+  $$CommentsTableTableManager get comments =>
+      $$CommentsTableTableManager(_db, _db.comments);
+  $$ReactionsTableTableManager get reactions =>
+      $$ReactionsTableTableManager(_db, _db.reactions);
 }

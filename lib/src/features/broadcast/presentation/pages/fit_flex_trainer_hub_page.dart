@@ -309,7 +309,7 @@ class FeaturesPage extends StatelessWidget {
       const Feature(
         title: 'Personalized Notifications',
         description:
-            'Send targeted reminders, workout updates, and progress reports directly to your clients. Customize content and scheduling for each individual to boost engagement and results.',
+            'Send personalized reminders, workout updates, and progress reports to each client. Customize content and timing to boost engagement and results.',
         icon: Icons.notifications_active,
         isPremium: true,
         route:
@@ -318,7 +318,7 @@ class FeaturesPage extends StatelessWidget {
       const Feature(
         title: 'One-to-One Chat',
         description:
-            'Build stronger relationships with your clients through private messaging. Provide personalized guidance, answer questions, and offer real-time support whenever needed.',
+            'Strengthen client relationships with private messaging. Offer personalized guidance, answer questions, and provide real-time support.',
         icon: Icons.chat_bubble,
         isPremium: true,
         route:
@@ -327,7 +327,7 @@ class FeaturesPage extends StatelessWidget {
       const Feature(
         title: 'Announcements',
         description:
-            'Broadcast important updates, promotions, or class changes to all your clients at once. Keep everyone informed about new programs, schedule changes, or special events.',
+            'Broadcast important updates, promotions, or special events to all your clients at once. Keep everyone informed about new programs and offerings.',
         icon: Icons.campaign,
         isPremium: true,
         route:
@@ -420,7 +420,12 @@ class FeaturesPage extends StatelessWidget {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                  bottom: 100,
+                ),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {

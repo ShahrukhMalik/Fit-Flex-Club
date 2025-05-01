@@ -42,6 +42,10 @@ import '../../../features/authentication/presentation/bloc/authentication_bloc.d
     as _i70;
 import '../../../features/broadcast/data/datasources/broadcast_remote_datasource.dart'
     as _i932;
+import '../../../features/broadcast/data/datasources/local/broadcast_local_datasource.dart'
+    as _i972;
+import '../../../features/broadcast/data/datasources/local/daos/broadcast_dao.dart'
+    as _i595;
 import '../../../features/broadcast/data/repositories/broadcast_repository_impl.dart'
     as _i375;
 import '../../../features/broadcast/domain/repositories/broadcast_repository.dart'
@@ -225,6 +229,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i593.WorkoutHistoryDao(gh<_i987.AppDatabase>()));
     gh.factory<_i663.SyncQueueDao>(
         () => _i663.SyncQueueDao(gh<_i987.AppDatabase>()));
+    gh.factory<_i595.BroadcastDao>(
+        () => _i595.BroadcastDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i40.AuthRemoteDatasource>(() => _i40.AuthRemoteDatasourceImpl(
           gh<_i878.SharedPrefsUtil>(),
           gh<_i974.FirebaseFirestore>(),
@@ -242,6 +248,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i899.ClientsDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i939.WorkoutPlanDao>(
         () => _i939.WorkoutPlanDao(gh<_i987.AppDatabase>()));
+    gh.singleton<_i972.BroadcastLocalDatasource>(
+        () => _i972.BroadcastLocalDatasourceImpl(gh<_i595.BroadcastDao>()));
     gh.singleton<_i648.ClientLocalDatasource>(
         () => _i648.ClientLocalDatasourceImpl(
               dao: gh<_i899.ClientsDao>(),
@@ -326,6 +334,12 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.factory<_i29.GetexercisesCubit>(
         () => _i29.GetexercisesCubit(gh<_i139.GetExercisesUsecase>()));
+    gh.singleton<_i196.BroadcastRepository>(() => _i375.BroadcastRepositoryImpl(
+          networkInfo: gh<_i228.NetworkInfo>(),
+          syncQueue: gh<_i663.SyncQueueDao>(),
+          broadcastRemoteDatasource: gh<_i932.BroadcastRemoteDatasource>(),
+          broadcastLocalDatasource: gh<_i972.BroadcastLocalDatasource>(),
+        ));
     gh.singleton<_i661.UpdateAssignedWorkoutPlanUsecase>(() =>
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
             workoutManagementRepository:
@@ -406,10 +420,6 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i596.GetclientweightsCubit(gh<_i535.GetClientWeightsUsecase>()));
     gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
-    gh.singleton<_i196.BroadcastRepository>(() => _i375.BroadcastRepositoryImpl(
-          networkInfo: gh<_i228.NetworkInfo>(),
-          broadcastRemoteDatasource: gh<_i932.BroadcastRemoteDatasource>(),
-        ));
     gh.singleton<_i92.SendNotificationUsecase>(() =>
         _i92.SendNotificationUsecaseImpl(
             broadcastRepository: gh<_i196.BroadcastRepository>()));

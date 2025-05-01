@@ -49,13 +49,11 @@ class ChatRepositoryImpl extends ChatRepository {
 
       if (isConnected) {
         final remoteChatStream = await remoteDb.getChat();
-        // if (remoteChat != null) {
         await for (final chat in remoteChatStream) {
           if (chat != null) {
             await localDb.startChat(chat: chat);
           }
         }
-        // }
       }
 
       return Right(
