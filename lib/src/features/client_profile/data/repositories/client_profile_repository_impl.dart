@@ -7,7 +7,11 @@ import 'package:fit_flex_club/src/features/client_management/domain/entities/cli
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/local/client_profile_local_datasource.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/datasources/remote/client_profile_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/gym_model.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/trainer_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/gym_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/trainer_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/repositories/client_profile_repository.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
@@ -27,7 +31,7 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
     required this.clientProfileLocalDatasource,
   });
   @override
-  Future<Either<Failures, void>>? addNewUser({
+  Future<Either<Failures, void>> addNewUser({
     required ClientEntity clientEntity,
   }) async {
     final isNetworkConnected = await networkInfo.isConnected;
@@ -290,6 +294,80 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
         return Right(
           await clientProfileRemoteDatasource.addClientWeight(
             model,
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, List<Gym>?>>? getGyms() async {
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      if (isConnected) {
+        final gyms = await clientProfileRemoteDatasource.getGyms();
+        return Right(gyms);
+      } else {
+        return Left(
+          ServerFailure(
+            message: "You don't have active internet connection to proceed.",
+            code: "01",
+          ),
+        );
+      }
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, void>> mapClientToTrainer({
+    required Gym gym,
+    required Trainer trainer,
+    required ClientEntity client,
+  }) async {
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      if (isConnected) {
+        final gyms = await clientProfileRemoteDatasource.mapClientToTrainer(
+          client: ClientModel.fromClientEntity(client),
+          gym: GymModel.fromEntity(gym),
+          trainer: TrainerModel.fromEntity(
+            trainer,
+          ),
+        );
+        return Right(gyms);
+      } else {
+        return Left(
+          ServerFailure(
+            message: "You don't have active internet connection to proceed.",
+            code: "01",
           ),
         );
       }

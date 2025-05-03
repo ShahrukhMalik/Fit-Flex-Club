@@ -44,7 +44,14 @@ part 'fit_flex_local_db.g.dart';
     Comments,
     Reactions
   ],
-  daos: [WorkoutPlanDao, ClientsDao, WorkoutHistoryDao, SyncQueueDao, ChatDao, BroadcastDao],
+  daos: [
+    WorkoutPlanDao,
+    ClientsDao,
+    WorkoutHistoryDao,
+    SyncQueueDao,
+    ChatDao,
+    BroadcastDao
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -63,7 +70,10 @@ class AppDatabase extends _$AppDatabase {
       workoutHistoryExercise.deleteAll(),
       chats.deleteAll(),
       messages.deleteAll(),
-      syncQueue.deleteAll()
+      syncQueue.deleteAll(),
+      announcements.deleteAll(),
+      comments.deleteAll(),
+      reactions.deleteAll()
     ]);
   }
 
@@ -82,6 +92,9 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(clientWeight);
           await m.createTable(chats);
           await m.createTable(messages);
+          await m.createTable(announcements);
+          await m.createTable(comments);
+          await m.createTable(reactions);
           await m.createTable(workoutHistorySet);
           await m.createTable(syncQueue);
           await m.createTable(workoutHistoryExercise);
@@ -90,37 +103,41 @@ class AppDatabase extends _$AppDatabase {
           // Handle schema version upgrades (when schemaVersion changes)
 
           // Example for migrating from version 1 to version 2:
-          if ((from == 1 ||
-                  from == 2 ||
-                  from == 3 ||
-                  from == 4 ||
-                  from == 5 ||
-                  from == 6 ||
-                  from == 7 ||
-                  from == 8 ||
-                  from == 9 ||
-                  from == 10 ||
-                  from == 11 ||
-                  from == 12 ||
-                  from == 13 ||
-                  from == 14 ||
-                  from == 15 ||
-                  from == 16 ||
-                  from == 17 ||
-                  from == 18 ||
-                  from == 19 ||
-                  from == 20 ||
-                  from == 21 ||
-                  from == 22 ||
-                  from == 23 ||
-                  from == 24 ||
-                  from == 25 ||
-                  from == 26 ||
-                  from == 27 ||
-                  from == 28 ||
-                  from == 29 ||
-                  from == 30) &&
-              to == 31) {
+          // if ((from == 1 ||
+          //         from == 2 ||
+          //         from == 3 ||
+          //         from == 4 ||
+          //         from == 5 ||
+          //         from == 6 ||
+          //         from == 7 ||
+          //         from == 8 ||
+          //         from == 9 ||
+          //         from == 10 ||
+          //         from == 11 ||
+          //         from == 12 ||
+          //         from == 13 ||
+          //         from == 14 ||
+          //         from == 15 ||
+          //         from == 16 ||
+          //         from == 17 ||
+          //         from == 18 ||
+          //         from == 19 ||
+          //         from == 20 ||
+          //         from == 21 ||
+          //         from == 22 ||
+          //         from == 23 ||
+          //         from == 24 ||
+          //         from == 25 ||
+          //         from == 26 ||
+          //         from == 27 ||
+          //         from == 28 ||
+          //         from == 29 ||
+          //         from == 30 ||
+          //         from == 31 ||
+          //         from == 32 ||
+          //         from == 33 ||
+          //         from == 34) &&
+          //     to == 35) {
             // await m.drop(workoutPlans);
             // await m.drop(weeks);
             // await m.drop(days);
@@ -128,8 +145,11 @@ class AppDatabase extends _$AppDatabase {
             // await m.drop(exerciseSets);
             // await m.drop(baseExercise);
             // await m.drop(clients);
-            await m.drop(chats);
-            await m.drop(messages);
+            // await m.drop(chats);
+            // await m.drop(messages);
+            await m.drop(announcements);
+            await m.drop(comments);
+            await m.drop(reactions);
             // await m.drop(clientWeight);
             // await m.drop(workoutHistorySet);
             // await m.drop(syncQueue);
@@ -142,8 +162,11 @@ class AppDatabase extends _$AppDatabase {
             // await m.createTable(exerciseSets);
             // await m.createTable(baseExercise);
             // await m.createTable(clients);
-            await m.createTable(chats);
-            await m.createTable(messages);
+            // await m.createTable(chats);
+            // await m.createTable(messages);
+            await m.createTable(announcements);
+            await m.createTable(comments);
+            await m.createTable(reactions);
             // await m.createTable(clientWeight);
             // await m.createTable(workoutHistorySet);
             // await m.createTable(syncQueue);
@@ -155,7 +178,7 @@ class AppDatabase extends _$AppDatabase {
             // You can add new tables or modify the existing schema like this:
             // await m.addColumn(workoutPlans, workoutPlans.id);
             // await m.createTable(weekTable); // Assuming you added new tables or need to recreate
-          }
+          // }
         },
       );
 
@@ -189,7 +212,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 31;
+  int get schemaVersion => 37;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

@@ -848,6 +848,10 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
                 const Text('Your weight tracker for the last 4 months.'),
                 const SizedBox(height: 5),
                 PlatformSpecificDropdown(
+                  borderColor: globalColorScheme.tertiary,
+                  downArrowColor: globalColorScheme.tertiary,
+                  selectedOptionColor: globalColorScheme.tertiary,
+                  pickerTitle: "Month",
                   onTap: (value) {
                     context.pop();
                   },

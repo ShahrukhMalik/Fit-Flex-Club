@@ -8,11 +8,20 @@ abstract class ClientProfileEvent extends Equatable {
 }
 
 class AddUserClientProfileEvent extends ClientProfileEvent {
+  final Gym gym;
   final ClientEntity clientEntity;
+  final Trainer trainer;
 
-  const AddUserClientProfileEvent({required this.clientEntity});
+  const AddUserClientProfileEvent({
+    required this.clientEntity,
+    required this.gym,
+    required this.trainer,
+  });
   @override
-  List<Object> get props => [clientEntity];
+  List<Object> get props => [
+        clientEntity,
+        gym,
+      ];
 }
 
 class UpdateUserClientProfileEvent extends ClientProfileEvent {

@@ -8,8 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPrefsUtil {
   static const String _keyAuthUid = 'auth_uid';
   static const String _keyAuthEntity = 'auth_entity';
+  static const String _keyGymId = 'gym_id';
+  static const String _keyTrainerId = 'trainer_id';
   static const String _keyLastUpdateTimestamp = 'last_update_timestamp';
-  
+
   final SharedPreferences _prefs;
 
   // Constructor injection
@@ -21,8 +23,28 @@ class SharedPrefsUtil {
     return await _prefs.setString(_keyAuthUid, uid);
   }
 
+  // Auth UID methods with timestamp
+  Future<bool> setGymId(String uid) async {
+    await _updateLastTimestamp();
+    return await _prefs.setString(_keyGymId, uid);
+  }
+
+  // Auth UID methods with timestamp
+  Future<bool> setTrainerId(String uid) async {
+    await _updateLastTimestamp();
+    return await _prefs.setString(_keyTrainerId, uid);
+  }
+
   String? getAuthUid() {
     return _prefs.getString(_keyAuthUid);
+  }
+
+  String? getGymId() {
+    return _prefs.getString(_keyGymId);
+  }
+
+  String? getTrainerId() {
+    return _prefs.getString(_keyTrainerId);
   }
 
   Future<bool> removeAuthUid() async {
@@ -39,8 +61,8 @@ class SharedPrefsUtil {
   AuthEntity? getAuthEntity() {
     final jsonString = _prefs.getString(_keyAuthEntity);
     if (jsonString == null) return null;
-    if(isDataStale()) return null;
-    
+    if (isDataStale()) return null;
+
     try {
       final jsonMap = json.decode(jsonString);
       return AuthEntity.fromJson(jsonMap);
@@ -73,7 +95,7 @@ class SharedPrefsUtil {
 
     final currentTime = DateTime.now();
     final difference = currentTime.difference(lastUpdate);
-    
+
     return difference > threshold;
   }
 
@@ -90,13 +112,13 @@ class SharedPrefsUtil {
   bool isAuthenticated({bool checkFreshness = true}) {
     final authEntity = getAuthEntity();
     final authUid = getAuthUid();
-    
+
     if (authEntity == null || authUid == null) return false;
-    
+
     if (checkFreshness && isDataStale()) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -107,7 +129,7 @@ class SharedPrefsUtil {
 
     final currentTime = DateTime.now();
     final difference = currentTime.difference(lastUpdate);
-    
+
     return difference.inMinutes / 60;
   }
 }

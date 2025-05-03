@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/gym_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/trainer_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/usecases/add_user_usecase.dart'
     as addUser;
 import 'package:fit_flex_club/src/features/client_profile/domain/usecases/get_client_by_id_usecase.dart'
@@ -53,7 +55,9 @@ class ClientProfileBloc extends Bloc<ClientProfileEvent, ClientProfileState> {
     emit(ClientProfileLoading());
     final result = await addUserUsecase(
       addUser.Params(
+        gym: event.gym,
         clientEntity: event.clientEntity,
+        trainer: event.trainer
       ),
     );
     if (result == null) {

@@ -6416,26 +6416,49 @@ class $AnnouncementsTable extends Announcements
       const VerificationMeta('trainerId');
   @override
   late final GeneratedColumn<String> trainerId = GeneratedColumn<String>(
-      'trainer_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'trainer_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _gymIdMeta = const VerificationMeta('gymId');
+  @override
+  late final GeneratedColumn<String> gymId = GeneratedColumn<String>(
+      'gym_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _trainerNameMeta =
       const VerificationMeta('trainerName');
   @override
   late final GeneratedColumn<String> trainerName = GeneratedColumn<String>(
-      'trainer_name', aliasedName, false,
+      'trainer_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _postedForMeta =
+      const VerificationMeta('postedFor');
+  @override
+  late final GeneratedColumn<String> postedFor = GeneratedColumn<String>(
+      'posted_for', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _gymNameMeta =
+      const VerificationMeta('gymName');
+  @override
+  late final GeneratedColumn<String> gymName = GeneratedColumn<String>(
+      'gym_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _contentMeta =
       const VerificationMeta('content');
   @override
   late final GeneratedColumn<String> content = GeneratedColumn<String>(
-      'content', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'content', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _mediaUrlMeta =
       const VerificationMeta('mediaUrl');
   @override
   late final GeneratedColumn<String> mediaUrl = GeneratedColumn<String>(
       'media_url', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mediaBytesMeta =
+      const VerificationMeta('mediaBytes');
+  @override
+  late final GeneratedColumn<Uint8List> mediaBytes = GeneratedColumn<Uint8List>(
+      'media_bytes', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
   static const VerificationMeta _postTypeMeta =
       const VerificationMeta('postType');
   @override
@@ -6445,12 +6468,23 @@ class $AnnouncementsTable extends Announcements
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, trainerId, trainerName, content, mediaUrl, postType, createdAt];
+  List<GeneratedColumn> get $columns => [
+        id,
+        trainerId,
+        gymId,
+        trainerName,
+        postedFor,
+        gymName,
+        content,
+        mediaUrl,
+        mediaBytes,
+        postType,
+        createdAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -6469,26 +6503,40 @@ class $AnnouncementsTable extends Announcements
     if (data.containsKey('trainer_id')) {
       context.handle(_trainerIdMeta,
           trainerId.isAcceptableOrUnknown(data['trainer_id']!, _trainerIdMeta));
-    } else if (isInserting) {
-      context.missing(_trainerIdMeta);
+    }
+    if (data.containsKey('gym_id')) {
+      context.handle(
+          _gymIdMeta, gymId.isAcceptableOrUnknown(data['gym_id']!, _gymIdMeta));
     }
     if (data.containsKey('trainer_name')) {
       context.handle(
           _trainerNameMeta,
           trainerName.isAcceptableOrUnknown(
               data['trainer_name']!, _trainerNameMeta));
+    }
+    if (data.containsKey('posted_for')) {
+      context.handle(_postedForMeta,
+          postedFor.isAcceptableOrUnknown(data['posted_for']!, _postedForMeta));
     } else if (isInserting) {
-      context.missing(_trainerNameMeta);
+      context.missing(_postedForMeta);
+    }
+    if (data.containsKey('gym_name')) {
+      context.handle(_gymNameMeta,
+          gymName.isAcceptableOrUnknown(data['gym_name']!, _gymNameMeta));
     }
     if (data.containsKey('content')) {
       context.handle(_contentMeta,
           content.isAcceptableOrUnknown(data['content']!, _contentMeta));
-    } else if (isInserting) {
-      context.missing(_contentMeta);
     }
     if (data.containsKey('media_url')) {
       context.handle(_mediaUrlMeta,
           mediaUrl.isAcceptableOrUnknown(data['media_url']!, _mediaUrlMeta));
+    }
+    if (data.containsKey('media_bytes')) {
+      context.handle(
+          _mediaBytesMeta,
+          mediaBytes.isAcceptableOrUnknown(
+              data['media_bytes']!, _mediaBytesMeta));
     }
     if (data.containsKey('post_type')) {
       context.handle(_postTypeMeta,
@@ -6514,17 +6562,25 @@ class $AnnouncementsTable extends Announcements
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       trainerId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}trainer_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}trainer_id']),
+      gymId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gym_id']),
       trainerName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}trainer_name'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}trainer_name']),
+      postedFor: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}posted_for'])!,
+      gymName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gym_name']),
       content: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}content']),
       mediaUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}media_url']),
+      mediaBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}media_bytes']),
       postType: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}post_type'])!,
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
     );
   }
 
@@ -6536,44 +6592,83 @@ class $AnnouncementsTable extends Announcements
 
 class Announcement extends DataClass implements Insertable<Announcement> {
   final String id;
-  final String trainerId;
-  final String trainerName;
-  final String content;
+  final String? trainerId;
+  final String? gymId;
+  final String? trainerName;
+  final String postedFor;
+  final String? gymName;
+  final String? content;
   final String? mediaUrl;
+  final Uint8List? mediaBytes;
   final String postType;
-  final DateTime createdAt;
+  final int createdAt;
   const Announcement(
       {required this.id,
-      required this.trainerId,
-      required this.trainerName,
-      required this.content,
+      this.trainerId,
+      this.gymId,
+      this.trainerName,
+      required this.postedFor,
+      this.gymName,
+      this.content,
       this.mediaUrl,
+      this.mediaBytes,
       required this.postType,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['trainer_id'] = Variable<String>(trainerId);
-    map['trainer_name'] = Variable<String>(trainerName);
-    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || trainerId != null) {
+      map['trainer_id'] = Variable<String>(trainerId);
+    }
+    if (!nullToAbsent || gymId != null) {
+      map['gym_id'] = Variable<String>(gymId);
+    }
+    if (!nullToAbsent || trainerName != null) {
+      map['trainer_name'] = Variable<String>(trainerName);
+    }
+    map['posted_for'] = Variable<String>(postedFor);
+    if (!nullToAbsent || gymName != null) {
+      map['gym_name'] = Variable<String>(gymName);
+    }
+    if (!nullToAbsent || content != null) {
+      map['content'] = Variable<String>(content);
+    }
     if (!nullToAbsent || mediaUrl != null) {
       map['media_url'] = Variable<String>(mediaUrl);
     }
+    if (!nullToAbsent || mediaBytes != null) {
+      map['media_bytes'] = Variable<Uint8List>(mediaBytes);
+    }
     map['post_type'] = Variable<String>(postType);
-    map['created_at'] = Variable<DateTime>(createdAt);
+    map['created_at'] = Variable<int>(createdAt);
     return map;
   }
 
   AnnouncementsCompanion toCompanion(bool nullToAbsent) {
     return AnnouncementsCompanion(
       id: Value(id),
-      trainerId: Value(trainerId),
-      trainerName: Value(trainerName),
-      content: Value(content),
+      trainerId: trainerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(trainerId),
+      gymId:
+          gymId == null && nullToAbsent ? const Value.absent() : Value(gymId),
+      trainerName: trainerName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(trainerName),
+      postedFor: Value(postedFor),
+      gymName: gymName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gymName),
+      content: content == null && nullToAbsent
+          ? const Value.absent()
+          : Value(content),
       mediaUrl: mediaUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(mediaUrl),
+      mediaBytes: mediaBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mediaBytes),
       postType: Value(postType),
       createdAt: Value(createdAt),
     );
@@ -6584,12 +6679,16 @@ class Announcement extends DataClass implements Insertable<Announcement> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Announcement(
       id: serializer.fromJson<String>(json['id']),
-      trainerId: serializer.fromJson<String>(json['trainerId']),
-      trainerName: serializer.fromJson<String>(json['trainerName']),
-      content: serializer.fromJson<String>(json['content']),
+      trainerId: serializer.fromJson<String?>(json['trainerId']),
+      gymId: serializer.fromJson<String?>(json['gymId']),
+      trainerName: serializer.fromJson<String?>(json['trainerName']),
+      postedFor: serializer.fromJson<String>(json['postedFor']),
+      gymName: serializer.fromJson<String?>(json['gymName']),
+      content: serializer.fromJson<String?>(json['content']),
       mediaUrl: serializer.fromJson<String?>(json['mediaUrl']),
+      mediaBytes: serializer.fromJson<Uint8List?>(json['mediaBytes']),
       postType: serializer.fromJson<String>(json['postType']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
     );
   }
   @override
@@ -6597,29 +6696,41 @@ class Announcement extends DataClass implements Insertable<Announcement> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'trainerId': serializer.toJson<String>(trainerId),
-      'trainerName': serializer.toJson<String>(trainerName),
-      'content': serializer.toJson<String>(content),
+      'trainerId': serializer.toJson<String?>(trainerId),
+      'gymId': serializer.toJson<String?>(gymId),
+      'trainerName': serializer.toJson<String?>(trainerName),
+      'postedFor': serializer.toJson<String>(postedFor),
+      'gymName': serializer.toJson<String?>(gymName),
+      'content': serializer.toJson<String?>(content),
       'mediaUrl': serializer.toJson<String?>(mediaUrl),
+      'mediaBytes': serializer.toJson<Uint8List?>(mediaBytes),
       'postType': serializer.toJson<String>(postType),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'createdAt': serializer.toJson<int>(createdAt),
     };
   }
 
   Announcement copyWith(
           {String? id,
-          String? trainerId,
-          String? trainerName,
-          String? content,
+          Value<String?> trainerId = const Value.absent(),
+          Value<String?> gymId = const Value.absent(),
+          Value<String?> trainerName = const Value.absent(),
+          String? postedFor,
+          Value<String?> gymName = const Value.absent(),
+          Value<String?> content = const Value.absent(),
           Value<String?> mediaUrl = const Value.absent(),
+          Value<Uint8List?> mediaBytes = const Value.absent(),
           String? postType,
-          DateTime? createdAt}) =>
+          int? createdAt}) =>
       Announcement(
         id: id ?? this.id,
-        trainerId: trainerId ?? this.trainerId,
-        trainerName: trainerName ?? this.trainerName,
-        content: content ?? this.content,
+        trainerId: trainerId.present ? trainerId.value : this.trainerId,
+        gymId: gymId.present ? gymId.value : this.gymId,
+        trainerName: trainerName.present ? trainerName.value : this.trainerName,
+        postedFor: postedFor ?? this.postedFor,
+        gymName: gymName.present ? gymName.value : this.gymName,
+        content: content.present ? content.value : this.content,
         mediaUrl: mediaUrl.present ? mediaUrl.value : this.mediaUrl,
+        mediaBytes: mediaBytes.present ? mediaBytes.value : this.mediaBytes,
         postType: postType ?? this.postType,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -6627,10 +6738,15 @@ class Announcement extends DataClass implements Insertable<Announcement> {
     return Announcement(
       id: data.id.present ? data.id.value : this.id,
       trainerId: data.trainerId.present ? data.trainerId.value : this.trainerId,
+      gymId: data.gymId.present ? data.gymId.value : this.gymId,
       trainerName:
           data.trainerName.present ? data.trainerName.value : this.trainerName,
+      postedFor: data.postedFor.present ? data.postedFor.value : this.postedFor,
+      gymName: data.gymName.present ? data.gymName.value : this.gymName,
       content: data.content.present ? data.content.value : this.content,
       mediaUrl: data.mediaUrl.present ? data.mediaUrl.value : this.mediaUrl,
+      mediaBytes:
+          data.mediaBytes.present ? data.mediaBytes.value : this.mediaBytes,
       postType: data.postType.present ? data.postType.value : this.postType,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
@@ -6641,9 +6757,13 @@ class Announcement extends DataClass implements Insertable<Announcement> {
     return (StringBuffer('Announcement(')
           ..write('id: $id, ')
           ..write('trainerId: $trainerId, ')
+          ..write('gymId: $gymId, ')
           ..write('trainerName: $trainerName, ')
+          ..write('postedFor: $postedFor, ')
+          ..write('gymName: $gymName, ')
           ..write('content: $content, ')
           ..write('mediaUrl: $mediaUrl, ')
+          ..write('mediaBytes: $mediaBytes, ')
           ..write('postType: $postType, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -6652,70 +6772,102 @@ class Announcement extends DataClass implements Insertable<Announcement> {
 
   @override
   int get hashCode => Object.hash(
-      id, trainerId, trainerName, content, mediaUrl, postType, createdAt);
+      id,
+      trainerId,
+      gymId,
+      trainerName,
+      postedFor,
+      gymName,
+      content,
+      mediaUrl,
+      $driftBlobEquality.hash(mediaBytes),
+      postType,
+      createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Announcement &&
           other.id == this.id &&
           other.trainerId == this.trainerId &&
+          other.gymId == this.gymId &&
           other.trainerName == this.trainerName &&
+          other.postedFor == this.postedFor &&
+          other.gymName == this.gymName &&
           other.content == this.content &&
           other.mediaUrl == this.mediaUrl &&
+          $driftBlobEquality.equals(other.mediaBytes, this.mediaBytes) &&
           other.postType == this.postType &&
           other.createdAt == this.createdAt);
 }
 
 class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
   final Value<String> id;
-  final Value<String> trainerId;
-  final Value<String> trainerName;
-  final Value<String> content;
+  final Value<String?> trainerId;
+  final Value<String?> gymId;
+  final Value<String?> trainerName;
+  final Value<String> postedFor;
+  final Value<String?> gymName;
+  final Value<String?> content;
   final Value<String?> mediaUrl;
+  final Value<Uint8List?> mediaBytes;
   final Value<String> postType;
-  final Value<DateTime> createdAt;
+  final Value<int> createdAt;
   final Value<int> rowid;
   const AnnouncementsCompanion({
     this.id = const Value.absent(),
     this.trainerId = const Value.absent(),
+    this.gymId = const Value.absent(),
     this.trainerName = const Value.absent(),
+    this.postedFor = const Value.absent(),
+    this.gymName = const Value.absent(),
     this.content = const Value.absent(),
     this.mediaUrl = const Value.absent(),
+    this.mediaBytes = const Value.absent(),
     this.postType = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AnnouncementsCompanion.insert({
     required String id,
-    required String trainerId,
-    required String trainerName,
-    required String content,
+    this.trainerId = const Value.absent(),
+    this.gymId = const Value.absent(),
+    this.trainerName = const Value.absent(),
+    required String postedFor,
+    this.gymName = const Value.absent(),
+    this.content = const Value.absent(),
     this.mediaUrl = const Value.absent(),
+    this.mediaBytes = const Value.absent(),
     required String postType,
-    required DateTime createdAt,
+    required int createdAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
-        trainerId = Value(trainerId),
-        trainerName = Value(trainerName),
-        content = Value(content),
+        postedFor = Value(postedFor),
         postType = Value(postType),
         createdAt = Value(createdAt);
   static Insertable<Announcement> custom({
     Expression<String>? id,
     Expression<String>? trainerId,
+    Expression<String>? gymId,
     Expression<String>? trainerName,
+    Expression<String>? postedFor,
+    Expression<String>? gymName,
     Expression<String>? content,
     Expression<String>? mediaUrl,
+    Expression<Uint8List>? mediaBytes,
     Expression<String>? postType,
-    Expression<DateTime>? createdAt,
+    Expression<int>? createdAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (trainerId != null) 'trainer_id': trainerId,
+      if (gymId != null) 'gym_id': gymId,
       if (trainerName != null) 'trainer_name': trainerName,
+      if (postedFor != null) 'posted_for': postedFor,
+      if (gymName != null) 'gym_name': gymName,
       if (content != null) 'content': content,
       if (mediaUrl != null) 'media_url': mediaUrl,
+      if (mediaBytes != null) 'media_bytes': mediaBytes,
       if (postType != null) 'post_type': postType,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
@@ -6724,19 +6876,27 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
 
   AnnouncementsCompanion copyWith(
       {Value<String>? id,
-      Value<String>? trainerId,
-      Value<String>? trainerName,
-      Value<String>? content,
+      Value<String?>? trainerId,
+      Value<String?>? gymId,
+      Value<String?>? trainerName,
+      Value<String>? postedFor,
+      Value<String?>? gymName,
+      Value<String?>? content,
       Value<String?>? mediaUrl,
+      Value<Uint8List?>? mediaBytes,
       Value<String>? postType,
-      Value<DateTime>? createdAt,
+      Value<int>? createdAt,
       Value<int>? rowid}) {
     return AnnouncementsCompanion(
       id: id ?? this.id,
       trainerId: trainerId ?? this.trainerId,
+      gymId: gymId ?? this.gymId,
       trainerName: trainerName ?? this.trainerName,
+      postedFor: postedFor ?? this.postedFor,
+      gymName: gymName ?? this.gymName,
       content: content ?? this.content,
       mediaUrl: mediaUrl ?? this.mediaUrl,
+      mediaBytes: mediaBytes ?? this.mediaBytes,
       postType: postType ?? this.postType,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
@@ -6752,8 +6912,17 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     if (trainerId.present) {
       map['trainer_id'] = Variable<String>(trainerId.value);
     }
+    if (gymId.present) {
+      map['gym_id'] = Variable<String>(gymId.value);
+    }
     if (trainerName.present) {
       map['trainer_name'] = Variable<String>(trainerName.value);
+    }
+    if (postedFor.present) {
+      map['posted_for'] = Variable<String>(postedFor.value);
+    }
+    if (gymName.present) {
+      map['gym_name'] = Variable<String>(gymName.value);
     }
     if (content.present) {
       map['content'] = Variable<String>(content.value);
@@ -6761,11 +6930,14 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     if (mediaUrl.present) {
       map['media_url'] = Variable<String>(mediaUrl.value);
     }
+    if (mediaBytes.present) {
+      map['media_bytes'] = Variable<Uint8List>(mediaBytes.value);
+    }
     if (postType.present) {
       map['post_type'] = Variable<String>(postType.value);
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<int>(createdAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -6778,9 +6950,13 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     return (StringBuffer('AnnouncementsCompanion(')
           ..write('id: $id, ')
           ..write('trainerId: $trainerId, ')
+          ..write('gymId: $gymId, ')
           ..write('trainerName: $trainerName, ')
+          ..write('postedFor: $postedFor, ')
+          ..write('gymName: $gymName, ')
           ..write('content: $content, ')
           ..write('mediaUrl: $mediaUrl, ')
+          ..write('mediaBytes: $mediaBytes, ')
           ..write('postType: $postType, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
@@ -12838,23 +13014,31 @@ typedef $$MessagesTableProcessedTableManager = ProcessedTableManager<
 typedef $$AnnouncementsTableCreateCompanionBuilder = AnnouncementsCompanion
     Function({
   required String id,
-  required String trainerId,
-  required String trainerName,
-  required String content,
+  Value<String?> trainerId,
+  Value<String?> gymId,
+  Value<String?> trainerName,
+  required String postedFor,
+  Value<String?> gymName,
+  Value<String?> content,
   Value<String?> mediaUrl,
+  Value<Uint8List?> mediaBytes,
   required String postType,
-  required DateTime createdAt,
+  required int createdAt,
   Value<int> rowid,
 });
 typedef $$AnnouncementsTableUpdateCompanionBuilder = AnnouncementsCompanion
     Function({
   Value<String> id,
-  Value<String> trainerId,
-  Value<String> trainerName,
-  Value<String> content,
+  Value<String?> trainerId,
+  Value<String?> gymId,
+  Value<String?> trainerName,
+  Value<String> postedFor,
+  Value<String?> gymName,
+  Value<String?> content,
   Value<String?> mediaUrl,
+  Value<Uint8List?> mediaBytes,
   Value<String> postType,
-  Value<DateTime> createdAt,
+  Value<int> createdAt,
   Value<int> rowid,
 });
 
@@ -12909,8 +13093,17 @@ class $$AnnouncementsTableFilterComposer
   ColumnFilters<String> get trainerId => $composableBuilder(
       column: $table.trainerId, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get gymId => $composableBuilder(
+      column: $table.gymId, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get trainerName => $composableBuilder(
       column: $table.trainerName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get postedFor => $composableBuilder(
+      column: $table.postedFor, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get gymName => $composableBuilder(
+      column: $table.gymName, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get content => $composableBuilder(
       column: $table.content, builder: (column) => ColumnFilters(column));
@@ -12918,10 +13111,13 @@ class $$AnnouncementsTableFilterComposer
   ColumnFilters<String> get mediaUrl => $composableBuilder(
       column: $table.mediaUrl, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<Uint8List> get mediaBytes => $composableBuilder(
+      column: $table.mediaBytes, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get postType => $composableBuilder(
       column: $table.postType, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
   Expression<bool> commentsRefs(
@@ -12982,8 +13178,17 @@ class $$AnnouncementsTableOrderingComposer
   ColumnOrderings<String> get trainerId => $composableBuilder(
       column: $table.trainerId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get gymId => $composableBuilder(
+      column: $table.gymId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get trainerName => $composableBuilder(
       column: $table.trainerName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get postedFor => $composableBuilder(
+      column: $table.postedFor, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get gymName => $composableBuilder(
+      column: $table.gymName, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get content => $composableBuilder(
       column: $table.content, builder: (column) => ColumnOrderings(column));
@@ -12991,10 +13196,13 @@ class $$AnnouncementsTableOrderingComposer
   ColumnOrderings<String> get mediaUrl => $composableBuilder(
       column: $table.mediaUrl, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<Uint8List> get mediaBytes => $composableBuilder(
+      column: $table.mediaBytes, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get postType => $composableBuilder(
       column: $table.postType, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
@@ -13013,8 +13221,17 @@ class $$AnnouncementsTableAnnotationComposer
   GeneratedColumn<String> get trainerId =>
       $composableBuilder(column: $table.trainerId, builder: (column) => column);
 
+  GeneratedColumn<String> get gymId =>
+      $composableBuilder(column: $table.gymId, builder: (column) => column);
+
   GeneratedColumn<String> get trainerName => $composableBuilder(
       column: $table.trainerName, builder: (column) => column);
+
+  GeneratedColumn<String> get postedFor =>
+      $composableBuilder(column: $table.postedFor, builder: (column) => column);
+
+  GeneratedColumn<String> get gymName =>
+      $composableBuilder(column: $table.gymName, builder: (column) => column);
 
   GeneratedColumn<String> get content =>
       $composableBuilder(column: $table.content, builder: (column) => column);
@@ -13022,10 +13239,13 @@ class $$AnnouncementsTableAnnotationComposer
   GeneratedColumn<String> get mediaUrl =>
       $composableBuilder(column: $table.mediaUrl, builder: (column) => column);
 
+  GeneratedColumn<Uint8List> get mediaBytes => $composableBuilder(
+      column: $table.mediaBytes, builder: (column) => column);
+
   GeneratedColumn<String> get postType =>
       $composableBuilder(column: $table.postType, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
   Expression<T> commentsRefs<T extends Object>(
@@ -13095,40 +13315,56 @@ class $$AnnouncementsTableTableManager extends RootTableManager<
               $$AnnouncementsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String> trainerId = const Value.absent(),
-            Value<String> trainerName = const Value.absent(),
-            Value<String> content = const Value.absent(),
+            Value<String?> trainerId = const Value.absent(),
+            Value<String?> gymId = const Value.absent(),
+            Value<String?> trainerName = const Value.absent(),
+            Value<String> postedFor = const Value.absent(),
+            Value<String?> gymName = const Value.absent(),
+            Value<String?> content = const Value.absent(),
             Value<String?> mediaUrl = const Value.absent(),
+            Value<Uint8List?> mediaBytes = const Value.absent(),
             Value<String> postType = const Value.absent(),
-            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> createdAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AnnouncementsCompanion(
             id: id,
             trainerId: trainerId,
+            gymId: gymId,
             trainerName: trainerName,
+            postedFor: postedFor,
+            gymName: gymName,
             content: content,
             mediaUrl: mediaUrl,
+            mediaBytes: mediaBytes,
             postType: postType,
             createdAt: createdAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required String id,
-            required String trainerId,
-            required String trainerName,
-            required String content,
+            Value<String?> trainerId = const Value.absent(),
+            Value<String?> gymId = const Value.absent(),
+            Value<String?> trainerName = const Value.absent(),
+            required String postedFor,
+            Value<String?> gymName = const Value.absent(),
+            Value<String?> content = const Value.absent(),
             Value<String?> mediaUrl = const Value.absent(),
+            Value<Uint8List?> mediaBytes = const Value.absent(),
             required String postType,
-            required DateTime createdAt,
+            required int createdAt,
             Value<int> rowid = const Value.absent(),
           }) =>
               AnnouncementsCompanion.insert(
             id: id,
             trainerId: trainerId,
+            gymId: gymId,
             trainerName: trainerName,
+            postedFor: postedFor,
+            gymName: gymName,
             content: content,
             mediaUrl: mediaUrl,
+            mediaBytes: mediaBytes,
             postType: postType,
             createdAt: createdAt,
             rowid: rowid,

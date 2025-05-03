@@ -2,6 +2,9 @@ import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/gym_model.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/trainer_model.dart';
+import 'package:fit_flex_club/src/features/client_profile/domain/entities/gym_entity.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
 import 'package:injectable/injectable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +12,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 
 abstract class ClientProfileRemoteDatasource {
+  ///
+  Future<List<GymModel>> getGyms();
+
+  ///
+  Future<void> mapClientToTrainer({
+    required GymModel gym,
+    required TrainerModel trainer,
+    required ClientModel client,
+  });
+
   ///Add new user
   Future<void>? addNewUser({
     required ClientModel clientModel,
@@ -58,7 +71,9 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
         .collection('weightTracker');
 
     try {
-      await ref.doc(auth.currentUser?.uid).set(clientModel.toFirestore());
+      await ref.doc(auth.currentUser?.uid).update(
+            clientModel.toFirestore(),
+          );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -168,11 +183,38 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
   @override
   Future<List<ClientModel>?> getClients() async {
     try {
+      final authId = auth.currentUser?.uid;
+      if (authId == null) {
+        throw ServerException(
+          errorMessage: "Auth ID not found",
+        );
+      }
+
       final CollectionReference usersRef = db.collection('Users');
+      final mappingDoc =
+          await db.collection('trainer_clients').doc(authId).get();
+
+      if (!mappingDoc.exists) {
+        return [];
+      }
+
+      final data = mappingDoc.data();
+
+      if (data == null) {
+        return [];
+      }
+
+      final clientIds = (data['clients'] as List?)?.map(
+        (obj) => obj['id'],
+      );
 
       // Query to get clients who are not trainers
-      final QuerySnapshot querySnapshot =
-          await usersRef.where('isTrainer', isEqualTo: false).get();
+      final QuerySnapshot querySnapshot = await usersRef
+          .where(
+            FieldPath.documentId,
+            whereIn: clientIds,
+          )
+          .get();
 
       // Map the QuerySnapshot documents to a List<ClientModel>
       final List<ClientModel> clients =
@@ -294,6 +336,93 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
           db.collection('Users').doc(clientId).collection('weightTracker');
 
       await weightTrakerRef.add(clientWeightModel.toMap());
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<List<GymModel>> getGyms() async {
+    try {
+      final gymsCollection = FirebaseFirestore.instance.collection('gyms');
+
+      final gymsSnapshot = await gymsCollection.get();
+
+      List<GymModel> gyms = [];
+
+      for (var gymDoc in gymsSnapshot.docs) {
+        final gymData = gymDoc.data();
+        final trainersSnapshot =
+            await gymDoc.reference.collection('trainers').get();
+
+        final trainers = trainersSnapshot.docs.map((trainerDoc) {
+          return TrainerModel.fromJson(trainerDoc.data()).toEntity();
+        }).toList();
+
+        gyms.add(
+          GymModel(
+            gymId: gymDoc.id,
+            gymName: gymData['name'] ?? '',
+            trainers: trainers,
+          ),
+        );
+      }
+
+      return gyms;
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<void> mapClientToTrainer({
+    required GymModel gym,
+    required TrainerModel trainer,
+    required ClientModel client, // One client only
+  }) async {
+    try {
+      final authId = auth.currentUser?.uid;
+      if (authId == null) {
+        throw ServerException(
+          errorMessage: "Auth ID not found",
+        );
+      }
+
+      final userRef = db.collection('Users').doc(authId);
+      final trainerClientRef =
+          db.collection('trainer_clients').doc(trainer.trainerId);
+      await userRef.set(
+        {
+          'trainerId': trainer.trainerId,
+          'gymId': gym.gymId,
+        },
+        SetOptions(
+          merge: true,
+        ),
+      );
+      await trainerClientRef.set({
+        'trainerId': trainer.trainerId,
+        'trainerName': trainer.trainerName,
+        'trainerEmail': trainer.email,
+        'gymId': gym.gymId,
+        'gymName': gym.gymName,
+        'clients': FieldValue.arrayUnion([
+          client
+              .copyWith(
+                id: authId,
+              )
+              .toFirestore()
+        ]),
+        'timestamp': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      print("✅ Client successfully mapped to trainer ${trainer.trainerName}");
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

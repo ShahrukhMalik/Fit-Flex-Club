@@ -6,6 +6,7 @@ import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/datasources/broadcast_remote_datasource.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/datasources/local/broadcast_local_datasource.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/announcement_model.dart';
@@ -16,8 +17,10 @@ import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_ent
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/notification_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/repositories/broadcast_repository.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uuid_v4/uuid_v4.dart';
 
 enum AnnouncementsEvents {
   createEvent,
@@ -142,7 +145,15 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
         );
       }
 
-      final model = AnnouncementModel.fromEntity(announcement);
+      final gymId = getIt<SharedPrefsUtil>().getGymId();
+
+      final announcementId =
+          'announcement_${gymId ?? authId}_${UUIDv4().toString()}';
+      final model = AnnouncementModel.fromEntity(announcement).copyWithModel(
+        id: announcementId,
+        gymId: announcement.postedFor == PostedFor.Gym ? gymId : null,
+        trainerId: announcement.postedFor == PostedFor.Trainer ? authId : null,
+      );
 
       await broadcastLocalDatasource.createAnnouncement(
         model,
@@ -503,11 +514,11 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
   ) async {
     try {
       final isConnected = await networkInfo.isConnected ?? false;
-      final localCommentsStream =
-          await broadcastLocalDatasource.watchCommentsByAnnouncementId(announcementId);
+      final localCommentsStream = await broadcastLocalDatasource
+          .watchCommentsByAnnouncementId(announcementId);
       if (isConnected) {
-        final remoteCommentsStream =
-            await broadcastRemoteDatasource.watchCommentsByAnnouncementId(announcementId);
+        final remoteCommentsStream = await broadcastRemoteDatasource
+            .watchCommentsByAnnouncementId(announcementId);
 
         // Listen without awaiting the full stream
         remoteCommentsStream.listen(
@@ -546,11 +557,11 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
   ) async {
     try {
       final isConnected = await networkInfo.isConnected ?? false;
-      final localReactionsStream =
-          await broadcastLocalDatasource.watchReactionsByAnnouncementId(announcementId);
+      final localReactionsStream = await broadcastLocalDatasource
+          .watchReactionsByAnnouncementId(announcementId);
       if (isConnected) {
-        final remoteReactionsStream =
-            await broadcastRemoteDatasource.watchReactionsByAnnouncementId(announcementId);
+        final remoteReactionsStream = await broadcastRemoteDatasource
+            .watchReactionsByAnnouncementId(announcementId);
 
         // Listen without awaiting the full stream
         remoteReactionsStream.listen(

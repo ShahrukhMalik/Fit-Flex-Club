@@ -7,6 +7,7 @@ import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit
 import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit_flex_auth_sign_up_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
@@ -380,7 +381,16 @@ GoRouter goRouter(appState) {
                         child: FitFlexAnnouncementsPage(),
                       );
                     },
-                    routes: [],
+                    routes: [
+                      GoRoute(
+                        routes: [],
+                        path: FitFlexPostAnnouncmentsPage.route,
+                        pageBuilder: (context, state) => TransitionPage(
+                          key: state.pageKey,
+                          child: FitFlexPostAnnouncmentsPage(),
+                        ),
+                      )
+                    ],
                   ),
                   GoRoute(
                     path: FitFlexOneToOneChatPage.route,
@@ -536,6 +546,16 @@ GoRouter goRouter(appState) {
                 GlobalKey<NavigatorState>(debugLabel: 'clientAnnounceMents'),
             routes: [
               GoRoute(
+                routes: [
+                  GoRoute(
+                    routes: [],
+                    path: FitFlexPostAnnouncmentsPage.route,
+                    pageBuilder: (context, state) => TransitionPage(
+                      key: state.pageKey,
+                      child: FitFlexPostAnnouncmentsPage(),
+                    ),
+                  )
+                ],
                 path: FitFlexAnnouncementsPage.route,
                 pageBuilder: (context, state) => TransitionPage(
                   key: state.pageKey,

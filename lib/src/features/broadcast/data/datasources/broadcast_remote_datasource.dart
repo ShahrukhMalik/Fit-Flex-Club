@@ -1,6 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
+import 'package:mime/mime.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/announcement_model.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/comment_model.dart';
@@ -9,6 +13,7 @@ import 'package:fit_flex_club/src/features/broadcast/data/models/reaction_model.
 
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/notification_entity.dart';
 import 'package:injectable/injectable.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../domain/entities/announcement_entity.dart';
 
@@ -146,11 +151,47 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
   @override
   Future<void> createAnnouncement(AnnouncementModel announcement) async {
     try {
+      final authId = auth.currentUser?.uid;
+
+      if (authId == null) {
+        throw ServerException(errorMessage: "No Auth ID found");
+      }
       final CollectionReference announcementsRef =
           remoteDb.collection('announcements');
-      await announcementsRef.add(
-        announcement.toJson(),
-      );
+
+      String? mediaUrl;
+
+      if (announcement.mediaBytes != null) {
+        // Determine owner ID (gym or trainer)
+        final ownerId = announcement.gymId ?? authId;
+
+        // Determine file extension (e.g. jpg, mp4)
+        // final mimeType = lookupMimeType(
+        //   '',
+        //   headerBytes: announcement.mediaBytes,
+        // );
+        final fileExtension =
+            announcement.postType == PostType.image ? 'jpg' : 'mp4';
+
+        // Construct path in Firebase Storage
+        final filePath =
+            'announcements/$ownerId/${announcement.id}_$ownerId.$fileExtension';
+
+        // Upload to Firebase Storage
+        final storageRef = FirebaseStorage.instance.ref().child(filePath);
+        final uploadTask = await storageRef.putData(announcement.mediaBytes!);
+        mediaUrl = await uploadTask.ref.getDownloadURL();
+
+        // // Attach generated fields to announcement model
+        // announcement = announcement.copyWithModel(
+        //   mediaUrl: mediaUrl,
+        // );
+      }
+
+      // Save to Firestore
+      await announcementsRef
+          .doc(announcement.id)
+          .set(announcement.toJson(mediaUrl));
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -241,28 +282,63 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
       final CollectionReference announcementsRef =
           remoteDb.collection('announcements');
       final authId = auth.currentUser?.uid;
+      final gymId = getIt<SharedPrefsUtil>().getGymId();
 
       if (authId == null) {
         throw ServerException(errorMessage: "No Auth ID found");
       }
+      final trainerQuery =
+          announcementsRef.where('trainerId', isEqualTo: authId).snapshots();
 
-      return announcementsRef
-          .where('trainerId', isEqualTo: authId)
-          .snapshots()
-          .map(
-        (snapshot) {
-          final docs = snapshot.docs;
+      final gymQuery =
+          announcementsRef.where('gymId', isEqualTo: gymId).snapshots();
 
-          return docs
-              .map(
-                (doc) => AnnouncementModel.fromFirestore(
-                  doc.data() as Map<String, dynamic>,
-                  doc.id,
-                ),
-              )
-              .toList();
+      return Rx.combineLatest2(
+        trainerQuery,
+        gymQuery,
+        (QuerySnapshot trainerSnap, QuerySnapshot gymSnap) {
+          final trainerDocs = trainerSnap.docs.map(
+            (doc) => AnnouncementModel.fromFirestore(
+                doc.data() as Map<String, dynamic>, doc.id),
+          );
+
+          final gymDocs = gymSnap.docs.map(
+            (doc) => AnnouncementModel.fromFirestore(
+                doc.data() as Map<String, dynamic>, doc.id),
+          );
+
+          final allDocs = [
+            ...trainerDocs,
+            ...gymDocs,
+          ];
+
+          // Optionally remove duplicates by ID
+          final uniqueAnnouncements = {
+            for (var doc in allDocs) doc.id: doc,
+          }.values.toList();
+
+          return uniqueAnnouncements;
         },
       );
+
+      // return announcementsRef
+      //     .where('trainerId', isEqualTo: authId)
+      //     .where('gymId', isEqualTo: gymId)
+      //     .snapshots()
+      //     .map(
+      //   (snapshot) {
+      //     final docs = snapshot.docs;
+
+      //     return docs
+      //         .map(
+      //           (doc) => AnnouncementModel.fromFirestore(
+      //             doc.data() as Map<String, dynamic>,
+      //             doc.id,
+      //           ),
+      //         )
+      //         .toList();
+      //   },
+      // );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -325,4 +401,16 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
       );
     }
   }
+}
+
+/// Utility function to extract extension from MIME type
+String? extensionFromMime(String? mimeType) {
+  if (mimeType == null) return null;
+  final typeMap = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'video/mp4': 'mp4',
+    'image/gif': 'gif',
+  };
+  return typeMap[mimeType];
 }

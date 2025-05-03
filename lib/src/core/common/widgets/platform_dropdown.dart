@@ -9,6 +9,10 @@ class PlatformSpecificDropdown extends StatefulWidget {
   final Map<String, String> initialValue;
   final ValueChanged<Map<String, String>> onChanged;
   final ValueChanged<String> onTap;
+  final String pickerTitle;
+  final Color borderColor;
+  final Color downArrowColor;
+  final Color selectedOptionColor;
 
   const PlatformSpecificDropdown({
     super.key,
@@ -16,6 +20,10 @@ class PlatformSpecificDropdown extends StatefulWidget {
     required this.initialValue,
     required this.onChanged,
     required this.onTap,
+    required this.pickerTitle,
+    required this.borderColor,
+    required this.downArrowColor,
+    required this.selectedOptionColor,
   });
 
   @override
@@ -77,7 +85,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                     ),
                   ),
                   Text(
-                    "Select Month",
+                    "Select ${widget.pickerTitle}",
                     style: TextStyle(
                       color: Colors.black87,
                       fontSize: 18,
@@ -117,14 +125,22 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                 },
                 children: widget.options
                     .map(
-                      (option) => Center(
-                        child: Text(
-                          option.values.first,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: option == selectedValue
-                                ? globalColorScheme.tertiaryContainer
-                                : globalColorScheme.onPrimaryContainer,
+                      (option) => GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedValue = option;
+                            widget.onChanged(option);
+                          });
+                        },
+                        child: Center(
+                          child: Text(
+                            option.values.first,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: option == selectedValue
+                                  ? globalColorScheme.tertiaryContainer
+                                  : globalColorScheme.onPrimaryContainer,
+                            ),
                           ),
                         ),
                       ),
@@ -147,19 +163,27 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: globalColorScheme.primary,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: globalColorScheme.tertiary,
+            color: Colors.transparent,
+            // borderRadius: BorderRadius.circular(8),
+            border: Border(
+              bottom: BorderSide(
+                color: widget.borderColor,
+              ),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(selectedValue.values.first, style: TextStyle(fontSize: 16)),
+              Text(
+                selectedValue.values.first,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: widget.selectedOptionColor.withOpacity(0.7),
+                ),
+              ),
               Icon(
                 CupertinoIcons.chevron_down,
-                color: globalColorScheme.tertiary,
+                color: widget.downArrowColor,
               ),
             ],
           ),
@@ -170,8 +194,11 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          border: Border.all(color: globalColorScheme.tertiary),
-          borderRadius: BorderRadius.circular(8),
+          border: Border(
+              bottom: BorderSide(
+            color: widget.borderColor,
+          )),
+          // borderRadius: BorderRadius.circular(8),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<Map<String, String>>(
@@ -181,7 +208,9 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                 .map(
                   (option) => DropdownMenuItem(
                     value: option,
-                    child: Text(option.values.first),
+                    child: Text(
+                      option.values.first,
+                    ),
                   ),
                 )
                 .toList(),

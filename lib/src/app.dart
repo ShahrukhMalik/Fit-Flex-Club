@@ -9,7 +9,10 @@ import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/getgyms/getgyms_cubit.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/postannouncement/postannouncement_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/sendnotification/sendnotification_cubit.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/watchannouncement/watchannouncement_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/getchat/getchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/sendmessage/sendmessage_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
@@ -170,7 +173,10 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<SendNotificationCubit>()),
         BlocProvider(create: (context) => getIt<StartChatCubit>()),
         BlocProvider(create: (context) => getIt<GetChatCubit>()),
+        BlocProvider(create: (context) => getIt<GetGymsCubit>()),
         BlocProvider(create: (context) => getIt<SendMessageCubit>()),
+        BlocProvider(create: (context) => getIt<PostAnnouncementCubit>()),
+        BlocProvider(create: (context) => getIt<WatchAnnouncementCubit>()),
         BlocProvider(create: (context) => getIt<UpdateMessageCubit>()),
         BlocProvider(create: (context) => getIt<WatchChatStreamCubit>()),
         BlocProvider(create: (context) => getIt<WatchMessagesbyChatIdCubit>()),

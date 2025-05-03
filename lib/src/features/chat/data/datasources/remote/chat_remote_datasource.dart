@@ -206,7 +206,16 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
   @override
   Future<List<ChatModel>> getAllChats() async {
     try {
-      final snapShot = await remoteDb.collection('chats').get();
+      final authId = auth.currentUser?.uid;
+      if (authId == null) {
+        throw ServerException(
+          errorMessage: "Auth ID not found",
+        );
+      }
+      final snapShot = await remoteDb
+          .collection('chats')
+          .where('memberIds', arrayContains: authId)
+          .get();
 
       if (snapShot.docs.isEmpty) {
         return [];
@@ -214,7 +223,6 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
 
       return snapShot.docs.map((doc) {
         final data = doc.data();
-        // Assuming ChatModel has a `fromJson` factory constructor
         return ChatModel.fromMap(doc.id, data);
       }).toList();
     } on FirebaseException catch (err) {

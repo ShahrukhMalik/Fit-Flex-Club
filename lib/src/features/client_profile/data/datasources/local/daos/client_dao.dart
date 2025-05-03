@@ -38,6 +38,7 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
   // Insert method
   Future<int> insertClientWeight(ClientWeightModel model) {
     return into(clientWeight).insert(
+      mode: InsertMode.insertOrReplace,
       ClientWeightCompanion(
         clientId:
             model.clientId != null ? Value(model.clientId!) : Value.absent(),

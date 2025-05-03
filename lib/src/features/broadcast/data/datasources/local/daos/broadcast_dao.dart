@@ -20,7 +20,11 @@ class BroadcastDao extends DatabaseAccessor<AppDatabase>
   Future<void> batchInsertAnnouncements(
       List<Insertable<Announcement>> announcementsList) async {
     await batch((batch) {
-      batch.insertAll(announcements, announcementsList);
+      batch.insertAll(
+        announcements,
+        announcementsList,
+        mode: InsertMode.insertOrReplace,
+      );
     });
   }
 
@@ -41,9 +45,13 @@ class BroadcastDao extends DatabaseAccessor<AppDatabase>
     await update(announcements).replace(announcement);
   }
 
-  // Watch announcements as a live stream
   Stream<List<Announcement>> watchAnnouncements() {
-    return select(announcements).watch();
+    return (select(announcements)
+          ..orderBy([
+            (t) =>
+                OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)
+          ]))
+        .watch();
   }
 
   // Add a comment to an announcement
