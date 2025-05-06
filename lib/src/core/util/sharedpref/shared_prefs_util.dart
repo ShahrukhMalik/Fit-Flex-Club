@@ -9,6 +9,8 @@ class SharedPrefsUtil {
   static const String _keyAuthUid = 'auth_uid';
   static const String _keyAuthEntity = 'auth_entity';
   static const String _keyGymId = 'gym_id';
+  static const String _keyGymName = 'gym_name';
+  static const String _keyUserName = 'user_name';
   static const String _keyTrainerId = 'trainer_id';
   static const String _keyLastUpdateTimestamp = 'last_update_timestamp';
 
@@ -30,6 +32,18 @@ class SharedPrefsUtil {
   }
 
   // Auth UID methods with timestamp
+  Future<bool> setGymName(String name) async {
+    await _updateLastTimestamp();
+    return await _prefs.setString(_keyGymName, name);
+  }
+
+  ///
+  Future<bool> setUserName(String name) async {
+    await _updateLastTimestamp();
+    return await _prefs.setString(_keyUserName, name);
+  }
+
+  // Auth UID methods with timestamp
   Future<bool> setTrainerId(String uid) async {
     await _updateLastTimestamp();
     return await _prefs.setString(_keyTrainerId, uid);
@@ -37,6 +51,14 @@ class SharedPrefsUtil {
 
   String? getAuthUid() {
     return _prefs.getString(_keyAuthUid);
+  }
+
+  String? getGymName() {
+    return _prefs.getString(_keyGymName);
+  }
+
+  String? getUserName() {
+    return _prefs.getString(_keyUserName);
   }
 
   String? getGymId() {

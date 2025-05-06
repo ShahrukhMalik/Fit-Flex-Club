@@ -1,15 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
+
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/client_management/data/models/client_weight_model.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
+import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/gym_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/trainer_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/gym_entity.dart';
 import 'package:fit_flex_club/src/features/syncmanager/domain/repositories/sync_manager_repository.dart';
-import 'package:injectable/injectable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
 
 abstract class ClientProfileRemoteDatasource {
   ///
@@ -55,10 +58,12 @@ abstract class ClientProfileRemoteDatasource {
 class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
   final FirebaseAuth auth;
   final FirebaseFirestore db;
+  final SharedPrefsUtil prefs;
 
   ClientProfileRemoteDatasourceImpl({
     required this.auth,
     required this.db,
+    required this.prefs,
   });
   @override
   Future<void>? addNewUser({
@@ -406,6 +411,7 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
           merge: true,
         ),
       );
+      await prefs.setGymName(gym.gymName);
       await trainerClientRef.set({
         'trainerId': trainer.trainerId,
         'trainerName': trainer.trainerName,

@@ -9,6 +9,116 @@ admin.initializeApp();
 const db = admin.firestore();
 const messaging = admin.messaging();
 
+
+exports.onReactionCreated = functions.firestore.onDocumentCreated(
+  "announcements/{announcementId}/reactions/{reactionId}",
+  async (snap, context) => {
+    const { announcementId } = snap.params;
+
+    // if (!snap.exists) {
+    //   console.warn("No reaction data found.");
+    //   return null;
+    // }
+
+    const db = admin.firestore();
+    const reactionsRef = db
+      .collection("announcements")
+      .doc(announcementId)
+      .collection("reactions");
+
+    const announcementRef = db.collection("announcements").doc(announcementId);
+
+    try {
+      const reactionsSnapshot = await reactionsRef.get();
+      const count = reactionsSnapshot.size;
+
+      await announcementRef.update({ 
+        reactionsCount: count,
+        updatedAt: Date.now()  // epoch timestamp in ms
+      });
+
+      console.log(
+        `Updated reactionsCount for announcement ${announcementId} to ${count}`
+      );
+    } catch (error) {
+      console.error("Error updating reactionsCount:", error);
+    }
+
+    return null;
+  }
+);
+exports.onReactionWritten = functions.firestore.onDocumentWritten(
+  "announcements/{announcementId}/reactions/{reactionId}",
+  async (snap, context) => {
+    const { announcementId } = snap.params;
+
+    // if (!snap.exists) {
+    //   console.warn("No reaction data found.");
+    //   return null;
+    // }
+
+    const db = admin.firestore();
+    const reactionsRef = db
+      .collection("announcements")
+      .doc(announcementId)
+      .collection("reactions");
+
+    const announcementRef = db.collection("announcements").doc(announcementId);
+
+    try {
+      const reactionsSnapshot = await reactionsRef.get();
+      const count = reactionsSnapshot.size;
+
+      await announcementRef.update({ 
+        reactionsCount: count,
+        updatedAt: Date.now()  // epoch timestamp in ms
+      });
+
+      console.log(
+        `Updated reactionsCount for announcement ${announcementId} to ${count}`
+      );
+    } catch (error) {
+      console.error("Error updating reactionsCount:", error);
+    }
+
+    return null;
+  }
+);
+exports.onCommentCreated = functions.firestore.onDocumentCreated(
+  "announcements/{announcementId}/comments/{commentId}",
+  async (snap, context) => {
+    const { announcementId } = snap.params;
+
+    // if (!snap.exists) {
+    //   console.warn("No reaction data found.");
+    //   return null;
+    // }
+
+    const db = admin.firestore();
+    const commentsRef = db
+      .collection("announcements")
+      .doc(announcementId)
+      .collection("comments");
+
+    const announcementRef = db.collection("announcements").doc(announcementId);
+
+    try {
+      const reactionsSnapshot = await commentsRef.get();
+      const count = reactionsSnapshot.size;
+
+      await announcementRef.update({ commentsCount: count });
+
+      console.log(
+        `Updated reactionsCount for announcement ${announcementId} to ${count}`
+      );
+    } catch (error) {
+      console.error("Error updating commentsCount:", error);
+    }
+
+    return null;
+  }
+);
+
 exports.onMessageCreated = functions.firestore.onDocumentCreated(
   "chats/{chatId}/messages/{messageId}",
   async (snap, context) => {

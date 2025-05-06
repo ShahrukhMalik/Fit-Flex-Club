@@ -191,7 +191,9 @@ class PlatformApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Platform.isIOS ? _buildCupertinoApp() : _buildMaterialApp();
+    return
+        // Platform.isIOS ? _buildCupertinoApp() :
+        _buildMaterialApp();
   }
 
   Widget _buildMaterialApp() {

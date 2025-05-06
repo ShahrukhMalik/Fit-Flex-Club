@@ -273,9 +273,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final data = snapshot.data() as Map<String, dynamic>?;
 
       final gymId = (data)?['gymId'];
+      final userName = (data)?['username'];
 
       if (gymId != null) {
         await prefs.setGymId(gymId);
+      }
+      if(userName != null) {
+        await prefs.setUserName(userName);
       }
 
       isUserActive = data == null ? false : (data)['isUserActive'] ?? false;

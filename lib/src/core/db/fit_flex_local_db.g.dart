@@ -6471,6 +6471,24 @@ class $AnnouncementsTable extends Announcements
   late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
       'created_at', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _reactionsCountMeta =
+      const VerificationMeta('reactionsCount');
+  @override
+  late final GeneratedColumn<int> reactionsCount = GeneratedColumn<int>(
+      'reactions_count', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _commentsCountMeta =
+      const VerificationMeta('commentsCount');
+  @override
+  late final GeneratedColumn<int> commentsCount = GeneratedColumn<int>(
+      'comments_count', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _myReactionMeta =
+      const VerificationMeta('myReaction');
+  @override
+  late final GeneratedColumn<String> myReaction = GeneratedColumn<String>(
+      'my_reaction', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -6483,7 +6501,10 @@ class $AnnouncementsTable extends Announcements
         mediaUrl,
         mediaBytes,
         postType,
-        createdAt
+        createdAt,
+        reactionsCount,
+        commentsCount,
+        myReaction
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -6550,6 +6571,28 @@ class $AnnouncementsTable extends Announcements
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('reactions_count')) {
+      context.handle(
+          _reactionsCountMeta,
+          reactionsCount.isAcceptableOrUnknown(
+              data['reactions_count']!, _reactionsCountMeta));
+    } else if (isInserting) {
+      context.missing(_reactionsCountMeta);
+    }
+    if (data.containsKey('comments_count')) {
+      context.handle(
+          _commentsCountMeta,
+          commentsCount.isAcceptableOrUnknown(
+              data['comments_count']!, _commentsCountMeta));
+    } else if (isInserting) {
+      context.missing(_commentsCountMeta);
+    }
+    if (data.containsKey('my_reaction')) {
+      context.handle(
+          _myReactionMeta,
+          myReaction.isAcceptableOrUnknown(
+              data['my_reaction']!, _myReactionMeta));
+    }
     return context;
   }
 
@@ -6581,6 +6624,12 @@ class $AnnouncementsTable extends Announcements
           .read(DriftSqlType.string, data['${effectivePrefix}post_type'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
+      reactionsCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}reactions_count'])!,
+      commentsCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}comments_count'])!,
+      myReaction: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}my_reaction']),
     );
   }
 
@@ -6602,6 +6651,9 @@ class Announcement extends DataClass implements Insertable<Announcement> {
   final Uint8List? mediaBytes;
   final String postType;
   final int createdAt;
+  final int reactionsCount;
+  final int commentsCount;
+  final String? myReaction;
   const Announcement(
       {required this.id,
       this.trainerId,
@@ -6613,7 +6665,10 @@ class Announcement extends DataClass implements Insertable<Announcement> {
       this.mediaUrl,
       this.mediaBytes,
       required this.postType,
-      required this.createdAt});
+      required this.createdAt,
+      required this.reactionsCount,
+      required this.commentsCount,
+      this.myReaction});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -6642,6 +6697,11 @@ class Announcement extends DataClass implements Insertable<Announcement> {
     }
     map['post_type'] = Variable<String>(postType);
     map['created_at'] = Variable<int>(createdAt);
+    map['reactions_count'] = Variable<int>(reactionsCount);
+    map['comments_count'] = Variable<int>(commentsCount);
+    if (!nullToAbsent || myReaction != null) {
+      map['my_reaction'] = Variable<String>(myReaction);
+    }
     return map;
   }
 
@@ -6671,6 +6731,11 @@ class Announcement extends DataClass implements Insertable<Announcement> {
           : Value(mediaBytes),
       postType: Value(postType),
       createdAt: Value(createdAt),
+      reactionsCount: Value(reactionsCount),
+      commentsCount: Value(commentsCount),
+      myReaction: myReaction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(myReaction),
     );
   }
 
@@ -6689,6 +6754,9 @@ class Announcement extends DataClass implements Insertable<Announcement> {
       mediaBytes: serializer.fromJson<Uint8List?>(json['mediaBytes']),
       postType: serializer.fromJson<String>(json['postType']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
+      reactionsCount: serializer.fromJson<int>(json['reactionsCount']),
+      commentsCount: serializer.fromJson<int>(json['commentsCount']),
+      myReaction: serializer.fromJson<String?>(json['myReaction']),
     );
   }
   @override
@@ -6706,6 +6774,9 @@ class Announcement extends DataClass implements Insertable<Announcement> {
       'mediaBytes': serializer.toJson<Uint8List?>(mediaBytes),
       'postType': serializer.toJson<String>(postType),
       'createdAt': serializer.toJson<int>(createdAt),
+      'reactionsCount': serializer.toJson<int>(reactionsCount),
+      'commentsCount': serializer.toJson<int>(commentsCount),
+      'myReaction': serializer.toJson<String?>(myReaction),
     };
   }
 
@@ -6720,7 +6791,10 @@ class Announcement extends DataClass implements Insertable<Announcement> {
           Value<String?> mediaUrl = const Value.absent(),
           Value<Uint8List?> mediaBytes = const Value.absent(),
           String? postType,
-          int? createdAt}) =>
+          int? createdAt,
+          int? reactionsCount,
+          int? commentsCount,
+          Value<String?> myReaction = const Value.absent()}) =>
       Announcement(
         id: id ?? this.id,
         trainerId: trainerId.present ? trainerId.value : this.trainerId,
@@ -6733,6 +6807,9 @@ class Announcement extends DataClass implements Insertable<Announcement> {
         mediaBytes: mediaBytes.present ? mediaBytes.value : this.mediaBytes,
         postType: postType ?? this.postType,
         createdAt: createdAt ?? this.createdAt,
+        reactionsCount: reactionsCount ?? this.reactionsCount,
+        commentsCount: commentsCount ?? this.commentsCount,
+        myReaction: myReaction.present ? myReaction.value : this.myReaction,
       );
   Announcement copyWithCompanion(AnnouncementsCompanion data) {
     return Announcement(
@@ -6749,6 +6826,14 @@ class Announcement extends DataClass implements Insertable<Announcement> {
           data.mediaBytes.present ? data.mediaBytes.value : this.mediaBytes,
       postType: data.postType.present ? data.postType.value : this.postType,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      reactionsCount: data.reactionsCount.present
+          ? data.reactionsCount.value
+          : this.reactionsCount,
+      commentsCount: data.commentsCount.present
+          ? data.commentsCount.value
+          : this.commentsCount,
+      myReaction:
+          data.myReaction.present ? data.myReaction.value : this.myReaction,
     );
   }
 
@@ -6765,7 +6850,10 @@ class Announcement extends DataClass implements Insertable<Announcement> {
           ..write('mediaUrl: $mediaUrl, ')
           ..write('mediaBytes: $mediaBytes, ')
           ..write('postType: $postType, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('reactionsCount: $reactionsCount, ')
+          ..write('commentsCount: $commentsCount, ')
+          ..write('myReaction: $myReaction')
           ..write(')'))
         .toString();
   }
@@ -6782,7 +6870,10 @@ class Announcement extends DataClass implements Insertable<Announcement> {
       mediaUrl,
       $driftBlobEquality.hash(mediaBytes),
       postType,
-      createdAt);
+      createdAt,
+      reactionsCount,
+      commentsCount,
+      myReaction);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6797,7 +6888,10 @@ class Announcement extends DataClass implements Insertable<Announcement> {
           other.mediaUrl == this.mediaUrl &&
           $driftBlobEquality.equals(other.mediaBytes, this.mediaBytes) &&
           other.postType == this.postType &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.reactionsCount == this.reactionsCount &&
+          other.commentsCount == this.commentsCount &&
+          other.myReaction == this.myReaction);
 }
 
 class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
@@ -6812,6 +6906,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
   final Value<Uint8List?> mediaBytes;
   final Value<String> postType;
   final Value<int> createdAt;
+  final Value<int> reactionsCount;
+  final Value<int> commentsCount;
+  final Value<String?> myReaction;
   final Value<int> rowid;
   const AnnouncementsCompanion({
     this.id = const Value.absent(),
@@ -6825,6 +6922,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     this.mediaBytes = const Value.absent(),
     this.postType = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.reactionsCount = const Value.absent(),
+    this.commentsCount = const Value.absent(),
+    this.myReaction = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AnnouncementsCompanion.insert({
@@ -6839,11 +6939,16 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     this.mediaBytes = const Value.absent(),
     required String postType,
     required int createdAt,
+    required int reactionsCount,
+    required int commentsCount,
+    this.myReaction = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         postedFor = Value(postedFor),
         postType = Value(postType),
-        createdAt = Value(createdAt);
+        createdAt = Value(createdAt),
+        reactionsCount = Value(reactionsCount),
+        commentsCount = Value(commentsCount);
   static Insertable<Announcement> custom({
     Expression<String>? id,
     Expression<String>? trainerId,
@@ -6856,6 +6961,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     Expression<Uint8List>? mediaBytes,
     Expression<String>? postType,
     Expression<int>? createdAt,
+    Expression<int>? reactionsCount,
+    Expression<int>? commentsCount,
+    Expression<String>? myReaction,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -6870,6 +6978,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
       if (mediaBytes != null) 'media_bytes': mediaBytes,
       if (postType != null) 'post_type': postType,
       if (createdAt != null) 'created_at': createdAt,
+      if (reactionsCount != null) 'reactions_count': reactionsCount,
+      if (commentsCount != null) 'comments_count': commentsCount,
+      if (myReaction != null) 'my_reaction': myReaction,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -6886,6 +6997,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
       Value<Uint8List?>? mediaBytes,
       Value<String>? postType,
       Value<int>? createdAt,
+      Value<int>? reactionsCount,
+      Value<int>? commentsCount,
+      Value<String?>? myReaction,
       Value<int>? rowid}) {
     return AnnouncementsCompanion(
       id: id ?? this.id,
@@ -6899,6 +7013,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
       mediaBytes: mediaBytes ?? this.mediaBytes,
       postType: postType ?? this.postType,
       createdAt: createdAt ?? this.createdAt,
+      reactionsCount: reactionsCount ?? this.reactionsCount,
+      commentsCount: commentsCount ?? this.commentsCount,
+      myReaction: myReaction ?? this.myReaction,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -6939,6 +7056,15 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
     }
+    if (reactionsCount.present) {
+      map['reactions_count'] = Variable<int>(reactionsCount.value);
+    }
+    if (commentsCount.present) {
+      map['comments_count'] = Variable<int>(commentsCount.value);
+    }
+    if (myReaction.present) {
+      map['my_reaction'] = Variable<String>(myReaction.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -6959,6 +7085,9 @@ class AnnouncementsCompanion extends UpdateCompanion<Announcement> {
           ..write('mediaBytes: $mediaBytes, ')
           ..write('postType: $postType, ')
           ..write('createdAt: $createdAt, ')
+          ..write('reactionsCount: $reactionsCount, ')
+          ..write('commentsCount: $commentsCount, ')
+          ..write('myReaction: $myReaction, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -7350,9 +7479,10 @@ class $ReactionsTable extends Reactions
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _emojiMeta = const VerificationMeta('emoji');
   @override
-  late final GeneratedColumn<String> emoji = GeneratedColumn<String>(
-      'emoji', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumnWithTypeConverter<Map<String, dynamic>, String>
+      emoji = GeneratedColumn<String>('emoji', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<Map<String, dynamic>>($ReactionsTable.$converteremoji);
   static const VerificationMeta _timestampMeta =
       const VerificationMeta('timestamp');
   @override
@@ -7397,12 +7527,7 @@ class $ReactionsTable extends Reactions
     } else if (isInserting) {
       context.missing(_userNameMeta);
     }
-    if (data.containsKey('emoji')) {
-      context.handle(
-          _emojiMeta, emoji.isAcceptableOrUnknown(data['emoji']!, _emojiMeta));
-    } else if (isInserting) {
-      context.missing(_emojiMeta);
-    }
+    context.handle(_emojiMeta, const VerificationResult.success());
     if (data.containsKey('timestamp')) {
       context.handle(_timestampMeta,
           timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
@@ -7426,8 +7551,9 @@ class $ReactionsTable extends Reactions
           DriftSqlType.string, data['${effectivePrefix}announcement_id'])!,
       userName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_name'])!,
-      emoji: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}emoji'])!,
+      emoji: $ReactionsTable.$converteremoji.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}emoji'])!),
       timestamp: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
     );
@@ -7437,6 +7563,9 @@ class $ReactionsTable extends Reactions
   $ReactionsTable createAlias(String alias) {
     return $ReactionsTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<Map<String, dynamic>, String> $converteremoji =
+      const StringMapConverter();
 }
 
 class Reaction extends DataClass implements Insertable<Reaction> {
@@ -7444,7 +7573,7 @@ class Reaction extends DataClass implements Insertable<Reaction> {
   final String userId;
   final String announcementId;
   final String userName;
-  final String emoji;
+  final Map<String, dynamic> emoji;
   final DateTime timestamp;
   const Reaction(
       {required this.id,
@@ -7460,7 +7589,10 @@ class Reaction extends DataClass implements Insertable<Reaction> {
     map['user_id'] = Variable<String>(userId);
     map['announcement_id'] = Variable<String>(announcementId);
     map['user_name'] = Variable<String>(userName);
-    map['emoji'] = Variable<String>(emoji);
+    {
+      map['emoji'] =
+          Variable<String>($ReactionsTable.$converteremoji.toSql(emoji));
+    }
     map['timestamp'] = Variable<DateTime>(timestamp);
     return map;
   }
@@ -7484,7 +7616,7 @@ class Reaction extends DataClass implements Insertable<Reaction> {
       userId: serializer.fromJson<String>(json['userId']),
       announcementId: serializer.fromJson<String>(json['announcementId']),
       userName: serializer.fromJson<String>(json['userName']),
-      emoji: serializer.fromJson<String>(json['emoji']),
+      emoji: serializer.fromJson<Map<String, dynamic>>(json['emoji']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
     );
   }
@@ -7496,7 +7628,7 @@ class Reaction extends DataClass implements Insertable<Reaction> {
       'userId': serializer.toJson<String>(userId),
       'announcementId': serializer.toJson<String>(announcementId),
       'userName': serializer.toJson<String>(userName),
-      'emoji': serializer.toJson<String>(emoji),
+      'emoji': serializer.toJson<Map<String, dynamic>>(emoji),
       'timestamp': serializer.toJson<DateTime>(timestamp),
     };
   }
@@ -7506,7 +7638,7 @@ class Reaction extends DataClass implements Insertable<Reaction> {
           String? userId,
           String? announcementId,
           String? userName,
-          String? emoji,
+          Map<String, dynamic>? emoji,
           DateTime? timestamp}) =>
       Reaction(
         id: id ?? this.id,
@@ -7562,7 +7694,7 @@ class ReactionsCompanion extends UpdateCompanion<Reaction> {
   final Value<String> userId;
   final Value<String> announcementId;
   final Value<String> userName;
-  final Value<String> emoji;
+  final Value<Map<String, dynamic>> emoji;
   final Value<DateTime> timestamp;
   final Value<int> rowid;
   const ReactionsCompanion({
@@ -7579,7 +7711,7 @@ class ReactionsCompanion extends UpdateCompanion<Reaction> {
     required String userId,
     required String announcementId,
     required String userName,
-    required String emoji,
+    required Map<String, dynamic> emoji,
     required DateTime timestamp,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -7613,7 +7745,7 @@ class ReactionsCompanion extends UpdateCompanion<Reaction> {
       Value<String>? userId,
       Value<String>? announcementId,
       Value<String>? userName,
-      Value<String>? emoji,
+      Value<Map<String, dynamic>>? emoji,
       Value<DateTime>? timestamp,
       Value<int>? rowid}) {
     return ReactionsCompanion(
@@ -7643,7 +7775,8 @@ class ReactionsCompanion extends UpdateCompanion<Reaction> {
       map['user_name'] = Variable<String>(userName.value);
     }
     if (emoji.present) {
-      map['emoji'] = Variable<String>(emoji.value);
+      map['emoji'] =
+          Variable<String>($ReactionsTable.$converteremoji.toSql(emoji.value));
     }
     if (timestamp.present) {
       map['timestamp'] = Variable<DateTime>(timestamp.value);
@@ -13024,6 +13157,9 @@ typedef $$AnnouncementsTableCreateCompanionBuilder = AnnouncementsCompanion
   Value<Uint8List?> mediaBytes,
   required String postType,
   required int createdAt,
+  required int reactionsCount,
+  required int commentsCount,
+  Value<String?> myReaction,
   Value<int> rowid,
 });
 typedef $$AnnouncementsTableUpdateCompanionBuilder = AnnouncementsCompanion
@@ -13039,6 +13175,9 @@ typedef $$AnnouncementsTableUpdateCompanionBuilder = AnnouncementsCompanion
   Value<Uint8List?> mediaBytes,
   Value<String> postType,
   Value<int> createdAt,
+  Value<int> reactionsCount,
+  Value<int> commentsCount,
+  Value<String?> myReaction,
   Value<int> rowid,
 });
 
@@ -13119,6 +13258,16 @@ class $$AnnouncementsTableFilterComposer
 
   ColumnFilters<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get reactionsCount => $composableBuilder(
+      column: $table.reactionsCount,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get commentsCount => $composableBuilder(
+      column: $table.commentsCount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get myReaction => $composableBuilder(
+      column: $table.myReaction, builder: (column) => ColumnFilters(column));
 
   Expression<bool> commentsRefs(
       Expression<bool> Function($$CommentsTableFilterComposer f) f) {
@@ -13204,6 +13353,17 @@ class $$AnnouncementsTableOrderingComposer
 
   ColumnOrderings<int> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get reactionsCount => $composableBuilder(
+      column: $table.reactionsCount,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get commentsCount => $composableBuilder(
+      column: $table.commentsCount,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get myReaction => $composableBuilder(
+      column: $table.myReaction, builder: (column) => ColumnOrderings(column));
 }
 
 class $$AnnouncementsTableAnnotationComposer
@@ -13247,6 +13407,15 @@ class $$AnnouncementsTableAnnotationComposer
 
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get reactionsCount => $composableBuilder(
+      column: $table.reactionsCount, builder: (column) => column);
+
+  GeneratedColumn<int> get commentsCount => $composableBuilder(
+      column: $table.commentsCount, builder: (column) => column);
+
+  GeneratedColumn<String> get myReaction => $composableBuilder(
+      column: $table.myReaction, builder: (column) => column);
 
   Expression<T> commentsRefs<T extends Object>(
       Expression<T> Function($$CommentsTableAnnotationComposer a) f) {
@@ -13325,6 +13494,9 @@ class $$AnnouncementsTableTableManager extends RootTableManager<
             Value<Uint8List?> mediaBytes = const Value.absent(),
             Value<String> postType = const Value.absent(),
             Value<int> createdAt = const Value.absent(),
+            Value<int> reactionsCount = const Value.absent(),
+            Value<int> commentsCount = const Value.absent(),
+            Value<String?> myReaction = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AnnouncementsCompanion(
@@ -13339,6 +13511,9 @@ class $$AnnouncementsTableTableManager extends RootTableManager<
             mediaBytes: mediaBytes,
             postType: postType,
             createdAt: createdAt,
+            reactionsCount: reactionsCount,
+            commentsCount: commentsCount,
+            myReaction: myReaction,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -13353,6 +13528,9 @@ class $$AnnouncementsTableTableManager extends RootTableManager<
             Value<Uint8List?> mediaBytes = const Value.absent(),
             required String postType,
             required int createdAt,
+            required int reactionsCount,
+            required int commentsCount,
+            Value<String?> myReaction = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AnnouncementsCompanion.insert(
@@ -13367,6 +13545,9 @@ class $$AnnouncementsTableTableManager extends RootTableManager<
             mediaBytes: mediaBytes,
             postType: postType,
             createdAt: createdAt,
+            reactionsCount: reactionsCount,
+            commentsCount: commentsCount,
+            myReaction: myReaction,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -13722,7 +13903,7 @@ typedef $$ReactionsTableCreateCompanionBuilder = ReactionsCompanion Function({
   required String userId,
   required String announcementId,
   required String userName,
-  required String emoji,
+  required Map<String, dynamic> emoji,
   required DateTime timestamp,
   Value<int> rowid,
 });
@@ -13731,7 +13912,7 @@ typedef $$ReactionsTableUpdateCompanionBuilder = ReactionsCompanion Function({
   Value<String> userId,
   Value<String> announcementId,
   Value<String> userName,
-  Value<String> emoji,
+  Value<Map<String, dynamic>> emoji,
   Value<DateTime> timestamp,
   Value<int> rowid,
 });
@@ -13774,8 +13955,11 @@ class $$ReactionsTableFilterComposer
   ColumnFilters<String> get userName => $composableBuilder(
       column: $table.userName, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get emoji => $composableBuilder(
-      column: $table.emoji, builder: (column) => ColumnFilters(column));
+  ColumnWithTypeConverterFilters<Map<String, dynamic>, Map<String, dynamic>,
+          String>
+      get emoji => $composableBuilder(
+          column: $table.emoji,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
   ColumnFilters<DateTime> get timestamp => $composableBuilder(
       column: $table.timestamp, builder: (column) => ColumnFilters(column));
@@ -13864,7 +14048,7 @@ class $$ReactionsTableAnnotationComposer
   GeneratedColumn<String> get userName =>
       $composableBuilder(column: $table.userName, builder: (column) => column);
 
-  GeneratedColumn<String> get emoji =>
+  GeneratedColumnWithTypeConverter<Map<String, dynamic>, String> get emoji =>
       $composableBuilder(column: $table.emoji, builder: (column) => column);
 
   GeneratedColumn<DateTime> get timestamp =>
@@ -13918,7 +14102,7 @@ class $$ReactionsTableTableManager extends RootTableManager<
             Value<String> userId = const Value.absent(),
             Value<String> announcementId = const Value.absent(),
             Value<String> userName = const Value.absent(),
-            Value<String> emoji = const Value.absent(),
+            Value<Map<String, dynamic>> emoji = const Value.absent(),
             Value<DateTime> timestamp = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -13936,7 +14120,7 @@ class $$ReactionsTableTableManager extends RootTableManager<
             required String userId,
             required String announcementId,
             required String userName,
-            required String emoji,
+            required Map<String, dynamic> emoji,
             required DateTime timestamp,
             Value<int> rowid = const Value.absent(),
           }) =>

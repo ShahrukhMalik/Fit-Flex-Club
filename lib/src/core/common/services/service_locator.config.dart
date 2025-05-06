@@ -54,12 +54,20 @@ import '../../../features/broadcast/data/repositories/broadcast_repository_impl.
     as _i375;
 import '../../../features/broadcast/domain/repositories/broadcast_repository.dart'
     as _i196;
+import '../../../features/broadcast/domain/usecases/add_reaction_usecase.dart'
+    as _i580;
+import '../../../features/broadcast/domain/usecases/get_emojis_usecase.dart'
+    as _i1069;
 import '../../../features/broadcast/domain/usecases/post_announcement_usecase.dart'
     as _i671;
 import '../../../features/broadcast/domain/usecases/send_notification_usecase.dart'
     as _i92;
 import '../../../features/broadcast/domain/usecases/watch_announcement_usecase.dart'
     as _i17;
+import '../../../features/broadcast/presentation/cubit/addreaction/addreaction_cubit.dart'
+    as _i797;
+import '../../../features/broadcast/presentation/cubit/getemojis/getemojis_cubit.dart'
+    as _i1059;
 import '../../../features/broadcast/presentation/cubit/postannouncement/postannouncement_cubit.dart'
     as _i1009;
 import '../../../features/broadcast/presentation/cubit/sendnotification/sendnotification_cubit.dart'
@@ -236,6 +244,12 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.singleton<_i878.SharedPrefsUtil>(
         () => _i878.SharedPrefsUtil(gh<_i460.SharedPreferences>()));
+    gh.singleton<_i588.ClientProfileRemoteDatasource>(
+        () => _i588.ClientProfileRemoteDatasourceImpl(
+              auth: gh<_i59.FirebaseAuth>(),
+              db: gh<_i974.FirebaseFirestore>(),
+              prefs: gh<_i878.SharedPrefsUtil>(),
+            ));
     gh.factory<_i729.ChatDao>(() => _i729.ChatDao(gh<_i987.AppDatabase>()));
     gh.factory<_i593.WorkoutHistoryDao>(
         () => _i593.WorkoutHistoryDao(gh<_i987.AppDatabase>()));
@@ -251,11 +265,6 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.singleton<_i392.ChatLocalDatasource>(
         () => _i392.ChatLocalDatasourceImpl(chatDao: gh<_i729.ChatDao>()));
-    gh.singleton<_i588.ClientProfileRemoteDatasource>(
-        () => _i588.ClientProfileRemoteDatasourceImpl(
-              auth: gh<_i59.FirebaseAuth>(),
-              db: gh<_i974.FirebaseFirestore>(),
-            ));
     gh.singleton<_i899.ClientsDao>(
         () => _i899.ClientsDao(gh<_i987.AppDatabase>()));
     gh.singleton<_i939.WorkoutPlanDao>(
@@ -348,9 +357,10 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i29.GetexercisesCubit(gh<_i139.GetExercisesUsecase>()));
     gh.singleton<_i196.BroadcastRepository>(() => _i375.BroadcastRepositoryImpl(
           networkInfo: gh<_i228.NetworkInfo>(),
-          syncQueue: gh<_i663.SyncQueueDao>(),
           broadcastRemoteDatasource: gh<_i932.BroadcastRemoteDatasource>(),
           broadcastLocalDatasource: gh<_i972.BroadcastLocalDatasource>(),
+          syncQueue: gh<_i663.SyncQueueDao>(),
+          prefs: gh<_i878.SharedPrefsUtil>(),
         ));
     gh.singleton<_i661.UpdateAssignedWorkoutPlanUsecase>(() =>
         _i661.UpdateAssignedWorkoutPlanUsecaseImpl(
@@ -420,6 +430,8 @@ extension GetItInjectableX on _i174.GetIt {
           remoteDb: gh<_i572.ChatRemoteDatasource>(),
           syncQueue: gh<_i663.SyncQueueDao>(),
         ));
+    gh.singleton<_i580.AddReactionUsecase>(() => _i580.AddReactionUsecaseImpl(
+        broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.singleton<_i429.UpdateMessageUsecase>(() =>
         _i429.UpdateMessageUsecaseImpl(
             chatRepository: gh<_i75.ChatRepository>()));
@@ -460,11 +472,15 @@ extension GetItInjectableX on _i174.GetIt {
             broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.factory<_i441.GetworkoutplanCubit>(() =>
         _i441.GetworkoutplanCubit(gh<_i91.GetWorkoutPlansForClientUsecase>()));
+    gh.singleton<_i1069.GetEmojisUsecase>(() => _i1069.GetEmojisUsecaseImpl(
+        broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.factory<_i695.GetGymsCubit>(
         () => _i695.GetGymsCubit(gh<_i1026.GetGymsUsecase>()));
     gh.singleton<_i119.GetWorkoutHistoryUsecase>(() =>
         _i119.GetWorkoutHistoryUsecaseImpl(
             workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
+    gh.factory<_i1059.GetEmojisCubit>(
+        () => _i1059.GetEmojisCubit(gh<_i1069.GetEmojisUsecase>()));
     gh.factory<_i268.ClientProfileBloc>(() => _i268.ClientProfileBloc(
           gh<_i541.AddUserUsecase>(),
           gh<_i864.UpdateUserUsecase>(),
@@ -510,6 +526,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i208.LogWorkoutHistoryUsecase>(),
           gh<_i119.GetWorkoutHistoryUsecase>(),
         ));
+    gh.factory<_i797.AddReactionCubit>(
+        () => _i797.AddReactionCubit(gh<_i580.AddReactionUsecase>()));
     gh.factory<_i397.SendMessageCubit>(
         () => _i397.SendMessageCubit(gh<_i1019.SendMessageUsecase>()));
     gh.factory<_i1041.SendNotificationCubit>(

@@ -18,13 +18,27 @@ class StringIntMapConverter extends TypeConverter<Map<String, int>, String> {
   const StringIntMapConverter();
 
   @override
-  Map<String, int> fromSql(String fromDb) => Map<String, int>.from(jsonDecode(fromDb));
+  Map<String, int> fromSql(String fromDb) =>
+      Map<String, int>.from(jsonDecode(fromDb));
 
   @override
   String toSql(Map<String, int> value) => jsonEncode(value);
 }
 
-class MemberListMapConverter extends TypeConverter<List<Map<String, dynamic>>, String> {
+class StringMapConverter extends TypeConverter<Map<String, dynamic>, String> {
+  const StringMapConverter();
+
+  @override
+  Map<String, dynamic> fromSql(String fromDb) => Map<String, dynamic>.from(
+        jsonDecode(fromDb),
+      );
+
+  @override
+  String toSql(Map<String, dynamic> value) => jsonEncode(value);
+}
+
+class MemberListMapConverter
+    extends TypeConverter<List<Map<String, dynamic>>, String> {
   const MemberListMapConverter();
 
   @override
@@ -40,4 +54,3 @@ class MemberListMapConverter extends TypeConverter<List<Map<String, dynamic>>, S
     return jsonEncode(value);
   }
 }
-

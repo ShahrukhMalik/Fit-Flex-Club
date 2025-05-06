@@ -73,7 +73,10 @@ class BroadcastDao extends DatabaseAccessor<AppDatabase>
 
   // Add a reaction to an announcement
   Future<void> addReaction(Insertable<Reaction> reaction) async {
-    await into(reactions).insert(reaction);
+    await into(reactions).insert(
+      reaction,
+      mode: InsertMode.insertOrReplace,
+    );
   }
 
   Future<void> batchInsertReactions(

@@ -180,7 +180,7 @@ class BroadcastLocalDatasourceImpl extends BroadcastLocalDatasource {
 
       final transformedStream = announcementsStream.map(
         (chatList) => chatList
-            .map((chat) => AnnouncementModel.fromJson(chat.toJson()))
+            .map((chat) => AnnouncementModel.fromDb(chat.toJson()))
             .toList(),
       );
       return transformedStream;

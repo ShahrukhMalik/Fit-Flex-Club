@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:fit_flex_club/src/features/broadcast/data/models/comment_model.dart';
+import 'package:fit_flex_club/src/features/broadcast/data/models/reaction_model.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/announcement_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
 
@@ -13,6 +16,10 @@ class AnnouncementModel extends Announcement {
     super.content,
     super.mediaUrl,
     super.mediaBytes,
+    super.commentsCount,
+    super.myComment,
+    super.reactionCount,
+    super.myReaction,
     required super.postType,
     required super.postedFor,
     required super.createdAt,
@@ -51,11 +58,16 @@ class AnnouncementModel extends Announcement {
     );
   }
 
-  factory AnnouncementModel.fromFirestore(
-    Map<String, dynamic> json,
-    String docId,
-  ) {
+  factory AnnouncementModel.fromFirestore({
+    required Map<String, dynamic> json,
+    required String docId,
+  }) {
     return AnnouncementModel(
+      commentsCount: json['commentsCount'],
+      reactionCount: json['reactionsCount'],
+      myReaction: json['myReaction'] != null
+          ? ReactionModel.fromJson(json['myReaction'])
+          : null,
       postedFor:
           PostedFor.values.firstWhere((e) => e.name == json['postedFor']),
       gymName: json['gymName'],
@@ -97,6 +109,11 @@ class AnnouncementModel extends Announcement {
       content: row['content'],
       mediaUrl: row['mediaUrl'],
       mediaBytes: row['mediaBytes'],
+      commentsCount: row['commentsCount'],
+      reactionCount: row['reactionsCount'],
+      myReaction: row['myReaction'] != null
+          ? ReactionModel.fromDb(jsonDecode(row['myReaction']))
+          : null,
       postType: PostType.values.firstWhere((e) => e.name == row['postType']),
       createdAt: DateTime.fromMillisecondsSinceEpoch(row['createdAt']),
     );
@@ -112,6 +129,11 @@ class AnnouncementModel extends Announcement {
       'content': content,
       'mediaUrl': mediaUrl,
       'mediaBytes': mediaBytes,
+      'reactionsCount': reactionCount ?? 0,
+      'commentsCount': commentsCount ?? 0,
+      'myReaction': myReaction != null
+          ? jsonEncode(ReactionModel.fromEntity(myReaction!).toDb())
+          : null,
       'postType': postType.name,
       'postedFor': postedFor.name,
       'createdAt': createdAt.millisecondsSinceEpoch,
@@ -130,8 +152,16 @@ class AnnouncementModel extends Announcement {
     PostedFor? postedFor,
     DateTime? createdAt,
     Uint8List? mediaBytes,
+    int? commentsCount,
+    int? reactionCount,
+    ReactionModel? myReaction,
+    CommentModel? myComment,
   }) {
     return AnnouncementModel(
+      commentsCount: commentsCount ?? this.commentsCount,
+      reactionCount: reactionCount ?? this.reactionCount,
+      myComment: myComment ?? this.myComment,
+      myReaction: myReaction ?? this.myReaction,
       postedFor: postedFor ?? this.postedFor,
       gymName: gymName ?? this.gymName,
       gymId: gymId ?? this.gymId,

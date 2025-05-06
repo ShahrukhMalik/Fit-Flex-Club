@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/announcement_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_entity.dart';
+import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/notification_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
 
@@ -10,6 +11,9 @@ abstract class BroadcastRepository {
   Future<Either<Failures, void>> sendNotification(
     NotificationEntity notification,
   );
+
+  ///
+  Future<Either<Failures, List<EmojiEntity>>> getEmojis();
 
   ///
   Future<Either<Failures, void>> createAnnouncement(

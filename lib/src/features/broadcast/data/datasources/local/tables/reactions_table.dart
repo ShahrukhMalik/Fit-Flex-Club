@@ -1,12 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/datasources/local/tables/announcements_table.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/local/converters/converters.dart';
 
 class Reactions extends Table {
   TextColumn get id => text()();
   TextColumn get userId => text()();
   TextColumn get announcementId => text().references(Announcements, #id)();
   TextColumn get userName => text()();
-  TextColumn get emoji => text()();
+  TextColumn get emoji => text().map(const StringMapConverter())();
   DateTimeColumn get timestamp => dateTime()();
 
   @override

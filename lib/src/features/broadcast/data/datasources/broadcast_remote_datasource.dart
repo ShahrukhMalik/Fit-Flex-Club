@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
+import 'package:fit_flex_club/src/features/broadcast/data/models/emoji_model.dart';
+import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 import 'package:mime/mime.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/announcement_model.dart';
@@ -18,6 +20,9 @@ import 'package:rxdart/rxdart.dart';
 import '../../domain/entities/announcement_entity.dart';
 
 abstract class BroadcastRemoteDatasource {
+  ///
+  Future<List<EmojiEntity>> getEmojis();
+
   ///
   Future<void> sendNotification(
     NotificationEntity notification,
@@ -137,8 +142,15 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
     try {
       final CollectionReference announcementsRef =
           remoteDb.collection('announcements');
-      await announcementsRef.doc(announcementId).collection('reactions').add(
+      await announcementsRef
+          .doc(announcementId)
+          .collection('reactions')
+          .doc(reaction.id)
+          .set(
             reaction.toJson(),
+            SetOptions(
+              merge: true
+            )
           );
     } on FirebaseException catch (err) {
       throw ServerException(
@@ -281,64 +293,91 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
     try {
       final CollectionReference announcementsRef =
           remoteDb.collection('announcements');
+
       final authId = auth.currentUser?.uid;
       final gymId = getIt<SharedPrefsUtil>().getGymId();
 
       if (authId == null) {
         throw ServerException(errorMessage: "No Auth ID found");
       }
+
       final trainerQuery =
           announcementsRef.where('trainerId', isEqualTo: authId).snapshots();
 
       final gymQuery =
           announcementsRef.where('gymId', isEqualTo: gymId).snapshots();
 
-      return Rx.combineLatest2(
+      final combinedStream = Rx.combineLatest2<QuerySnapshot, QuerySnapshot,
+          List<DocumentReference>>(
         trainerQuery,
         gymQuery,
-        (QuerySnapshot trainerSnap, QuerySnapshot gymSnap) {
-          final trainerDocs = trainerSnap.docs.map(
-            (doc) => AnnouncementModel.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id),
-          );
+        (trainerSnap, gymSnap) {
+          final trainerRefs = trainerSnap.docs.map((doc) => doc.reference);
+          final gymRefs = gymSnap.docs.map((doc) => doc.reference);
 
-          final gymDocs = gymSnap.docs.map(
-            (doc) => AnnouncementModel.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id),
-          );
+          final allRefs = [...trainerRefs, ...gymRefs];
 
-          final allDocs = [
-            ...trainerDocs,
-            ...gymDocs,
-          ];
-
-          // Optionally remove duplicates by ID
-          final uniqueAnnouncements = {
-            for (var doc in allDocs) doc.id: doc,
+          final uniqueRefs = {
+            for (var ref in allRefs) ref.id: ref,
           }.values.toList();
 
-          return uniqueAnnouncements;
+          return uniqueRefs;
         },
       );
 
-      // return announcementsRef
-      //     .where('trainerId', isEqualTo: authId)
-      //     .where('gymId', isEqualTo: gymId)
-      //     .snapshots()
-      //     .map(
-      //   (snapshot) {
-      //     final docs = snapshot.docs;
+      return combinedStream.asyncMap((docRefs) async {
+        final enrichedList = await Future.wait(docRefs.map(
+          (docRef) async {
+            final docSnap = await docRef.get();
+            final data = docSnap.data() as Map<String, dynamic>;
 
-      //     return docs
-      //         .map(
-      //           (doc) => AnnouncementModel.fromFirestore(
-      //             doc.data() as Map<String, dynamic>,
-      //             doc.id,
-      //           ),
-      //         )
-      //         .toList();
-      //   },
-      // );
+            final announcement = AnnouncementModel.fromFirestore(
+              json: data,
+              docId: docRef.id,
+            );
+
+            // // Fetch comment count
+            // final commentSnap = await docRef.collection('comments').get();
+            // final commentCount = commentSnap.size;
+
+            // // Fetch reaction count
+            // final reactionSnap = await docRef.collection('reactions').get();
+            // final reactionCount = reactionSnap.size;
+
+            // Fetch my comment
+            final myCommentSnap = await docRef
+                .collection('comments')
+                .where('userId', isEqualTo: authId)
+                .limit(1)
+                .get();
+
+            final myComment = myCommentSnap.docs.isNotEmpty
+                ? CommentModel.fromFirestore(
+                    myCommentSnap.docs.first.data(),
+                    myCommentSnap.docs.first.id,
+                  )
+                : null;
+
+            // Fetch my reaction
+            final myReactionSnap =
+                await docRef.collection('reactions').doc(authId).get();
+
+            final myReaction = myReactionSnap.exists
+                ? ReactionModel.fromFirestore(
+                    myReactionSnap.data()!,
+                    myReactionSnap.id,
+                  )
+                : null;
+
+            return announcement.copyWithModel(
+              myComment: myComment,
+              myReaction: myReaction,
+            );
+          },
+        ));
+
+        return enrichedList;
+      });
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -394,6 +433,26 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
           ).toList();
         },
       );
+    } on FirebaseException catch (err) {
+      throw ServerException(
+        errorMessage: err.message ?? "Something went wrong!",
+        errorCode: err.code,
+      );
+    }
+  }
+
+  @override
+  Future<List<EmojiEntity>> getEmojis() async {
+    try {
+      final emojiDoc = await remoteDb
+          .collection('emojis')
+          .orderBy('emojiSeq', descending: false)
+          .get();
+      return emojiDoc.docs
+          .map(
+            (obj) => EmojiModel.fromFirestore(obj),
+          )
+          .toList();
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

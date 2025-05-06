@@ -142,86 +142,91 @@ class _WorkoutPlanPickerWidgetState extends State<WorkoutPlanPickerWidget> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SizedBox(
-        height: 500,
-        child: Container(
-          color: globalColorScheme.surface,
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: globalColorScheme.surface,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  'Select Workout Plan',
-                  style: TextStyle(
-                    color: globalColorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+      child: MediaQuery.removePadding(
+        removeTop: true,
+        context: context,
+        child: SizedBox(
+          height: 450,
+          child: Material(
+            child: Container(
+              color: globalColorScheme.surface,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: globalColorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'Select Workout Plan',
+                      style: TextStyle(
+                        color: globalColorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
-                builder: (context, state) {
-                  if (state is WorkoutManagementLoading) {
-                    return Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: List.generate(
-                            8,
-                            (index) => Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: PlatformLoader().buildLoader(
-                                type: LoaderType.shimmer,
+                  BlocBuilder<WorkoutManagementBloc, WorkoutManagementState>(
+                    builder: (context, state) {
+                      if (state is WorkoutManagementLoading) {
+                        return Flexible(
+                          child: Column(
+                            children: List.generate(
+                              8,
+                              (index) => Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: PlatformLoader().buildLoader(
+                                  type: LoaderType.shimmer,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      if (state is GetWorkoutPlansComplete) {
+                        final workoutPlans = state.workoutPlans;
+                        if (workoutPlans.isNotEmpty) {
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: ListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: workoutPlans.length,
+                                itemBuilder: (context, index) {
+                                  return _buildProgramItem(
+                                    workoutPlans[index],
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Text('No workout plans found.');
+                        }
+                      }
+                      return Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(
+                              8,
+                              (index) => Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: PlatformLoader().buildLoader(
+                                  type: LoaderType.shimmer,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }
-                  if (state is GetWorkoutPlansComplete) {
-                    final workoutPlans = state.workoutPlans;
-                    if (workoutPlans.isNotEmpty) {
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: workoutPlans.length,
-                            itemBuilder: (context, index) {
-                              return _buildProgramItem(
-                                workoutPlans[index],
-                              );
-                            },
-                          ),
-                        ),
                       );
-                    } else {
-                      return Text('No workout plans found.');
-                    }
-                  }
-                  return Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(
-                          8,
-                          (index) => Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: PlatformLoader().buildLoader(
-                              type: LoaderType.shimmer,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              )
-            ],
+                    },
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ),

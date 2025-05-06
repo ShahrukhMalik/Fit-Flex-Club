@@ -1,3 +1,4 @@
+import 'package:fit_flex_club/src/features/broadcast/data/models/emoji_model.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
 
 class ReactionModel extends Reaction {
@@ -6,7 +7,7 @@ class ReactionModel extends Reaction {
     required super.userId,
     required super.announcementId,
     required super.userName,
-    required super.emoji,
+    required EmojiModel super.emoji,
     required super.timestamp,
   });
 
@@ -16,7 +17,11 @@ class ReactionModel extends Reaction {
       userId: entity.userId,
       announcementId: entity.announcementId,
       userName: entity.userName,
-      emoji: entity.emoji,
+      emoji: EmojiModel(
+        emojiId: entity.emoji.emojiId,
+        emojiTitle: entity.emoji.emojiTitle,
+        emojiUrl: entity.emoji.emojiUrl,
+      ),
       timestamp: entity.timestamp,
     );
   }
@@ -41,7 +46,7 @@ class ReactionModel extends Reaction {
       userId: json['userId'],
       announcementId: json['announcementId'],
       userName: json['userName'],
-      emoji: json['emoji'],
+      emoji: EmojiModel.fromJson(json['emoji']),
       timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp']),
     );
   }
@@ -52,7 +57,7 @@ class ReactionModel extends Reaction {
       userId: row['userId'] as String,
       announcementId: row['announcementId'] as String,
       userName: row['userName'] as String,
-      emoji: row['emoji'] as String,
+      emoji: EmojiModel.fromJson(row['emoji']),
       timestamp: DateTime.fromMillisecondsSinceEpoch(row['timestamp']),
     );
   }
@@ -63,7 +68,11 @@ class ReactionModel extends Reaction {
       'userId': userId,
       'announcementId': announcementId,
       'userName': userName,
-      'emoji': emoji,
+      'emoji': EmojiModel(
+        emojiId: emoji.emojiId,
+        emojiTitle: emoji.emojiTitle,
+        emojiUrl: emoji.emojiUrl,
+      ).toJson(),
       'timestamp': timestamp.millisecondsSinceEpoch,
     };
   }
@@ -74,7 +83,11 @@ class ReactionModel extends Reaction {
       'userId': userId,
       'announcementId': announcementId,
       'userName': userName,
-      'emoji': emoji,
+      'emoji': EmojiModel(
+        emojiId: emoji.emojiId,
+        emojiTitle: emoji.emojiTitle,
+        emojiUrl: emoji.emojiUrl,
+      ).toJson(),
       'timestamp': timestamp.millisecondsSinceEpoch,
     };
   }
@@ -84,7 +97,7 @@ class ReactionModel extends Reaction {
     String? userId,
     String? announcementId,
     String? userName,
-    String? emoji,
+    EmojiModel? emoji,
     DateTime? timestamp,
   }) {
     return ReactionModel(
@@ -92,7 +105,12 @@ class ReactionModel extends Reaction {
       userId: userId ?? this.userId,
       announcementId: announcementId ?? this.announcementId,
       userName: userName ?? this.userName,
-      emoji: emoji ?? this.emoji,
+      emoji: emoji ??
+          EmojiModel(
+            emojiId: this.emoji.emojiId,
+            emojiTitle: this.emoji.emojiTitle,
+            emojiUrl: this.emoji.emojiUrl,
+          ),
       timestamp: timestamp ?? this.timestamp,
     );
   }

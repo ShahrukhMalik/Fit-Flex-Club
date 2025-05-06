@@ -1,12 +1,13 @@
 // entities/reaction.dart
 import 'package:equatable/equatable.dart';
+import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 
 class Reaction extends Equatable {
   final String id;
   final String userId;
   final String announcementId;
   final String userName;
-  final String emoji; // e.g., '🔥', '❤️', '💪'
+  final EmojiEntity emoji; // e.g., '🔥', '❤️', '💪'
   final DateTime timestamp;
 
   const Reaction({

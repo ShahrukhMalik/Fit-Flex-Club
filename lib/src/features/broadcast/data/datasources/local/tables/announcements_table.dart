@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fit_flex_club/src/features/chat/data/datasources/local/converters/converters.dart';
 
 class Announcements extends Table {
   TextColumn get id => text()();
@@ -12,6 +13,9 @@ class Announcements extends Table {
   BlobColumn get mediaBytes => blob().nullable()();
   TextColumn get postType => text()(); // Drift supports enum mapping
   IntColumn get createdAt => integer()();
+  IntColumn get reactionsCount => integer()();
+  IntColumn get commentsCount => integer()();
+  TextColumn get myReaction => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

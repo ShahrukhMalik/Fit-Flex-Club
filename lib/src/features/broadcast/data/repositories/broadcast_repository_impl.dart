@@ -1,9 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
+import 'package:uuid_v4/uuid_v4.dart';
+
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
-
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
@@ -14,13 +16,12 @@ import 'package:fit_flex_club/src/features/broadcast/data/models/comment_model.d
 import 'package:fit_flex_club/src/features/broadcast/data/models/reaction_model.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/announcement_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_entity.dart';
+import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/notification_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/repositories/broadcast_repository.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
-import 'package:injectable/injectable.dart';
-import 'package:uuid_v4/uuid_v4.dart';
 
 enum AnnouncementsEvents {
   createEvent,
@@ -38,11 +39,13 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
   final BroadcastRemoteDatasource broadcastRemoteDatasource;
   final BroadcastLocalDatasource broadcastLocalDatasource;
   final SyncQueueDao syncQueue;
+  final SharedPrefsUtil prefs;
   BroadcastRepositoryImpl({
     required this.networkInfo,
-    required this.syncQueue,
     required this.broadcastRemoteDatasource,
     required this.broadcastLocalDatasource,
+    required this.syncQueue,
+    required this.prefs,
   });
   @override
   Future<Either<Failures, void>> sendNotification(
@@ -153,6 +156,8 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
         id: announcementId,
         gymId: announcement.postedFor == PostedFor.Gym ? gymId : null,
         trainerId: announcement.postedFor == PostedFor.Trainer ? authId : null,
+        trainerName: prefs.getUserName(),
+        gymName: prefs.getGymName()
       );
 
       await broadcastLocalDatasource.createAnnouncement(
@@ -250,6 +255,10 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
 
       final model = ReactionModel.fromEntity(
         reaction,
+      ).copyWith(
+        id: authId,
+        userId: authId,
+        userName: prefs.getUserName(),
       );
 
       await broadcastLocalDatasource.addReaction(
@@ -576,6 +585,36 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
         );
       }
       return Right(localReactionsStream);
+    } on ServerException catch (error) {
+      return Left(
+        ServerFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    } on CacheException catch (error) {
+      return Left(
+        CacheFailure(
+          message: error.errorMessage,
+          code: error.errorCode,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failures, List<EmojiEntity>>> getEmojis() async {
+    try {
+      final isConnected = await networkInfo.isConnected ?? false;
+      if (isConnected) {
+        return Right(await broadcastRemoteDatasource.getEmojis());
+      } else {
+        return Left(
+          ServerFailure(
+            message: "Internet is not available",
+          ),
+        );
+      }
     } on ServerException catch (error) {
       return Left(
         ServerFailure(
