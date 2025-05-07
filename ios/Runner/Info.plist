@@ -39,6 +39,8 @@
 	</array>
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access to send voice messages.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fit Flex requires access to the phone's library so that you are able to save profile picture for you.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

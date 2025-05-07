@@ -59,7 +59,7 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
       if (widget.mediaBytes != null) {
         final audioFile = await writeBytesToTempFile(
           widget.mediaBytes!,
-          'chat_audio_${DateTime.now().millisecondsSinceEpoch}',
+          'chat_audio_${DateTime.now().millisecondsSinceEpoch}.m4a',
         );
         path = audioFile.path;
         await _player.setFilePath(path);

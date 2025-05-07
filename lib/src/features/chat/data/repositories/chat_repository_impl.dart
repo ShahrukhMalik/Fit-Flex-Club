@@ -124,6 +124,7 @@ class ChatRepositoryImpl extends ChatRepository {
       );
       await localDb.startMessage(
         message: messageModel,
+        
       );
       final updatedUnreadCount =
           Map<String, int>.from(retrievedChat.unreadCount);
