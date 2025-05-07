@@ -194,86 +194,89 @@ class _FitFlexClientDashboardPageState
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      floatingActionButton: !widget.showFloatingAction
-          ? null
-          : FloatingActionButton(
-              onPressed: () {},
-              child: BlocConsumer<WatchChatStreamCubit, WatchChatStreamState>(
-                listener: (context, state) {},
-                builder: (context, state) {
-                  // if (state is SubjectFailed) {
-                  //   return ErrorOutput(message: state.message);
-                  // }
-                  if (state is WatchChatStreamComplete) {
-                    final currentUserId =
-                        getIt<FirebaseAuth>().currentUser?.uid;
-
-                    final chats = state.chats
-                        .where(
-                          (chat) => chat.members.any(
-                            (member) => member['userId'] == currentUserId,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        floatingActionButton: !widget.showFloatingAction
+            ? null
+            : FloatingActionButton(
+                onPressed: () {},
+                child: BlocConsumer<WatchChatStreamCubit, WatchChatStreamState>(
+                  listener: (context, state) {},
+                  builder: (context, state) {
+                    // if (state is SubjectFailed) {
+                    //   return ErrorOutput(message: state.message);
+                    // }
+                    if (state is WatchChatStreamComplete) {
+                      final currentUserId =
+                          getIt<FirebaseAuth>().currentUser?.uid;
+      
+                      final chats = state.chats
+                          .where(
+                            (chat) => chat.members.any(
+                              (member) => member['userId'] == currentUserId,
+                            ),
+                          )
+                          .toList();
+                      String unreadCount = '';
+                      ChatEntity? chat;
+      
+                      if (chats.isNotEmpty) {
+                        chat = chats[0];
+                        unreadCount = (chat.unreadCount[
+                                        getIt<FirebaseAuth>().currentUser?.uid] ??
+                                    0) >
+                                0
+                            ? (chat.unreadCount[
+                                        getIt<FirebaseAuth>().currentUser?.uid] ??
+                                    0)
+                                .toString()
+                            : '';
+                      }
+                      return Stack(
+                        children: [
+                          IconButton(
+                            onPressed: () => context.push(
+                              '${FitFlexClientProfilePage.route}/${FitFlexClientChatWindowPage.route}',
+                              extra: {
+                                'chat': chat,
+                              },
+                            ),
+                            icon: Icon(Icons.chat_bubble),
                           ),
-                        )
-                        .toList();
-                    String unreadCount = '';
-                    ChatEntity? chat;
-
-                    if (chats.isNotEmpty) {
-                      chat = chats[0];
-                      unreadCount = (chat.unreadCount[
-                                      getIt<FirebaseAuth>().currentUser?.uid] ??
-                                  0) >
-                              0
-                          ? (chat.unreadCount[
-                                      getIt<FirebaseAuth>().currentUser?.uid] ??
-                                  0)
-                              .toString()
-                          : '';
-                    }
-                    return Stack(
-                      children: [
-                        IconButton(
-                          onPressed: () => context.push(
-                            '${FitFlexClientProfilePage.route}/${FitFlexClientChatWindowPage.route}',
-                            extra: {
-                              'chat': chat,
-                            },
-                          ),
-                          icon: Icon(Icons.chat_bubble),
-                        ),
-                        if (unreadCount.isNotEmpty)
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: CircleAvatar(
-                              backgroundColor:
-                                  globalColorScheme.secondaryContainer,
-                              minRadius: 12,
-                              child: Center(
-                                child: Text(
-                                  unreadCount,
-                                  style: TextStyle(
-                                    color: Colors.white,
+                          if (unreadCount.isNotEmpty)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: CircleAvatar(
+                                backgroundColor:
+                                    globalColorScheme.secondaryContainer,
+                                minRadius: 12,
+                                child: Center(
+                                  child: Text(
+                                    unreadCount,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                      ],
-                    );
-                  }
-                  return CupertinoActivityIndicator();
-                },
+                            )
+                        ],
+                      );
+                    }
+                    return CupertinoActivityIndicator();
+                  },
+                ),
               ),
-            ),
-      body: Column(
-        children: [
-          // Main content
-          Expanded(child: widget.navigationShell),
-          // Bottom navigation overlay
-          if (widget.showBottomNavBar) _buildBottomNavOverlay(context, width),
-        ],
+        body: Column(
+          children: [
+            // Main content
+            Expanded(child: widget.navigationShell),
+            // Bottom navigation overlay
+            if (widget.showBottomNavBar) _buildBottomNavOverlay(context, width),
+          ],
+        ),
       ),
     );
   }

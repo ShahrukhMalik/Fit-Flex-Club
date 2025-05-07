@@ -6,6 +6,8 @@ class Messages extends Table {
   TextColumn get id => text()(); // Firestore doc ID or UUID
   TextColumn get senderId => text()();
   TextColumn get messageText => text().nullable()();
+  TextColumn get mediaUrl => text().nullable()();
+  BlobColumn get mediaBytes => blob().nullable()();
   TextColumn get type =>
       text().withDefault(const Constant('text'))(); // text, image etc.
   DateTimeColumn get timestamp => dateTime()();

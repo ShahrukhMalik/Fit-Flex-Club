@@ -5944,6 +5944,18 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
   late final GeneratedColumn<String> messageText = GeneratedColumn<String>(
       'message_text', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mediaUrlMeta =
+      const VerificationMeta('mediaUrl');
+  @override
+  late final GeneratedColumn<String> mediaUrl = GeneratedColumn<String>(
+      'media_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mediaBytesMeta =
+      const VerificationMeta('mediaBytes');
+  @override
+  late final GeneratedColumn<Uint8List> mediaBytes = GeneratedColumn<Uint8List>(
+      'media_bytes', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
   static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumn<String> type = GeneratedColumn<String>(
@@ -5989,6 +6001,8 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         id,
         senderId,
         messageText,
+        mediaUrl,
+        mediaBytes,
         type,
         timestamp,
         sentTo,
@@ -6023,6 +6037,16 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
           messageText.isAcceptableOrUnknown(
               data['message_text']!, _messageTextMeta));
     }
+    if (data.containsKey('media_url')) {
+      context.handle(_mediaUrlMeta,
+          mediaUrl.isAcceptableOrUnknown(data['media_url']!, _mediaUrlMeta));
+    }
+    if (data.containsKey('media_bytes')) {
+      context.handle(
+          _mediaBytesMeta,
+          mediaBytes.isAcceptableOrUnknown(
+              data['media_bytes']!, _mediaBytesMeta));
+    }
     if (data.containsKey('type')) {
       context.handle(
           _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
@@ -6055,6 +6079,10 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
           .read(DriftSqlType.string, data['${effectivePrefix}sender_id'])!,
       messageText: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}message_text']),
+      mediaUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}media_url']),
+      mediaBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}media_bytes']),
       type: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
       timestamp: attachedDatabase.typeMapping
@@ -6090,6 +6118,8 @@ class Message extends DataClass implements Insertable<Message> {
   final String id;
   final String senderId;
   final String? messageText;
+  final String? mediaUrl;
+  final Uint8List? mediaBytes;
   final String type;
   final DateTime timestamp;
   final List<String> sentTo;
@@ -6100,6 +6130,8 @@ class Message extends DataClass implements Insertable<Message> {
       {required this.id,
       required this.senderId,
       this.messageText,
+      this.mediaUrl,
+      this.mediaBytes,
       required this.type,
       required this.timestamp,
       required this.sentTo,
@@ -6113,6 +6145,12 @@ class Message extends DataClass implements Insertable<Message> {
     map['sender_id'] = Variable<String>(senderId);
     if (!nullToAbsent || messageText != null) {
       map['message_text'] = Variable<String>(messageText);
+    }
+    if (!nullToAbsent || mediaUrl != null) {
+      map['media_url'] = Variable<String>(mediaUrl);
+    }
+    if (!nullToAbsent || mediaBytes != null) {
+      map['media_bytes'] = Variable<Uint8List>(mediaBytes);
     }
     map['type'] = Variable<String>(type);
     map['timestamp'] = Variable<DateTime>(timestamp);
@@ -6141,6 +6179,12 @@ class Message extends DataClass implements Insertable<Message> {
       messageText: messageText == null && nullToAbsent
           ? const Value.absent()
           : Value(messageText),
+      mediaUrl: mediaUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mediaUrl),
+      mediaBytes: mediaBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mediaBytes),
       type: Value(type),
       timestamp: Value(timestamp),
       sentTo: Value(sentTo),
@@ -6158,6 +6202,8 @@ class Message extends DataClass implements Insertable<Message> {
       id: serializer.fromJson<String>(json['id']),
       senderId: serializer.fromJson<String>(json['senderId']),
       messageText: serializer.fromJson<String?>(json['messageText']),
+      mediaUrl: serializer.fromJson<String?>(json['mediaUrl']),
+      mediaBytes: serializer.fromJson<Uint8List?>(json['mediaBytes']),
       type: serializer.fromJson<String>(json['type']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
       sentTo: serializer.fromJson<List<String>>(json['sentTo']),
@@ -6173,6 +6219,8 @@ class Message extends DataClass implements Insertable<Message> {
       'id': serializer.toJson<String>(id),
       'senderId': serializer.toJson<String>(senderId),
       'messageText': serializer.toJson<String?>(messageText),
+      'mediaUrl': serializer.toJson<String?>(mediaUrl),
+      'mediaBytes': serializer.toJson<Uint8List?>(mediaBytes),
       'type': serializer.toJson<String>(type),
       'timestamp': serializer.toJson<DateTime>(timestamp),
       'sentTo': serializer.toJson<List<String>>(sentTo),
@@ -6186,6 +6234,8 @@ class Message extends DataClass implements Insertable<Message> {
           {String? id,
           String? senderId,
           Value<String?> messageText = const Value.absent(),
+          Value<String?> mediaUrl = const Value.absent(),
+          Value<Uint8List?> mediaBytes = const Value.absent(),
           String? type,
           DateTime? timestamp,
           List<String>? sentTo,
@@ -6196,6 +6246,8 @@ class Message extends DataClass implements Insertable<Message> {
         id: id ?? this.id,
         senderId: senderId ?? this.senderId,
         messageText: messageText.present ? messageText.value : this.messageText,
+        mediaUrl: mediaUrl.present ? mediaUrl.value : this.mediaUrl,
+        mediaBytes: mediaBytes.present ? mediaBytes.value : this.mediaBytes,
         type: type ?? this.type,
         timestamp: timestamp ?? this.timestamp,
         sentTo: sentTo ?? this.sentTo,
@@ -6209,6 +6261,9 @@ class Message extends DataClass implements Insertable<Message> {
       senderId: data.senderId.present ? data.senderId.value : this.senderId,
       messageText:
           data.messageText.present ? data.messageText.value : this.messageText,
+      mediaUrl: data.mediaUrl.present ? data.mediaUrl.value : this.mediaUrl,
+      mediaBytes:
+          data.mediaBytes.present ? data.mediaBytes.value : this.mediaBytes,
       type: data.type.present ? data.type.value : this.type,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
       sentTo: data.sentTo.present ? data.sentTo.value : this.sentTo,
@@ -6225,6 +6280,8 @@ class Message extends DataClass implements Insertable<Message> {
           ..write('id: $id, ')
           ..write('senderId: $senderId, ')
           ..write('messageText: $messageText, ')
+          ..write('mediaUrl: $mediaUrl, ')
+          ..write('mediaBytes: $mediaBytes, ')
           ..write('type: $type, ')
           ..write('timestamp: $timestamp, ')
           ..write('sentTo: $sentTo, ')
@@ -6236,8 +6293,18 @@ class Message extends DataClass implements Insertable<Message> {
   }
 
   @override
-  int get hashCode => Object.hash(id, senderId, messageText, type, timestamp,
-      sentTo, deliveredTo, readBy, chatId);
+  int get hashCode => Object.hash(
+      id,
+      senderId,
+      messageText,
+      mediaUrl,
+      $driftBlobEquality.hash(mediaBytes),
+      type,
+      timestamp,
+      sentTo,
+      deliveredTo,
+      readBy,
+      chatId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6245,6 +6312,8 @@ class Message extends DataClass implements Insertable<Message> {
           other.id == this.id &&
           other.senderId == this.senderId &&
           other.messageText == this.messageText &&
+          other.mediaUrl == this.mediaUrl &&
+          $driftBlobEquality.equals(other.mediaBytes, this.mediaBytes) &&
           other.type == this.type &&
           other.timestamp == this.timestamp &&
           other.sentTo == this.sentTo &&
@@ -6257,6 +6326,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   final Value<String> id;
   final Value<String> senderId;
   final Value<String?> messageText;
+  final Value<String?> mediaUrl;
+  final Value<Uint8List?> mediaBytes;
   final Value<String> type;
   final Value<DateTime> timestamp;
   final Value<List<String>> sentTo;
@@ -6268,6 +6339,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.id = const Value.absent(),
     this.senderId = const Value.absent(),
     this.messageText = const Value.absent(),
+    this.mediaUrl = const Value.absent(),
+    this.mediaBytes = const Value.absent(),
     this.type = const Value.absent(),
     this.timestamp = const Value.absent(),
     this.sentTo = const Value.absent(),
@@ -6280,6 +6353,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     required String id,
     required String senderId,
     this.messageText = const Value.absent(),
+    this.mediaUrl = const Value.absent(),
+    this.mediaBytes = const Value.absent(),
     this.type = const Value.absent(),
     required DateTime timestamp,
     required List<String> sentTo,
@@ -6297,6 +6372,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Expression<String>? id,
     Expression<String>? senderId,
     Expression<String>? messageText,
+    Expression<String>? mediaUrl,
+    Expression<Uint8List>? mediaBytes,
     Expression<String>? type,
     Expression<DateTime>? timestamp,
     Expression<String>? sentTo,
@@ -6309,6 +6386,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (id != null) 'id': id,
       if (senderId != null) 'sender_id': senderId,
       if (messageText != null) 'message_text': messageText,
+      if (mediaUrl != null) 'media_url': mediaUrl,
+      if (mediaBytes != null) 'media_bytes': mediaBytes,
       if (type != null) 'type': type,
       if (timestamp != null) 'timestamp': timestamp,
       if (sentTo != null) 'sent_to': sentTo,
@@ -6323,6 +6402,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       {Value<String>? id,
       Value<String>? senderId,
       Value<String?>? messageText,
+      Value<String?>? mediaUrl,
+      Value<Uint8List?>? mediaBytes,
       Value<String>? type,
       Value<DateTime>? timestamp,
       Value<List<String>>? sentTo,
@@ -6334,6 +6415,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       id: id ?? this.id,
       senderId: senderId ?? this.senderId,
       messageText: messageText ?? this.messageText,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
+      mediaBytes: mediaBytes ?? this.mediaBytes,
       type: type ?? this.type,
       timestamp: timestamp ?? this.timestamp,
       sentTo: sentTo ?? this.sentTo,
@@ -6355,6 +6438,12 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     }
     if (messageText.present) {
       map['message_text'] = Variable<String>(messageText.value);
+    }
+    if (mediaUrl.present) {
+      map['media_url'] = Variable<String>(mediaUrl.value);
+    }
+    if (mediaBytes.present) {
+      map['media_bytes'] = Variable<Uint8List>(mediaBytes.value);
     }
     if (type.present) {
       map['type'] = Variable<String>(type.value);
@@ -6389,6 +6478,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
           ..write('id: $id, ')
           ..write('senderId: $senderId, ')
           ..write('messageText: $messageText, ')
+          ..write('mediaUrl: $mediaUrl, ')
+          ..write('mediaBytes: $mediaBytes, ')
           ..write('type: $type, ')
           ..write('timestamp: $timestamp, ')
           ..write('sentTo: $sentTo, ')
@@ -12812,6 +12903,8 @@ typedef $$MessagesTableCreateCompanionBuilder = MessagesCompanion Function({
   required String id,
   required String senderId,
   Value<String?> messageText,
+  Value<String?> mediaUrl,
+  Value<Uint8List?> mediaBytes,
   Value<String> type,
   required DateTime timestamp,
   required List<String> sentTo,
@@ -12824,6 +12917,8 @@ typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
   Value<String> id,
   Value<String> senderId,
   Value<String?> messageText,
+  Value<String?> mediaUrl,
+  Value<Uint8List?> mediaBytes,
   Value<String> type,
   Value<DateTime> timestamp,
   Value<List<String>> sentTo,
@@ -12869,6 +12964,12 @@ class $$MessagesTableFilterComposer
 
   ColumnFilters<String> get messageText => $composableBuilder(
       column: $table.messageText, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mediaUrl => $composableBuilder(
+      column: $table.mediaUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get mediaBytes => $composableBuilder(
+      column: $table.mediaBytes, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get type => $composableBuilder(
       column: $table.type, builder: (column) => ColumnFilters(column));
@@ -12930,6 +13031,12 @@ class $$MessagesTableOrderingComposer
   ColumnOrderings<String> get messageText => $composableBuilder(
       column: $table.messageText, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get mediaUrl => $composableBuilder(
+      column: $table.mediaUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get mediaBytes => $composableBuilder(
+      column: $table.mediaBytes, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get type => $composableBuilder(
       column: $table.type, builder: (column) => ColumnOrderings(column));
 
@@ -12983,6 +13090,12 @@ class $$MessagesTableAnnotationComposer
 
   GeneratedColumn<String> get messageText => $composableBuilder(
       column: $table.messageText, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaUrl =>
+      $composableBuilder(column: $table.mediaUrl, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get mediaBytes => $composableBuilder(
+      column: $table.mediaBytes, builder: (column) => column);
 
   GeneratedColumn<String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
@@ -13047,6 +13160,8 @@ class $$MessagesTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> senderId = const Value.absent(),
             Value<String?> messageText = const Value.absent(),
+            Value<String?> mediaUrl = const Value.absent(),
+            Value<Uint8List?> mediaBytes = const Value.absent(),
             Value<String> type = const Value.absent(),
             Value<DateTime> timestamp = const Value.absent(),
             Value<List<String>> sentTo = const Value.absent(),
@@ -13059,6 +13174,8 @@ class $$MessagesTableTableManager extends RootTableManager<
             id: id,
             senderId: senderId,
             messageText: messageText,
+            mediaUrl: mediaUrl,
+            mediaBytes: mediaBytes,
             type: type,
             timestamp: timestamp,
             sentTo: sentTo,
@@ -13071,6 +13188,8 @@ class $$MessagesTableTableManager extends RootTableManager<
             required String id,
             required String senderId,
             Value<String?> messageText = const Value.absent(),
+            Value<String?> mediaUrl = const Value.absent(),
+            Value<Uint8List?> mediaBytes = const Value.absent(),
             Value<String> type = const Value.absent(),
             required DateTime timestamp,
             required List<String> sentTo,
@@ -13083,6 +13202,8 @@ class $$MessagesTableTableManager extends RootTableManager<
             id: id,
             senderId: senderId,
             messageText: messageText,
+            mediaUrl: mediaUrl,
+            mediaBytes: mediaBytes,
             type: type,
             timestamp: timestamp,
             sentTo: sentTo,

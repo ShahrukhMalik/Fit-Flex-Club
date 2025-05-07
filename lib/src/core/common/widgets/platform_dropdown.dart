@@ -204,7 +204,9 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<Map<String, String>>(
+            style: TextStyle(color: widget.selectedOptionColor),
             isDense: true,
+            iconEnabledColor: widget.selectedOptionColor,
             value: selectedValue,
             items: widget.options
                 .map(

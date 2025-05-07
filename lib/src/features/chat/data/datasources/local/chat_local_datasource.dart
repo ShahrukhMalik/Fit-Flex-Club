@@ -117,7 +117,11 @@ class ChatLocalDatasourceImpl extends ChatLocalDatasource {
 
       final transformedStream = messagesByChatIdStream.map(
         (messagesList) => messagesList
-            .map((message) => MessageModel.fromLocal(message.toJson()))
+            .map(
+              (message) => MessageModel.fromLocal(
+                message.toJson(),
+              ),
+            )
             .toList(),
       );
 
@@ -136,15 +140,20 @@ class ChatLocalDatasourceImpl extends ChatLocalDatasource {
         messages
             .map(
               (message) => MessagesCompanion(
-                  id: Value(message.id),
-                  chatId: Value(message.chatId),
-                  deliveredTo: Value(message.deliveredTo),
-                  messageText: Value(message.messageText),
-                  readBy: Value(message.readBy),
-                  senderId: Value(message.senderId),
-                  sentTo: Value(message.sentTo),
-                  timestamp: Value(message.timestamp),
-                  type: Value(message.type)),
+                id: Value(message.id),
+                mediaBytes: Value(message.mediaBytes),
+                mediaUrl: Value(message.mediaUrl),
+                chatId: Value(message.chatId),
+                deliveredTo: Value(message.deliveredTo),
+                messageText: Value(message.messageText),
+                readBy: Value(message.readBy),
+                senderId: Value(message.senderId),
+                sentTo: Value(message.sentTo),
+                timestamp: Value(message.timestamp),
+                type: Value(
+                  message.type.name,
+                ),
+              ),
             )
             .toList(),
       );
@@ -160,11 +169,13 @@ class ChatLocalDatasourceImpl extends ChatLocalDatasource {
     try {
       await chatDao.insertMessage(
         MessagesCompanion(
+          mediaBytes: Value(message.mediaBytes),
+          mediaUrl: Value(message.mediaUrl),
           id: Value(message.id),
           chatId: Value(message.chatId),
           deliveredTo: Value(message.deliveredTo),
           messageText: Value(message.messageText),
-          type: Value(message.type),
+          type: Value(message.type.name),
           timestamp: Value(message.timestamp),
           sentTo: Value(message.sentTo),
           readBy: Value(message.readBy),

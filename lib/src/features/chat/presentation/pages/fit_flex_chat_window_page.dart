@@ -3,11 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart'
+    show AnnouncementImageWidget;
 import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/sendmessage/sendmessage_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/updatemessage/updatemessage_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchmessagesbychatid/watchmessagesbychatid_cubit.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_message_player_widget.dart'
+    show AudioMessagePlayerWidget;
+import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_record_mic_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +29,6 @@ class FitFlexChatWindowPage extends StatefulWidget {
   const FitFlexChatWindowPage({
     super.key,
     required this.chat,
-
   });
 
   @override
@@ -32,6 +36,7 @@ class FitFlexChatWindowPage extends StatefulWidget {
 }
 
 class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
+  final ValueNotifier<bool> showMessageSendIcon = ValueNotifier(false);
   final _messageController = TextEditingController();
   @override
   void initState() {
@@ -44,9 +49,68 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
 
   late String currentUserId;
 
+  Widget buildMessageContent(
+    MessageEntity message,
+    bool isCurrentUser,
+    String formattedTime,
+  ) {
+    switch (message.type) {
+      case MessageType.text:
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: isCurrentUser
+                ? globalColorScheme.primary.withOpacity(0.8)
+                : globalColorScheme.onPrimaryContainer.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  message.messageText,
+                  style: TextStyle(
+                    color: isCurrentUser
+                        ? globalColorScheme.onPrimary
+                        : globalColorScheme.onSecondary,
+                  ),
+                ),
+              ),
+              SizedBox(width: 6),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Text(
+                  formattedTime,
+                  style: TextStyle(
+                    color: isCurrentUser
+                        ? globalColorScheme.onPrimaryContainer.withOpacity(0.8)
+                        : globalColorScheme.surface.withOpacity(0.7),
+                    fontSize: 9,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+
+      case MessageType.image:
+        return AnnouncementImageWidget(
+          mediaBytes: message.mediaBytes,
+          mediaUrl: message.mediaUrl,
+        );
+
+      case MessageType.audio:
+        return AudioMessagePlayerWidget(
+          mediaBytes: message.mediaBytes,
+          mediaUrl: message.mediaUrl,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     final userName = widget.chat.members
         .where(
           (element) => element['userId'] != currentUserId,
@@ -190,135 +254,68 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
 
                         // Message bubble rendering
                         final message = item as MessageEntity;
-                        final isCurrentUser =
-                            message.senderId == currentUserId;
+                        final isCurrentUser = message.senderId == currentUserId;
                         final formattedTime =
                             DateFormat.Hm().format(message.timestamp);
 
                         return Align(
-                          alignment: isCurrentUser
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 1.5),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: isCurrentUser
-                                  ? globalColorScheme.primary.withOpacity(0.8)
-                                  : globalColorScheme.onPrimaryContainer
-                                      .withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    message.messageText,
-                                    style: TextStyle(
-                                      color: isCurrentUser
-                                          ? globalColorScheme.onPrimary
-                                          : globalColorScheme.onSecondary,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 6),
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(
-                                    formattedTime,
-                                    style: TextStyle(
-                                      color: isCurrentUser
-                                          ? globalColorScheme.onPrimaryContainer
-                                              .withOpacity(0.8)
-                                          : globalColorScheme.surface
-                                              .withOpacity(0.7),
-                                      fontSize: 9,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
+                            alignment: isCurrentUser
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: buildMessageContent(
+                              message,
+                              isCurrentUser,
+                              formattedTime,
+                            )
+                            // Container(
+                            //   margin: const EdgeInsets.symmetric(vertical: 1.5),
+                            //   padding: const EdgeInsets.symmetric(
+                            //       horizontal: 10, vertical: 5),
+                            //   decoration: BoxDecoration(
+                            //     color: isCurrentUser
+                            //         ? globalColorScheme.primary.withOpacity(0.8)
+                            //         : globalColorScheme.onPrimaryContainer
+                            //             .withOpacity(0.7),
+                            //     borderRadius: BorderRadius.circular(8),
+                            //   ),
+                            //   child: Row(
+                            //     mainAxisSize: MainAxisSize.min,
+                            //     children: [
+                            //       Flexible(
+                            //         child: Text(
+                            //           message.messageText,
+                            //           style: TextStyle(
+                            //             color: isCurrentUser
+                            //                 ? globalColorScheme.onPrimary
+                            //                 : globalColorScheme.onSecondary,
+                            //           ),
+                            //         ),
+                            //       ),
+                            //       SizedBox(width: 6),
+                            //       Align(
+                            //         alignment: Alignment.bottomCenter,
+                            //         child: Text(
+                            //           formattedTime,
+                            //           style: TextStyle(
+                            //             color: isCurrentUser
+                            //                 ? globalColorScheme.onPrimaryContainer
+                            //                     .withOpacity(0.8)
+                            //                 : globalColorScheme.surface
+                            //                     .withOpacity(0.7),
+                            //             fontSize: 9,
+                            //           ),
+                            //         ),
+                            //       )
+                            //     ],
+                            //   ),
+                            // ),
+                            );
                       },
                     );
-
-                    // return ListView.builder(
-                    //   reverse: true, // newest messages at the bottom
-                    //   itemCount: messages.length,
-                    //   padding: const EdgeInsets.symmetric(
-                    //       horizontal: 16, vertical: 8),
-                    //   itemBuilder: (context, index) {
-                    //     final message = messages[index];
-
-                    //     final isCurrentUser =
-                    //         message.senderId == currentUserId;
-                    //     final formattedTime =
-                    //         DateFormat.Hm().format(message.timestamp);
-                    //     return Align(
-                    //       alignment: isCurrentUser
-                    //           ? Alignment.centerRight
-                    //           : Alignment.centerLeft,
-                    //       child: Column(
-                    //         children: [
-                    //           Container(
-                    //             margin:
-                    //                 const EdgeInsets.symmetric(vertical: 1.5),
-                    //             padding: const EdgeInsets.symmetric(
-                    //                 horizontal: 10, vertical: 5),
-                    //             decoration: BoxDecoration(
-                    //               color: isCurrentUser
-                    //                   ? globalColorScheme.primary
-                    //                       .withOpacity(0.8)
-                    //                   : globalColorScheme.onPrimaryContainer
-                    //                       .withOpacity(0.7),
-                    //               borderRadius: BorderRadius.circular(8),
-                    //             ),
-                    //             child: Row(
-                    //               mainAxisSize: MainAxisSize.min,
-                    //               spacing: 5,
-                    //               children: [
-                    //                 Flexible(
-                    //                   child: Text(
-                    //                     message
-                    //                         .messageText, // Or whatever your field is
-                    //                     style: TextStyle(
-                    //                       color: isCurrentUser
-                    //                           ? globalColorScheme.onPrimary
-                    //                           : globalColorScheme.onSecondary,
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //                 Align(
-                    //                   alignment: Alignment.bottomCenter,
-                    //                   child: Text(
-                    //                     formattedTime,
-                    //                     style: TextStyle(
-                    //                       color: isCurrentUser
-                    //                           ? globalColorScheme
-                    //                               .onPrimaryContainer
-                    //                               .withOpacity(0.8)
-                    //                           : globalColorScheme.surface
-                    //                               .withOpacity(0.7),
-                    //                       fontSize: 9,
-                    //                     ),
-                    //                   ),
-                    //                 )
-                    //               ],
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     );
-                    //   },
-                    // );
                   } else {
                     return Center(child: Text('No messages yet..'));
                   }
                 }
-
                 return Center(child: CupertinoActivityIndicator());
               },
             ),
@@ -328,7 +325,7 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
           Positioned(
             bottom: 20,
             left: 20,
-            right: 20,
+            right: 70,
             child: Row(
               spacing: 0,
               children: [
@@ -343,7 +340,7 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                                 senderId: currentUserId,
                                 messageText: message,
                                 timestamp: DateTime.now(),
-                                type: 'text',
+                                type: MessageType.text,
                                 sentTo: [],
                                 deliveredTo: [],
                                 readBy: [],
@@ -361,35 +358,71 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
                     ),
                   ),
                 ),
-                IconButton(
-                  style: IconButton.styleFrom(
-                      backgroundColor:
-                          globalColorScheme.primary.withOpacity(0.3)),
-                  icon: Icon(
-                    Icons.send_sharp,
-                    color: globalColorScheme.onPrimaryContainer,
-                  ),
-                  onPressed: () {
-                    if (_messageController.text.isNotEmpty) {
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 10,
+            child: ValueListenableBuilder(
+              valueListenable: showMessageSendIcon,
+              builder: (context, showMessageIcon, _) {
+                if (showMessageIcon) {
+                  return InkWell(
+                    onTap: () {
+                      if (_messageController.text.isNotEmpty) {
+                        context.read<SendMessageCubit>().sendMessage(
+                              message: MessageEntity(
+                                id: '',
+                                chatId: widget.chat.id,
+                                senderId: '',
+                                messageText: _messageController.text.trim(),
+                                timestamp: DateTime.now(),
+                                type: MessageType.text,
+                                sentTo: [],
+                                deliveredTo: [],
+                                readBy: [],
+                              ),
+                              chat: widget.chat,
+                            );
+                      }
+                      _messageController.clear();
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: globalColorScheme.onPrimaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.send_sharp,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                } else {
+                  return DragExpandMic(
+                    onAudioRecorded: (audioBytes) {
                       context.read<SendMessageCubit>().sendMessage(
                             message: MessageEntity(
                               id: '',
                               chatId: widget.chat.id,
-                              senderId: currentUserId,
-                              messageText: _messageController.text.trim(),
+                              senderId: '',
+                              messageText: '',
                               timestamp: DateTime.now(),
-                              type: 'text',
+                              type: MessageType.audio,
+                              mediaBytes: audioBytes,
                               sentTo: [],
                               deliveredTo: [],
                               readBy: [],
                             ),
                             chat: widget.chat,
                           );
-                    }
-                    _messageController.clear();
-                  },
-                ),
-              ],
+                    },
+                  );
+                }
+              },
             ),
           )
         ],

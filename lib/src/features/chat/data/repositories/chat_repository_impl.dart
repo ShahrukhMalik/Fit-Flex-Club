@@ -107,6 +107,8 @@ class ChatRepositoryImpl extends ChatRepository {
         chatId: chat.id,
         senderId: authId,
         messageText: message.messageText,
+        mediaBytes: message.mediaBytes,
+        mediaUrl: message.mediaUrl,
         timestamp: DateTime.now(),
         type: message.type,
         sentTo: List<String>.from(chat.members
@@ -152,7 +154,7 @@ class ChatRepositoryImpl extends ChatRepository {
             "Messages",
             {
               'chat': updatedChat.toMap(),
-              'message': messageModel.toMap(),
+              'message': messageModel.toMap(true),
             },
           ),
         );
@@ -294,7 +296,8 @@ class ChatRepositoryImpl extends ChatRepository {
         remoteMessagesByChatIdStream.listen(
           (remoteMessages) async {
             await localDb.insertMessages(
-                messages: remoteMessages); // ✅ update local
+              messages: remoteMessages,
+            ); // ✅ update local
           },
           onError: (e) {
             // optional: handle remote stream errors

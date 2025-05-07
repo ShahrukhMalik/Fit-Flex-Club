@@ -1,8 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:core';
-
+import 'package:mime/mime.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 
 import 'package:fit_flex_club/src/features/chat/data/models/chat_model.dart';
@@ -10,6 +11,7 @@ import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uuid_v4/uuid_v4.dart';
 
 abstract class ChatRemoteDatasource {
   ///
@@ -87,11 +89,31 @@ class ChatRemoteDatasourceImpl extends ChatRemoteDatasource {
       await chatRef.doc(chat.id).set(
             chat.toMap(),
           );
-      await chatRef
-          .doc(chat.id)
-          .collection('messages')
-          .doc(message.id)
-          .set(message.toMap());
+
+      String? mediaUrl;
+
+      if (message.mediaBytes != null) {
+        // Determine owner ID (gym or trainer)
+        final ownerId = authId;
+
+        final fileExtension = message.type == MessageType.image ? 'jpg' : 'm4a';
+        final mimeType = lookupMimeType(
+          '',
+          headerBytes: message.mediaBytes,
+        );
+
+        // Construct path in Firebase Storage
+        final filePath =
+            'chats/${chat.id}/${chat.id}_${ownerId}_${UUIDv4().toString()}.$fileExtension';
+
+        // Upload to Firebase Storage
+        final storageRef = FirebaseStorage.instance.ref().child(filePath);
+        final uploadTask = await storageRef.putData(message.mediaBytes!);
+        mediaUrl = await uploadTask.ref.getDownloadURL();
+      }
+      await chatRef.doc(chat.id).collection('messages').doc(message.id).set(
+            message.copyWith(mediaUrl: mediaUrl).toMap(),
+          );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

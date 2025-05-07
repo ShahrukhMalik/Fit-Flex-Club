@@ -1,13 +1,20 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+
+enum MessageType { text, image, audio }
 
 class MessageEntity extends Equatable {
   final String id;
   final String chatId;
   final String senderId;
   final String messageText;
+  final Uint8List? mediaBytes;
+  final String? mediaUrl;
   final DateTime timestamp;
-  final String type;
+  final MessageType type;
   final List<String> sentTo;
   final List<String> deliveredTo;
   final List<String> readBy;
@@ -17,6 +24,8 @@ class MessageEntity extends Equatable {
     required this.chatId,
     required this.senderId,
     required this.messageText,
+    this.mediaBytes,
+    this.mediaUrl,
     required this.timestamp,
     required this.type,
     required this.sentTo,
@@ -40,5 +49,7 @@ class MessageEntity extends Equatable {
         sentTo,
         deliveredTo,
         readBy,
+        mediaBytes,
+        mediaUrl
       ];
 }

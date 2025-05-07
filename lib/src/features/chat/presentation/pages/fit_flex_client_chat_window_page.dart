@@ -2,7 +2,10 @@
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/updatemessage/updatemessage_cubit.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_message_player_widget.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_record_mic_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,6 +40,7 @@ class FitFlexClientChatWindowPage extends StatefulWidget {
 class _FitFlexClientChatWindowPageState
     extends State<FitFlexClientChatWindowPage> {
   final _messageController = TextEditingController();
+  final ValueNotifier<bool> showMessageSendIcon = ValueNotifier(false);
   late String? currentUserId;
   ChatEntity? chat;
   @override
@@ -46,6 +50,76 @@ class _FitFlexClientChatWindowPageState
     currentUserId = getIt<FirebaseAuth>().currentUser?.uid;
     if (chat != null) {
       context.read<WatchMessagesbyChatIdCubit>().getMessagesByChatId(chat!.id);
+    }
+
+    _messageController.addListener(
+      () {
+        if (_messageController.text.isEmpty) {
+          showMessageSendIcon.value = false;
+        } else {
+          showMessageSendIcon.value = true;
+        }
+      },
+    );
+  }
+
+  Widget buildMessageContent(
+    MessageEntity message,
+    bool isCurrentUser,
+    String formattedTime,
+  ) {
+    switch (message.type) {
+      case MessageType.text:
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: isCurrentUser
+                ? globalColorScheme.primary.withOpacity(0.8)
+                : globalColorScheme.onPrimaryContainer.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  message.messageText,
+                  style: TextStyle(
+                    color: isCurrentUser
+                        ? globalColorScheme.onPrimary
+                        : globalColorScheme.onSecondary,
+                  ),
+                ),
+              ),
+              SizedBox(width: 6),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Text(
+                  formattedTime,
+                  style: TextStyle(
+                    color: isCurrentUser
+                        ? globalColorScheme.onPrimaryContainer.withOpacity(0.8)
+                        : globalColorScheme.surface.withOpacity(0.7),
+                    fontSize: 9,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+
+      case MessageType.image:
+        return AnnouncementImageWidget(
+          mediaBytes: message.mediaBytes,
+          mediaUrl: message.mediaUrl,
+        );
+
+      case MessageType.audio:
+        return AudioMessagePlayerWidget(
+          mediaBytes: message.mediaBytes,
+          mediaUrl: message.mediaUrl,
+        );
     }
   }
 
@@ -241,52 +315,53 @@ class _FitFlexClientChatWindowPageState
                                   alignment: isCurrentUser
                                       ? Alignment.centerRight
                                       : Alignment.centerLeft,
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 1.5),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: isCurrentUser
-                                          ? globalColorScheme.primary
-                                              .withOpacity(0.8)
-                                          : globalColorScheme.onPrimaryContainer
-                                              .withOpacity(0.7),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            message.messageText,
-                                            style: TextStyle(
-                                              color: isCurrentUser
-                                                  ? globalColorScheme.onPrimary
-                                                  : globalColorScheme
-                                                      .onSecondary,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 6),
-                                        Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Text(
-                                            formattedTime,
-                                            style: TextStyle(
-                                              color: isCurrentUser
-                                                  ? globalColorScheme
-                                                      .onPrimaryContainer
-                                                      .withOpacity(0.8)
-                                                  : globalColorScheme.surface
-                                                      .withOpacity(0.7),
-                                              fontSize: 9,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                  child: buildMessageContent(message,isCurrentUser,formattedTime)
+                                  // Container(
+                                  //   margin: const EdgeInsets.symmetric(
+                                  //       vertical: 1.5),
+                                  //   padding: const EdgeInsets.symmetric(
+                                  //       horizontal: 10, vertical: 5),
+                                  //   decoration: BoxDecoration(
+                                  //     color: isCurrentUser
+                                  //         ? globalColorScheme.primary
+                                  //             .withOpacity(0.8)
+                                  //         : globalColorScheme.onPrimaryContainer
+                                  //             .withOpacity(0.7),
+                                  //     borderRadius: BorderRadius.circular(8),
+                                  //   ),
+                                  //   child: Row(
+                                  //     mainAxisSize: MainAxisSize.min,
+                                  //     children: [
+                                  //       Flexible(
+                                  //         child: Text(
+                                  //           message.messageText,
+                                  //           style: TextStyle(
+                                  //             color: isCurrentUser
+                                  //                 ? globalColorScheme.onPrimary
+                                  //                 : globalColorScheme
+                                  //                     .onSecondary,
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //       SizedBox(width: 6),
+                                  //       Align(
+                                  //         alignment: Alignment.bottomCenter,
+                                  //         child: Text(
+                                  //           formattedTime,
+                                  //           style: TextStyle(
+                                  //             color: isCurrentUser
+                                  //                 ? globalColorScheme
+                                  //                     .onPrimaryContainer
+                                  //                     .withOpacity(0.8)
+                                  //                 : globalColorScheme.surface
+                                  //                     .withOpacity(0.7),
+                                  //             fontSize: 9,
+                                  //           ),
+                                  //         ),
+                                  //       )
+                                  //     ],
+                                  //   ),
+                                  // ),
                                 );
                               },
                             );
@@ -331,7 +406,7 @@ class _FitFlexClientChatWindowPageState
                 Positioned(
                   bottom: 20,
                   left: 20,
-                  right: 20,
+                  right: 70,
                   child: Row(
                     spacing: 0,
                     children: [
@@ -346,7 +421,7 @@ class _FitFlexClientChatWindowPageState
                                       senderId: currentUserId ?? '',
                                       messageText: message,
                                       timestamp: DateTime.now(),
-                                      type: 'text',
+                                      type: MessageType.text,
                                       sentTo: [],
                                       deliveredTo: [],
                                       readBy: [],
@@ -364,35 +439,101 @@ class _FitFlexClientChatWindowPageState
                           ),
                         ),
                       ),
-                      IconButton(
-                        style: IconButton.styleFrom(
-                            backgroundColor:
-                                globalColorScheme.primary.withOpacity(0.3)),
-                        icon: Icon(
-                          Icons.send_sharp,
-                          color: globalColorScheme.onPrimaryContainer,
-                        ),
-                        onPressed: () {
-                          if (_messageController.text.isNotEmpty) {
+                      // DragExpandMic()
+                      // IconButton(
+                      //   style: IconButton.styleFrom(
+                      //       backgroundColor:
+                      //           globalColorScheme.primary.withOpacity(0.3)),
+                      //   icon: Icon(
+                      //     Icons.send_sharp,
+                      //     color: globalColorScheme.onPrimaryContainer,
+                      //   ),
+                      //   onPressed: () {
+                      //     if (_messageController.text.isNotEmpty) {
+                      //       context.read<SendMessageCubit>().sendMessage(
+                      //             message: MessageEntity(
+                      //               id: '',
+                      //               chatId: chat!.id,
+                      //               senderId: '',
+                      //               messageText: _messageController.text.trim(),
+                      //               timestamp: DateTime.now(),
+                      //               type: MessageType.text,
+                      //               sentTo: [],
+                      //               deliveredTo: [],
+                      //               readBy: [],
+                      //             ),
+                      //             chat: chat!,
+                      //           );
+                      //     }
+                      //     _messageController.clear();
+                      //   },
+                      // ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  right: 10,
+                  child: ValueListenableBuilder(
+                    valueListenable: showMessageSendIcon,
+                    builder: (context, showMessageIcon, _) {
+                      if (showMessageIcon) {
+                        return InkWell(
+                          onTap: () {
+                            if (_messageController.text.isNotEmpty) {
+                              context.read<SendMessageCubit>().sendMessage(
+                                    message: MessageEntity(
+                                      id: '',
+                                      chatId: chat!.id,
+                                      senderId: '',
+                                      messageText:
+                                          _messageController.text.trim(),
+                                      timestamp: DateTime.now(),
+                                      type: MessageType.text,
+                                      sentTo: [],
+                                      deliveredTo: [],
+                                      readBy: [],
+                                    ),
+                                    chat: chat!,
+                                  );
+                            }
+                            _messageController.clear();
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: globalColorScheme.onPrimaryContainer,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.send_sharp,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return DragExpandMic(
+                          onAudioRecorded: (audioBytes) {
                             context.read<SendMessageCubit>().sendMessage(
                                   message: MessageEntity(
                                     id: '',
                                     chatId: chat!.id,
                                     senderId: '',
-                                    messageText: _messageController.text.trim(),
+                                    messageText: '',
                                     timestamp: DateTime.now(),
-                                    type: 'text',
+                                    type: MessageType.audio,
+                                    mediaBytes: audioBytes,
                                     sentTo: [],
                                     deliveredTo: [],
                                     readBy: [],
                                   ),
                                   chat: chat!,
                                 );
-                          }
-                          _messageController.clear();
-                        },
-                      ),
-                    ],
+                          },
+                        );
+                      }
+                    },
                   ),
                 )
               ] else
@@ -422,17 +563,6 @@ class _FitFlexClientChatWindowPageState
                   ),
                 )
             ],
-
-            //     } else {
-            //       return Center(
-            //         child: Text(
-            //           'Chat is not yet intiated by trainer',
-            //         ),
-            //       );
-            //     }
-            //   }
-            //   return Center(child: CupertinoActivityIndicator());
-            // },
           ),
         ),
       ),

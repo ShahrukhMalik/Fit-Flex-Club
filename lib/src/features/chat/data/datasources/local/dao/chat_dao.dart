@@ -45,7 +45,7 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
 
   // 👉 Insert a message
   Future<void> insertMessage(MessagesCompanion message) async {
-    await into(messages).insert(message);
+    await into(messages).insertOnConflictUpdate(message);
     await (update(chats)..where((tbl) => tbl.id.equals(message.chatId.value!)))
         .write(
       ChatsCompanion(
