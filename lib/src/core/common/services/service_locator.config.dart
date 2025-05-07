@@ -54,6 +54,8 @@ import '../../../features/broadcast/data/repositories/broadcast_repository_impl.
     as _i375;
 import '../../../features/broadcast/domain/repositories/broadcast_repository.dart'
     as _i196;
+import '../../../features/broadcast/domain/usecases/add_comment_usecase.dart'
+    as _i953;
 import '../../../features/broadcast/domain/usecases/add_reaction_usecase.dart'
     as _i580;
 import '../../../features/broadcast/domain/usecases/get_emojis_usecase.dart'
@@ -64,6 +66,12 @@ import '../../../features/broadcast/domain/usecases/send_notification_usecase.da
     as _i92;
 import '../../../features/broadcast/domain/usecases/watch_announcement_usecase.dart'
     as _i17;
+import '../../../features/broadcast/domain/usecases/watch_comments_by_announcement_id_usecase.dart'
+    as _i732;
+import '../../../features/broadcast/domain/usecases/watch_reactions_by_announcment_id_usecase.dart'
+    as _i940;
+import '../../../features/broadcast/presentation/cubit/addcomment/addcomment_cubit.dart'
+    as _i1002;
 import '../../../features/broadcast/presentation/cubit/addreaction/addreaction_cubit.dart'
     as _i797;
 import '../../../features/broadcast/presentation/cubit/getemojis/getemojis_cubit.dart'
@@ -74,6 +82,10 @@ import '../../../features/broadcast/presentation/cubit/sendnotification/sendnoti
     as _i1041;
 import '../../../features/broadcast/presentation/cubit/watchannouncement/watchannouncement_cubit.dart'
     as _i843;
+import '../../../features/broadcast/presentation/cubit/watchcommentsbyannouncmentid/watchcommentsbyannouncmentid_cubit.dart'
+    as _i108;
+import '../../../features/broadcast/presentation/cubit/watchreactionsbyannouncmentid/watchreactionsbyannouncmentid_cubit.dart'
+    as _i90;
 import '../../../features/chat/data/datasources/local/chat_local_datasource.dart'
     as _i392;
 import '../../../features/chat/data/datasources/local/dao/chat_dao.dart'
@@ -445,6 +457,9 @@ extension GetItInjectableX on _i174.GetIt {
         _i1009.PostAnnouncementCubit(gh<_i671.PostAnnouncementUsecase>()));
     gh.singleton<_i447.LogOutUsecase>(() =>
         _i447.LogOutUsecaseImpl(authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i732.WatchCommentsByAnnouncementIdUsecase>(() =>
+        _i732.WatchCommentsByAnnouncementIdUsecaseImpl(
+            broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.factory<_i596.GetclientweightsCubit>(
         () => _i596.GetclientweightsCubit(gh<_i535.GetClientWeightsUsecase>()));
     gh.singleton<_i864.UpdateUserUsecase>(() => _i864.UpdateUserUsecaseImpl(
@@ -459,9 +474,14 @@ extension GetItInjectableX on _i174.GetIt {
               local: gh<_i615.WorkoutHistoryLocalDataSource>(),
               remote: gh<_i352.WorkoutHistoryRemoteDataSource>(),
             ));
+    gh.singleton<_i940.WatchReactionsByAnnouncementIdUsecase>(() =>
+        _i940.WatchReactionsByAnnouncementIdUsecaseImpl(
+            broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.singleton<_i841.GetClientByIdUsecase>(() =>
         _i841.GetClientByIdUsecaseImpl(
             clientProfileRepository: gh<_i627.ClientProfileRepository>()));
+    gh.singleton<_i953.AddCommentUsecase>(() => _i953.AddCommentUsecaseImpl(
+        broadcastRepository: gh<_i196.BroadcastRepository>()));
     gh.singleton<_i1026.GetGymsUsecase>(() => _i1026.GetGymsUsecaseImpl(
         clientProfileRepository: gh<_i627.ClientProfileRepository>()));
     gh.factory<_i729.WatchMessagesbyChatIdCubit>(() =>
@@ -491,6 +511,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i177.MarkEventListenedUsecase>(() =>
         _i177.MarkEventListenedUsecaseImpl(
             syncManagerRepository: gh<_i273.SyncManagerRepository>()));
+    gh.factory<_i108.WatchCommentsByAnnouncmentIdCubit>(() =>
+        _i108.WatchCommentsByAnnouncmentIdCubit(
+            gh<_i732.WatchCommentsByAnnouncementIdUsecase>()));
     gh.singleton<_i85.EventListenerUsecase>(() => _i85.EventListenerUsecaseImpl(
         syncManagerRepository: gh<_i273.SyncManagerRepository>()));
     gh.singleton<_i798.CheckConnectivityUsecase>(() =>
@@ -503,6 +526,9 @@ extension GetItInjectableX on _i174.GetIt {
             workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
     gh.singleton<_i250.GetChatUsecase>(() =>
         _i250.GetChatUsecaseImpl(chatRepository: gh<_i75.ChatRepository>()));
+    gh.factory<_i90.WatchReactionsbyAnnouncmentIdCubit>(() =>
+        _i90.WatchReactionsbyAnnouncmentIdCubit(
+            gh<_i940.WatchReactionsByAnnouncementIdUsecase>()));
     gh.factory<_i70.AuthenticationBloc>(() => _i70.AuthenticationBloc(
           authenticateUserUsecase: gh<_i949.AuthenticateUserUsecase>(),
           createAccountUsecase: gh<_i955.CreateAccountUsecase>(),
@@ -539,6 +565,8 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.factory<_i843.WatchAnnouncementCubit>(() =>
         _i843.WatchAnnouncementCubit(gh<_i17.WatchAnnouncementUsecase>()));
+    gh.factory<_i1002.AddcommentCubit>(
+        () => _i1002.AddcommentCubit(gh<_i953.AddCommentUsecase>()));
     gh.factory<_i156.GetChatCubit>(
         () => _i156.GetChatCubit(gh<_i250.GetChatUsecase>()));
     gh.factory<_i962.WatchChatStreamCubit>(

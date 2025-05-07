@@ -75,7 +75,7 @@ abstract class BroadcastRemoteDatasource {
       String announcementId);
 
   ///
-  Future<Stream<List<ReactionModel>>> watchReactionsByAnnouncementId(
+  Future<List<ReactionModel>> watchReactionsByAnnouncementId(
       String announcementId);
 }
 
@@ -123,8 +123,17 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
     try {
       final CollectionReference announcementsRef =
           remoteDb.collection('announcements');
-      await announcementsRef.doc(announcementId).collection('comments').add(
+      await announcementsRef
+          .doc(announcementId)
+          .collection('comments')
+          .doc(
+            comment.id,
+          )
+          .set(
             comment.toJson(),
+            SetOptions(
+              merge: true,
+            ),
           );
     } on FirebaseException catch (err) {
       throw ServerException(
@@ -146,12 +155,7 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
           .doc(announcementId)
           .collection('reactions')
           .doc(reaction.id)
-          .set(
-            reaction.toJson(),
-            SetOptions(
-              merge: true
-            )
-          );
+          .set(reaction.toJson(), SetOptions(merge: true));
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",
@@ -296,13 +300,27 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
 
       final authId = auth.currentUser?.uid;
       final gymId = getIt<SharedPrefsUtil>().getGymId();
+      final trainedId = getIt<SharedPrefsUtil>().getTrainerId();
+
+      final role = getIt<SharedPrefsUtil>().getAuthRole();
+
+      if (role == null) {
+        throw ServerException(errorMessage: "No Auth role found");
+      }
+
+      if (role == 'client' && trainedId == null) {
+        throw ServerException(errorMessage: "No trainer ID found");
+      }
 
       if (authId == null) {
         throw ServerException(errorMessage: "No Auth ID found");
       }
 
-      final trainerQuery =
-          announcementsRef.where('trainerId', isEqualTo: authId).snapshots();
+      final trainedIdForWhere = role == 'client' ? trainedId : authId;
+
+      final trainerQuery = announcementsRef
+          .where('trainerId', isEqualTo: trainedIdForWhere)
+          .snapshots();
 
       final gymQuery =
           announcementsRef.where('gymId', isEqualTo: gymId).snapshots();
@@ -395,7 +413,19 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
           .collection('announcements')
           .doc(announcementId)
           .collection('comments');
+      // final snapshot = await commentsRef.get();
 
+      // final comments = snapshot.docs
+      //     .map(
+      //       (doc) => CommentModel.fromFirestore(
+      //         doc.data() as Map<String, dynamic>,
+      //         doc.id,
+      //       ),
+      //     )
+      //     .toList();
+      // print('FB $announcementId');
+      // print(comments.length);
+      // return comments;
       return commentsRef.snapshots().map(
         (snapshot) {
           return snapshot.docs.map(
@@ -415,7 +445,7 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
   }
 
   @override
-  Future<Stream<List<ReactionModel>>> watchReactionsByAnnouncementId(
+  Future<List<ReactionModel>> watchReactionsByAnnouncementId(
       String announcementId) async {
     try {
       final CollectionReference commentsRef = remoteDb
@@ -423,16 +453,29 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
           .doc(announcementId)
           .collection('reactions');
 
-      return commentsRef.snapshots().map(
-        (snapshot) {
-          return snapshot.docs.map(
-            (doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return ReactionModel.fromFirestore(data, doc.id);
-            },
-          ).toList();
-        },
-      );
+      final snapshot = await commentsRef.get();
+
+      final reactions = snapshot.docs
+          .map(
+            (doc) => ReactionModel.fromFirestore(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
+          .toList();
+      print('FB $announcementId');
+      print(reactions.length);
+      return reactions;
+      // return commentsRef.snapshots().map(
+      //   (snapshot) {
+      //     return snapshot.docs.map(
+      //       (doc) {
+      //         final data = doc.data() as Map<String, dynamic>;
+      //         return ReactionModel.fromFirestore(data, doc.id);
+      //       },
+      //     ).toList();
+      //   },
+      // );
     } on FirebaseException catch (err) {
       throw ServerException(
         errorMessage: err.message ?? "Something went wrong!",

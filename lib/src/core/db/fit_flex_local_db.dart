@@ -212,7 +212,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 42;
+  int get schemaVersion => 44;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

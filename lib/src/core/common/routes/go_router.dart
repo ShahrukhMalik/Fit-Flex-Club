@@ -8,6 +8,7 @@ import 'package:fit_flex_club/src/features/authentication/presentation/pages/fit
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_personalized_notification_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_reactions_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
@@ -378,7 +379,9 @@ GoRouter goRouter(appState) {
                       final extraData = state.extra as Map<String, dynamic>?;
                       return TransitionPage(
                         key: state.pageKey,
-                        child: FitFlexAnnouncementsPage(),
+                        child: FitFlexAnnouncementsPage(
+                          isTrainer: true,
+                        ),
                       );
                     },
                     routes: [
@@ -389,6 +392,21 @@ GoRouter goRouter(appState) {
                           key: state.pageKey,
                           child: FitFlexPostAnnouncmentsPage(),
                         ),
+                      ),
+                      GoRoute(
+                        routes: [],
+                        path: FitFlexReactionsPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexReactionsPage(
+                              key: UniqueKey(),
+                              announcementId: extraData?['announcementId'],
+                            ),
+                          );
+                        },
                       )
                     ],
                   ),
@@ -412,7 +430,6 @@ GoRouter goRouter(appState) {
                             child: FitFlexChatWindowPage(
                               key: UniqueKey(),
                               chat: extraData?['chat'],
-                              // currentUserId: extraData?['currentUserId'],
                             ),
                           );
                         },
@@ -549,14 +566,19 @@ GoRouter goRouter(appState) {
                 routes: [
                   GoRoute(
                     routes: [],
-                    path: FitFlexPostAnnouncmentsPage.route,
-                    pageBuilder: (context, state) => TransitionPage(
-                      key: state.pageKey,
-                      child: FitFlexPostAnnouncmentsPage(),
-                    ),
-                  )
+                    path: FitFlexReactionsPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexReactionsPage(
+                          announcementId: extraData?['announcementId'],
+                        ),
+                      );
+                    },
+                  ),
                 ],
-                path: FitFlexAnnouncementsPage.route,
+                path: FitFlexAnnouncementsPage.clientRoute,
                 pageBuilder: (context, state) => TransitionPage(
                   key: state.pageKey,
                   child: FitFlexAnnouncementsPage(),

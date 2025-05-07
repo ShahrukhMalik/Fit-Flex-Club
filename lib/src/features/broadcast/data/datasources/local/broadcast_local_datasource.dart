@@ -76,7 +76,7 @@ abstract class BroadcastLocalDatasource {
   );
 
   ///
-  Future<Stream<List<ReactionModel>>> watchReactionsByAnnouncementId(
+  Future<List<ReactionModel>> watchReactionsByAnnouncementId(
     String announcementId,
   );
 }
@@ -193,12 +193,12 @@ class BroadcastLocalDatasourceImpl extends BroadcastLocalDatasource {
   Future<Stream<List<CommentModel>>> watchCommentsByAnnouncementId(
       String announcementId) async {
     try {
-      final commentsStream =
-          broadcastDao.watchCommentsForAnnouncement(announcementId);
-
+      final commentsStream =  broadcastDao.watchCommentsForAnnouncement(
+        announcementId,
+      );
       final transformedStream = commentsStream.map(
         (chatList) => chatList
-            .map((chat) => CommentModel.fromJson(chat.toJson()))
+            .map((chat) => CommentModel.fromDb(chat.toJson()))
             .toList(),
       );
       return transformedStream;
@@ -208,17 +208,17 @@ class BroadcastLocalDatasourceImpl extends BroadcastLocalDatasource {
   }
 
   @override
-  Future<Stream<List<ReactionModel>>> watchReactionsByAnnouncementId(
+  Future<List<ReactionModel>> watchReactionsByAnnouncementId(
       String announcementId) async {
     try {
-      final reactionsStream =
-          broadcastDao.watchReactionsForAnnouncement(announcementId);
-      final transformedStream = reactionsStream.map(
-        (chatList) => chatList
-            .map((chat) => ReactionModel.fromJson(chat.toJson()))
-            .toList(),
+      final reactions = await broadcastDao.watchReactionsForAnnouncement(
+        announcementId,
       );
-      return transformedStream;
+      print('LB $announcementId');
+      print(reactions.length);
+      return reactions
+          .map((chat) => ReactionModel.fromJson(chat.toJson()))
+          .toList();
     } catch (err) {
       throw CacheException(errorMessage: err.toString());
     }

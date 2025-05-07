@@ -497,14 +497,17 @@ class _FitFlexPostAnnouncmentsPageState
                                   } else if (state.type == MediaType.video) {
                                     return Stack(
                                       children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            child: VideoPreview(
-                                              bytes: state.bytes,
+                                        SizedBox(
+                                          height: 250,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 10),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: VideoPreview(
+                                                bytes: state.bytes,
+                                              ),
                                             ),
                                           ),
                                         ),

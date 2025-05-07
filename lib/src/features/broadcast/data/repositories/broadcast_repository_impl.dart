@@ -91,19 +91,23 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
         );
       }
 
+      final model = CommentModel.fromEntity(
+        comment,
+      ).copyWith(
+        id: authId,
+        userId: authId,
+        userName: prefs.getUserName(),
+      );
+
       await broadcastLocalDatasource.addComment(
         announcementId: announcementId,
-        comment: CommentModel.fromEntity(
-          comment,
-        ),
+        comment: model,
       );
 
       if (isConnected) {
         await broadcastRemoteDatasource.addComment(
           announcementId: announcementId,
-          comment: CommentModel.fromEntity(
-            comment,
-          ),
+          comment: model,
         );
         return Right(null);
       } else {
@@ -153,12 +157,12 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
       final announcementId =
           'announcement_${gymId ?? authId}_${UUIDv4().toString()}';
       final model = AnnouncementModel.fromEntity(announcement).copyWithModel(
-        id: announcementId,
-        gymId: announcement.postedFor == PostedFor.Gym ? gymId : null,
-        trainerId: announcement.postedFor == PostedFor.Trainer ? authId : null,
-        trainerName: prefs.getUserName(),
-        gymName: prefs.getGymName()
-      );
+          id: announcementId,
+          gymId: announcement.postedFor == PostedFor.Gym ? gymId : null,
+          trainerId:
+              announcement.postedFor == PostedFor.Trainer ? authId : null,
+          trainerName: prefs.getUserName(),
+          gymName: prefs.getGymName());
 
       await broadcastLocalDatasource.createAnnouncement(
         model,
@@ -528,8 +532,9 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
       if (isConnected) {
         final remoteCommentsStream = await broadcastRemoteDatasource
             .watchCommentsByAnnouncementId(announcementId);
+        // await broadcastLocalDatasource.insertComments(remoteComments);
+        // return Right(remoteComments);
 
-        // Listen without awaiting the full stream
         remoteCommentsStream.listen(
           (remoteComments) async {
             await broadcastLocalDatasource
@@ -560,8 +565,7 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
   }
 
   @override
-  Future<Either<Failures, Stream<List<Reaction>>>>
-      watchReactionsByAnnouncementId(
+  Future<Either<Failures, List<Reaction>>> watchReactionsByAnnouncementId(
     String announcementId,
   ) async {
     try {
@@ -571,18 +575,19 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
       if (isConnected) {
         final remoteReactionsStream = await broadcastRemoteDatasource
             .watchReactionsByAnnouncementId(announcementId);
-
+        await broadcastLocalDatasource.insertReactions(remoteReactionsStream);
+        return Right(remoteReactionsStream);
         // Listen without awaiting the full stream
-        remoteReactionsStream.listen(
-          (remoteReactions) async {
-            await broadcastLocalDatasource
-                .insertReactions(remoteReactions); // ✅ update local
-          },
-          onError: (e) {
-            // optional: handle remote stream errors
-          },
-          cancelOnError: false, // keep syncing even after recoverable errors
-        );
+        // remoteReactionsStream.listen(
+        //   (remoteReactions) async {
+        //     await broadcastLocalDatasource
+        //         .insertReactions(remoteReactions); // ✅ update local
+        //   },
+        //   onError: (e) {
+        //     // optional: handle remote stream errors
+        //   },
+        //   cancelOnError: false, // keep syncing even after recoverable errors
+        // );
       }
       return Right(localReactionsStream);
     } on ServerException catch (error) {

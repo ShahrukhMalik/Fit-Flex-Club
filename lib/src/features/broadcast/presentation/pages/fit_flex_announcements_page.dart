@@ -1,24 +1,40 @@
+import 'dart:ui';
+
+import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/announcement_entity.dart';
+import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
+import 'package:fit_flex_club/src/features/broadcast/domain/usecases/watch_comments_by_announcement_id_usecase.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/addcomment/addcomment_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/addreaction/addreaction_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/getemojis/getemojis_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/watchannouncement/watchannouncement_cubit.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/watchcommentsbyannouncmentid/watchcommentsbyannouncmentid_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_reactions_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/comment_sheet_widget.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/reaction_bar_widget.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/video_preview_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class FitFlexAnnouncementsPage extends StatefulWidget {
   static const route = 'announcements_page';
-  const FitFlexAnnouncementsPage({super.key});
+  static const clientRoute = '/announcements_page';
+  final bool isTrainer;
+  const FitFlexAnnouncementsPage({
+    super.key,
+    this.isTrainer = false,
+  });
 
   @override
   State<FitFlexAnnouncementsPage> createState() =>
@@ -27,11 +43,21 @@ class FitFlexAnnouncementsPage extends StatefulWidget {
 
 class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
   final ValueNotifier<List<EmojiEntity>> emojisNotifier = ValueNotifier([]);
+  final ValueNotifier<Map<String, Reaction?>> reactionsNotifier =
+      ValueNotifier<Map<String, Reaction?>>({});
+
   @override
   void initState() {
     super.initState();
     context.read<WatchAnnouncementCubit>().getAnnouncements();
     context.read<GetEmojisCubit>().getEmojis();
+  }
+
+  void updateReaction(String announcementId, Reaction? reaction) {
+    final currentReactions =
+        Map<String, Reaction?>.from(reactionsNotifier.value);
+    currentReactions[announcementId] = reaction;
+    reactionsNotifier.value = currentReactions;
   }
 
   String timeAgoSinceDate(DateTime postDate) {
@@ -63,23 +89,31 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
         foregroundColor: globalColorScheme.primary,
         context: context,
         backgroundColor: globalColorScheme.onPrimaryContainer,
-        onLeadingPressed: context.pop,
+        onLeadingPressed: () {
+          if (widget.isTrainer) {
+            context.pop();
+          } else {
+            context.go('/');
+          }
+        },
         // trailing: IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go(
-          '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}/${FitFlexPostAnnouncmentsPage.route}',
-        ),
-        icon: IconButton.filled(
-          onPressed: null,
-          icon: Icon(
-            Icons.add,
-          ),
-        ),
-        label: Text(
-          'Post',
-        ),
-      ),
+      floatingActionButton: widget.isTrainer
+          ? FloatingActionButton.extended(
+              onPressed: () => context.go(
+                '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}/${FitFlexPostAnnouncmentsPage.route}',
+              ),
+              icon: IconButton.filled(
+                onPressed: null,
+                icon: Icon(
+                  Icons.add,
+                ),
+              ),
+              label: Text(
+                'Post',
+              ),
+            )
+          : null,
       body: BlocListener<GetEmojisCubit, GetEmojisState>(
         listener: (context, state) {
           if (state is GetEmojisComplete) {
@@ -115,6 +149,34 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
               builder: (context, state) {
                 if (state is WatchAnnouncementComplete) {
                   final announcements = state.announcements;
+
+                  if (announcements.isEmpty) {
+                    return Positioned.fill(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: 6.0,
+                          sigmaY: 6.0,
+                        ),
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'No announcments done yet..',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
 
                   return ListView.builder(
                     // reverse: true,
@@ -220,34 +282,137 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 if ((announcement.reactionCount ?? 0) > 0)
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    spacing: 5,
-                                    children: [
-                                      Text(
-                                        (announcement.reactionCount ?? 0)
-                                            .toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                  InkWell(
+                                    onTap: () => widget.isTrainer
+                                        ? context.go(
+                                            '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}/${FitFlexReactionsPage.route}',
+                                            extra: {
+                                              'announcementId': announcement.id
+                                            },
+                                          )
+                                        : context.go(
+                                            '${FitFlexAnnouncementsPage.clientRoute}/${FitFlexReactionsPage.route}',
+                                            extra: {
+                                              'announcementId': announcement.id
+                                            },
+                                          ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      spacing: 5,
+                                      children: [
+                                        Text(
+                                          (announcement.reactionCount ?? 0)
+                                              .toString(),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      Text('Reactions')
-                                    ],
+                                        Text('Reactions')
+                                      ],
+                                    ),
                                   ),
                                 if ((announcement.commentsCount ?? 0) > 0)
-                                  Row(
-                                    spacing: 5,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        (announcement.commentsCount ?? 0)
-                                            .toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  BlocListener<AddcommentCubit,
+                                      AddcommentState>(
+                                    listener: (context, state) {
+                                      if (state is AddcommentLoading) {
+                                        // PlatformDialog.showLoadingDialog(
+                                        //   context: context,
+                                        // );
+                                      }
+
+                                      if (state is AddcommentError) {
+                                        context.pop();
+                                        PlatformDialog.showAlertDialog(
+                                          context: context,
+                                          title: 'Announcments',
+                                          message: state.failure.message ??
+                                              "Something went wrong",
+                                        );
+                                      }
+                                      if (state is AddcommentComplete) {
+                                        // context
+                                        //     .read<
+                                        //         WatchCommentsByAnnouncmentIdCubit>()
+                                        //     .getCommentsByAnnouncement(
+                                        //       announcement.id,
+                                        //     );
+                                      }
+                                    },
+                                    child: InkWell(
+                                      onTap: () {
+                                        context
+                                            .read<
+                                                WatchCommentsByAnnouncmentIdCubit>()
+                                            .getCommentsByAnnouncement(
+                                              announcement.id,
+                                            );
+
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(16)),
+                                          ),
+                                          builder: (_) {
+                                            return BlocBuilder<
+                                                WatchCommentsByAnnouncmentIdCubit,
+                                                WatchCommentsByAnnouncmentIdState>(
+                                              builder: (context, state) {
+                                                if (state
+                                                    is WatchCommentsByAnnouncmentIdComplete) {
+                                                  final comments =
+                                                      state.comments;
+                                                  return CommentsSheet(
+                                                    comments:
+                                                        comments, // List<Comment>
+                                                    onSend: (text) {
+                                                      context
+                                                          .read<
+                                                              AddcommentCubit>()
+                                                          .addComment(
+                                                            comment: Comment(
+                                                              id: '',
+                                                              userId: '',
+                                                              announcementId:
+                                                                  announcement
+                                                                      .id,
+                                                              content: text,
+                                                              timestamp:
+                                                                  DateTime
+                                                                      .now(),
+                                                              userName: '',
+                                                            ),
+                                                            announcementId:
+                                                                announcement.id,
+                                                          );
+                                                    },
+                                                  );
+                                                }
+                                                return CupertinoActivityIndicator();
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Row(
+                                        spacing: 5,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            (announcement.commentsCount ?? 0)
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text('Comments')
+                                        ],
                                       ),
-                                      Text('Comments')
-                                    ],
+                                    ),
                                   ),
                               ],
                             ),
@@ -263,99 +428,216 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 GestureDetector(
-                                  onLongPress: () {
-                                    showDialog(
-                                      context: context,
-                                      barrierColor: Colors.transparent,
-                                      builder: (_) => Center(
-                                        child: Builder(
-                                          builder: (context) {
-                                            return ValueListenableBuilder(
-                                              valueListenable: emojisNotifier,
-                                              builder: (context, emojis, _) {
-                                                return ReactionBar(
-                                                  emojis: emojis,
-                                                  onReact: (emoji) {
-                                                    context
-                                                        .read<
-                                                            AddReactionCubit>()
-                                                        .addReaction(
-                                                          reaction: Reaction(
-                                                            userId: '',
-                                                            id: '',
+                                    onLongPress: () {
+                                      showDialog(
+                                        context: context,
+                                        barrierColor: Colors.transparent,
+                                        builder: (_) => Center(
+                                          child: Builder(
+                                            builder: (context) {
+                                              return ValueListenableBuilder(
+                                                valueListenable: emojisNotifier,
+                                                builder: (context, emojis, _) {
+                                                  return ReactionBar(
+                                                    emojis: emojis,
+                                                    onReact: (emoji) {
+                                                      final reaction = Reaction(
+                                                        userId: '',
+                                                        id: '',
+                                                        announcementId:
+                                                            announcement.id,
+                                                        userName: '',
+                                                        emoji: emoji,
+                                                        timestamp:
+                                                            DateTime.now(),
+                                                      );
+                                                      updateReaction(
+                                                          announcement.id,
+                                                          reaction);
+                                                      context
+                                                          .read<
+                                                              AddReactionCubit>()
+                                                          .addReaction(
+                                                            reaction: reaction,
                                                             announcementId:
                                                                 announcement.id,
-                                                            userName: '',
-                                                            emoji: emoji,
+                                                          );
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child:
+                                        // announcement.myReaction == null
+                                        //     ?
+                                        ValueListenableBuilder(
+                                      valueListenable: reactionsNotifier,
+                                      builder: (context, myReaction, _) {
+                                        if (myReaction[announcement.id] ==
+                                            null) {
+                                          return InkWell(
+                                            onTap: () {
+                                              final reaction = Reaction(
+                                                userId: '',
+                                                id: '',
+                                                announcementId: announcement.id,
+                                                userName: '',
+                                                emoji: EmojiEntity(
+                                                  emojiId:
+                                                      'OrdFvRtWZeQFLhd0xUBa',
+                                                  emojiTitle: 'Like',
+                                                  emojiUrl:
+                                                      'https://firebasestorage.googleapis.com/v0/b/fitflexclub-fa604.firebasestorage.app/o/emojis%2Flike_emoji.png?alt=media&token=dbfaf7c5-de85-4bb5-9e12-87b9c1297e81',
+                                                ),
+                                                timestamp: DateTime.now(),
+                                              );
+                                              updateReaction(
+                                                  announcement.id, reaction);
+                                              context
+                                                  .read<AddReactionCubit>()
+                                                  .addReaction(
+                                                    reaction: reaction,
+                                                    announcementId:
+                                                        announcement.id,
+                                                  );
+                                            },
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Image.asset(
+                                                  'assets/emojis/like.png',
+                                                ),
+                                                SizedBox.shrink(),
+                                                Text('Like')
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          return Column(
+                                            children: [
+                                              Image.network(
+                                                myReaction[announcement.id]!
+                                                    .emoji
+                                                    .emojiUrl,
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return const Center(
+                                                    child:
+                                                        CupertinoActivityIndicator(),
+                                                  );
+                                                },
+                                              ),
+                                              SizedBox.shrink(),
+                                              Text(
+                                                myReaction[announcement.id]!
+                                                    .emoji
+                                                    .emojiTitle,
+                                              )
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    )),
+                                BlocListener<AddcommentCubit, AddcommentState>(
+                                  listener: (context, state) {
+                                    if (state is AddcommentLoading) {
+                                      // PlatformDialog.showLoadingDialog(
+                                      //   context: context,
+                                      // );
+                                    }
+
+                                    if (state is AddcommentError) {
+                                      context.pop();
+                                      PlatformDialog.showAlertDialog(
+                                        context: context,
+                                        title: 'Announcments',
+                                        message: state.failure.message ??
+                                            "Something went wrong",
+                                      );
+                                    }
+                                    if (state is AddcommentComplete) {
+                                      // context
+                                      //     .read<
+                                      //         WatchCommentsByAnnouncmentIdCubit>()
+                                      //     .getCommentsByAnnouncement(
+                                      //       announcement.id,
+                                      //     );
+                                    }
+                                  },
+                                  child: InkWell(
+                                    onTap: () {
+                                      context
+                                          .read<
+                                              WatchCommentsByAnnouncmentIdCubit>()
+                                          .getCommentsByAnnouncement(
+                                            announcement.id,
+                                          );
+
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(16)),
+                                        ),
+                                        builder: (_) {
+                                          return BlocBuilder<
+                                              WatchCommentsByAnnouncmentIdCubit,
+                                              WatchCommentsByAnnouncmentIdState>(
+                                            builder: (context, state) {
+                                              // if (state is SubjectFailed) {
+                                              //   return ErrorOutput(
+                                              //       message: state.message);
+                                              // }
+                                              if (state
+                                                  is WatchCommentsByAnnouncmentIdComplete) {
+                                                final comments = state.comments;
+                                                return CommentsSheet(
+                                                  comments:
+                                                      comments, // List<Comment>
+                                                  onSend: (text) {
+                                                    context
+                                                        .read<AddcommentCubit>()
+                                                        .addComment(
+                                                          comment: Comment(
+                                                            id: '',
+                                                            userId: '',
+                                                            announcementId:
+                                                                announcement.id,
+                                                            content: text,
                                                             timestamp:
                                                                 DateTime.now(),
+                                                            userName: '',
                                                           ),
                                                           announcementId:
                                                               announcement.id,
                                                         );
                                                   },
                                                 );
-                                              },
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: announcement.myReaction == null
-                                      ? InkWell(
-                                          onTap: () {
-                                            context
-                                                .read<AddReactionCubit>()
-                                                .addReaction(
-                                                  reaction: Reaction(
-                                                    userId: '',
-                                                    id: '',
-                                                    announcementId:
-                                                        announcement.id,
-                                                    userName: '',
-                                                    emoji: EmojiEntity(
-                                                      emojiId:
-                                                          'OrdFvRtWZeQFLhd0xUBa',
-                                                      emojiTitle: 'Like',
-                                                      emojiUrl:
-                                                          'https://firebasestorage.googleapis.com/v0/b/fitflexclub-fa604.firebasestorage.app/o/emojis%2Flike_emoji.png?alt=media&token=dbfaf7c5-de85-4bb5-9e12-87b9c1297e81',
-                                                    ),
-                                                    timestamp: DateTime.now(),
-                                                  ),
-                                                  announcementId:
-                                                      announcement.id,
-                                                );
-                                          },
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Image.asset(
-                                                  'assets/emojis/like.png'),
-                                              SizedBox.shrink(),
-                                              Text('Like')
-                                            ],
-                                          ),
-                                        )
-                                      : Column(
-                                          children: [
-                                            Image.network(
-                                              announcement
-                                                  .myReaction!.emoji.emojiUrl,
-                                            ),
-                                            SizedBox.shrink(),
-                                            Text(announcement
-                                                .myReaction!.emoji.emojiTitle)
-                                          ],
-                                        ),
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Image.asset('assets/emojis/comments.png'),
-                                    SizedBox.shrink(),
-                                    Text('Comment')
-                                  ],
+                                              }
+                                              return CupertinoActivityIndicator();
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                            'assets/emojis/comments.png'),
+                                        SizedBox.shrink(),
+                                        Text('Comment')
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -383,6 +665,15 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
                 );
               },
               listener: (context, state) {
+                if (state is WatchAnnouncementComplete) {
+                  final announcements = state.announcements;
+                  for (final announcement in announcements) {
+                    updateReaction(
+                      announcement.id,
+                      announcement.myReaction,
+                    );
+                  }
+                }
                 if (state is WatchAnnouncementError) {
                   PlatformDialog.showAlertDialog(
                     onConfirm: () {

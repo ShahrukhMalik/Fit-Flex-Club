@@ -38,7 +38,7 @@ abstract class BroadcastRepository {
       String announcementId);
 
   ///
-  Future<Either<Failures, Stream<List<Reaction>>>>
+  Future<Either<Failures, List<Reaction>>>
       watchReactionsByAnnouncementId(String announcementId);
 
   ///

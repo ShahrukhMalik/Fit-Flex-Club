@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPrefsUtil {
   static const String _keyAuthUid = 'auth_uid';
   static const String _keyAuthEntity = 'auth_entity';
+  static const String _keyAuthRole = 'auth_role';
   static const String _keyGymId = 'gym_id';
   static const String _keyGymName = 'gym_name';
   static const String _keyUserName = 'user_name';
@@ -23,6 +24,11 @@ class SharedPrefsUtil {
   Future<bool> setAuthUid(String uid) async {
     await _updateLastTimestamp();
     return await _prefs.setString(_keyAuthUid, uid);
+  }
+
+  Future<bool> setAuthRole(String role) async {
+    await _updateLastTimestamp();
+    return await _prefs.setString(_keyAuthRole, role);
   }
 
   // Auth UID methods with timestamp
@@ -51,6 +57,10 @@ class SharedPrefsUtil {
 
   String? getAuthUid() {
     return _prefs.getString(_keyAuthUid);
+  }
+
+  String? getAuthRole() {
+    return _prefs.getString(_keyAuthRole);
   }
 
   String? getGymName() {

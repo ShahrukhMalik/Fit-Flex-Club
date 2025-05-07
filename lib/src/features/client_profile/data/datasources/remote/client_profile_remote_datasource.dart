@@ -406,12 +406,16 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
         {
           'trainerId': trainer.trainerId,
           'gymId': gym.gymId,
+          'gymName': gym.gymName,
         },
         SetOptions(
           merge: true,
         ),
       );
       await prefs.setGymName(gym.gymName);
+      await prefs.setGymId(gym.gymId);
+      await prefs.setTrainerId(trainer.trainerId);
+      await prefs.setAuthRole('client');
       await trainerClientRef.set({
         'trainerId': trainer.trainerId,
         'trainerName': trainer.trainerName,

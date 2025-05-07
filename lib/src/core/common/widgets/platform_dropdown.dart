@@ -63,47 +63,49 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade300),
+            Material(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade300),
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(
-                        color: globalColorScheme.error,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: globalColorScheme.error,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    "Select ${widget.pickerTitle}",
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Text(
-                      "Done",
+                    Text(
+                      "Select ${widget.pickerTitle}",
                       style: TextStyle(
-                        color: globalColorScheme.onPrimaryContainer,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                        color: Colors.black87,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                    GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Text(
+                        "Done",
+                        style: TextStyle(
+                          color: globalColorScheme.onPrimaryContainer,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 

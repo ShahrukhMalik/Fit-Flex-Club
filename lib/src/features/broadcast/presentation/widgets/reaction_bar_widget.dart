@@ -1,6 +1,7 @@
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/getemojis/getemojis_cubit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +10,11 @@ class ReactionBar extends StatefulWidget {
   final Function(EmojiEntity emoji) onReact;
   final List<EmojiEntity> emojis;
 
-  const ReactionBar({required this.onReact, super.key, required this.emojis});
+  const ReactionBar({
+    required this.onReact,
+    super.key,
+    required this.emojis,
+  });
 
   @override
   State<ReactionBar> createState() => _ReactionBarState();
@@ -27,15 +32,6 @@ class _ReactionBarState extends State<ReactionBar> {
       },
     );
   }
-
-  final List<String> emojiAssets = [
-    'assets/emojis/like_emoji.png',
-    'assets/emojis/celebrate_emoji.png',
-    'assets/emojis/hand_heart_emoji.png',
-    'assets/emojis/love_emoji.png',
-    'assets/emojis/insightful_emoji.png',
-    'assets/emojis/smile_emoji.png',
-  ];
 
   int? hoveredIndex;
 
@@ -69,16 +65,6 @@ class _ReactionBarState extends State<ReactionBar> {
                       widget.onReact(emoji);
                       context.pop();
                     },
-                    // onPanUpdate: (details) {
-                    //   setState(() {
-                    //     hoveredIndex = index;
-                    //   });
-                    // },
-                    // onPanEnd: (_) {
-                    //   if (hoveredIndex != null) {
-                    //     widget.onReact(emoji);
-                    //   }
-                    // },
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -87,6 +73,14 @@ class _ReactionBarState extends State<ReactionBar> {
                       child: Image.network(
                         emoji.emojiUrl,
                         height: 40,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return const Center(
+                            child: CupertinoActivityIndicator(),
+                          );
+                        },
                       ),
                     ),
                   );

@@ -805,9 +805,15 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
           print('State emitted at UI : '
               "${DateTime.now().millisecondsSinceEpoch}");
           currentWeights.value = state.weights;
-          _originalWeights = state.weights;
           widget.weights.value = state.weights;
           isLoading.value = false;
+          Future.delayed(
+            Durations.short1,
+            () {
+              _originalWeights = state.weights;
+            },
+          );
+          setState(() {});
         }
       },
       child: ValueListenableBuilder(

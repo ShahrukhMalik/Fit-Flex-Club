@@ -32,7 +32,7 @@ class ReactionModel extends Reaction {
       userId: json['userId'],
       announcementId: json['announcementId'],
       userName: json['userName'],
-      emoji: json['emoji'],
+      emoji: EmojiModel.fromJson(json['emoji']),
       timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp']),
     );
   }

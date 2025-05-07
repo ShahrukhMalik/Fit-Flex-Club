@@ -10,8 +10,6 @@ import 'package:injectable/injectable.dart';
 abstract class WatchAnnouncementUsecase extends BroadcastUsecase
     implements UseCase<Stream<List<Announcement>>, NoParams> {}
 
-
-
 @Singleton(as: WatchAnnouncementUsecase)
 class WatchAnnouncementUsecaseImpl extends WatchAnnouncementUsecase {
   final BroadcastRepository broadcastRepository;

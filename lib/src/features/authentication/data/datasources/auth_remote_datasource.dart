@@ -112,6 +112,18 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           );
         } else {
           final isUserActive = userDoc.data()?['isUserActive'];
+          final isTrainer = userDoc.data()?['isTrainer'];
+          final gymName = userDoc.data()?['gymName'];
+          final gymId = userDoc.data()?['gymId'];
+          final trainerId = userDoc.data()?['trainerId'];
+          if (isTrainer) {
+            await prefs.setAuthRole('trainer');
+          } else {
+            await prefs.setAuthRole('client');
+          }
+          if (gymName != null) await prefs.setGymName(gymName);
+          if (gymId != null) await prefs.setGymId(gymId);
+          if (trainerId != null) await prefs.setTrainerId(trainerId);
 
           if (isUserActive != true) {
             throw ServerException(
@@ -278,7 +290,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       if (gymId != null) {
         await prefs.setGymId(gymId);
       }
-      if(userName != null) {
+      if (userName != null) {
         await prefs.setUserName(userName);
       }
 
@@ -305,6 +317,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         return Future.value(
           toStoreEntity,
         );
+      }
+      if (isTrainer) {
+        await prefs.setAuthRole('trainer');
+      } else {
+        await prefs.setAuthRole('client');
       }
       if (data != null) {
         for (var field in [
