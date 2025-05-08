@@ -677,8 +677,8 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
                 if (state is WatchAnnouncementError) {
                   PlatformDialog.showAlertDialog(
                     onConfirm: () {
-                      context.pop();
-                      if (context.canPop()) context.pop();
+                      // context.pop();
+                      context.go('/');
                     },
                     context: context,
                     title: "Announcements",

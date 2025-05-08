@@ -94,7 +94,7 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
       final model = CommentModel.fromEntity(
         comment,
       ).copyWith(
-        id: authId,
+        id: UUIDv4().toString(),
         userId: authId,
         userName: prefs.getUserName(),
       );
