@@ -207,31 +207,70 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
           return Container(
             height: 400,
             color: Color.fromARGB(155, 255, 205, 124),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: CupertinoSearchTextField(
-                    backgroundColor: Colors.white,
-                    controller: _searchController,
-                    placeholder: 'Search Country',
+            child: Material(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: CupertinoSearchTextField(
+                      backgroundColor: Colors.white,
+                      controller: _searchController,
+                      placeholder: 'Search Country',
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: MediaQuery.removePadding(
-                    removeTop: true,
-                    removeBottom: true,
-                    removeLeft: true,
-                    removeRight: true,
-                    context: context,
-                    child: CupertinoScrollbar(
-                      child: ValueListenableBuilder(
-                        valueListenable: filteredCountryCodes,
-                        builder: (context, codes, child) {
-                          return ListView.builder(
-                            itemCount: codes.length,
+                  Expanded(
+                    child: MediaQuery.removePadding(
+                      removeTop: true,
+                      removeBottom: true,
+                      removeLeft: true,
+                      removeRight: true,
+                      context: context,
+                      child: CupertinoScrollbar(
+                        child: ValueListenableBuilder(
+                          valueListenable: filteredCountryCodes,
+                          builder: (context, codes, child) {
+                            return ListView.builder(
+                              itemCount: codes.length,
+                              itemBuilder: (context, index) {
+                                final country = codes[index];
+                                return GestureDetector(
+                                  onTap: () =>
+                                      _onCountrySelect(country['dial_code']!),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                      vertical: 8.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            country['name']!,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          country['dial_code']!,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: ListView.builder(
+                            itemCount: filteredCountryCodes.value.length,
                             itemBuilder: (context, index) {
-                              final country = codes[index];
+                              final country = filteredCountryCodes.value[index];
                               return GestureDetector(
                                 onTap: () =>
                                     _onCountrySelect(country['dial_code']!),
@@ -244,19 +283,16 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          country['name']!,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
+                                      Text(
+                                        country['name']!,
+                                        style: TextStyle(
+                                          fontSize: 16,
                                         ),
                                       ),
                                       Text(
                                         country['dial_code']!,
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                          color: CupertinoColors.secondaryLabel,
                                         ),
                                       ),
                                     ],
@@ -264,47 +300,13 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                                 ),
                               );
                             },
-                          );
-                        },
-                        child: ListView.builder(
-                          itemCount: filteredCountryCodes.value.length,
-                          itemBuilder: (context, index) {
-                            final country = filteredCountryCodes.value[index];
-                            return GestureDetector(
-                              onTap: () =>
-                                  _onCountrySelect(country['dial_code']!),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                  vertical: 8.0,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      country['name']!,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      country['dial_code']!,
-                                      style: TextStyle(
-                                        color: CupertinoColors.secondaryLabel,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
