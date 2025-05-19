@@ -1,7 +1,7 @@
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 
 class CommentsSheet extends StatelessWidget {
   final List<Comment> comments;
@@ -23,39 +23,18 @@ class CommentsSheet extends StatelessWidget {
       child: Container(
         height: mediaQuery.size.height * 0.75,
         padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 100),
         child: Column(
           children: [
-            // TextField to add comment
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      hintText: 'Add a comment...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                    ),
-                  ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton.filled(
+                onPressed: context.pop,
+                icon: Icon(
+                  Icons.close,
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    final content = _commentController.text.trim();
-                    if (content.isNotEmpty) {
-                      onSend(content);
-                      _commentController.clear();
-                    }
-                  },
-                )
-              ],
+              ),
             ),
-            const SizedBox(height: 16),
-
-            Divider(),
-
             // List of comments
             Expanded(
               child: comments.isEmpty
@@ -78,15 +57,54 @@ class CommentsSheet extends StatelessWidget {
                               Text(comment.content),
                               const SizedBox(height: 4),
                               Text(
-                                DateFormat('hh:mm a • MMM dd').format(comment.timestamp),
-                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                                DateFormat('hh:mm a • MMM dd')
+                                    .format(comment.timestamp),
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.grey),
                               ),
                             ],
                           ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 8),
                         );
                       },
                     ),
+            ),
+            // const SizedBox(height: 16),
+            // TextField to add comment
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _commentController,
+                    onSubmitted: (value) {
+                      final content = _commentController.text.trim();
+                      if (content.isNotEmpty) {
+                        onSend(content);
+                        _commentController.clear();
+                      }
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Add a comment...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    final content = _commentController.text.trim();
+                    if (content.isNotEmpty) {
+                      onSend(content);
+                      _commentController.clear();
+                    }
+                  },
+                )
+              ],
             ),
           ],
         ),
