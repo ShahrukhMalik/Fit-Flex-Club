@@ -21,6 +21,7 @@ class WatchAnnouncementCubit extends Cubit<WatchAnnouncementState> {
   WatchAnnouncementCubit(
     this.watchAnnouncementUsecase,
   ) : super(WatchAnnouncementInitial());
+  bool _isFirstLoad = true;
 
   Future<void> getAnnouncements() async {
     final result = await watchAnnouncementUsecase(NoParams());
@@ -39,8 +40,10 @@ class WatchAnnouncementCubit extends Cubit<WatchAnnouncementState> {
             emit(
               WatchAnnouncementComplete(
                 announcements: announcements,
+                firstLoad: _isFirstLoad,
               ),
             );
+            _isFirstLoad = false;
           },
           onError: (error) {
             emit(

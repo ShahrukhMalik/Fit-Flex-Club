@@ -9,6 +9,8 @@ abstract class WatchAnnouncementState extends Equatable {
 
 class WatchAnnouncementInitial extends WatchAnnouncementState {}
 
+class WatchAnnouncementLoading extends WatchAnnouncementState {}
+
 class WatchAnnouncementError extends WatchAnnouncementState {
   final Failures failure;
 
@@ -17,8 +19,10 @@ class WatchAnnouncementError extends WatchAnnouncementState {
 
 class WatchAnnouncementComplete extends WatchAnnouncementState {
   final List<Announcement> announcements;
+  final bool firstLoad;
   const WatchAnnouncementComplete({
     required this.announcements,
+    this.firstLoad = false,
   });
   @override
   List<Object> get props => [announcements];
