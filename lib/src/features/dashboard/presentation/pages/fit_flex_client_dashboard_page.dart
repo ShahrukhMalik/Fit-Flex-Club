@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/core/common/services/fcm_service.dart';
 import 'package:fit_flex_club/src/core/common/services/local_notification_service.dart';
@@ -86,7 +88,7 @@ class _FitFlexClientDashboardPageState
               return AnimatedPositioned(
                 duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                left: currentIndex * (width * 0.245),
+                left: currentIndex * (width * 0.2),
                 child: Container(
                   width: 50,
                   height: 50,
@@ -200,6 +202,8 @@ class _FitFlexClientDashboardPageState
     return SafeArea(
       top: false,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.transparent,
         floatingActionButton: !widget.showFloatingAction
             ? null
             : FloatingActionButton(
@@ -328,14 +332,64 @@ class _FitFlexClientDashboardPageState
                   },
                 ),
               ),
-        body: Column(
+        body: Stack(
           children: [
-            // Main content
-            Expanded(child: widget.navigationShell),
-            // Bottom navigation overlay
-            if (widget.showBottomNavBar) _buildBottomNavOverlay(context, width),
+            // Background (can be your main content or image)
+            Positioned.fill(
+              child: widget.navigationShell,
+            ),
+
+            // Glass overlay
+            Positioned(
+              bottom: 0, // or wherever you want
+              left: 0,
+              right: 0,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20), // Optional
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15), // Semi-transparent
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                      ),
+                    ),
+                    child: _buildBottomNavOverlay(context, width),
+                  ),
+                ),
+              ),
+            ),
           ],
-        ),
+        )
+        // Column(
+        //   children: [
+        //     // Main content
+        //     Expanded(child: widget.navigationShell),
+        //     // Bottom navigation overlay
+        //     if (widget.showBottomNavBar)
+        //       ClipRRect(
+        //         // borderRadius: BorderRadius.circular(20), // Optional
+        //         child: BackdropFilter(
+        //           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        //           child: Container(
+        //             padding: EdgeInsets.all(12),
+        //             decoration: BoxDecoration(
+        //               color: globalColorScheme.primary.withOpacity(0.15), // Semi-transparent
+        //               // borderRadius: BorderRadius.circular(20),
+        //               border: Border.all(
+        //                 color: Colors.white.withOpacity(0.2),
+        //               ),
+        //             ),
+        //             child: _buildBottomNavOverlay(context, width),
+        //           ),
+        //         ),
+        //       )
+        //   ],
+        // )
+        ,
       ),
     );
   }
