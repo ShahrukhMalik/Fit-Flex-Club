@@ -3,9 +3,12 @@ import 'package:fit_flex_club/src/core/common/services/fcm_service.dart';
 import 'package:fit_flex_club/src/core/common/services/local_notification_service.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/getchat/getchat_cubit.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_client_chat_window_page.dart';
@@ -210,7 +213,7 @@ class _FitFlexClientDashboardPageState
                     if (state is WatchChatStreamComplete) {
                       final currentUserId =
                           getIt<FirebaseAuth>().currentUser?.uid;
-      
+
                       final chats = state.chats
                           .where(
                             (chat) => chat.members.any(
@@ -220,29 +223,85 @@ class _FitFlexClientDashboardPageState
                           .toList();
                       String unreadCount = '';
                       ChatEntity? chat;
-      
+
                       if (chats.isNotEmpty) {
                         chat = chats[0];
-                        unreadCount = (chat.unreadCount[
-                                        getIt<FirebaseAuth>().currentUser?.uid] ??
+                        unreadCount = (chat.unreadCount[getIt<FirebaseAuth>()
+                                        .currentUser
+                                        ?.uid] ??
                                     0) >
                                 0
-                            ? (chat.unreadCount[
-                                        getIt<FirebaseAuth>().currentUser?.uid] ??
+                            ? (chat.unreadCount[getIt<FirebaseAuth>()
+                                        .currentUser
+                                        ?.uid] ??
                                     0)
                                 .toString()
                             : '';
                       }
                       return Stack(
                         children: [
-                          IconButton(
-                            onPressed: () => context.push(
-                              '${FitFlexClientProfilePage.route}/${FitFlexClientChatWindowPage.route}',
-                              extra: {
-                                'chat': chat,
+                          BlocListener<StartChatCubit, StartChatState>(
+                            listener: (context, state) {
+                              if (state is StartChatLoading) {
+                                PlatformDialog.showLoadingDialog(
+                                    context: context,
+                                    message: "Initiating Chat...");
+                              }
+
+                              if (state is StartChatComplete) {
+                                context.pop();
+                                context.push(
+                                  '${FitFlexClientProfilePage.route}/${FitFlexClientChatWindowPage.route}',
+                                  extra: {
+                                    'chat': chat,
+                                  },
+                                );
+                              }
+                            },
+                            child: IconButton(
+                              onPressed: () {
+                                if (chat != null) {
+                                  context.push(
+                                    '${FitFlexClientProfilePage.route}/${FitFlexClientChatWindowPage.route}',
+                                    extra: {
+                                      'chat': chat,
+                                    },
+                                  );
+                                } else {
+                                  final clientId = currentUserId ??
+                                      getIt<SharedPrefsUtil>().getAuthUid();
+                                  final clientName =
+                                      getIt<SharedPrefsUtil>().getUserName();
+                                  final trainerId =
+                                      getIt<SharedPrefsUtil>().getTrainerId();
+
+                                  final chat = ChatEntity(
+                                    id: '',
+                                    members: [
+                                      {
+                                        'userId': clientId,
+                                        'userName': clientName,
+                                      },
+                                      {
+                                        'userId': trainerId,
+                                        'userName': "Trainer",
+                                      },
+                                    ],
+                                    lastMessage: 'No messages yet..',
+                                    lastSender: clientId ?? '',
+                                    lastTimestamp: DateTime.now(),
+                                    unreadCount: {
+                                      clientId ?? 'N/A': 0,
+                                      trainerId ?? "N/A": 0
+                                    },
+                                  );
+                                  context
+                                      .read<StartChatCubit>()
+                                      .startChat(chat);
+                                }
                               },
+                              icon: Icon(Icons.chat_bubble),
                             ),
-                            icon: Icon(Icons.chat_bubble),
                           ),
                           if (unreadCount.isNotEmpty)
                             Positioned(
