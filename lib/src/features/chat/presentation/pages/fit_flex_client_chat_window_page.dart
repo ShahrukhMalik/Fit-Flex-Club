@@ -52,9 +52,7 @@ class _FitFlexClientChatWindowPageState
     currentUserId = getIt<FirebaseAuth>().currentUser?.uid;
     if (chat != null) {
       context.read<WatchMessagesbyChatIdCubit>().getMessagesByChatId(chat!.id);
-    } else {
-
-    }
+    } else {}
 
     _messageController.addListener(
       () {
@@ -200,7 +198,7 @@ class _FitFlexClientChatWindowPageState
               ///
               if (chat != null) ...[
                 Positioned.fill(
-                  bottom: 70,
+                  bottom: 190,
                   child: BlocConsumer<WatchMessagesbyChatIdCubit,
                       WatchMessagesbyChatIdState>(
                     listener: (context, state) {
@@ -409,7 +407,7 @@ class _FitFlexClientChatWindowPageState
 
                 ///
                 Positioned(
-                  bottom: 20,
+                  bottom: 120,
                   left: 20,
                   right: 70,
                   child: Row(
@@ -477,7 +475,7 @@ class _FitFlexClientChatWindowPageState
                   ),
                 ),
                 Positioned(
-                  bottom: 20,
+                  bottom: 120,
                   right: 10,
                   child: ValueListenableBuilder(
                     valueListenable: showMessageSendIcon,
