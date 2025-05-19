@@ -92,9 +92,10 @@ class ChatDao extends DatabaseAccessor<AppDatabase> with _$ChatDaoMixin {
     List<MessagesCompanion> messagesList,
   ) async {
     await batch((batch) {
-      batch.replaceAll(
+      batch.insertAll(
         messages,
         messagesList,
+        mode: InsertMode.insertOrReplace
       );
     });
   }

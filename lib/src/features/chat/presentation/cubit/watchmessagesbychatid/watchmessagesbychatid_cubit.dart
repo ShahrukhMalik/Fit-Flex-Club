@@ -63,9 +63,11 @@ class WatchMessagesbyChatIdCubit extends Cubit<WatchMessagesbyChatIdState> {
             emit(WatchMessagesbyChatIdComplete(messages));
           },
           onError: (error) {
-            emit(WatchMessagesbyChatIdError(
-              failure: CacheFailure(message: error.toString()),
-            ));
+            emit(
+              WatchMessagesbyChatIdError(
+                failure: CacheFailure(message: error.toString()),
+              ),
+            );
           },
         );
       },

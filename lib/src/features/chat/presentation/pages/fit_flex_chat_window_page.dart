@@ -45,6 +45,15 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
     context
         .read<WatchMessagesbyChatIdCubit>()
         .getMessagesByChatId(widget.chat.id);
+    _messageController.addListener(
+      () {
+        if (_messageController.text.isEmpty) {
+          showMessageSendIcon.value = false;
+        } else {
+          showMessageSendIcon.value = true;
+        }
+      },
+    );
   }
 
   late String currentUserId;

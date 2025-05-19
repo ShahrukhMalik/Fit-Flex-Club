@@ -124,7 +124,6 @@ class ChatRepositoryImpl extends ChatRepository {
       );
       await localDb.startMessage(
         message: messageModel,
-        
       );
       final updatedUnreadCount =
           Map<String, int>.from(retrievedChat.unreadCount);
@@ -286,8 +285,6 @@ class ChatRepositoryImpl extends ChatRepository {
   }) async {
     try {
       final isConnected = await networkInfo.isConnected ?? false;
-      final localMessagesByChatIdStream =
-          await localDb.getMessagesByChatStream(chatId);
 
       if (isConnected) {
         final remoteMessagesByChatIdStream =
@@ -306,6 +303,8 @@ class ChatRepositoryImpl extends ChatRepository {
           cancelOnError: false, // keep syncing even after recoverable errors
         );
       }
+      final localMessagesByChatIdStream =
+          await localDb.getMessagesByChatStream(chatId);
 
       // ✅ Always return the local stream
       return Right(localMessagesByChatIdStream);

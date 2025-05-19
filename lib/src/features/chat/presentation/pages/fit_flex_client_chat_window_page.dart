@@ -2,7 +2,9 @@
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/updatemessage/updatemessage_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_message_player_widget.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_record_mic_widget.dart';
@@ -50,6 +52,8 @@ class _FitFlexClientChatWindowPageState
     currentUserId = getIt<FirebaseAuth>().currentUser?.uid;
     if (chat != null) {
       context.read<WatchMessagesbyChatIdCubit>().getMessagesByChatId(chat!.id);
+    } else {
+
     }
 
     _messageController.addListener(
@@ -312,57 +316,58 @@ class _FitFlexClientChatWindowPageState
                                     DateFormat.Hm().format(message.timestamp);
 
                                 return Align(
-                                  alignment: isCurrentUser
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                                  child: buildMessageContent(message,isCurrentUser,formattedTime)
-                                  // Container(
-                                  //   margin: const EdgeInsets.symmetric(
-                                  //       vertical: 1.5),
-                                  //   padding: const EdgeInsets.symmetric(
-                                  //       horizontal: 10, vertical: 5),
-                                  //   decoration: BoxDecoration(
-                                  //     color: isCurrentUser
-                                  //         ? globalColorScheme.primary
-                                  //             .withOpacity(0.8)
-                                  //         : globalColorScheme.onPrimaryContainer
-                                  //             .withOpacity(0.7),
-                                  //     borderRadius: BorderRadius.circular(8),
-                                  //   ),
-                                  //   child: Row(
-                                  //     mainAxisSize: MainAxisSize.min,
-                                  //     children: [
-                                  //       Flexible(
-                                  //         child: Text(
-                                  //           message.messageText,
-                                  //           style: TextStyle(
-                                  //             color: isCurrentUser
-                                  //                 ? globalColorScheme.onPrimary
-                                  //                 : globalColorScheme
-                                  //                     .onSecondary,
-                                  //           ),
-                                  //         ),
-                                  //       ),
-                                  //       SizedBox(width: 6),
-                                  //       Align(
-                                  //         alignment: Alignment.bottomCenter,
-                                  //         child: Text(
-                                  //           formattedTime,
-                                  //           style: TextStyle(
-                                  //             color: isCurrentUser
-                                  //                 ? globalColorScheme
-                                  //                     .onPrimaryContainer
-                                  //                     .withOpacity(0.8)
-                                  //                 : globalColorScheme.surface
-                                  //                     .withOpacity(0.7),
-                                  //             fontSize: 9,
-                                  //           ),
-                                  //         ),
-                                  //       )
-                                  //     ],
-                                  //   ),
-                                  // ),
-                                );
+                                    alignment: isCurrentUser
+                                        ? Alignment.centerRight
+                                        : Alignment.centerLeft,
+                                    child: buildMessageContent(
+                                        message, isCurrentUser, formattedTime)
+                                    // Container(
+                                    //   margin: const EdgeInsets.symmetric(
+                                    //       vertical: 1.5),
+                                    //   padding: const EdgeInsets.symmetric(
+                                    //       horizontal: 10, vertical: 5),
+                                    //   decoration: BoxDecoration(
+                                    //     color: isCurrentUser
+                                    //         ? globalColorScheme.primary
+                                    //             .withOpacity(0.8)
+                                    //         : globalColorScheme.onPrimaryContainer
+                                    //             .withOpacity(0.7),
+                                    //     borderRadius: BorderRadius.circular(8),
+                                    //   ),
+                                    //   child: Row(
+                                    //     mainAxisSize: MainAxisSize.min,
+                                    //     children: [
+                                    //       Flexible(
+                                    //         child: Text(
+                                    //           message.messageText,
+                                    //           style: TextStyle(
+                                    //             color: isCurrentUser
+                                    //                 ? globalColorScheme.onPrimary
+                                    //                 : globalColorScheme
+                                    //                     .onSecondary,
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //       SizedBox(width: 6),
+                                    //       Align(
+                                    //         alignment: Alignment.bottomCenter,
+                                    //         child: Text(
+                                    //           formattedTime,
+                                    //           style: TextStyle(
+                                    //             color: isCurrentUser
+                                    //                 ? globalColorScheme
+                                    //                     .onPrimaryContainer
+                                    //                     .withOpacity(0.8)
+                                    //                 : globalColorScheme.surface
+                                    //                     .withOpacity(0.7),
+                                    //             fontSize: 9,
+                                    //           ),
+                                    //         ),
+                                    //       )
+                                    //     ],
+                                    //   ),
+                                    // ),
+                                    );
                               },
                             );
                           } else {
