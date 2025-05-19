@@ -73,19 +73,22 @@ class PlatformAppbar {
           backgroundColor: backgroundColor,
           automaticallyImplyLeading: automaticallyImplyLeading,
           leading: automaticallyImplyLeading
-              ? InkWell(
-                  onTap: onLeadingPressed,
-                  child: SizedBox(
-                    width: 60, // or 44.0 (standard iOS)
-                    child: leadingWidget ??
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: onLeadingPressed ?? () => context.pop(),
-                          child: Icon(
-                            CupertinoIcons.back,
-                            color: foregroundColor,
+              ? Material(
+                color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onLeadingPressed,
+                    child: SizedBox(
+                      width: 60, // or 44.0 (standard iOS)
+                      child: leadingWidget ??
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: onLeadingPressed ?? () => context.pop(),
+                            child: Icon(
+                              CupertinoIcons.back,
+                              color: foregroundColor,
+                            ),
                           ),
-                        ),
+                    ),
                   ),
                 )
               : null,

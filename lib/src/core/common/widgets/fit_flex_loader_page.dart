@@ -12,7 +12,7 @@ class FitFlexLoaderPage extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/fit_flex_image.png',
+              'assets/images/fit_flex_bg_wo_text.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
             ),

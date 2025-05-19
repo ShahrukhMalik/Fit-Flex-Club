@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
@@ -31,8 +33,8 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
       children: [
         Positioned.fill(
           child: Image.asset(
-            'assets/images/fit_flex_image.png',
-            fit: BoxFit.cover,
+            'assets/images/fit_flex_bg_wo_text.png',
+            fit: BoxFit.fill,
             alignment: Alignment.center,
           ),
         ),
@@ -50,69 +52,84 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: Text(
-                              "Welcome to FitFlex Club",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white),
-                            ),
-                          ),
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      margin: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color:
+                            Colors.white.withOpacity(0.1), // Semi-transparent
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
                         ),
-                        Text(
-                          "Email",
-                          style:
-                              TextStyle(color: Color(0xFFFFCD7C), fontSize: 18),
-                        ),
-                        AppTextFields.basicTextField(
-                          fieldType: TextFieldType.email,
-                          controller: _emailController,
-                          boxDecoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                width: 2,
-                                color: Color(0xFFFFCD7C),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Text(
+                                  "Welcome to Fit Blitz",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          "Password",
-                          style:
-                              TextStyle(color: Color(0xFFFFCD7C), fontSize: 18),
-                        ),
-                        ValueListenableBuilder(
-                            valueListenable: passwordVisible,
-                            builder: (context, visible, _) {
-                              return AppTextFields.passwordTextField(
-                                controller: _passwordController,
-                                obscureText: visible,
-                                onToggleVisibility: () =>
-                                    passwordVisible.value = !visible,
-                                boxDecoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      width: 2,
-                                      color: Color(0xFFFFCD7C),
-                                    ),
+                            Text(
+                              "Email",
+                              style: TextStyle(
+                                  color: Color(0xFFFFCD7C), fontSize: 18),
+                            ),
+                            AppTextFields.basicTextField(
+                              fieldType: TextFieldType.email,
+                              controller: _emailController,
+                              boxDecoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    width: 2,
+                                    color: Color(0xFFFFCD7C),
                                   ),
                                 ),
-                              );
-                            }),
-                      ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              "Password",
+                              style: TextStyle(
+                                  color: Color(0xFFFFCD7C), fontSize: 18),
+                            ),
+                            ValueListenableBuilder(
+                                valueListenable: passwordVisible,
+                                builder: (context, visible, _) {
+                                  return AppTextFields.passwordTextField(
+                                    controller: _passwordController,
+                                    obscureText: visible,
+                                    onToggleVisibility: () =>
+                                        passwordVisible.value = !visible,
+                                    boxDecoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          width: 2,
+                                          color: Color(0xFFFFCD7C),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   Padding(

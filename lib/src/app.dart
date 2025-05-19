@@ -151,7 +151,7 @@ class _MyAppState extends State<MyApp> {
           listener: (context, state) {},
           builder: (context, state) {
             return PlatformApp(
-              title: "Fit Flex Club",
+              title: "Fit Blitz",
               routerConfig: goRouter(state),
             );
           },

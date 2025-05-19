@@ -734,6 +734,7 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
   @override
   void initState() {
     super.initState();
+    context.read<GetclientweightsCubit>().getClientWeights();
 
 // Example: Adding a listener to recalculate when weights change
     currentWeights.addListener(() {

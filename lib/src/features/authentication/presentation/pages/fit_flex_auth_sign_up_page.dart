@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
@@ -109,8 +111,8 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
           children: [
             Positioned.fill(
               child: Image.asset(
-                'assets/images/fit_flex_image.png',
-                fit: BoxFit.cover,
+                'assets/images/fit_flex_bg_wo_text.png',
+                fit: BoxFit.fill,
                 alignment: Alignment.center,
               ),
             ),
@@ -135,285 +137,323 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                     body: Form(
                       key: formStateKey,
                       child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Full Name",
-                                    style: TextStyle(
-                                        color: Color(0xFFFFCD7C), fontSize: 18),
-                                  ),
-                                  AppTextFields.basicTextField(
-                                    controller: _nameController,
-                                    fieldType: TextFieldType.name,
-                                    boxDecoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          width: 2,
-                                          color: Color(0xFFFFCD7C),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    "Email",
-                                    style: TextStyle(
-                                        color: Color(0xFFFFCD7C), fontSize: 18),
-                                  ),
-                                  AppTextFields.basicTextField(
-                                    fieldType: TextFieldType.email,
-                                    controller: _emailController,
-                                    boxDecoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          width: 2,
-                                          color: Color(0xFFFFCD7C),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    "Gym",
-                                    style: TextStyle(
-                                        color: Color(0xFFFFCD7C), fontSize: 18),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 20,
-                                      right: 0,
-                                    ),
-                                    child: ValueListenableBuilder<List<Gym>>(
-                                      valueListenable: originalGyms,
-                                      builder: (context, gyms, _) {
-                                        return PlatformSpecificDropdown(
-                                          borderColor:
-                                              globalColorScheme.primary,
-                                          downArrowColor:
-                                              globalColorScheme.primary,
-                                          selectedOptionColor:
-                                              globalColorScheme.primary,
-                                          pickerTitle: "Gym",
-                                          options:
-                                              getGymOptions(originalGyms.value),
-                                          initialValue: selectedGym.value !=
-                                                  null
-                                              ? {
-                                                  'name': selectedGym
-                                                      .value!.gymName,
-                                                  'id':
-                                                      selectedGym.value!.gymId,
-                                                }
-                                              : {
-                                                  'name': 'Select Gym',
-                                                  'id': '',
-                                                },
-                                          onChanged: (selected) {
-                                            final gym = originalGyms.value
-                                                .firstWhere((g) =>
-                                                    g.gymId == selected['id']);
-                                            selectedGym.value = gym;
-                                            selectedTrainer.value = null;
-                                            filteredTrainers.value =
-                                                gym.trainers;
-                                          },
-                                          onTap: (val) {
-                                            // Optional: use if you want to log or track tap event
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    "Trainer",
-                                    style: TextStyle(
-                                        color: Color(0xFFFFCD7C), fontSize: 18),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 20,
-                                      right: 0,
-                                    ),
-                                    child:
-                                        ValueListenableBuilder<List<Trainer>>(
-                                      valueListenable: filteredTrainers,
-                                      builder: (context, trainers, _) {
-                                        return PlatformSpecificDropdown(
-                                          borderColor:
-                                              globalColorScheme.primary,
-                                          downArrowColor:
-                                              globalColorScheme.primary,
-                                          selectedOptionColor:
-                                              globalColorScheme.primary,
-                                          key: UniqueKey(),
-                                          pickerTitle: "Trainer",
-                                          options: filteredTrainers.value
-                                              .map((trainer) => {
-                                                    'name': trainer.trainerName,
-                                                    'id': trainer.trainerId,
-                                                  })
-                                              .toList(),
-                                          initialValue:
-                                              selectedTrainer.value != null
-                                                  ? {
-                                                      'name': selectedTrainer
-                                                          .value!.trainerName,
-                                                      'id': selectedTrainer
-                                                          .value!.trainerId,
-                                                    }
-                                                  : {
-                                                      'name': 'Select Trainer',
-                                                      'id': '',
-                                                    },
-                                          onChanged: (selected) {
-                                            final trainer = filteredTrainers
-                                                .value
-                                                .firstWhere((t) =>
-                                                    t.trainerId ==
-                                                    selected['id']);
-                                            selectedTrainer.value = trainer;
-                                          },
-                                          onTap: (val) {},
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    "Phone",
-                                    style: TextStyle(
-                                        color: Color(0xFFFFCD7C), fontSize: 18),
-                                  ),
-                                  CustomPhoneField(
-                                    keyboardType:
-                                        TextInputType.numberWithOptions(
-                                            signed: true, decimal: true),
-                                    onCountrySelect: (p0) {
-                                      _codeController.text = p0.toString();
-                                      return null;
-                                    },
-                                    controller: _phoneController,
-                                    boxDecoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          width: 2,
-                                          color: Color(0xFFFFCD7C),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    "Password",
-                                    style: TextStyle(
-                                        color: Color(0xFFFFCD7C), fontSize: 18),
-                                  ),
-                                  ValueListenableBuilder(
-                                      valueListenable: passwordVisible,
-                                      builder: (context, visible, _) {
-                                        return AppTextFields.passwordTextField(
-                                          controller: _passwordController,
-                                          obscureText: visible,
-                                          onToggleVisibility: () =>
-                                              passwordVisible.value = !visible,
-                                          boxDecoration: BoxDecoration(
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                width: 2,
-                                                color: Color(0xFFFFCD7C),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                ],
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            margin: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white
+                                  .withOpacity(0.1), // Semi-transparent
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
                               ),
                             ),
-                            BlocConsumer<AuthenticationBloc,
-                                AuthenticationState>(
-                              listener: (context, state) {
-                                if (state is AuthenticationComplete) {
-                                  context.read<ClientProfileBloc>().add(
-                                        AddUserClientProfileEvent(
-                                          gym: selectedGym.value!,
-                                          trainer: selectedTrainer.value!,
-                                          clientEntity: ClientEntity(
-                                            phone: {
-                                              "countryCode":
-                                                  _codeController.text.isEmpty
-                                                      ? "+92"
-                                                      : _codeController.text,
-                                              "phoneNumber":
-                                                  _phoneController.text,
-                                            },
-                                            username:
-                                                _nameController.text.trim(),
-                                            email: _emailController.text,
-                                            isUserActive: true,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Full Name",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFCD7C),
+                                            fontSize: 18),
+                                      ),
+                                      AppTextFields.basicTextField(
+                                        controller: _nameController,
+                                        fieldType: TextFieldType.name,
+                                        boxDecoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              width: 2,
+                                              color: Color(0xFFFFCD7C),
+                                            ),
                                           ),
                                         ),
-                                      );
-                                }
-                                if (state is AuthenticationError) {
-                                  PlatformDialog.showAlertDialog(
-                                    context: context,
-                                    title: "Create Account",
-                                    message: state.failures.message ??
-                                        "Something went wrong!",
-                                  );
-                                }
-                                if (state is AuthenticationLoading) {}
-                              },
-                              builder: (context, state) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: PlatformButton().buildButton(
-                                    backgroundColor: Color(0xFFFFCD7C),
-                                    borderRadius: 100,
-                                    context: context,
-                                    isLoading: state is AuthenticationLoading,
-                                    type: ButtonType.primary,
-                                    textStyle: TextStyle(
-                                      color: Color.fromARGB(255, 94, 87, 86),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                    text: "Sign Up",
-                                    onPressed: () {
-                                      if (formStateKey.currentState!
-                                          .validate()) {
-                                        context.read<AuthenticationBloc>().add(
-                                              CreateAccountAuthenticationEvent(
-                                                email: _emailController.text,
-                                                password:
-                                                    _passwordController.text,
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        "Email",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFCD7C),
+                                            fontSize: 18),
+                                      ),
+                                      AppTextFields.basicTextField(
+                                        fieldType: TextFieldType.email,
+                                        controller: _emailController,
+                                        boxDecoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              width: 2,
+                                              color: Color(0xFFFFCD7C),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        "Gym",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFCD7C),
+                                            fontSize: 18),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 0,
+                                        ),
+                                        child:
+                                            ValueListenableBuilder<List<Gym>>(
+                                          valueListenable: originalGyms,
+                                          builder: (context, gyms, _) {
+                                            return PlatformSpecificDropdown(
+                                              borderColor:
+                                                  globalColorScheme.primary,
+                                              downArrowColor:
+                                                  globalColorScheme.primary,
+                                              selectedOptionColor:
+                                                  globalColorScheme.primary,
+                                              pickerTitle: "Gym",
+                                              options: getGymOptions(
+                                                  originalGyms.value),
+                                              initialValue:
+                                                  selectedGym.value != null
+                                                      ? {
+                                                          'name': selectedGym
+                                                              .value!.gymName,
+                                                          'id': selectedGym
+                                                              .value!.gymId,
+                                                        }
+                                                      : {
+                                                          'name': 'Select Gym',
+                                                          'id': '',
+                                                        },
+                                              onChanged: (selected) {
+                                                final gym = originalGyms.value
+                                                    .firstWhere((g) =>
+                                                        g.gymId ==
+                                                        selected['id']);
+                                                selectedGym.value = gym;
+                                                selectedTrainer.value = null;
+                                                filteredTrainers.value =
+                                                    gym.trainers;
+                                              },
+                                              onTap: (val) {
+                                                // Optional: use if you want to log or track tap event
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        "Trainer",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFCD7C),
+                                            fontSize: 18),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 0,
+                                        ),
+                                        child: ValueListenableBuilder<
+                                            List<Trainer>>(
+                                          valueListenable: filteredTrainers,
+                                          builder: (context, trainers, _) {
+                                            return PlatformSpecificDropdown(
+                                              borderColor:
+                                                  globalColorScheme.primary,
+                                              downArrowColor:
+                                                  globalColorScheme.primary,
+                                              selectedOptionColor:
+                                                  globalColorScheme.primary,
+                                              key: UniqueKey(),
+                                              pickerTitle: "Trainer",
+                                              options: filteredTrainers.value
+                                                  .map((trainer) => {
+                                                        'name':
+                                                            trainer.trainerName,
+                                                        'id': trainer.trainerId,
+                                                      })
+                                                  .toList(),
+                                              initialValue:
+                                                  selectedTrainer.value != null
+                                                      ? {
+                                                          'name':
+                                                              selectedTrainer
+                                                                  .value!
+                                                                  .trainerName,
+                                                          'id': selectedTrainer
+                                                              .value!.trainerId,
+                                                        }
+                                                      : {
+                                                          'name':
+                                                              'Select Trainer',
+                                                          'id': '',
+                                                        },
+                                              onChanged: (selected) {
+                                                final trainer = filteredTrainers
+                                                    .value
+                                                    .firstWhere((t) =>
+                                                        t.trainerId ==
+                                                        selected['id']);
+                                                selectedTrainer.value = trainer;
+                                              },
+                                              onTap: (val) {},
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        "Phone",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFCD7C),
+                                            fontSize: 18),
+                                      ),
+                                      CustomPhoneField(
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                signed: true, decimal: true),
+                                        onCountrySelect: (p0) {
+                                          _codeController.text = p0.toString();
+                                          return null;
+                                        },
+                                        controller: _phoneController,
+                                        boxDecoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              width: 2,
+                                              color: Color(0xFFFFCD7C),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        "Password",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFCD7C),
+                                            fontSize: 18),
+                                      ),
+                                      ValueListenableBuilder(
+                                          valueListenable: passwordVisible,
+                                          builder: (context, visible, _) {
+                                            return AppTextFields
+                                                .passwordTextField(
+                                              controller: _passwordController,
+                                              obscureText: visible,
+                                              onToggleVisibility: () =>
+                                                  passwordVisible.value =
+                                                      !visible,
+                                              boxDecoration: BoxDecoration(
+                                                border: Border(
+                                                  bottom: BorderSide(
+                                                    width: 2,
+                                                    color: Color(0xFFFFCD7C),
+                                                  ),
+                                                ),
                                               ),
                                             );
-                                      }
-                                    },
-                                    width: double.maxFinite,
-                                  )!,
-                                );
-                              },
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                                BlocConsumer<AuthenticationBloc,
+                                    AuthenticationState>(
+                                  listener: (context, state) {
+                                    if (state is AuthenticationComplete) {
+                                      context.read<ClientProfileBloc>().add(
+                                            AddUserClientProfileEvent(
+                                              gym: selectedGym.value!,
+                                              trainer: selectedTrainer.value!,
+                                              clientEntity: ClientEntity(
+                                                phone: {
+                                                  "countryCode": _codeController
+                                                          .text.isEmpty
+                                                      ? "+92"
+                                                      : _codeController.text,
+                                                  "phoneNumber":
+                                                      _phoneController.text,
+                                                },
+                                                username:
+                                                    _nameController.text.trim(),
+                                                email: _emailController.text,
+                                                isUserActive: true,
+                                              ),
+                                            ),
+                                          );
+                                    }
+                                    if (state is AuthenticationError) {
+                                      PlatformDialog.showAlertDialog(
+                                        context: context,
+                                        title: "Create Account",
+                                        message: state.failures.message ??
+                                            "Something went wrong!",
+                                      );
+                                    }
+                                    if (state is AuthenticationLoading) {}
+                                  },
+                                  builder: (context, state) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: PlatformButton().buildButton(
+                                        backgroundColor: Color(0xFFFFCD7C),
+                                        borderRadius: 100,
+                                        context: context,
+                                        isLoading:
+                                            state is AuthenticationLoading,
+                                        type: ButtonType.primary,
+                                        textStyle: TextStyle(
+                                          color:
+                                              Color.fromARGB(255, 94, 87, 86),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                        text: "Sign Up",
+                                        onPressed: () {
+                                          if (formStateKey.currentState!
+                                              .validate()) {
+                                            context
+                                                .read<AuthenticationBloc>()
+                                                .add(
+                                                  CreateAccountAuthenticationEvent(
+                                                    email:
+                                                        _emailController.text,
+                                                    password:
+                                                        _passwordController
+                                                            .text,
+                                                  ),
+                                                );
+                                          }
+                                        },
+                                        width: double.maxFinite,
+                                      )!,
+                                    );
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                )
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

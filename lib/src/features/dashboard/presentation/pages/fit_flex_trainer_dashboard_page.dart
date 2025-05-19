@@ -188,7 +188,7 @@ class _FitFlexTrainerDashboardPageState
         if (selectedIndex.value == 0) {
           PlatformDialog.showAlertDialog(
             context: context,
-            title: "Fit Flex Club",
+            title: "Fit Blitz",
             message: 'Want to exit ?',
             cancelText: 'No',
             confirmText: 'Yes',

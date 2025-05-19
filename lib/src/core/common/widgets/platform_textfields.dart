@@ -277,16 +277,17 @@ class AppTextFields {
     );
   }
 
-  static Widget prefixSuffixTextField(
-      {String? labelText,
-      Widget? prefix,
-      Widget? suffix,
-      TextInputType? keyboardType,
-      TextStyle? style,
-      Color? filledColor,
-      TextEditingController? controller,
-      void Function(String)? onChanged,
-      void Function(String)? onFieldSubmitted}) {
+  static Widget prefixSuffixTextField({
+    String? labelText,
+    Widget? prefix,
+    Widget? suffix,
+    TextInputType? keyboardType,
+    TextStyle? style,
+    Color? filledColor,
+    TextEditingController? controller,
+    void Function(String)? onChanged,
+    void Function(String)? onFieldSubmitted,
+  }) {
     if (Platform.isIOS) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),

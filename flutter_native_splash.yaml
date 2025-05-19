@@ -3,10 +3,10 @@ flutter_native_splash:
   color: "#FFFFFF"
   
   # Or use background_image instead of color
-  background_image: "assets/images/fit_flex_ios_splash.png"
+  background_image: "assets/images/fit_flex_bg_wo_text.png"
   
   # Image for all platforms
-  image: assets/images/fit_flex_ios_splash.png
+  image: assets/images/fit_flex_bg_wo_text.png
   
   # Splash screen will be full screen (default is true)
   fullscreen: true
@@ -14,26 +14,26 @@ flutter_native_splash:
   # Android 12 configuration
   android_12:
     # Base image that will be center cropped
-    image: assets/images/fit_flex_splash_12_2.png
+    image: assets/images/fit_flex_bg_wo_text.png
     # branding: assets/images/fit_flex_branding_dark.png
     icon_background_color: "#121212"
-    image_dark: assets/images/fit_flex_splash_12_2.png
+    image_dark: assets/images/fit_flex_bg_wo_text.png
     icon_background_color_dark: "#121212"
 
   # Android configuration
   android: true
-  android_gravity: center
+  android_gravity: fill
   
   # iOS configuration
   ios: true
-  image_ios: assets/images/fit_flex_splash_ios.png
+  image_ios: assets/images/fit_flex_bg_wo_text.png
   ios_content_mode: scaleAspectFill
   # branding_ios: assets/images/fit_flex_branding_dark.png
   # branding_ios_color: "#FFFFFF"
 
   info_plist_files:
-    - 'ios/Runner/Info-Debug.plist'
-    - 'ios/Runner/Info-Release.plist'
+    - 'ios/Runner/Info.plist'
+
   
   # Web configuration
   web: false
