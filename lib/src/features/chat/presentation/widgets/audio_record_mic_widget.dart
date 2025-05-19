@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/widgets/record_indicator_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -182,44 +184,54 @@ class _DragExpandMicState extends State<DragExpandMic>
 
   Future<String> _getFilePath() async {
     final dir = await getApplicationDocumentsDirectory();
-    return "${dir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.mp3";
+    if (Platform.isIOS) {
+      return "${dir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a";
+    } else {
+      return "${dir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.mp3";
+    }
   }
 
   Future<void> _startRecording() async {
-    // Step 1: Check the current microphone permission status
     final permissionStatus = await Permission.microphone.status;
 
     if (permissionStatus.isGranted) {
-      await _startRecording();
+      final path = await _getFilePath();
+      await _record.start(RecordConfig(), path: path);
+      _recordedFilePath = path;
+      setState(() {
+        _isRecording = true;
+      });
     } else if (permissionStatus.isDenied) {
-      // Step 2: Request permission if previously denied
       final newStatus = await Permission.microphone.request();
 
       if (newStatus.isGranted) {
-        await _startRecording();
+        final path = await _getFilePath();
+        await _record.start(RecordConfig(), path: path);
+        _recordedFilePath = path;
+        setState(() {
+          _isRecording = true;
+        });
       } else if (newStatus.isPermanentlyDenied) {
-        // Step 3: Permission is permanently denied, redirect to app settings
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text("Microphone Permission Needed"),
-            content: Text(
-                "Please enable microphone permission from settings to record audio."),
-            actions: [
-              TextButton(
-                onPressed: () => openAppSettings(),
-                child: Text("Open Settings"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text("Cancel"),
-              ),
-            ],
-          ),
-        );
-        await _onLongPressEnd(null);
+        if (Platform.isAndroid) {
+          PlatformDialog.showAlertDialog(
+            context: context,
+            title: "Microphone Permission Needed",
+            message:
+                "Please enable microphone permission from settings to record audio.",
+            confirmText: "Open Settings",
+            cancelText: "Cancel",
+            onConfirm: openAppSettings,
+            onCancel: context.pop,
+          );
+        } else {
+          final path = await _getFilePath();
+          await _record.start(RecordConfig(), path: path);
+          _recordedFilePath = path;
+          setState(() {
+            _isRecording = true;
+          });
+        }
       } else {
-        // Step 4: Still denied or restricted
         debugPrint("Microphone permission denied.");
         setState(() {
           _isRecording = false;
@@ -229,25 +241,32 @@ class _DragExpandMicState extends State<DragExpandMic>
         });
       }
     } else if (permissionStatus.isPermanentlyDenied) {
-      // Step 5: Already permanently denied
-      await showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text("Microphone Permission Required"),
-          content: Text("Microphone access is required to record audio."),
-          actions: [
-            TextButton(
-              onPressed: () => openAppSettings(),
-              child: Text("Open Settings"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Cancel"),
-            ),
-          ],
-        ),
-      );
-      await _onLongPressEnd(null);
+      if (Platform.isAndroid) {
+        PlatformDialog.showAlertDialog(
+          context: context,
+          title: "Microphone Permission Needed",
+          message:
+              "Please enable microphone permission from settings to record audio.",
+          confirmText: "Open Settings",
+          cancelText: "Cancel",
+          onConfirm: openAppSettings,
+          onCancel: context.pop,
+        );
+        debugPrint("Microphone permission denied.");
+        setState(() {
+          _isRecording = false;
+          _dragOffset = 0.0;
+          _isPressed = false;
+          _isCancelled = false;
+        });
+      } else {
+        final path = await _getFilePath();
+        await _record.start(RecordConfig(), path: path);
+        _recordedFilePath = path;
+        setState(() {
+          _isRecording = true;
+        });
+      }
     }
   }
 
