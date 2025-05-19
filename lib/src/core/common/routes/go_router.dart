@@ -465,11 +465,13 @@ GoRouter goRouter(appState) {
           final route = state.fullPath;
           final showBottomNavBar = (route == FitFlexClientProfilePage.route) ||
               (route == FitFlexClientWorkoutHistoryPage.route ||
-                  (route == FitFlexAnnouncementsPage.route));
+                  (route == FitFlexAnnouncementsPage.clientRoute));
           return FitFlexClientDashboardPage(
             navigationShell: navigationShell,
             showBottomNavBar: showBottomNavBar,
-            showFloatingAction: (route == FitFlexClientProfilePage.route),
+            showFloatingAction: (route == FitFlexClientProfilePage.route ||
+                (route == FitFlexAnnouncementsPage.clientRoute) ||
+                route == FitFlexClientWorkoutHistoryPage.route),
           );
         },
         branches: [
