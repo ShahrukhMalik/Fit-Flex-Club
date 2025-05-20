@@ -1177,6 +1177,9 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                   );
                 }
               },
+            ),
+            SizedBox(
+              height: 120,
             )
           ],
         ),
