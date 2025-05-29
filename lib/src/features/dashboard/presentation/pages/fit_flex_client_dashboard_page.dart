@@ -347,7 +347,10 @@ class _FitFlexClientDashboardPageState
                   left: 0,
                   right: 0,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20), // Optional
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ), // Optional
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
@@ -355,7 +358,10 @@ class _FitFlexClientDashboardPageState
                         decoration: BoxDecoration(
                           color: Colors.white
                               .withOpacity(0.15), // Semi-transparent
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.2),
                           ),

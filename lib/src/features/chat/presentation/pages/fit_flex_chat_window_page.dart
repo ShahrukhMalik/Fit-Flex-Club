@@ -338,6 +338,7 @@ class _FitFlexChatWindowPageState extends State<FitFlexChatWindowPage> {
               children: [
                 Expanded(
                   child: AppTextFields.prefixSuffixTextField(
+                    usePadding: true,
                     onFieldSubmitted: (message) {
                       if (_messageController.text.isNotEmpty) {
                         context.read<SendMessageCubit>().sendMessage(

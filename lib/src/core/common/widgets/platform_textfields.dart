@@ -284,44 +284,78 @@ class AppTextFields {
     TextInputType? keyboardType,
     TextStyle? style,
     Color? filledColor,
+    bool usePadding = false,
     TextEditingController? controller,
     void Function(String)? onChanged,
     void Function(String)? onFieldSubmitted,
   }) {
     if (Platform.isIOS) {
-      return CupertinoTextFormFieldRow(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        onFieldSubmitted: onFieldSubmitted,
-        validator: (value) {
-          // if (value == null || value.isEmpty) {
-          //   return 'Please enter weight';
-          // }
-          return null;
-        },
-        style: style ?? const TextStyle(fontSize: 16),
-        keyboardType: keyboardType,
-        controller: controller,
-        placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
-        placeholder: labelText ?? "Type a message",
-        onChanged: onChanged,
-        // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        prefix: prefix != null
-            ? Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: prefix,
-              )
-            : null,
-        // : suffix != null
-        //     ? Padding(
-        //         padding: const EdgeInsets.only(right: 8),
-        //         child: suffix,
-        //       )
-        //     : null,
-        decoration: BoxDecoration(
-          color: filledColor ?? CupertinoColors.systemGrey5,
-          borderRadius: BorderRadius.circular(25),
-        ),
-      );
+      if (usePadding) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+          decoration: BoxDecoration(
+            color: filledColor ?? CupertinoColors.systemGrey4,
+            borderRadius: BorderRadius.circular(100),
+            border:
+                Border.all(color: filledColor ?? CupertinoColors.systemGrey4),
+          ),
+          child: CupertinoTextFormFieldRow(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            onFieldSubmitted: onFieldSubmitted,
+            validator: (value) {
+              // if (value == null || value.isEmpty) {
+              //   return 'Please enter weight';
+              // }
+              return null;
+            },
+            style: style ?? const TextStyle(fontSize: 16),
+            keyboardType: keyboardType,
+            controller: controller,
+            placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
+            placeholder: labelText ?? "Type a message",
+            onChanged: onChanged,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            prefix: prefix != null
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: prefix,
+                  )
+                : null,
+            decoration: BoxDecoration(
+              color: filledColor ?? CupertinoColors.systemGrey5,
+              borderRadius: BorderRadius.circular(25),
+            ),
+          ),
+        );
+      } else {
+        return CupertinoTextFormFieldRow(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          onFieldSubmitted: onFieldSubmitted,
+          validator: (value) {
+            // if (value == null || value.isEmpty) {
+            //   return 'Please enter weight';
+            // }
+            return null;
+          },
+          style: style ?? const TextStyle(fontSize: 16),
+          keyboardType: keyboardType,
+          controller: controller,
+          placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
+          placeholder: labelText ?? "Type a message",
+          onChanged: onChanged,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          prefix: prefix != null
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: prefix,
+                )
+              : null,
+          decoration: BoxDecoration(
+            color: filledColor ?? CupertinoColors.systemGrey5,
+            borderRadius: BorderRadius.circular(25),
+          ),
+        );
+      }
     }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),

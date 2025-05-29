@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 
@@ -22,34 +22,43 @@ class AudioMessagePlayerWidget extends StatefulWidget {
 }
 
 class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
-  late AudioPlayer _player;
+  late ManagedAudioPlayer _managedPlayer;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   bool _isPlaying = false;
   bool _loadError = false;
 
-  // final _waveformController = PlayerController();
-
   @override
   void initState() {
     super.initState();
-    _player = AudioPlayer();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        _initializePlayer();
+
+    _managedPlayer = AudioPlayerManager().createManagedPlayer(
+      widgetKey: widget.key?.toString(),
+      onCompleted: () {
+        setState(() {
+          _position = Duration.zero;
+          _isPlaying = false;
+        });
+      },
+      onStateChanged: (isPlaying) {
+        setState(() => _isPlaying = isPlaying);
       },
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializePlayer();
+    });
   }
 
   Future<File> writeBytesToTempFile(Uint8List bytes, String filename) async {
     final tempDir = await getTemporaryDirectory();
     final file = File('${tempDir.path}/$filename');
-
     return await file.writeAsBytes(bytes, flush: true);
   }
 
   Future<void> _initializePlayer() async {
     try {
+      final player = _managedPlayer.player;
       String? path;
 
       if (widget.mediaBytes != null) {
@@ -58,42 +67,19 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
           'chat_audio_${DateTime.now().millisecondsSinceEpoch}.m4a',
         );
         path = audioFile.path;
-        await _player.setFilePath(path);
+        await player.setFilePath(path);
       } else if (widget.mediaUrl != null && widget.mediaUrl!.isNotEmpty) {
         path = widget.mediaUrl!;
-        await _player.setUrl(path);
+        await player.setUrl(path);
       } else {
         setState(() => _loadError = true);
         return;
       }
 
-      // 👇 Connect waveform controller to this audio source
-      // _waveformController
-      //   // ..playerState = PlayerState.stopped
-      //   ..preparePlayer(path: path);
+      _duration = player.duration ?? Duration.zero;
 
-      _duration = _player.duration ?? Duration.zero;
-
-      _player.positionStream.listen((pos) {
-        setState(() {
-          _position = pos;
-        });
-      });
-
-      _player.playerStateStream.listen((state) {
-        if (state.processingState == ProcessingState.completed) {
-          // Reset player
-          _player.seek(Duration.zero);
-          _player.stop();
-          setState(() {
-            _position = Duration.zero;
-            _isPlaying = false;
-          });
-        } else {
-          setState(() {
-            _isPlaying = state.playing;
-          });
-        }
+      player.positionStream.listen((pos) {
+        setState(() => _position = pos);
       });
     } catch (e) {
       print('Error loading audio: $e');
@@ -101,23 +87,23 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
     }
   }
 
-  @override
-  void dispose() {
-    _player.dispose();
-    // _waveformController.dispose();
-    super.dispose();
+  void _togglePlayback() {
+    final manager = AudioPlayerManager();
+
+    if (_isPlaying) {
+      _managedPlayer.player.pause();
+      manager.unregisterPlayer(_managedPlayer.id);
+    } else {
+      manager.registerPlayer(_managedPlayer);
+      _managedPlayer.player.play();
+    }
   }
 
-  void _togglePlayback() {
-    if (_isPlaying) {
-      _player.pause();
-
-      // _waveformController.pausePlayer();
-    } else {
-      _player.play();
-      // _waveformController.startPlayer();
-    }
-    setState(() {});
+  @override
+  void dispose() {
+    AudioPlayerManager().unregisterPlayer(_managedPlayer.id);
+    _managedPlayer.player.dispose();
+    super.dispose();
   }
 
   String _formatDuration(Duration d) {
@@ -140,7 +126,7 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
         child: Row(
           children: [
             Icon(Icons.error_outline, color: Colors.grey.shade600),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Audio not available',
@@ -155,9 +141,7 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.7,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      margin: const EdgeInsets.symmetric(
-        vertical: 8,
-      ),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: globalColorScheme.inversePrimary,
         borderRadius: BorderRadius.circular(16),
@@ -165,7 +149,6 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Play/pause button
           IconButton(
             icon: Icon(
               _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
@@ -174,23 +157,10 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
             ),
             onPressed: _togglePlayback,
           ),
-          // const SizedBox(width: 10),
-
-          // Waveform + Slider
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // AudioFileWaveforms(
-                //   size: const Size(double.infinity, 30),
-                //   playerController: _waveformController,
-                //   playerWaveStyle: PlayerWaveStyle(
-                //     fixedWaveColor: globalColorScheme.onPrimaryContainer,
-                //     liveWaveColor: globalColorScheme.tertiary,
-                //     showSeekLine: true,
-                //   ),
-                //   enableSeekGesture: false,
-                // ),
                 Slider(
                   value: _position.inMilliseconds.toDouble().clamp(
                         0.0,
@@ -201,14 +171,13 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
                   activeColor: globalColorScheme.tertiary,
                   inactiveColor: globalColorScheme.onPrimaryContainer,
                   onChanged: (value) async {
-                    await _player.seek(Duration(milliseconds: value.toInt()));
+                    await _managedPlayer.player
+                        .seek(Duration(milliseconds: value.toInt()));
                   },
                 ),
               ],
             ),
           ),
-
-          // Remaining time
           Text(
             _formatDuration(_duration - _position),
             style: TextStyle(fontSize: 13, color: Colors.green.shade900),
