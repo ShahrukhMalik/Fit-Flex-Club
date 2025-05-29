@@ -12,7 +12,6 @@ import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/sta
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
-import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';

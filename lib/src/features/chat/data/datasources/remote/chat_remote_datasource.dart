@@ -8,7 +8,6 @@ import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 
 import 'package:fit_flex_club/src/features/chat/data/models/chat_model.dart';
 import 'package:fit_flex_club/src/features/chat/data/models/message_model.dart';
-import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid_v4/uuid_v4.dart';

@@ -44,6 +44,11 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
     // Find the initial index of the selected value
     final initialIndex = widget.options.indexOf(selectedValue);
 
+    setState(() {
+      selectedValue = widget.options[0];
+      widget.onChanged(widget.options[0]);
+    });
+
     showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
@@ -133,6 +138,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                             selectedValue = option;
                             widget.onChanged(option);
                           });
+                          context.pop();
                         },
                         child: Center(
                           child: Text(
@@ -214,6 +220,12 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                     value: option,
                     child: Text(
                       option.values.first,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: option == selectedValue
+                            ? globalColorScheme.tertiaryContainer
+                            : globalColorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 )

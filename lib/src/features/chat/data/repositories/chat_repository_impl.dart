@@ -14,7 +14,6 @@ import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
 import 'package:fit_flex_club/src/features/chat/domain/repositories/chat_repository.dart';
 import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/daos/sync_queue_dao.dart';
-import 'package:fit_flex_club/src/features/syncmanager/data/datasources/local/tables/sync_queue_table.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid_v4/uuid_v4.dart';
 

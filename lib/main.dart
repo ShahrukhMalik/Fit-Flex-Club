@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fit_flex_club/firebase_options.dart';
 import 'package:fit_flex_club/src/app.dart';
-import 'package:fit_flex_club/src/core/common/services/fcm_service.dart';
-import 'package:fit_flex_club/src/core/common/services/local_notification_service.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_controller.dart';
 import 'package:fit_flex_club/src/core/common/settings/settings_service.dart';

@@ -289,45 +289,37 @@ class AppTextFields {
     void Function(String)? onFieldSubmitted,
   }) {
     if (Platform.isIOS) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+      return CupertinoTextFormFieldRow(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        onFieldSubmitted: onFieldSubmitted,
+        validator: (value) {
+          // if (value == null || value.isEmpty) {
+          //   return 'Please enter weight';
+          // }
+          return null;
+        },
+        style: style ?? const TextStyle(fontSize: 16),
+        keyboardType: keyboardType,
+        controller: controller,
+        placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
+        placeholder: labelText ?? "Type a message",
+        onChanged: onChanged,
+        // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        prefix: prefix != null
+            ? Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: prefix,
+              )
+            : null,
+        // : suffix != null
+        //     ? Padding(
+        //         padding: const EdgeInsets.only(right: 8),
+        //         child: suffix,
+        //       )
+        //     : null,
         decoration: BoxDecoration(
-          color: filledColor ?? CupertinoColors.systemGrey4,
-          borderRadius: BorderRadius.circular(100),
-          border: Border.all(color: filledColor ?? CupertinoColors.systemGrey4),
-        ),
-        child: CupertinoTextFormFieldRow(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          onFieldSubmitted: onFieldSubmitted,
-          validator: (value) {
-            // if (value == null || value.isEmpty) {
-            //   return 'Please enter weight';
-            // }
-            return null;
-          },
-          style: style ?? const TextStyle(fontSize: 16),
-          keyboardType: keyboardType,
-          controller: controller,
-          placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
-          placeholder: labelText ?? "Type a message",
-          onChanged: onChanged,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          prefix: prefix != null
-              ? Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: prefix,
-                )
-              : null,
-          // : suffix != null
-          //     ? Padding(
-          //         padding: const EdgeInsets.only(right: 8),
-          //         child: suffix,
-          //       )
-          //     : null,
-          decoration: BoxDecoration(
-            color: filledColor ?? CupertinoColors.systemGrey5,
-            borderRadius: BorderRadius.circular(25),
-          ),
+          color: filledColor ?? CupertinoColors.systemGrey5,
+          borderRadius: BorderRadius.circular(25),
         ),
       );
     }

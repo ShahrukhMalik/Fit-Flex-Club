@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
 
 class MessageModel extends MessageEntity {

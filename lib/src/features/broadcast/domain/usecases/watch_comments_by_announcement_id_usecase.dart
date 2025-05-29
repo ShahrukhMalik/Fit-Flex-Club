@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/core/util/usecase/usecase.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_entity.dart';
-import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/repositories/broadcast_repository.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/usecases/broadcast_usecase.dart';
 import 'package:injectable/injectable.dart';

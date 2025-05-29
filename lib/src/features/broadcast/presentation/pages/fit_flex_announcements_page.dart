@@ -1,15 +1,12 @@
 import 'dart:ui';
 
-import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
-import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/announcement_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/comment_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/reaction_entity.dart';
-import 'package:fit_flex_club/src/features/broadcast/domain/usecases/watch_comments_by_announcement_id_usecase.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/addcomment/addcomment_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/addreaction/addreaction_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/getemojis/getemojis_cubit.dart';
@@ -86,19 +83,20 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: PlatformAppbar.basicAppBar(
-        title: "Announcements",
-        foregroundColor: globalColorScheme.primary,
-        context: context,
-        backgroundColor: globalColorScheme.onPrimaryContainer,
-        onLeadingPressed: () {
-          if (widget.isTrainer) {
-            context.pop();
-          } else {
-            context.go('/');
-          }
-        },
-        // trailing: IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
-      ),
+          title: "Announcements",
+          foregroundColor: globalColorScheme.primary,
+          context: context,
+          backgroundColor: globalColorScheme.onPrimaryContainer,
+          automaticallyImplyLeading: false
+          // onLeadingPressed: () {
+          //   if (widget.isTrainer) {
+          //     context.pop();
+          //   } else {
+          //     context.go('/');
+          //   }
+          // },
+          // trailing: IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+          ),
       floatingActionButton: widget.isTrainer
           ? FloatingActionButton.extended(
               onPressed: () => context.go(
@@ -189,6 +187,7 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
                     padding: const EdgeInsets.only(bottom: 110),
                     child: ListView.builder(
                       // reverse: true,
+                      cacheExtent: MediaQuery.of(context).size.height * 3,
                       itemCount: announcements.length,
                       itemBuilder: (context, index) {
                         final announcement = announcements[index];
@@ -367,7 +366,6 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
 
                                           showModalBottomSheet(
                                             context: context,
-                                            
                                             isScrollControlled: true,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -390,35 +388,32 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
                                                             .viewInsets
                                                             .bottom,
                                                       ),
-                                                      child:
-                                                          CommentsSheet(
-                                                            comments: comments,
-                                                            onSend: (text) {
-                                                              context
-                                                                  .read<
-                                                                      AddcommentCubit>()
-                                                                  .addComment(
-                                                                    comment:
-                                                                        Comment(
-                                                                      id: '',
-                                                                      userId: '',
-                                                                      announcementId:
-                                                                          announcement
-                                                                              .id,
-                                                                      content:
-                                                                          text,
-                                                                      timestamp:
-                                                                          DateTime
-                                                                              .now(),
-                                                                      userName:
-                                                                          '',
-                                                                    ),
-                                                                    announcementId:
-                                                                        announcement
-                                                                            .id,
-                                                                  );
-                                                            },
-                                                          ),
+                                                      child: CommentsSheet(
+                                                        comments: comments,
+                                                        onSend: (text) {
+                                                          context
+                                                              .read<
+                                                                  AddcommentCubit>()
+                                                              .addComment(
+                                                                comment:
+                                                                    Comment(
+                                                                  id: '',
+                                                                  userId: '',
+                                                                  announcementId:
+                                                                      announcement
+                                                                          .id,
+                                                                  content: text,
+                                                                  timestamp:
+                                                                      DateTime
+                                                                          .now(),
+                                                                  userName: '',
+                                                                ),
+                                                                announcementId:
+                                                                    announcement
+                                                                        .id,
+                                                              );
+                                                        },
+                                                      ),
                                                     );
                                                   }
                                                   return CupertinoActivityIndicator();

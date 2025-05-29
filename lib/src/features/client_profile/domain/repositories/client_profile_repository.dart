@@ -1,9 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fit_flex_club/src/core/util/error/failures.dart';
 import 'package:fit_flex_club/src/features/client_management/domain/entities/client_weight_entity.dart';
-import 'package:fit_flex_club/src/features/client_profile/data/models/client_model.dart';
-import 'package:fit_flex_club/src/features/client_profile/data/models/gym_model.dart';
-import 'package:fit_flex_club/src/features/client_profile/data/models/trainer_model.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/gym_entity.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/trainer_entity.dart';

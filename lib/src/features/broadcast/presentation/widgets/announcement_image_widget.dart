@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:fit_flex_club/src/features/broadcast/domain/entities/announcement_entity.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AnnouncementImageWidget extends StatelessWidget {
@@ -21,7 +21,7 @@ class AnnouncementImageWidget extends StatelessWidget {
         children: [
           // Glass Background (random image)
           Image.asset(
-            'assets/images/fit_flex_image.png',
+            'assets/images/fit_flex_logo.png',
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
@@ -48,6 +48,8 @@ class AnnouncementImageWidget extends StatelessWidget {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
+        cacheHeight: double.maxFinite.toInt(),
+        cacheWidth: double.maxFinite.toInt(),
         // loadingBuilder: (context, child, loadingProgress) {
         //   if (loadingProgress == null) return child;
         //   return const Center(child: CircularProgressIndicator());
@@ -61,9 +63,11 @@ class AnnouncementImageWidget extends StatelessWidget {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
+        cacheHeight: double.maxFinite.toInt(),
+        cacheWidth: double.maxFinite.toInt(),
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CupertinoActivityIndicator());
         },
         errorBuilder: (context, error, stackTrace) =>
             const Icon(Icons.broken_image, size: 48),

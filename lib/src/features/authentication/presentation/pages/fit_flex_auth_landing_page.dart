@@ -56,11 +56,11 @@ class _FitFlexAuthLandingPageState extends State<FitFlexAuthLandingPage> {
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: PlatformAppbar.basicAppBar(
-            // onLeadingPressed: () => context.go('/'),
-            title: "Welcome",
-            context: context,
-            backgroundColor: Colors.transparent,
-          ),
+              // onLeadingPressed: () => context.go('/'),
+              title: "Welcome",
+              context: context,
+              backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: true),
           body: Stack(
             children: [
               // Positioned(

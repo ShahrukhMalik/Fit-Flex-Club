@@ -467,6 +467,17 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                         context: context,
                         title: "Add Weight",
                         actions: [
+                          PlatformButton().buildButton(
+                            context: context,
+                            onPressed: () => context.pop(),
+                            text: "Close",
+                            type: ButtonType.text,
+                            backgroundColor: globalColorScheme.primary,
+                            textStyle: TextStyle(
+                              color: globalColorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )!,
                           ValueListenableBuilder(
                             valueListenable: isWeightConfirmed,
                             builder: (context, weightConfirmed, _) {
@@ -563,7 +574,9 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                     child: AppTextFields.prefixSuffixTextField(
                                       controller: weightController,
                                       labelText: 'Weight in (kgs)',
-                                      keyboardType: TextInputType.number,
+                                      keyboardType:
+                                          TextInputType.numberWithOptions(
+                                              decimal: true),
                                       style: TextStyle(
                                         color: globalColorScheme
                                             .onPrimaryContainer,

@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
+import 'package:fit_flex_club/src/core/util/api/api_service.dart';
 import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/emoji_model.dart';
 import 'package:fit_flex_club/src/features/broadcast/domain/entities/emoji_entity.dart';
-import 'package:mime/mime.dart';
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/announcement_model.dart';
 import 'package:fit_flex_club/src/features/broadcast/data/models/comment_model.dart';
@@ -346,9 +346,13 @@ class BroadcastRemoteDatasourceImpl extends BroadcastRemoteDatasource {
       return combinedStream.asyncMap((docRefs) async {
         final enrichedList = await Future.wait(docRefs.map(
           (docRef) async {
+            final ApiService apiService = ApiService();
             final docSnap = await docRef.get();
             final data = docSnap.data() as Map<String, dynamic>;
-
+            final mediaUrl = data['mediaUrl'];
+            final mediaBytes =
+                await apiService.getUint8ListFromNetworkUrl(mediaUrl);
+            data['mediaBytes'] = mediaBytes;
             final announcement = AnnouncementModel.fromFirestore(
               json: data,
               docId: docRef.id,

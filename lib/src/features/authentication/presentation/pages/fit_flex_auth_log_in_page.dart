@@ -46,6 +46,7 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
               title: "Log In",
               context: context,
               backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: true
             ),
             body: Form(
               key: formStateKey,

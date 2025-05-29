@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 
 class ChatModel extends ChatEntity {

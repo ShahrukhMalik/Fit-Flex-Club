@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:fit_flex_club/src/features/chat/data/datasources/local/converters/converters.dart';
 
 class Announcements extends Table {
   TextColumn get id => text()();

@@ -18,6 +18,7 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
       (batch) {
         batch.insertAll(
           clientWeight, // The table you're inserting into
+          mode: InsertMode.insertOrReplace,
           models.map(
             (model) {
               return ClientWeightCompanion(

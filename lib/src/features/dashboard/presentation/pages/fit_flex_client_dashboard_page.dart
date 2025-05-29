@@ -9,10 +9,8 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
 import 'package:fit_flex_club/src/core/util/network/network_info.dart';
 import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
-import 'package:fit_flex_club/src/features/chat/presentation/cubit/getchat/getchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchchatstream/watchchatstream_cubit.dart';
-import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_client_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/workout_history/presentation/bloc/workout_history_bloc.dart';
@@ -27,12 +25,14 @@ class FitFlexClientDashboardPage extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
   final bool showBottomNavBar;
   final bool showFloatingAction;
+  final bool showBlurEffectBottomNavbar;
 
   const FitFlexClientDashboardPage({
     super.key,
     required this.navigationShell,
     this.showBottomNavBar = false,
     this.showFloatingAction = false,
+    this.showBlurEffectBottomNavbar = true,
   });
 
   @override
@@ -340,28 +340,38 @@ class _FitFlexClientDashboardPageState
             ),
 
             // Glass overlay
-            Positioned(
-              bottom: 0, // or wherever you want
-              left: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20), // Optional
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15), // Semi-transparent
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
+            if (widget.showBottomNavBar)
+              if (widget.showBlurEffectBottomNavbar)
+                Positioned(
+                  bottom: 0, // or wherever you want
+                  left: 0,
+                  right: 0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20), // Optional
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white
+                              .withOpacity(0.15), // Semi-transparent
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                        ),
+                        child: _buildBottomNavOverlay(context, width),
                       ),
                     ),
-                    child: _buildBottomNavOverlay(context, width),
                   ),
+                )
+              else
+                Positioned(
+                  bottom: 0, // or wherever you want
+                  left: 0,
+                  right: 0,
+                  child: _buildBottomNavOverlay(context, width),
                 ),
-              ),
-            ),
           ],
         )
         // Column(

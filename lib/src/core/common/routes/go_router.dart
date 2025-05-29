@@ -15,7 +15,6 @@ import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_client_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_one_to_one_chat_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_assigned_workout_plan_page.dart';
-import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_measure_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
 import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_workout_history_page.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/pages/fit_flex_client_profile_select_age_page.dart';
@@ -465,10 +464,13 @@ GoRouter goRouter(appState) {
           final route = state.fullPath;
           final showBottomNavBar = (route == FitFlexClientProfilePage.route) ||
               (route == FitFlexClientWorkoutHistoryPage.route ||
-                  (route == FitFlexAnnouncementsPage.clientRoute));
+                  (route == FitFlexAnnouncementsPage.clientRoute)) ||
+              route!.contains(FitFlexClientChatWindowPage.route);
           return FitFlexClientDashboardPage(
             navigationShell: navigationShell,
             showBottomNavBar: showBottomNavBar,
+            showBlurEffectBottomNavbar:
+                !(route == FitFlexClientProfilePage.route),
             showFloatingAction: (route == FitFlexClientProfilePage.route ||
                 (route == FitFlexAnnouncementsPage.clientRoute) ||
                 route == FitFlexClientWorkoutHistoryPage.route),

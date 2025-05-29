@@ -10,8 +10,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
-import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 
 class FitFlexTrainerHubPage extends StatelessWidget {
   static const route = '/trainer_hub';

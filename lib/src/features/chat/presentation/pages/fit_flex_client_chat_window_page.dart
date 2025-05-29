@@ -2,13 +2,10 @@
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fit_flex_club/src/core/util/sharedpref/shared_prefs_util.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
-import 'package:fit_flex_club/src/features/chat/presentation/cubit/startchat/startchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/updatemessage/updatemessage_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_message_player_widget.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/widgets/audio_record_mic_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -20,11 +17,8 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/chat_entity.dart';
 import 'package:fit_flex_club/src/features/chat/domain/entities/message_entity.dart';
-import 'package:fit_flex_club/src/features/chat/presentation/cubit/getchat/getchat_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/sendmessage/sendmessage_cubit.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/cubit/watchmessagesbychatid/watchmessagesbychatid_cubit.dart';
-import 'package:fit_flex_club/src/features/client_management/presentation/pages/fit_flex_client_profile_page.dart';
-import 'package:fit_flex_club/src/features/dashboard/presentation/pages/fit_flex_client_dashboard_page.dart';
 
 class FitFlexClientChatWindowPage extends StatefulWidget {
   static const route = 'chat_window';

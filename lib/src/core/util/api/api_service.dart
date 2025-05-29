@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:fit_flex_club/src/core/util/error/exceptions.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/exercise_gif_model.dart';
@@ -36,6 +37,22 @@ class ApiService {
       } else {
         throw ServerException(errorMessage: e.toString());
       }
+    }
+  }
+
+  Future<Uint8List?> getUint8ListFromNetworkUrl(String? url) async {
+    try {
+      if (url == null) return null;
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response.bodyBytes; // This is the Uint8List
+      } else {
+        throw ServerException(
+          errorMessage: 'Failed to load data: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw ServerException(errorMessage: e.toString());
     }
   }
 }

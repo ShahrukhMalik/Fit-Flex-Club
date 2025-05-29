@@ -3,11 +3,7 @@ import 'dart:io';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AudioMessagePlayerWidget extends StatefulWidget {
@@ -32,7 +28,7 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
   bool _isPlaying = false;
   bool _loadError = false;
 
-  final _waveformController = PlayerController();
+  // final _waveformController = PlayerController();
 
   @override
   void initState() {
@@ -108,7 +104,7 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
   @override
   void dispose() {
     _player.dispose();
-    _waveformController.dispose();
+    // _waveformController.dispose();
     super.dispose();
   }
 

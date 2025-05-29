@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 
 final Color primaryColor = Color(0xFFFFCD7C);
