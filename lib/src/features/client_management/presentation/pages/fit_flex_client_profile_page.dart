@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
@@ -1007,7 +1008,8 @@ class _WorkoutActionButtonState extends State<WorkoutActionButton>
                     angle: 35,
                     child: Icon(
                       Icons.bolt,
-                      color: globalColorScheme.secondary.withOpacity(0.3),
+                      color:
+                          globalColorScheme.onPrimaryContainer.withOpacity(0.3),
                       size: 150,
                     ),
                   )),
@@ -1016,7 +1018,7 @@ class _WorkoutActionButtonState extends State<WorkoutActionButton>
                 angle: 60,
                 child: Icon(
                   Icons.bolt,
-                  color: globalColorScheme.primary,
+                  color: globalColorScheme.primaryContainer,
                   size: 100,
                 ),
               ),
@@ -1084,10 +1086,21 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                                 .fitHeight, // <-- key change for header section
                           );
                         }
-                        return PlatformLoader().buildLoader(
-                          type: LoaderType.shimmer,
-                          baseColor: globalColorScheme.secondary,
-                          highlightColor: globalColorScheme.tertiary,
+                        return Stack(
+                          children: [
+                            Image.asset(
+                              'assets/images/fit_flex_logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                            BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                              child: Container(
+                                color: Colors.black.withOpacity(0.3),
+                                alignment: Alignment.centerLeft,
+                                child: SizedBox(),
+                              ),
+                            ),
+                          ],
                         );
                       },
                     ),
@@ -1104,11 +1117,13 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                       tileMode: TileMode.clamp,
                       begin: Alignment.centerRight,
                       end: Alignment.topLeft,
+                      stops: [0.0, 0.1, 0.35, 0.7, 0.8, 1.0],
                       colors: [
                         globalColorScheme.onErrorContainer,
+                        globalColorScheme.onErrorContainer,
                         globalColorScheme.onPrimaryContainer,
-                        globalColorScheme.onPrimaryContainer
-                            .withOpacity(0.7), // More transparent
+                        Colors.transparent,
+                        Colors.transparent,
                         Colors.transparent, // Fully transparent
                       ],
                     ),

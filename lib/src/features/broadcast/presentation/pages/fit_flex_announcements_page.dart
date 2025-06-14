@@ -15,6 +15,7 @@ import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/watchcom
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_post_announcments_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_reactions_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_view_image_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/comment_sheet_widget.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/reaction_bar_widget.dart';
@@ -274,17 +275,39 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
 
                               // --- Media Preview ---
                               if (announcement.postType == PostType.image)
-                                SizedBox(
-                                  height: 250,
-                                  child: AnnouncementImageWidget(
-                                    mediaUrl: announcement.mediaUrl,
-                                    mediaBytes: announcement.mediaBytes,
+                                InkWell(
+                                  onTap: () {
+                                    if (widget.isTrainer) {
+                                      context.push(
+                                        '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}/${FitFlexViewImagePage.route}',
+                                        extra: {
+                                          'mediaUrl': announcement.mediaUrl,
+                                          'mediaBytes': announcement.mediaBytes,
+                                        },
+                                      );
+                                    } else {
+                                      context.push(
+                                        '${FitFlexAnnouncementsPage.clientRoute}/${FitFlexViewImagePage.route}',
+                                        extra: {
+                                          'mediaUrl': announcement.mediaUrl,
+                                          'mediaBytes': announcement.mediaBytes,
+                                        },
+                                      );
+                                    }
+                                  },
+                                  child: SizedBox(
+                                    height: 250,
+                                    child: AnnouncementImageWidget(
+                                      mediaUrl: announcement.mediaUrl,
+                                      mediaBytes: announcement.mediaBytes,
+                                    ),
                                   ),
                                 ),
                               if (announcement.postType == PostType.video)
                                 SizedBox(
                                   height: 250,
                                   child: VideoPreview(
+                                    isTrainer: widget.isTrainer,
                                     networkUrl: announcement.mediaUrl,
                                     bytes: announcement.mediaBytes,
                                   ),

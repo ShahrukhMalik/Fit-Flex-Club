@@ -11,6 +11,8 @@ import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_reactions_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_select_clients_page.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_view_image_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_view_video_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_client_chat_window_page.dart';
 import 'package:fit_flex_club/src/features/chat/presentation/pages/fit_flex_one_to_one_chat_page.dart';
@@ -386,6 +388,36 @@ GoRouter goRouter(appState) {
                     routes: [
                       GoRoute(
                         routes: [],
+                        path: FitFlexViewVideoPage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexViewVideoPage(
+                              bytes: extraData?['mediaBytes'],
+                              networkUrl: extraData?['mediaUrl'],
+                            ),
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        routes: [],
+                        path: FitFlexViewImagePage.route,
+                        pageBuilder: (context, state) {
+                          final extraData =
+                              state.extra as Map<String, dynamic>?;
+                          return TransitionPage(
+                            key: state.pageKey,
+                            child: FitFlexViewImagePage(
+                              mediaBytes: extraData?['mediaBytes'],
+                              mediaUrl: extraData?['mediaUrl'],
+                            ),
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        routes: [],
                         path: FitFlexPostAnnouncmentsPage.route,
                         pageBuilder: (context, state) => TransitionPage(
                           key: state.pageKey,
@@ -577,6 +609,34 @@ GoRouter goRouter(appState) {
                         key: state.pageKey,
                         child: FitFlexReactionsPage(
                           announcementId: extraData?['announcementId'],
+                        ),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    routes: [],
+                    path: FitFlexViewVideoPage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexViewVideoPage(
+                          bytes: extraData?['mediaBytes'],
+                          networkUrl: extraData?['mediaUrl'],
+                        ),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    routes: [],
+                    path: FitFlexViewImagePage.route,
+                    pageBuilder: (context, state) {
+                      final extraData = state.extra as Map<String, dynamic>?;
+                      return TransitionPage(
+                        key: state.pageKey,
+                        child: FitFlexViewImagePage(
+                          mediaBytes: extraData?['mediaBytes'],
+                          mediaUrl: extraData?['mediaUrl'],
                         ),
                       );
                     },

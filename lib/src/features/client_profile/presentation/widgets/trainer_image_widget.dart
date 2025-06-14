@@ -72,11 +72,11 @@ class TrainerImageWidget extends StatelessWidget {
           end: Alignment.centerRight,
           colors: [
             Colors.white, // Fully visible on left
-            Colors.white.withOpacity(0.7),
-            Colors.white.withOpacity(0.3),
+            Colors.white.withOpacity(0.8),
+            Colors.white.withOpacity(0.5),
             Colors.transparent, // Fully transparent on right
           ],
-          stops: [0.0, 0.8, 0.90, 1.0], // You can tweak these for smoother fade
+          stops: [0.0, 0.85, 0.90, 1.0], // You can tweak these for smoother fade
         ).createShader(bounds);
       },
       blendMode: BlendMode.dstIn, // This applies transparency

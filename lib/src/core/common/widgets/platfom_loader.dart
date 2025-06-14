@@ -79,12 +79,13 @@ class PlatformLoader {
 
       case LoaderType.shimmer:
         return _buildShimmerLoader(
-            baseColor: baseColor,
-            height: height,
-            highlightColor: highlightColor,
-            child: child,
-            duration: duration,
-            containerRadius: containerRadius);
+          baseColor: baseColor,
+          height: height,
+          highlightColor: highlightColor,
+          child: child,
+          duration: duration,
+          containerRadius: containerRadius,
+        );
 
       case LoaderType.custom:
         return _buildCustomLoader(
@@ -264,7 +265,7 @@ class PlatformLoader {
     double? containerRadius,
   }) {
     return ShimmerLoader(
-      baseColor: baseColor ?? globalColorScheme.surface,
+      baseColor: baseColor?.withOpacity(0.1) ?? globalColorScheme.surface,
       highlightColor:
           highlightColor?.withOpacity(0.7) ?? globalColorScheme.inversePrimary,
       duration: duration ?? const Duration(milliseconds: 1500),
@@ -273,8 +274,10 @@ class PlatformLoader {
             width: double.infinity,
             height: height ?? 80,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(containerRadius ?? 8),
+              color: highlightColor?.withOpacity(0.1) ?? Colors.white,
+              borderRadius: BorderRadius.circular(
+                containerRadius ?? 8,
+              ),
             ),
           ),
     );

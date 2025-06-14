@@ -164,7 +164,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_announcements_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_trainer_hub_page.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/pages/fit_flex_view_video_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -173,6 +177,7 @@ class VideoPreview extends StatefulWidget {
   final String? networkUrl;
   final String? assetPath;
   final Uint8List? bytes;
+  final bool isTrainer;
 
   const VideoPreview({
     super.key,
@@ -180,6 +185,7 @@ class VideoPreview extends StatefulWidget {
     this.networkUrl,
     this.assetPath,
     this.bytes,
+    this.isTrainer = false,
   });
 
   @override
@@ -309,25 +315,59 @@ class _VideoPreviewState extends State<VideoPreview> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              Text(_formatDuration(_controller!.value.position),
-                  style: const TextStyle(color: Colors.white)),
               Expanded(
-                child: Slider(
-                  value: _controller!.value.position.inMilliseconds.toDouble(),
-                  max: _controller!.value.duration.inMilliseconds.toDouble(),
-                  onChanged: (value) {
-                    _controller!.seekTo(Duration(milliseconds: value.toInt()));
-                  },
+                child: Row(
+                  children: [
+                    Text(_formatDuration(_controller!.value.position),
+                        style: const TextStyle(color: Colors.white)),
+                    Expanded(
+                      child: Slider(
+                        value: _controller!.value.position.inMilliseconds
+                            .toDouble(),
+                        max: _controller!.value.duration.inMilliseconds
+                            .toDouble(),
+                        onChanged: (value) {
+                          _controller!
+                              .seekTo(Duration(milliseconds: value.toInt()));
+                        },
+                      ),
+                    ),
+                    Text(
+                      _formatDuration(
+                        _controller!.value.duration,
+                      ),
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                _formatDuration(
-                  _controller!.value.duration,
+              IconButton(
+                onPressed: () {
+                  _controller?.pause();
+                  if (widget.isTrainer) {
+                    context.go(
+                      '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}/${FitFlexViewVideoPage.route}',
+                      extra: {
+                        'mediaUrl': widget.networkUrl,
+                        'mediaBytes': widget.bytes,
+                      },
+                    );
+                  } else {
+                    context.go(
+                      '${FitFlexAnnouncementsPage.clientRoute}/${FitFlexViewVideoPage.route}',
+                      extra: {
+                        'mediaUrl': widget.networkUrl,
+                        'mediaBytes': widget.bytes,
+                      },
+                    );
+                  }
+                },
+                icon: Icon(
+                  Icons.fullscreen,
                 ),
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
+              )
             ],
           ),
         ),
