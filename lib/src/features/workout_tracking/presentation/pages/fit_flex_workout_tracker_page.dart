@@ -1,4 +1,3 @@
-
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
@@ -422,6 +421,26 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
     _sets.value = widget.sets;
   }
 
+  String formatDuration(Duration duration) {
+    if (duration.inSeconds < 60) {
+      return '${duration.inSeconds} sec';
+    } else if (duration.inMinutes < 60) {
+      return '${duration.inMinutes} min';
+    } else {
+      return '${duration.inHours} hr';
+    }
+  }
+
+  String getDurationUnit(Duration duration) {
+    if (duration.inSeconds < 60) {
+      return 'sec';
+    } else if (duration.inMinutes < 60) {
+      return 'min';
+    } else {
+      return 'hr';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -518,8 +537,9 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                       child: Center(
                                         child: AppTextFields.basicTextField(
                                           style: TextStyle(
-                                              color: globalColorScheme
-                                                  .onPrimaryContainer),
+                                            color: globalColorScheme
+                                                .onPrimaryContainer,
+                                          ),
                                           onChanged: (p0) => _updateSets(
                                               sets![index].copyWith(
                                                   actualReps:
@@ -552,19 +572,44 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Duration (in mins)',
-                                        style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      'Duration (in ${getDurationUnit(widget.sets[index].targetTime!)})',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10),
                                       child: Center(
                                         child: AppTextFields.basicTextField(
-                                          onChanged: (p0) => _updateSets(
+                                          style: TextStyle(
+                                            color: globalColorScheme
+                                                .onPrimaryContainer,
+                                          ),
+                                          onChanged: (p0) {
+                                            final input = int.tryParse(p0) ?? 0;
+                                            final targetDuration =
+                                                widget.sets[index].targetTime!;
+                                            Duration newDuration;
+
+                                            if (targetDuration.inSeconds < 60) {
+                                              newDuration =
+                                                  Duration(seconds: input);
+                                            } else if (targetDuration
+                                                    .inMinutes <
+                                                60) {
+                                              newDuration =
+                                                  Duration(minutes: input);
+                                            } else {
+                                              newDuration =
+                                                  Duration(hours: input);
+                                            }
+
+                                            _updateSets(
                                               sets![index].copyWith(
-                                                  actualTime: Duration(
-                                                      minutes:
-                                                          int.tryParse(p0) ??
-                                                              0))),
+                                                actualTime: newDuration,
+                                              ),
+                                            );
+                                          },
                                           keyboardType: TextInputType.number,
                                           border: OutlineInputBorder(
                                             borderRadius:
@@ -579,7 +624,7 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                       ),
                                     ),
                                     Text(
-                                      'Target: ${widget.sets[index].targetTime!.inMinutes} mins',
+                                      'Target: ${formatDuration(widget.sets[index].targetTime!)}',
                                       style: TextStyle(
                                         color: globalColorScheme.secondary,
                                         fontWeight: FontWeight.bold,
@@ -587,7 +632,7 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                     ),
                                   ],
                                 ),
-                              ),
+                              )
                           ],
                         ),
                       ],
@@ -682,11 +727,19 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                     widget.onSubmit(_sets.value!);
                   }
                 } else if (widget.showTime) {
-                  final isNotReady = _sets.value?.any(
-                    (element) => ((element.actualTime?.inMinutes ??
-                            Duration(minutes: 0).inMinutes) <=
-                        Duration(minutes: 0).inMinutes),
-                  );
+                  final isNotReady = _sets.value?.any((element) {
+                    final actual = element.actualTime ?? Duration.zero;
+                    final target = element.targetTime ?? Duration.zero;
+
+                    if (target.inSeconds < 60) {
+                      return actual.inSeconds <= 0;
+                    } else if (target.inMinutes < 60) {
+                      return actual.inMinutes <= 0;
+                    } else {
+                      return actual.inHours <= 0;
+                    }
+                  });
+
                   if (isNotReady ?? true) {
                     PlatformDialog.showAlertDialog(
                       context: context,

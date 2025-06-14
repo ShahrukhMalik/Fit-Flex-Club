@@ -188,7 +188,7 @@ class VideoPreview extends StatefulWidget {
 
 class _VideoPreviewState extends State<VideoPreview> {
   VideoPlayerController? _controller;
-  bool _isPlaying = true;
+  bool _isPlaying = false;
   bool _isError = false;
   bool _isLoading = true;
 
@@ -217,7 +217,7 @@ class _VideoPreviewState extends State<VideoPreview> {
       }
 
       await _controller!.initialize();
-      _controller!.play();
+      // _controller!.play();
       _controller!.addListener(() {
         if (mounted) setState(() {});
       });
@@ -253,7 +253,7 @@ class _VideoPreviewState extends State<VideoPreview> {
       child: Stack(
         children: [
           Image.asset(
-            'assets/images/fit_flex_image.png',
+            'assets/images/fit_flex_logo.png',
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,

@@ -15,13 +15,13 @@ class GetclientweightsCubit extends Cubit<GetclientweightsState> {
   GetclientweightsCubit(this.getClientWeightsUsecase)
       : super(GetclientweightsInitial());
 
-  Future<void> getClientWeights() async {
+  Future<void> getClientWeights(String? clientId) async {
     print('Request reached a cubit : '
         "${DateTime.now().millisecondsSinceEpoch}");
     emit(GetclientweightsLoading());
     final result = await getClientWeightsUsecase(
       Params(
-        clientId: getIt<FirebaseAuth>().currentUser!.uid,
+        clientId: clientId,
       ),
     );
     print('Response from a repo and usecase : '
@@ -51,6 +51,7 @@ class GetclientweightsCubit extends Cubit<GetclientweightsState> {
           } else {
             print('Before emitting complete state : '
                 "${DateTime.now().millisecondsSinceEpoch}");
+            
             emit(
               GetclientweightsComplete(
                 weights: r,

@@ -233,7 +233,7 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
     final isNetworkConnected = await networkInfo.isConnected;
 
     try {
-      final cache = await clientProfileLocalDatasource.getClientWeights();
+      final cache = await clientProfileLocalDatasource.getClientWeights(clientId);
 
       return cache.fold(
         (l) async {
@@ -243,7 +243,7 @@ class ClientProfileRepositoryImpl implements ClientProfileRepository {
             );
           } else {
             final remoteClientWeights =
-                await clientProfileRemoteDatasource.getClientWeights();
+                await clientProfileRemoteDatasource.getClientWeights(clientId);
             if (remoteClientWeights != null && remoteClientWeights.isNotEmpty) {
               await clientProfileLocalDatasource
                   .insertClientWeights(remoteClientWeights);

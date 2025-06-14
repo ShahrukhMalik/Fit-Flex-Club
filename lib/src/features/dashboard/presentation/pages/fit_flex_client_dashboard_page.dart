@@ -63,7 +63,10 @@ class _FitFlexClientDashboardPageState
     context.read<WatchChatStreamCubit>().getChats();
   }
 
-  Widget _buildBottomNavOverlay(BuildContext context, double width) {
+  Widget _buildBottomNavOverlay(
+    BuildContext context,
+    double width,
+  ) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 75, vertical: 10),
       padding: EdgeInsets.all(5),

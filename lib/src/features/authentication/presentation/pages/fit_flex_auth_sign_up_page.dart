@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/validators/textform_field_validators.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
@@ -35,6 +36,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
   final _codeController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
 
   final ValueNotifier<List<Gym>> originalGyms = ValueNotifier([]);
@@ -164,6 +166,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                             fontSize: 18),
                                       ),
                                       AppTextFields.basicTextField(
+                                        hintText: "Enter your name",
                                         controller: _nameController,
                                         fieldType: TextFieldType.name,
                                         boxDecoration: BoxDecoration(
@@ -185,6 +188,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                             fontSize: 18),
                                       ),
                                       AppTextFields.basicTextField(
+                                        hintText: "Enter your email",
                                         fieldType: TextFieldType.email,
                                         controller: _emailController,
                                         boxDecoration: BoxDecoration(
@@ -346,31 +350,54 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                         height: 20,
                                       ),
                                       Text(
-                                        "Password",
+                                        "Enter Password",
                                         style: TextStyle(
                                             color: Color(0xFFFFCD7C),
                                             fontSize: 18),
                                       ),
-                                      ValueListenableBuilder(
-                                          valueListenable: passwordVisible,
-                                          builder: (context, visible, _) {
-                                            return AppTextFields
-                                                .passwordTextField(
-                                              controller: _passwordController,
-                                              obscureText: visible,
-                                              onToggleVisibility: () =>
-                                                  passwordVisible.value =
-                                                      !visible,
-                                              boxDecoration: BoxDecoration(
-                                                border: Border(
-                                                  bottom: BorderSide(
-                                                    width: 2,
-                                                    color: Color(0xFFFFCD7C),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
+                                      AppTextFields.passwordTextField(
+                                        validator: passwordValidator,
+                                        showVisibilityIcon: false,
+                                        controller: _passwordController,
+                                        obscureText: true,
+                                        onToggleVisibility: () {},
+                                        boxDecoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              width: 2,
+                                              color: Color(0xFFFFCD7C),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "Confirm Password",
+                                        style: TextStyle(
+                                          color: Color(0xFFFFCD7C),
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      AppTextFields.passwordTextField(
+                                        
+                                        validator: (text) {
+                                          return confirmPasswordValidator(
+                                            _passwordController.text,
+                                            text,
+                                          );
+                                        },
+                                        showVisibilityIcon: false,
+                                        controller: _confirmPasswordController,
+                                        obscureText: false,
+                                        onToggleVisibility: () {},
+                                        boxDecoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              width: 2,
+                                              color: Color(0xFFFFCD7C),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

@@ -12,12 +12,15 @@ class Clients extends Table {
   BoolColumn get isUserActive => boolean()();
   TextColumn get username => text()();
   TextColumn get fcmToken => text().nullable()();
+  TextColumn get trainerImageUrl => text().nullable()();
   TextColumn get email => text().nullable()();
   TextColumn get phoneNumber => text().nullable()();
   TextColumn get countryCode => text().nullable()();
   TextColumn get currentWorkoutPlanName => text().nullable()();
-  IntColumn get createdAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
-  IntColumn get updatedAt => integer().nullable()(); // Default value for updatedAt
+  IntColumn get createdAt =>
+      integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
+  IntColumn get updatedAt =>
+      integer().nullable()(); // Default value for updatedAt
 
   @override
   Set<Column> get primaryKey => {id};

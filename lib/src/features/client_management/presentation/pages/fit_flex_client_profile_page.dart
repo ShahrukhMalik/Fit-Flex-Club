@@ -1,4 +1,15 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
+import 'package:fit_flex_club/src/features/client_profile/presentation/widgets/trainer_image_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' as intl;
+
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platfom_loader.dart';
@@ -16,13 +27,6 @@ import 'package:fit_flex_club/src/features/client_profile/presentation/clientwei
 import 'package:fit_flex_club/src/features/client_profile/presentation/getclientweights/getclientweights_cubit.dart';
 import 'package:fit_flex_club/src/features/workout_management/data/models/workout_plan_model.dart';
 import 'package:fit_flex_club/src/features/workout_management/presentation/bloc/workout_management_bloc.dart';
-import 'package:flutter/material.dart';
-import 'dart:math' as math;
-import 'dart:ui' as ui;
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart' as intl;
 
 // class FitFlexClientProfilePage extends StatefulWidget {
 //   static const String route = "/fit-flex-client-profile";
@@ -335,9 +339,15 @@ class WeightGraphPainter extends CustomPainter {
 
 class WeightTrackerScreen extends StatefulWidget {
   final String initialClientWeight;
+  final bool showAddButton;
+  final String clientId;
+  final String clientName;
   const WeightTrackerScreen({
     super.key,
     required this.initialClientWeight,
+    this.showAddButton = true,
+    required this.clientId,
+    required this.clientName,
   });
 
   @override
@@ -371,17 +381,25 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      margin: const EdgeInsets.only(left: 20, right: 20),
+      margin: !widget.showAddButton
+          ? const EdgeInsets.only(left: 10, right: 10)
+          : const EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
-        color: globalColorScheme.primary,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: globalColorScheme.secondary.withOpacity(0.4),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        color: !widget.showAddButton
+            ? globalColorScheme.inversePrimary
+            : globalColorScheme.primary,
+        borderRadius: !widget.showAddButton
+            ? BorderRadius.circular(16)
+            : BorderRadius.circular(30),
+        boxShadow: !widget.showAddButton
+            ? []
+            : [
+                BoxShadow(
+                  color: globalColorScheme.secondary.withOpacity(0.4),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,192 +472,196 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                   ],
                 ),
               ),
-              PlatformButton().buildButton(
-                context: context,
-                type: ButtonType.icon,
-                foregroundColor: globalColorScheme.onPrimaryContainer,
-                icon: Icons.add_circle_rounded,
-                height: 35,
-                text: '',
-                onPressed: () => _allowToAddWeight()
-                    ? PlatformDialog.showCustomDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        title: "Add Weight",
-                        actions: [
-                          PlatformButton().buildButton(
-                            context: context,
-                            onPressed: () => context.pop(),
-                            text: "Close",
-                            type: ButtonType.text,
-                            backgroundColor: globalColorScheme.primary,
-                            textStyle: TextStyle(
-                              color: globalColorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )!,
-                          ValueListenableBuilder(
-                            valueListenable: isWeightConfirmed,
-                            builder: (context, weightConfirmed, _) {
-                              return BlocProvider(
-                                create: (context) =>
-                                    getIt<ClientweightsCubit>(),
-                                child: BlocConsumer<ClientweightsCubit,
-                                    ClientweightsState>(
-                                  builder: (context, state) {
-                                    if (state is ClientweightsLoading) {
-                                      return Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: PlatformLoader().buildLoader(
-                                            type: LoaderType.circular,
-                                            size: 20,
+              if (widget.showAddButton)
+                PlatformButton().buildButton(
+                  context: context,
+                  type: ButtonType.icon,
+                  foregroundColor: globalColorScheme.onPrimaryContainer,
+                  icon: Icons.add_circle_rounded,
+                  height: 35,
+                  text: '',
+                  onPressed: () => _allowToAddWeight()
+                      ? PlatformDialog.showCustomDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          title: "Add Weight",
+                          actions: [
+                            PlatformButton().buildButton(
+                              context: context,
+                              onPressed: () => context.pop(),
+                              text: "Close",
+                              type: ButtonType.text,
+                              backgroundColor: globalColorScheme.primary,
+                              textStyle: TextStyle(
+                                color: globalColorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )!,
+                            ValueListenableBuilder(
+                              valueListenable: isWeightConfirmed,
+                              builder: (context, weightConfirmed, _) {
+                                return BlocProvider(
+                                  create: (context) =>
+                                      getIt<ClientweightsCubit>(),
+                                  child: BlocConsumer<ClientweightsCubit,
+                                      ClientweightsState>(
+                                    builder: (context, state) {
+                                      if (state is ClientweightsLoading) {
+                                        return Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: PlatformLoader().buildLoader(
+                                              type: LoaderType.circular,
+                                              size: 20,
+                                            ),
                                           ),
+                                        );
+                                      }
+                                      return PlatformButton().buildButton(
+                                        context: context,
+                                        type: ButtonType.primary,
+                                        backgroundColor:
+                                            globalColorScheme.primary,
+                                        textStyle: TextStyle(
+                                          color: globalColorScheme
+                                              .onPrimaryContainer,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      );
-                                    }
-                                    return PlatformButton().buildButton(
-                                      context: context,
-                                      type: ButtonType.primary,
-                                      backgroundColor:
-                                          globalColorScheme.primary,
-                                      textStyle: TextStyle(
-                                        color: globalColorScheme
-                                            .onPrimaryContainer,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      text: 'Submit',
-                                      onPressed: !weightConfirmed
-                                          ? null
-                                          : () {
-                                              if (_formKey.currentState
-                                                      ?.validate() ??
-                                                  false) {
-                                                if (weightController
-                                                    .text.isNotEmpty) {
-                                                  context
-                                                      .read<
-                                                          ClientweightsCubit>()
-                                                      .addClientWeight(
-                                                        ClientWeightEntity(
-                                                          clientId: getIt<
-                                                                  FirebaseAuth>()
-                                                              .currentUser!
-                                                              .uid,
-                                                          timeStamp: DateTime
-                                                                  .now()
-                                                              .millisecondsSinceEpoch,
-                                                          weightInKg: double.tryParse(
-                                                                  weightController
-                                                                      .text) ??
-                                                              0,
-                                                          weightInLb:
-                                                              convertLbToKgDouble(
-                                                            double.tryParse(
-                                                                  weightController
-                                                                      .text,
-                                                                ) ??
+                                        text: 'Submit',
+                                        onPressed: !weightConfirmed
+                                            ? null
+                                            : () {
+                                                if (_formKey.currentState
+                                                        ?.validate() ??
+                                                    false) {
+                                                  if (weightController
+                                                      .text.isNotEmpty) {
+                                                    context
+                                                        .read<
+                                                            ClientweightsCubit>()
+                                                        .addClientWeight(
+                                                          ClientWeightEntity(
+                                                            clientId: getIt<
+                                                                    FirebaseAuth>()
+                                                                .currentUser!
+                                                                .uid,
+                                                            timeStamp: DateTime
+                                                                    .now()
+                                                                .millisecondsSinceEpoch,
+                                                            weightInKg: double.tryParse(
+                                                                    weightController
+                                                                        .text) ??
                                                                 0,
+                                                            weightInLb:
+                                                                convertLbToKgDouble(
+                                                              double.tryParse(
+                                                                    weightController
+                                                                        .text,
+                                                                  ) ??
+                                                                  0,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      );
+                                                        );
+                                                  }
                                                 }
-                                              }
-                                            },
-                                    )!;
-                                  },
-                                  listener: (context, state) {
-                                    if (state is ClientweightsComplete) {
-                                      context
-                                          .read<GetclientweightsCubit>()
-                                          .getClientWeights();
-                                      context.pop();
-                                      weightController.clear();
-                                    }
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                        content: SingleChildScrollView(
-                          child: SizedBox(
-                            height: 120,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Form(
-                                    key: _formKey,
-                                    child: AppTextFields.prefixSuffixTextField(
-                                      controller: weightController,
-                                      labelText: 'Weight in (kgs)',
-                                      keyboardType:
-                                          TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      style: TextStyle(
-                                        color: globalColorScheme
-                                            .onPrimaryContainer,
+                                              },
+                                      )!;
+                                    },
+                                    listener: (context, state) {
+                                      if (state is ClientweightsComplete) {
+                                        context
+                                            .read<GetclientweightsCubit>()
+                                            .getClientWeights(widget.clientId);
+                                        context.pop();
+                                        weightController.clear();
+                                      }
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                          content: SingleChildScrollView(
+                            child: SizedBox(
+                              height: 120,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Form(
+                                      key: _formKey,
+                                      child:
+                                          AppTextFields.prefixSuffixTextField(
+                                        controller: weightController,
+                                        labelText: 'Weight in (kgs)',
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true),
+                                        style: TextStyle(
+                                          color: globalColorScheme
+                                              .onPrimaryContainer,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                ValueListenableBuilder(
-                                  valueListenable: isWeightConfirmed,
-                                  builder: (context, weightConfirmed, _) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => isWeightConfirmed.value =
-                                              !isWeightConfirmed.value,
-                                          child: Container(
-                                            height: 20,
-                                            width: 20,
-                                            margin: EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                              color: weightConfirmed
-                                                  ? globalColorScheme
-                                                      .primaryContainer
-                                                  : globalColorScheme.surface,
-                                              border: Border.all(
-                                                color: globalColorScheme
-                                                    .primaryContainer,
-                                                width: 1,
+                                  ValueListenableBuilder(
+                                    valueListenable: isWeightConfirmed,
+                                    builder: (context, weightConfirmed, _) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () =>
+                                                isWeightConfirmed.value =
+                                                    !isWeightConfirmed.value,
+                                            child: Container(
+                                              height: 20,
+                                              width: 20,
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                                color: weightConfirmed
+                                                    ? globalColorScheme
+                                                        .primaryContainer
+                                                    : globalColorScheme.surface,
+                                                border: Border.all(
+                                                  color: globalColorScheme
+                                                      .primaryContainer,
+                                                  width: 1,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            'Confirm the weight added to submit.',
-                                            textAlign: TextAlign.start,
-                                          ),
-                                        )
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
+                                          Expanded(
+                                            child: Text(
+                                              'Confirm the weight added to submit.',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
+                        )
+                      : PlatformDialog.showAlertDialog(
+                          context: context,
+                          title: "Weight Tracker",
+                          message: "You've already added for today.",
                         ),
-                      )
-                    : PlatformDialog.showAlertDialog(
-                        context: context,
-                        title: "Weight Tracker",
-                        message: "You've already added for today.",
-                      ),
-              )!,
+                )!,
             ],
           ),
           WeightTrackerGraph(
             weightDifferenceInfo: weightDifferenceInfo,
             weights: weights,
+            clientId: widget.clientId,
           )
         ],
       ),
@@ -690,11 +712,13 @@ Widget _buildStatItem(String label, String value, String unit) {
 class WeightTrackerGraph extends StatefulWidget {
   final ValueNotifier<Map<String, dynamic>> weightDifferenceInfo;
   final ValueNotifier<List<ClientWeightEntity>?> weights;
+  final String clientId;
 
   const WeightTrackerGraph({
     super.key,
     required this.weightDifferenceInfo,
     required this.weights,
+    required this.clientId,
   });
 
   @override
@@ -747,7 +771,7 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
   @override
   void initState() {
     super.initState();
-    context.read<GetclientweightsCubit>().getClientWeights();
+    context.read<GetclientweightsCubit>().getClientWeights(widget.clientId);
 
 // Example: Adding a listener to recalculate when weights change
     currentWeights.addListener(() {
@@ -865,7 +889,7 @@ class _WeightTrackerGraphState extends State<WeightTrackerGraph> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Text('Your weight tracker for the last 4 months.'),
+                Text('Weight tracker for the last 4 months.'),
                 const SizedBox(height: 5),
                 PlatformSpecificDropdown(
                   borderColor: globalColorScheme.tertiary,
@@ -1040,13 +1064,32 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                 SizedBox(
                   height: height * 0.3,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(50),
-                      // bottomRight: Radius.circular(50),
+                      bottomRight: Radius.circular(50),
                     ),
-                    child: Image.asset(
-                      'assets/images/fit_flex_app_bar_image.jpeg',
-                      fit: BoxFit.fill,
+                    child: BlocBuilder<ClientProfileBloc, ClientProfileState>(
+                      builder: (context, state) {
+                        if (state is ClientProfileError) {
+                          return Image.asset(
+                            'assets/images/fit_flex_logo.png',
+                            fit: BoxFit.fitHeight,
+                          );
+                        }
+                        if (state is GetProfileComplete) {
+                          final mediaUrl = state.entity.trainerImageUrl;
+                          return TrainerImageWidget(
+                            mediaUrl: mediaUrl,
+                            fit: BoxFit
+                                .fitHeight, // <-- key change for header section
+                          );
+                        }
+                        return PlatformLoader().buildLoader(
+                          type: LoaderType.shimmer,
+                          baseColor: globalColorScheme.secondary,
+                          highlightColor: globalColorScheme.tertiary,
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -1115,7 +1158,8 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                                 clientValue.value = state.entity;
                                 context
                                     .read<GetclientweightsCubit>()
-                                    .getClientWeights();
+                                    .getClientWeights(
+                                        getIt<FirebaseAuth>().currentUser?.uid);
                               }
                             },
                             builder: (context, state) {
@@ -1178,6 +1222,8 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                 if (client != null) {
                   return WeightTrackerScreen(
                     initialClientWeight: client.weightInKg.toString(),
+                    clientId: getIt<FirebaseAuth>().currentUser!.uid,
+                    clientName: '',
                   );
                 } else {
                   return Padding(

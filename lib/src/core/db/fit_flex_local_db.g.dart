@@ -77,6 +77,12 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
   late final GeneratedColumn<String> fcmToken = GeneratedColumn<String>(
       'fcm_token', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _trainerImageUrlMeta =
+      const VerificationMeta('trainerImageUrl');
+  @override
+  late final GeneratedColumn<String> trainerImageUrl = GeneratedColumn<String>(
+      'trainer_image_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
   late final GeneratedColumn<String> email = GeneratedColumn<String>(
@@ -127,6 +133,7 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
         isUserActive,
         username,
         fcmToken,
+        trainerImageUrl,
         email,
         phoneNumber,
         countryCode,
@@ -205,6 +212,12 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
       context.handle(_fcmTokenMeta,
           fcmToken.isAcceptableOrUnknown(data['fcm_token']!, _fcmTokenMeta));
     }
+    if (data.containsKey('trainer_image_url')) {
+      context.handle(
+          _trainerImageUrlMeta,
+          trainerImageUrl.isAcceptableOrUnknown(
+              data['trainer_image_url']!, _trainerImageUrlMeta));
+    }
     if (data.containsKey('email')) {
       context.handle(
           _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
@@ -266,6 +279,8 @@ class $ClientsTable extends Clients with TableInfo<$ClientsTable, Client> {
           .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
       fcmToken: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}fcm_token']),
+      trainerImageUrl: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}trainer_image_url']),
       email: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}email']),
       phoneNumber: attachedDatabase.typeMapping
@@ -300,6 +315,7 @@ class Client extends DataClass implements Insertable<Client> {
   final bool isUserActive;
   final String username;
   final String? fcmToken;
+  final String? trainerImageUrl;
   final String? email;
   final String? phoneNumber;
   final String? countryCode;
@@ -318,6 +334,7 @@ class Client extends DataClass implements Insertable<Client> {
       required this.isUserActive,
       required this.username,
       this.fcmToken,
+      this.trainerImageUrl,
       this.email,
       this.phoneNumber,
       this.countryCode,
@@ -351,6 +368,9 @@ class Client extends DataClass implements Insertable<Client> {
     map['username'] = Variable<String>(username);
     if (!nullToAbsent || fcmToken != null) {
       map['fcm_token'] = Variable<String>(fcmToken);
+    }
+    if (!nullToAbsent || trainerImageUrl != null) {
+      map['trainer_image_url'] = Variable<String>(trainerImageUrl);
     }
     if (!nullToAbsent || email != null) {
       map['email'] = Variable<String>(email);
@@ -396,6 +416,9 @@ class Client extends DataClass implements Insertable<Client> {
       fcmToken: fcmToken == null && nullToAbsent
           ? const Value.absent()
           : Value(fcmToken),
+      trainerImageUrl: trainerImageUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(trainerImageUrl),
       email:
           email == null && nullToAbsent ? const Value.absent() : Value(email),
       phoneNumber: phoneNumber == null && nullToAbsent
@@ -429,6 +452,7 @@ class Client extends DataClass implements Insertable<Client> {
       isUserActive: serializer.fromJson<bool>(json['isUserActive']),
       username: serializer.fromJson<String>(json['username']),
       fcmToken: serializer.fromJson<String?>(json['fcmToken']),
+      trainerImageUrl: serializer.fromJson<String?>(json['trainerImageUrl']),
       email: serializer.fromJson<String?>(json['email']),
       phoneNumber: serializer.fromJson<String?>(json['phoneNumber']),
       countryCode: serializer.fromJson<String?>(json['countryCode']),
@@ -453,6 +477,7 @@ class Client extends DataClass implements Insertable<Client> {
       'isUserActive': serializer.toJson<bool>(isUserActive),
       'username': serializer.toJson<String>(username),
       'fcmToken': serializer.toJson<String?>(fcmToken),
+      'trainerImageUrl': serializer.toJson<String?>(trainerImageUrl),
       'email': serializer.toJson<String?>(email),
       'phoneNumber': serializer.toJson<String?>(phoneNumber),
       'countryCode': serializer.toJson<String?>(countryCode),
@@ -475,6 +500,7 @@ class Client extends DataClass implements Insertable<Client> {
           bool? isUserActive,
           String? username,
           Value<String?> fcmToken = const Value.absent(),
+          Value<String?> trainerImageUrl = const Value.absent(),
           Value<String?> email = const Value.absent(),
           Value<String?> phoneNumber = const Value.absent(),
           Value<String?> countryCode = const Value.absent(),
@@ -493,6 +519,9 @@ class Client extends DataClass implements Insertable<Client> {
         isUserActive: isUserActive ?? this.isUserActive,
         username: username ?? this.username,
         fcmToken: fcmToken.present ? fcmToken.value : this.fcmToken,
+        trainerImageUrl: trainerImageUrl.present
+            ? trainerImageUrl.value
+            : this.trainerImageUrl,
         email: email.present ? email.value : this.email,
         phoneNumber: phoneNumber.present ? phoneNumber.value : this.phoneNumber,
         countryCode: countryCode.present ? countryCode.value : this.countryCode,
@@ -521,6 +550,9 @@ class Client extends DataClass implements Insertable<Client> {
           : this.isUserActive,
       username: data.username.present ? data.username.value : this.username,
       fcmToken: data.fcmToken.present ? data.fcmToken.value : this.fcmToken,
+      trainerImageUrl: data.trainerImageUrl.present
+          ? data.trainerImageUrl.value
+          : this.trainerImageUrl,
       email: data.email.present ? data.email.value : this.email,
       phoneNumber:
           data.phoneNumber.present ? data.phoneNumber.value : this.phoneNumber,
@@ -548,6 +580,7 @@ class Client extends DataClass implements Insertable<Client> {
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
           ..write('fcmToken: $fcmToken, ')
+          ..write('trainerImageUrl: $trainerImageUrl, ')
           ..write('email: $email, ')
           ..write('phoneNumber: $phoneNumber, ')
           ..write('countryCode: $countryCode, ')
@@ -571,6 +604,7 @@ class Client extends DataClass implements Insertable<Client> {
       isUserActive,
       username,
       fcmToken,
+      trainerImageUrl,
       email,
       phoneNumber,
       countryCode,
@@ -592,6 +626,7 @@ class Client extends DataClass implements Insertable<Client> {
           other.isUserActive == this.isUserActive &&
           other.username == this.username &&
           other.fcmToken == this.fcmToken &&
+          other.trainerImageUrl == this.trainerImageUrl &&
           other.email == this.email &&
           other.phoneNumber == this.phoneNumber &&
           other.countryCode == this.countryCode &&
@@ -612,6 +647,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
   final Value<bool> isUserActive;
   final Value<String> username;
   final Value<String?> fcmToken;
+  final Value<String?> trainerImageUrl;
   final Value<String?> email;
   final Value<String?> phoneNumber;
   final Value<String?> countryCode;
@@ -631,6 +667,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     this.isUserActive = const Value.absent(),
     this.username = const Value.absent(),
     this.fcmToken = const Value.absent(),
+    this.trainerImageUrl = const Value.absent(),
     this.email = const Value.absent(),
     this.phoneNumber = const Value.absent(),
     this.countryCode = const Value.absent(),
@@ -651,6 +688,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     required bool isUserActive,
     required String username,
     this.fcmToken = const Value.absent(),
+    this.trainerImageUrl = const Value.absent(),
     this.email = const Value.absent(),
     this.phoneNumber = const Value.absent(),
     this.countryCode = const Value.absent(),
@@ -674,6 +712,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     Expression<bool>? isUserActive,
     Expression<String>? username,
     Expression<String>? fcmToken,
+    Expression<String>? trainerImageUrl,
     Expression<String>? email,
     Expression<String>? phoneNumber,
     Expression<String>? countryCode,
@@ -694,6 +733,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       if (isUserActive != null) 'is_user_active': isUserActive,
       if (username != null) 'username': username,
       if (fcmToken != null) 'fcm_token': fcmToken,
+      if (trainerImageUrl != null) 'trainer_image_url': trainerImageUrl,
       if (email != null) 'email': email,
       if (phoneNumber != null) 'phone_number': phoneNumber,
       if (countryCode != null) 'country_code': countryCode,
@@ -717,6 +757,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       Value<bool>? isUserActive,
       Value<String>? username,
       Value<String?>? fcmToken,
+      Value<String?>? trainerImageUrl,
       Value<String?>? email,
       Value<String?>? phoneNumber,
       Value<String?>? countryCode,
@@ -736,6 +777,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
       isUserActive: isUserActive ?? this.isUserActive,
       username: username ?? this.username,
       fcmToken: fcmToken ?? this.fcmToken,
+      trainerImageUrl: trainerImageUrl ?? this.trainerImageUrl,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       countryCode: countryCode ?? this.countryCode,
@@ -783,6 +825,9 @@ class ClientsCompanion extends UpdateCompanion<Client> {
     if (fcmToken.present) {
       map['fcm_token'] = Variable<String>(fcmToken.value);
     }
+    if (trainerImageUrl.present) {
+      map['trainer_image_url'] = Variable<String>(trainerImageUrl.value);
+    }
     if (email.present) {
       map['email'] = Variable<String>(email.value);
     }
@@ -822,6 +867,7 @@ class ClientsCompanion extends UpdateCompanion<Client> {
           ..write('isUserActive: $isUserActive, ')
           ..write('username: $username, ')
           ..write('fcmToken: $fcmToken, ')
+          ..write('trainerImageUrl: $trainerImageUrl, ')
           ..write('email: $email, ')
           ..write('phoneNumber: $phoneNumber, ')
           ..write('countryCode: $countryCode, ')
@@ -7959,6 +8005,7 @@ typedef $$ClientsTableCreateCompanionBuilder = ClientsCompanion Function({
   required bool isUserActive,
   required String username,
   Value<String?> fcmToken,
+  Value<String?> trainerImageUrl,
   Value<String?> email,
   Value<String?> phoneNumber,
   Value<String?> countryCode,
@@ -7979,6 +8026,7 @@ typedef $$ClientsTableUpdateCompanionBuilder = ClientsCompanion Function({
   Value<bool> isUserActive,
   Value<String> username,
   Value<String?> fcmToken,
+  Value<String?> trainerImageUrl,
   Value<String?> email,
   Value<String?> phoneNumber,
   Value<String?> countryCode,
@@ -8144,6 +8192,10 @@ class $$ClientsTableFilterComposer
 
   ColumnFilters<String> get fcmToken => $composableBuilder(
       column: $table.fcmToken, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get trainerImageUrl => $composableBuilder(
+      column: $table.trainerImageUrl,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnFilters(column));
@@ -8357,6 +8409,10 @@ class $$ClientsTableOrderingComposer
   ColumnOrderings<String> get fcmToken => $composableBuilder(
       column: $table.fcmToken, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get trainerImageUrl => $composableBuilder(
+      column: $table.trainerImageUrl,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnOrderings(column));
 
@@ -8418,6 +8474,9 @@ class $$ClientsTableAnnotationComposer
 
   GeneratedColumn<String> get fcmToken =>
       $composableBuilder(column: $table.fcmToken, builder: (column) => column);
+
+  GeneratedColumn<String> get trainerImageUrl => $composableBuilder(
+      column: $table.trainerImageUrl, builder: (column) => column);
 
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
@@ -8630,6 +8689,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             Value<bool> isUserActive = const Value.absent(),
             Value<String> username = const Value.absent(),
             Value<String?> fcmToken = const Value.absent(),
+            Value<String?> trainerImageUrl = const Value.absent(),
             Value<String?> email = const Value.absent(),
             Value<String?> phoneNumber = const Value.absent(),
             Value<String?> countryCode = const Value.absent(),
@@ -8650,6 +8710,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             isUserActive: isUserActive,
             username: username,
             fcmToken: fcmToken,
+            trainerImageUrl: trainerImageUrl,
             email: email,
             phoneNumber: phoneNumber,
             countryCode: countryCode,
@@ -8670,6 +8731,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             required bool isUserActive,
             required String username,
             Value<String?> fcmToken = const Value.absent(),
+            Value<String?> trainerImageUrl = const Value.absent(),
             Value<String?> email = const Value.absent(),
             Value<String?> phoneNumber = const Value.absent(),
             Value<String?> countryCode = const Value.absent(),
@@ -8690,6 +8752,7 @@ class $$ClientsTableTableManager extends RootTableManager<
             isUserActive: isUserActive,
             username: username,
             fcmToken: fcmToken,
+            trainerImageUrl: trainerImageUrl,
             email: email,
             phoneNumber: phoneNumber,
             countryCode: countryCode,

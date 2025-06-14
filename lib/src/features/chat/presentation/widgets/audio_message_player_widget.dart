@@ -31,21 +31,22 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
   @override
   void initState() {
     super.initState();
-
-    _managedPlayer = AudioPlayerManager().createManagedPlayer(
-      widgetKey: widget.key?.toString(),
-      onCompleted: () {
-        setState(() {
-          _position = Duration.zero;
-          _isPlaying = false;
-        });
-      },
-      onStateChanged: (isPlaying) {
-        setState(() => _isPlaying = isPlaying);
-      },
-    );
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _managedPlayer = AudioPlayerManager().createManagedPlayer(
+        widgetKey: widget.key?.toString(),
+        onCompleted: () {
+          if (mounted) {
+            setState(() {
+              _position = Duration.zero;
+              _isPlaying = false;
+            });
+          }
+        },
+        onStateChanged: (isPlaying) {
+          if (mounted) setState(() => _isPlaying = isPlaying);
+        },
+      );
+
       _initializePlayer();
     });
   }
@@ -72,18 +73,18 @@ class _AudioMessagePlayerWidgetState extends State<AudioMessagePlayerWidget> {
         path = widget.mediaUrl!;
         await player.setUrl(path);
       } else {
-        setState(() => _loadError = true);
+        if (mounted) setState(() => _loadError = true);
         return;
       }
 
       _duration = player.duration ?? Duration.zero;
 
       player.positionStream.listen((pos) {
-        setState(() => _position = pos);
+        if (mounted) setState(() => _position = pos);
       });
     } catch (e) {
       print('Error loading audio: $e');
-      setState(() => _loadError = true);
+      if (mounted) setState(() => _loadError = true);
     }
   }
 

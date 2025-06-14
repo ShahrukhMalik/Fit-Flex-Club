@@ -144,9 +144,9 @@ class AppDatabase extends _$AppDatabase {
             // await m.drop(workoutPlanExercise);
             // await m.drop(exerciseSets);
             // await m.drop(baseExercise);
-            // await m.drop(clients);
-            await m.drop(chats);
-            await m.drop(messages);
+            await m.drop(clients);
+            // await m.drop(chats);
+            // await m.drop(messages);
             // await m.drop(announcements);
             // await m.drop(comments);
             // await m.drop(reactions);
@@ -161,9 +161,9 @@ class AppDatabase extends _$AppDatabase {
             // await m.createTable(workoutPlanExercise);
             // await m.createTable(exerciseSets);
             // await m.createTable(baseExercise);
-            // await m.createTable(clients);
-            await m.createTable(chats);
-            await m.createTable(messages);
+            await m.createTable(clients);
+            // await m.createTable(chats);
+            // await m.createTable(messages);
             // await m.createTable(announcements);
             // await m.createTable(comments);
             // await m.createTable(reactions);
@@ -212,7 +212,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 50;
+  int get schemaVersion => 51;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'fit_flex_club_db');

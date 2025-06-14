@@ -11,7 +11,7 @@ abstract class GetClientWeightsUsecase extends ClientProfileUsecase
     implements UseCase<List<ClientWeightEntity>?, Params?> {}
 
 class Params extends Equatable {
-  final String clientId;
+  final String? clientId;
 
   const Params({required this.clientId});
   @override

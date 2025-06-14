@@ -18,6 +18,7 @@ class ClientModel extends ClientEntity {
     super.phone,
     super.fcmToken,
     super.currentWorkoutPlanName,
+    super.trainerImageUrl,
   });
   @override
   List<Object?> get props {
@@ -34,7 +35,8 @@ class ClientModel extends ClientEntity {
       username,
       phone,
       fcmToken,
-      currentWorkoutPlanName
+      currentWorkoutPlanName,
+      trainerImageUrl
     ];
   }
 
@@ -52,25 +54,26 @@ class ClientModel extends ClientEntity {
     String? email,
     String? fcmToken,
     String? currentWorkoutPlanName,
+    String? trainerImageUrl,
     Map<String, dynamic>? phone,
   }) {
     return ClientModel(
-      currentWorkoutPlanName:
-          currentWorkoutPlanName ?? this.currentWorkoutPlanName,
-      phone: phone ?? this.phone,
-      email: email ?? this.email,
-      id: id ?? this.id,
-      age: age ?? this.age,
-      gender: gender ?? this.gender,
-      weightInKg: weightInKg ?? this.weightInKg,
-      weightInLb: weightInLb ?? this.weightInLb,
-      heightInCm: heightInCm ?? this.heightInCm,
-      heightInFt: heightInFt ?? this.heightInFt,
-      isTrainer: isTrainer ?? this.isTrainer,
-      isUserActive: isUserActive ?? this.isUserActive,
-      username: username ?? this.username,
-      fcmToken: fcmToken ?? this.fcmToken 
-    );
+        trainerImageUrl: trainerImageUrl ?? this.trainerImageUrl,
+        currentWorkoutPlanName:
+            currentWorkoutPlanName ?? this.currentWorkoutPlanName,
+        phone: phone ?? this.phone,
+        email: email ?? this.email,
+        id: id ?? this.id,
+        age: age ?? this.age,
+        gender: gender ?? this.gender,
+        weightInKg: weightInKg ?? this.weightInKg,
+        weightInLb: weightInLb ?? this.weightInLb,
+        heightInCm: heightInCm ?? this.heightInCm,
+        heightInFt: heightInFt ?? this.heightInFt,
+        isTrainer: isTrainer ?? this.isTrainer,
+        isUserActive: isUserActive ?? this.isUserActive,
+        username: username ?? this.username,
+        fcmToken: fcmToken ?? this.fcmToken);
   }
 
   Map<String, dynamic> toMap() {
@@ -86,11 +89,13 @@ class ClientModel extends ClientEntity {
       'isUserActive': isUserActive,
       'username': username,
       'fcmToken': fcmToken,
+      'trainerImageUrl': trainerImageUrl,
     };
   }
 
   factory ClientModel.fromMap(Map<String, dynamic> map) {
     return ClientModel(
+      trainerImageUrl: map['trainerImageUrl'],
       currentWorkoutPlanName: map['currentWorkoutPlanName'],
       phone: {
         'countryCode': map['countryCode'],
@@ -112,30 +117,31 @@ class ClientModel extends ClientEntity {
   }
 
   factory ClientModel.fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> snapshot,
-    SnapshotOptions? options,
+    Map<String, dynamic> data,
+    String id,
   ) {
-    final data = snapshot.data();
     return ClientModel(
-      currentWorkoutPlanName: data?['currentWorkoutPlanName'],
-      phone: data?['phone'],
-      email: data?['email'],
-      id: snapshot.id,
-      age: data?['age'],
-      gender: data?['gender'],
-      weightInKg: (data?['weightInKg'] ?? 0).toDouble(),
-      weightInLb: (data?['weightInLb'] ?? 0).toDouble(),
-      heightInCm:( data?['heightInCm'] ?? 0).toDouble(),
-      heightInFt: (data?['heightInFt'] ?? 0).toDouble(),
-      isTrainer: data?['isTrainer'],
-      isUserActive: data?['isUserActive'],
-      username: data?['username'],
-      fcmToken: data?['fcmToken']
+      currentWorkoutPlanName: data['currentWorkoutPlanName'],
+      trainerImageUrl: data['trainerImageUrl'],
+      phone: data['phone'],
+      email: data['email'],
+      id: id,
+      age: data['age'],
+      gender: data['gender'],
+      weightInKg: (data['weightInKg'] ?? 0).toDouble(),
+      weightInLb: (data['weightInLb'] ?? 0).toDouble(),
+      heightInCm: (data['heightInCm'] ?? 0).toDouble(),
+      heightInFt: (data['heightInFt'] ?? 0).toDouble(),
+      isTrainer: data['isTrainer'],
+      isUserActive: data['isUserActive'],
+      username: data['username'],
+      fcmToken: data['fcmToken'],
     );
   }
 
   factory ClientModel.fromClientEntity(ClientEntity clientEntity) {
     return ClientModel(
+      trainerImageUrl: clientEntity.trainerImageUrl,
       currentWorkoutPlanName: clientEntity.currentWorkoutPlanName,
       phone: clientEntity.phone,
       email: clientEntity.email,
@@ -149,7 +155,7 @@ class ClientModel extends ClientEntity {
       isTrainer: clientEntity.isTrainer,
       isUserActive: clientEntity.isUserActive,
       username: clientEntity.username,
-      fcmToken: clientEntity.fcmToken
+      fcmToken: clientEntity.fcmToken,
     );
   }
 

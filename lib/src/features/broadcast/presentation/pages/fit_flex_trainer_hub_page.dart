@@ -307,7 +307,7 @@ class FeaturesPage extends StatelessWidget {
       const Feature(
         title: 'Personalized Notifications',
         description:
-            'Send personalized reminders, workout updates, and progress reports to each client. Customize content and timing to boost engagement and results.',
+            'Send customized reminders, updates, and progress reports to boost client engagement.',
         icon: Icons.notifications_active,
         isPremium: true,
         route:
@@ -316,7 +316,7 @@ class FeaturesPage extends StatelessWidget {
       const Feature(
         title: 'One-to-One Chat',
         description:
-            'Strengthen client relationships with private messaging. Offer personalized guidance, answer questions, and provide real-time support.',
+            'Engage clients directly with private messaging for guidance and real-time support.',
         icon: Icons.chat_bubble,
         isPremium: true,
         route:
@@ -325,13 +325,14 @@ class FeaturesPage extends StatelessWidget {
       const Feature(
         title: 'Announcements',
         description:
-            'Broadcast important updates, promotions, or special events to all your clients at once. Keep everyone informed about new programs and offerings.',
+            'Share updates, promotions, and events with all clients at once.',
         icon: Icons.campaign,
         isPremium: true,
         route:
             '${FitFlexTrainerHubPage.route}/${FitFlexAnnouncementsPage.route}',
       ),
     ];
+
     return Scaffold(
       body: Localizations(
         locale: const Locale('en'),
@@ -471,7 +472,7 @@ class FeaturesPage extends StatelessWidget {
                                                 child: Text(
                                                   feature.title,
                                                   style: const TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: 16,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),

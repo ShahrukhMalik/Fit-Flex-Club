@@ -42,75 +42,76 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: PlatformAppbar.basicAppBar(
-              onLeadingPressed: () => context.go('/'),
-              title: "Log In",
-              context: context,
-              backgroundColor: Colors.transparent,
-              automaticallyImplyLeading: true
-            ),
+                onLeadingPressed: () => context.go('/'),
+                title: "Log In",
+                context: context,
+                backgroundColor: Colors.transparent,
+                automaticallyImplyLeading: true),
             body: Form(
               key: formStateKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      margin: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color:
-                            Colors.white.withOpacity(0.1), // Semi-transparent
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        margin: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color:
+                              Colors.white.withOpacity(0.1), // Semi-transparent
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Text(
-                                  "Welcome to Fit Blitz",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            Text(
-                              "Email",
-                              style: TextStyle(
-                                  color: Color(0xFFFFCD7C), fontSize: 18),
-                            ),
-                            AppTextFields.basicTextField(
-                              fieldType: TextFieldType.email,
-                              controller: _emailController,
-                              boxDecoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 2,
-                                    color: Color(0xFFFFCD7C),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    "Welcome to Fit Blitz",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              "Password",
-                              style: TextStyle(
-                                  color: Color(0xFFFFCD7C), fontSize: 18),
-                            ),
-                            ValueListenableBuilder(
+                              Text(
+                                "Email",
+                                style: TextStyle(
+                                    color: Color(0xFFFFCD7C), fontSize: 18),
+                              ),
+                              AppTextFields.basicTextField(
+                                hintText: "Enter your email",
+                                fieldType: TextFieldType.email,
+                                controller: _emailController,
+                                boxDecoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      width: 2,
+                                      color: Color(0xFFFFCD7C),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                "Enter Password",
+                                style: TextStyle(
+                                    color: Color(0xFFFFCD7C), fontSize: 18),
+                              ),
+                              ValueListenableBuilder(
                                 valueListenable: passwordVisible,
                                 builder: (context, visible, _) {
                                   return AppTextFields.passwordTextField(
@@ -127,86 +128,89 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                                       ),
                                     ),
                                   );
-                                }),
-                          ],
+                                },
+                              ),
+                              
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child:
-                        BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                      listener: (context, state) {
-                        if (state is AuthenticationComplete) {
-                          if (state.entity?.isLoggedIn ?? false) {
-                            if (!state.rebuild!) {
-                              context
-                                  .read<AuthenticationBloc>()
-                                  .add(ListenToEvents());
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child:
+                          BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                        listener: (context, state) {
+                          if (state is AuthenticationComplete) {
+                            if (state.entity?.isLoggedIn ?? false) {
+                              if (!state.rebuild!) {
+                                context
+                                    .read<AuthenticationBloc>()
+                                    .add(ListenToEvents());
+                              }
                             }
                           }
-                        }
-                        if (state is AuthenticationError) {
-                          PlatformDialog.showAlertDialog(
+                          if (state is AuthenticationError) {
+                            PlatformDialog.showAlertDialog(
+                              context: context,
+                              title: "Log In",
+                              message: state.failures.message ??
+                                  "Something went wrong!",
+                            );
+                          }
+                          if (state is AuthenticationLoading) {}
+                        },
+                        builder: (context, state) {
+                          return PlatformButton().buildButton(
+                            borderRadius: 100,
                             context: context,
-                            title: "Log In",
-                            message: state.failures.message ??
-                                "Something went wrong!",
-                          );
-                        }
-                        if (state is AuthenticationLoading) {}
-                      },
-                      builder: (context, state) {
-                        return PlatformButton().buildButton(
-                          borderRadius: 100,
-                          context: context,
-                          isLoading: state is AuthenticationLoading,
-                          type: ButtonType.primary,
-                          backgroundColor: Color(0xFFFFCD7C),
-                          textStyle: TextStyle(
-                            color: Color.fromARGB(255, 94, 87, 86),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                          text: "Log In",
-                          onPressed: () {
-                            if (formStateKey.currentState!.validate()) {
-                              context.read<AuthenticationBloc>().add(
-                                    LogInAuthenticationEvent(
-                                      email: _emailController.text,
-                                      password: _passwordController.text,
-                                    ),
-                                  );
-                            }
-                          },
-                          width: double.maxFinite,
-                        )!;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: PlatformButton().buildButton(
-                      borderRadius: 100,
-                      context: context,
-                      type: ButtonType.primary,
-                      backgroundColor: Colors.transparent,
-                      textStyle: TextStyle(
-                        color: Color(0xFFFFCD7C),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                            isLoading: state is AuthenticationLoading,
+                            type: ButtonType.primary,
+                            backgroundColor: Color(0xFFFFCD7C),
+                            textStyle: TextStyle(
+                              color: Color.fromARGB(255, 94, 87, 86),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                            text: "Log In",
+                            onPressed: () {
+                              if (formStateKey.currentState!.validate()) {
+                                context.read<AuthenticationBloc>().add(
+                                      LogInAuthenticationEvent(
+                                        email: _emailController.text,
+                                        password: _passwordController.text,
+                                      ),
+                                    );
+                              }
+                            },
+                            width: double.maxFinite,
+                          )!;
+                        },
                       ),
-                      text: "Forgot Password ?",
-                      onPressed: () {
-                        context.push(
-                          '${FitFlexAuthLandingPage.route}/${FitFlexAuthLogInPage.route}/${FitFlexAuthForgotPasswordPage.route}',
-                        );
-                      },
-                      width: double.maxFinite,
-                    )!,
-                  ),
-                ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PlatformButton().buildButton(
+                        borderRadius: 100,
+                        context: context,
+                        type: ButtonType.primary,
+                        backgroundColor: Colors.transparent,
+                        textStyle: TextStyle(
+                          color: Color(0xFFFFCD7C),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                        text: "Forgot Password ?",
+                        onPressed: () {
+                          context.push(
+                            '${FitFlexAuthLandingPage.route}/${FitFlexAuthLogInPage.route}/${FitFlexAuthForgotPasswordPage.route}',
+                          );
+                        },
+                        width: double.maxFinite,
+                      )!,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

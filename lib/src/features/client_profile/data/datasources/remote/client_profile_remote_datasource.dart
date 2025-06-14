@@ -47,7 +47,7 @@ abstract class ClientProfileRemoteDatasource {
   Future<ClientModel?> getClientById([String? id]);
 
   ///Get clients weights
-  Future<List<ClientWeightEntity>?>? getClientWeights();
+  Future<List<ClientWeightEntity>?>? getClientWeights(String? clientId);
 
   ///Get clients weights
   Future<void>? addClientWeight(ClientWeightModel clientWeightModel);
@@ -223,10 +223,17 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
       // Map the QuerySnapshot documents to a List<ClientModel>
       final List<ClientModel> clients =
           await Future.wait(querySnapshot.docs.map((doc) async {
-        final client = ClientModel.fromFirestore(
-          doc as DocumentSnapshot<Map<String, dynamic>>,
-          null,
-        );
+        final CollectionReference gymRef = db.collection('gyms');
+        final gymId = (doc.data() as Map<String, dynamic>)['gymId'] as String?;
+        final trainerId =
+            (doc.data() as Map<String, dynamic>)['trainerId'] as String?;
+        final trainerDocSnapshot =
+            await gymRef.doc(gymId).collection('trainers').doc(trainerId).get();
+        final trainerImageUrl = (trainerDocSnapshot.data())!['trainerImageUrl'];
+
+        final mapObject = doc.data() as Map<String, dynamic>;
+        mapObject['trainerImageUrl'] = trainerImageUrl;
+        final client = ClientModel.fromFirestore(mapObject, doc.id);
 
         try {
           // Access the workoutPlans sub-collection for this user
@@ -269,9 +276,20 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
       if (!userDoc.exists) {
         return null;
       }
+      final CollectionReference gymRef = db.collection('gyms');
+      final gymId =
+          (userDoc.data() as Map<String, dynamic>)['gymId'] as String?;
+      final trainerId =
+          (userDoc.data() as Map<String, dynamic>)['trainerId'] as String?;
+      final trainerDocSnapshot =
+          await gymRef.doc(gymId).collection('trainers').doc(trainerId).get();
+      final trainerImageUrl = (trainerDocSnapshot.data())!['trainerImageUrl'];
+
+      final mapObject = userDoc.data() as Map<String, dynamic>;
+      mapObject['trainerImageUrl'] = trainerImageUrl;
       final user = ClientModel.fromFirestore(
-        userDoc as DocumentSnapshot<Map<String, dynamic>>,
-        null,
+        mapObject,
+        userDoc.id,
       );
 
       try {
@@ -302,12 +320,12 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
   }
 
   @override
-  Future<List<ClientWeightEntity>?>? getClientWeights() async {
+  Future<List<ClientWeightEntity>?>? getClientWeights(String? clientId) async {
     try {
-      final clientId = getIt<FirebaseAuth>().currentUser?.uid;
+      final clientUid = clientId ?? getIt<FirebaseAuth>().currentUser?.uid;
       final CollectionReference clients = db.collection('Users');
       final clientWeightsDocs = await clients
-          .doc(clientId)
+          .doc(clientUid)
           .collection('weightTracker')
           .orderBy('timeStamp', descending: false)
           .get();

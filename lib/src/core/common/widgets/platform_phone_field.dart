@@ -96,7 +96,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
         GestureDetector(
           onTap: () => _showCountryCodePicker(context),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 5),
             decoration: BoxDecoration(
               border: Border.all(color: Color(0xFFFFCD7C), width: 1),
               borderRadius: BorderRadius.circular(8),
@@ -108,7 +108,12 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Icon(Icons.arrow_drop_down_rounded),
+                      child: Icon(
+                        Icons.arrow_drop_down_rounded,
+                        color: Color(
+                          0xFFFFCD7C,
+                        ),
+                      ),
                     ),
                     // CuperIcon(),
                     Text(
@@ -128,9 +133,10 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        // const SizedBox(width: 8),
         Expanded(
           child: AppTextFields.basicTextField(
+            hintText: "Enter your phone number",
             border: widget.border,
             boxDecoration: widget.boxDecoration,
             controller: widget.controller,

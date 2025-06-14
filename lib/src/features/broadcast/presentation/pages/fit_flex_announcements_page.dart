@@ -83,20 +83,22 @@ class _FitFlexAnnouncementsPageState extends State<FitFlexAnnouncementsPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: PlatformAppbar.basicAppBar(
-          title: "Announcements",
-          foregroundColor: globalColorScheme.primary,
-          context: context,
-          backgroundColor: globalColorScheme.onPrimaryContainer,
-          automaticallyImplyLeading: false
-          // onLeadingPressed: () {
-          //   if (widget.isTrainer) {
-          //     context.pop();
-          //   } else {
-          //     context.go('/');
-          //   }
-          // },
-          // trailing: IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
-          ),
+        title: "Announcements",
+        foregroundColor: globalColorScheme.primary,
+        context: context,
+        backgroundColor: globalColorScheme.onPrimaryContainer,
+        automaticallyImplyLeading: widget.isTrainer,
+        onLeadingPressed: widget.isTrainer
+            ? () {
+                if (widget.isTrainer) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              }
+            : null,
+        // trailing: IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+      ),
       floatingActionButton: widget.isTrainer
           ? FloatingActionButton.extended(
               onPressed: () => context.go(

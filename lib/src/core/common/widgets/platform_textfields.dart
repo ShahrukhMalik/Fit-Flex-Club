@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/core/common/validators/textform_field_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,19 +42,16 @@ class AppTextFields {
           if (fieldType == TextFieldType.email) {
             return emailValidator(value);
           }
-
           return null;
         },
+        placeholderStyle:
+            TextStyle(color: globalColorScheme.primary.withOpacity(0.5)),
         style: style ??
             TextStyle(
-              color: Color(0xFFFFCD7C),
+              color: globalColorScheme.primary.withOpacity(0.7),
             ),
         // autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: controller,
-        placeholderStyle: style ??
-            TextStyle(
-              color: Color.fromARGB(152, 255, 205, 124),
-            ),
         placeholder: labelText ?? hintText,
         // padding: const EdgeInsets.all(12),
         keyboardType: keyboardType,
@@ -73,10 +71,9 @@ class AppTextFields {
       textAlign: TextAlign.center,
       inputFormatters: textInputFormatter,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      // key: formStateKey,
       style: style ??
           TextStyle(
-            color: Color(0xFFFFCD7C),
+            color: globalColorScheme.inversePrimary,
           ),
       controller: controller,
       onChanged: onChanged,
@@ -107,16 +104,19 @@ class AppTextFields {
 
   static Widget passwordTextField({
     String? labelText,
+    bool showVisibilityIcon = true,
     BoxDecoration? boxDecoration,
     TextEditingController? controller,
     void Function(String)? onChanged,
     required bool obscureText,
     required VoidCallback onToggleVisibility,
+    String? Function(String?)? validator,
     InputBorder? border,
     TextStyle? style,
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
+        key: UniqueKey(),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         style: style ??
             TextStyle(
@@ -124,19 +124,23 @@ class AppTextFields {
             ),
         controller: controller,
         decoration: boxDecoration,
-        prefix: GestureDetector(
-          onTap: onToggleVisibility,
-          child: Icon(
-            obscureText ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
-            size: 20,
-            color: Color(0xFFFFCD7C),
-          ),
-        ),
+        prefix: showVisibilityIcon
+            ? GestureDetector(
+                onTap: onToggleVisibility,
+                child: Icon(
+                  obscureText ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
+                  size: 20,
+                  color: Color(0xFFFFCD7C),
+                ),
+              )
+            : null,
         placeholder: 'Enter your password',
+        placeholderStyle:
+            TextStyle(color: globalColorScheme.primary.withOpacity(0.5)),
         obscureText: obscureText,
         // autovalidateMode: AutovalidateMode.onUserInteraction,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        validator: (value) => passwordValidator(value),
+        validator: validator,
       );
     }
 
@@ -150,7 +154,7 @@ class AppTextFields {
             color: Color(0xFFFFCD7C),
           ),
       // autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (value) => passwordValidator(value),
+      validator: validator,
       decoration: InputDecoration(
         labelText: labelText,
         border: border ??
@@ -291,42 +295,46 @@ class AppTextFields {
   }) {
     if (Platform.isIOS) {
       if (usePadding) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+        return CupertinoTextField(
+          controller: controller,
+          placeholder: labelText ?? 'Type a message',
+          placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 14,
+          ), // works more like contentPadding here
           decoration: BoxDecoration(
-            color: filledColor ?? CupertinoColors.systemGrey4,
-            borderRadius: BorderRadius.circular(100),
-            border:
-                Border.all(color: filledColor ?? CupertinoColors.systemGrey4),
+            color: filledColor ?? CupertinoColors.systemGrey5,
+            borderRadius: BorderRadius.circular(25),
           ),
-          child: CupertinoTextFormFieldRow(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            onFieldSubmitted: onFieldSubmitted,
-            validator: (value) {
-              // if (value == null || value.isEmpty) {
-              //   return 'Please enter weight';
-              // }
-              return null;
-            },
-            style: style ?? const TextStyle(fontSize: 16),
-            keyboardType: keyboardType,
-            controller: controller,
-            placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
-            placeholder: labelText ?? "Type a message",
-            onChanged: onChanged,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            prefix: prefix != null
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: prefix,
-                  )
-                : null,
-            decoration: BoxDecoration(
-              color: filledColor ?? CupertinoColors.systemGrey5,
-              borderRadius: BorderRadius.circular(25),
-            ),
-          ),
+          style: style ?? const TextStyle(fontSize: 16),
+          onChanged: onChanged,
+          onSubmitted: onFieldSubmitted,
         );
+
+        // return CupertinoTextFormFieldRow(
+        //   autovalidateMode: AutovalidateMode.onUserInteraction,
+        //   onFieldSubmitted: onFieldSubmitted,
+        //   validator: (value) => null,
+        //   style: style ?? const TextStyle(fontSize: 16),
+        //   keyboardType: keyboardType,
+        //   controller: controller,
+        //   placeholderStyle: TextStyle(color: style?.color?.withOpacity(0.7)),
+        //   placeholder: labelText ?? "Type a message",
+        //   onChanged: onChanged,
+        //   // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        //   prefix: prefix != null
+        //       ? Padding(
+        //           padding: const EdgeInsets.only(left: 8),
+        //           child: prefix,
+        //         )
+        //       : null,
+        //   decoration: BoxDecoration(
+        //     color: filledColor ?? CupertinoColors.systemGrey5,
+        //     borderRadius: BorderRadius.circular(25),
+        //     // border: Border.all(color: CupertinoColors.systemGrey4),
+        //   ),
+        // );
       } else {
         return CupertinoTextFormFieldRow(
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -358,11 +366,12 @@ class AppTextFields {
       }
     }
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: filledColor ?? CupertinoColors.systemGrey5,
         borderRadius: BorderRadius.circular(25),
       ),
+      padding: EdgeInsets.symmetric(
+          horizontal: 8, vertical: 6), // keep this for overall spacing
       child: Row(
         children: [
           if (prefix != null) prefix,
@@ -380,8 +389,8 @@ class AppTextFields {
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 border: InputBorder.none,
                 isCollapsed: true,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10), // for internal text padding
               ),
             ),
           ),
