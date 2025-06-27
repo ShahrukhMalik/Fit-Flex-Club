@@ -327,8 +327,11 @@ class _VideoPreviewState extends State<VideoPreview> {
                         max: _controller!.value.duration.inMilliseconds
                             .toDouble(),
                         onChanged: (value) {
-                          _controller!
-                              .seekTo(Duration(milliseconds: value.toInt()));
+                          _controller!.seekTo(
+                            Duration(
+                              milliseconds: value.toInt(),
+                            ),
+                          );
                         },
                       ),
                     ),

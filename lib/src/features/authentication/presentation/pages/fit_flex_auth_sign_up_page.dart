@@ -378,7 +378,6 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                         ),
                                       ),
                                       AppTextFields.passwordTextField(
-                                        
                                         validator: (text) {
                                           return confirmPasswordValidator(
                                             _passwordController.text,

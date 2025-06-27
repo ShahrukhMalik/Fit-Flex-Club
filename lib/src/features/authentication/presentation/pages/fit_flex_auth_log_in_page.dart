@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fit_flex_club/src/core/common/validators/textform_field_validators.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_dialog.dart';
@@ -115,6 +116,7 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                                 valueListenable: passwordVisible,
                                 builder: (context, visible, _) {
                                   return AppTextFields.passwordTextField(
+                                    validator: passwordValidator,
                                     controller: _passwordController,
                                     obscureText: visible,
                                     onToggleVisibility: () =>

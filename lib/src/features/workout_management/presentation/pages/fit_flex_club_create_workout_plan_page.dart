@@ -241,6 +241,8 @@ class _FitFlexClubCreateWorkoutPlanPageState
                 id: UUIDv4().toString(),
                 targetReps: set.targetReps,
                 targetWeight: set.targetWeight,
+                targetTime: set.targetTime,
+                targetDistance: set.targetDistance,
                 exerciseId: newExerciseId, // Link to the new exercise
               );
             }).toList(),

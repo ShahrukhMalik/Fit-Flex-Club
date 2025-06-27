@@ -50,6 +50,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
     });
 
     showCupertinoModalPopup(
+      barrierDismissible: false,
       context: context,
       builder: (_) => Container(
         height: 250, // Total height for dialog
@@ -80,7 +81,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
-                      onTap: () => context.pop(),
+                      onTap: () => Navigator.pop(context),
                       child: Text(
                         "Cancel",
                         style: TextStyle(
@@ -99,7 +100,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => context.pop(),
+                      onTap: () => Navigator.pop(context),
                       child: Text(
                         "Done",
                         style: TextStyle(

@@ -116,7 +116,6 @@ class AppTextFields {
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
-        key: UniqueKey(),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         style: style ??
             TextStyle(

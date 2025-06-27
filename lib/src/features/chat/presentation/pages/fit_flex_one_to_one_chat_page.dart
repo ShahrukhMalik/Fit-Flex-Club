@@ -184,13 +184,8 @@ class _FitFlexOneToOneChatPageState extends State<FitFlexOneToOneChatPage> {
                           extra: {'chat': chat, 'currentUserId': currentUserId},
                         );
                       },
-                      leading: IconButton.filled(
-                        onPressed: () {
-                          print('-------');
-                        },
-                        icon: Icon(
-                          Icons.fitness_center_rounded,
-                        ),
+                      leading: CircleAvatar(
+                        child: Text(userName[0].toUpperCase()),
                       ),
                       title: Text(userName),
                       subtitle: Text(
