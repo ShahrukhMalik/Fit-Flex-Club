@@ -35,7 +35,7 @@ class SetModel extends SetEntity {
       actualWeight: (map['actualWeight'] as num?)?.toDouble(),
       actualDistance: (map['actualDistance'] as num?)?.toDouble(),
       actualTime: map['actualTime'] != null
-          ? Duration(minutes: map['actualTime'] as int)
+          ? Duration(seconds: map['actualTime'] as int)
           : null,
     );
   }
@@ -54,7 +54,7 @@ class SetModel extends SetEntity {
       if (actualReps != null) 'actualReps': actualReps,
       if (actualWeight != null) 'actualWeight': actualWeight,
       if (actualDistance != null) 'actualDistance': actualDistance,
-      if (actualTime != null) 'actualTime': actualTime?.inMinutes,
+      if (actualTime != null) 'actualTime': actualTime?.inSeconds,
     };
   }
 

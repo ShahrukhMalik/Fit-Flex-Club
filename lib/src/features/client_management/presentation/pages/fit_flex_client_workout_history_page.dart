@@ -28,6 +28,26 @@ class _FitFlexClientWorkoutHistoryPageState
   final ValueNotifier<List<ExerciseModel?>?> _workoutHistoryModelsDateWise =
       ValueNotifier(null);
 
+  String formatDuration(Duration duration) {
+    if (duration.inSeconds < 60) {
+      return '${duration.inSeconds} sec';
+    } else if (duration.inMinutes < 60) {
+      return '${duration.inMinutes} min';
+    } else {
+      return '${duration.inHours} hr';
+    }
+  }
+
+  String getDurationUnit(Duration duration) {
+    if (duration.inSeconds < 60) {
+      return 'sec';
+    } else if (duration.inMinutes < 60) {
+      return 'min';
+    } else {
+      return 'hr';
+    }
+  }
+
   final List<DateTime> _dates = List.generate(
     30,
     (index) => DateTime.now().subtract(Duration(days: index)),
@@ -414,24 +434,24 @@ class _FitFlexClientWorkoutHistoryPageState
                                               children: [
                                                 Center(
                                                   child: Text(
-                                                    'Duration(in mins)',
+                                                    'Duration(in ${getDurationUnit(set.targetTime ?? Duration())})',
                                                     style:
                                                         TextStyle(fontSize: 12),
                                                   ),
                                                 ),
                                                 Center(
                                                   child: Text(
-                                                    (set.targetTime
-                                                                ?.inMinutes ??
-                                                            0)
+                                                    formatDuration(
+                                                            set.targetTime ??
+                                                                Duration())
                                                         .toString(),
                                                   ),
                                                 ),
                                                 Center(
                                                   child: Text(
-                                                    (set.actualTime
-                                                                ?.inMinutes ??
-                                                            0)
+                                                    formatDuration(
+                                                            set.actualTime ??
+                                                                Duration())
                                                         .toString(),
                                                     style: TextStyle(
                                                       fontWeight:
@@ -443,7 +463,7 @@ class _FitFlexClientWorkoutHistoryPageState
                                                 ),
                                                 Center(
                                                   child: Text(
-                                                    '${(((set.actualTime!.inMinutes) / set.targetTime!.inMinutes) * 100).toStringAsFixed(2)} %',
+                                                    '${(((set.actualTime!.inSeconds) / set.targetTime!.inSeconds) * 100).toStringAsFixed(2)} %',
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,

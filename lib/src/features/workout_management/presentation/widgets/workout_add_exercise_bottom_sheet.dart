@@ -1066,7 +1066,7 @@ class _FitFlexAddExercisePageState extends State<FitFlexAddExercisePage>
                     if (widget.duration)
                       Center(
                         child: Text(
-                          'Duration',
+                          'Duration(mins)',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),

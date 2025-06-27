@@ -237,12 +237,16 @@ class _FitFlexClubCreateWorkoutPlanPageState
             parameters: exercise.parameters,
             dayId: targetDay.id, // Assign to the target day
             exercise.sets.map((set) {
+              print('--------------------------------------');
+              print('In Minutes');
+              print(set.targetTime?.inMinutes);
+              print('In Seconds');
+              print(set.targetTime?.inSeconds);
               return SetModel(
                 id: UUIDv4().toString(),
                 targetReps: set.targetReps,
                 targetWeight: set.targetWeight,
                 targetTime: set.targetTime,
-                targetDistance: set.targetDistance,
                 exerciseId: newExerciseId, // Link to the new exercise
               );
             }).toList(),

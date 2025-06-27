@@ -43,6 +43,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
   void _showIosPicker(BuildContext context) {
     // Find the initial index of the selected value
     final initialIndex = widget.options.indexOf(selectedValue);
+    int currentIndex = 0;
 
     setState(() {
       selectedValue = widget.options[0];
@@ -80,17 +81,35 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(
-                          color: globalColorScheme.error,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                    IconButton.filled(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(
+                          globalColorScheme.error,
                         ),
                       ),
+                      // focusColor: globalColorScheme.error,
+                      highlightColor: globalColorScheme.error,
+                      color: Colors.white,
+                      onPressed: () {
+                        selectedValue = widget.options[currentIndex];
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.close),
                     ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     selectedValue = widget.options[currentIndex];
+                    //     Navigator.pop(context);
+                    //   },
+                    //   child: Text(
+                    //     "Cancel",
+                    //     style: TextStyle(
+                    //       color: globalColorScheme.error,
+                    //       fontSize: 16,
+                    //       fontWeight: FontWeight.w600,
+                    //     ),
+                    //   ),
+                    // ),
                     Text(
                       "Select ${widget.pickerTitle}",
                       style: TextStyle(
@@ -99,17 +118,27 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Text(
-                        "Done",
-                        style: TextStyle(
-                          color: globalColorScheme.onPrimaryContainer,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                    IconButton.filled(
+                      onPressed: () {
+                        selectedValue = widget.options[currentIndex];
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.check),
                     ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     selectedValue = widget.options[currentIndex];
+                    //     Navigator.pop(context);
+                    //   },
+                    //   child: Text(
+                    //     "Done",
+                    //     style: TextStyle(
+                    //       color: globalColorScheme.onPrimaryContainer,
+                    //       fontSize: 16,
+                    //       fontWeight: FontWeight.w800,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -126,6 +155,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                 magnification: 1.15,
                 itemExtent: 40,
                 onSelectedItemChanged: (index) {
+                  currentIndex = index;
                   setState(() {
                     selectedValue = widget.options[index];
                     widget.onChanged(widget.options[index]);

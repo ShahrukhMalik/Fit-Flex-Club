@@ -573,7 +573,7 @@ class _SetTrakerWidgetState extends State<SetTrakerWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Duration (in ${getDurationUnit(widget.sets[index].targetTime!)})',
+                                      'Duration (in ${getDurationUnit(widget.sets[index].targetTime ?? Duration())})',
                                       style: TextStyle(fontSize: 16),
                                     ),
                                     Padding(

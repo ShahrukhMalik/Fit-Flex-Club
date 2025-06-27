@@ -13,7 +13,6 @@ import 'package:go_router/go_router.dart';
 
 class AutoScrollTabsWidget extends StatefulWidget {
   final bool isClientSideView;
-
   final ValueNotifier<List<DayModel>> days;
   final ValueNotifier<List<WeekModel>> weeks;
   final ValueNotifier<List<ExerciseModel>> exercises;

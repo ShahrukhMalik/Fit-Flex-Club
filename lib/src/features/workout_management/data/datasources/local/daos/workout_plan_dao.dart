@@ -362,7 +362,7 @@ class WorkoutPlanDao extends DatabaseAccessor<AppDatabase>
                   targetReps: Value(set.targetReps),
                   targetWeight: Value(set.targetWeight),
                   targetDistance: Value(set.targetDistance),
-                  targetTime: Value(set.targetTime?.inMinutes),
+                  targetTime: Value(set.targetTime?.inSeconds),
                   id: Value(set.id),
                   setNumber: Value(
                     exercise.sets.indexOf(set) + 1,
