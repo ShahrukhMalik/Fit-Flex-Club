@@ -92,6 +92,7 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                                     color: Color(0xFFFFCD7C), fontSize: 18),
                               ),
                               AppTextFields.basicTextField(
+                                textAlign: TextAlign.start,
                                 hintText: "Enter your email",
                                 fieldType: TextFieldType.email,
                                 controller: _emailController,
@@ -132,7 +133,6 @@ class _FitFlexAuthLogInPageState extends State<FitFlexAuthLogInPage> {
                                   );
                                 },
                               ),
-                              
                             ],
                           ),
                         ),

@@ -23,7 +23,7 @@ class AppTextFields {
     InputBorder? border,
     String? initialValue,
     UniqueKey? uniqueKey,
-    TextAlign? textAlign,
+    TextAlign textAlign = TextAlign.center,
   }) {
     if (Platform.isIOS) {
       return CupertinoTextFormFieldRow(
@@ -44,8 +44,9 @@ class AppTextFields {
           }
           return null;
         },
-        placeholderStyle:
-            TextStyle(color: globalColorScheme.primary.withOpacity(0.5)),
+        placeholderStyle: TextStyle(
+          color: globalColorScheme.primary.withOpacity(0.5),
+        ),
         style: style ??
             TextStyle(
               color: globalColorScheme.primary.withOpacity(0.7),
@@ -68,12 +69,12 @@ class AppTextFields {
       textInputAction: TextInputAction.done,
       key: uniqueKey,
       initialValue: initialValue,
-      textAlign: TextAlign.center,
+      textAlign: textAlign,
       inputFormatters: textInputFormatter,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       style: style ??
           TextStyle(
-            color: globalColorScheme.inversePrimary,
+            color: globalColorScheme.primary.withOpacity(0.7),
           ),
       controller: controller,
       onChanged: onChanged,
@@ -156,6 +157,7 @@ class AppTextFields {
       validator: validator,
       decoration: InputDecoration(
         labelText: labelText,
+        hintText: labelText,
         border: border ??
             UnderlineInputBorder(
               borderSide: BorderSide(
@@ -163,10 +165,14 @@ class AppTextFields {
                 color: Color(0xFFFFCD7C),
               ),
             ),
-        suffixIcon: IconButton(
-          icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
-          onPressed: onToggleVisibility,
-        ),
+        suffixIcon: showVisibilityIcon
+            ? IconButton(
+                icon: Icon(
+                  obscureText ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: onToggleVisibility,
+              )
+            : null,
       ),
     );
   }

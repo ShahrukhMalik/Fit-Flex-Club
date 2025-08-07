@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
+import 'package:fit_flex_club/src/core/common/widgets/frosted_dropdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -50,8 +52,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
       widget.onChanged(widget.options[0]);
     });
 
-    showCupertinoModalPopup(
-      barrierDismissible: false,
+    showBottomSheet(
       context: context,
       builder: (_) => Container(
         height: 250, // Total height for dialog
@@ -79,23 +80,23 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                   ),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton.filled(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(
-                          globalColorScheme.error,
-                        ),
-                      ),
-                      // focusColor: globalColorScheme.error,
-                      highlightColor: globalColorScheme.error,
-                      color: Colors.white,
-                      onPressed: () {
-                        selectedValue = widget.options[currentIndex];
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.close),
-                    ),
+                    // IconButton.filled(
+                    //   style: ButtonStyle(
+                    //     backgroundColor: WidgetStateProperty.all(
+                    //       globalColorScheme.error,
+                    //     ),
+                    //   ),
+                    //   // focusColor: globalColorScheme.error,
+                    //   highlightColor: globalColorScheme.error,
+                    //   color: Colors.white,
+                    //   onPressed: () {
+                    //     selectedValue = widget.options[currentIndex];
+                    //     Navigator.pop(context);
+                    //   },
+                    //   icon: Icon(Icons.close),
+                    // ),
                     // GestureDetector(
                     //   onTap: () {
                     //     selectedValue = widget.options[currentIndex];
@@ -118,13 +119,13 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton.filled(
-                      onPressed: () {
-                        selectedValue = widget.options[currentIndex];
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.check),
-                    ),
+                    // IconButton.filled(
+                    //   onPressed: () {
+                    //     selectedValue = widget.options[currentIndex];
+                    //     Navigator.pop(context);
+                    //   },
+                    //   icon: Icon(Icons.check),
+                    // ),
                     // GestureDetector(
                     //   onTap: () {
                     //     selectedValue = widget.options[currentIndex];
@@ -144,47 +145,42 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
               ),
             ),
 
-            // Picker
+            // Simple Scrollable List
             Expanded(
-              child: CupertinoPicker(
-                scrollController: FixedExtentScrollController(
-                  initialItem: initialIndex >= 0 ? initialIndex : 0,
-                ),
-                backgroundColor: Colors.white,
-                useMagnifier: true,
-                magnification: 1.15,
-                itemExtent: 40,
-                onSelectedItemChanged: (index) {
-                  currentIndex = index;
-                  setState(() {
-                    selectedValue = widget.options[index];
-                    widget.onChanged(widget.options[index]);
-                  });
-                },
-                children: widget.options
-                    .map(
-                      (option) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedValue = option;
-                            widget.onChanged(option);
-                          });
-                          context.pop();
-                        },
-                        child: Center(
-                          child: Text(
-                            option.values.first,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: option == selectedValue
-                                  ? globalColorScheme.tertiaryContainer
-                                  : globalColorScheme.onPrimaryContainer,
-                            ),
-                          ),
+              child: ListView.builder(
+                itemCount: widget.options.length,
+                itemBuilder: (context, index) {
+                  final option = widget.options[index];
+                  final isSelected = option == selectedValue;
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedValue = option;
+                        widget.onChanged(option);
+                      });
+                      context.pop(); // Close the modal or picker sheet
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 20),
+                      color: isSelected
+                          ? globalColorScheme.primary.withOpacity(0.1)
+                          : Colors.transparent,
+                      child: Text(
+                        option.values.first,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? globalColorScheme.tertiaryContainer
+                              : globalColorScheme.onPrimaryContainer,
                         ),
                       ),
-                    )
-                    .toList(),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -195,7 +191,7 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
+    if (true) {
       // iOS Dropdown
       return GestureDetector(
         onTap: () => _showIosPicker(context),
@@ -230,46 +226,58 @@ class _PlatformSpecificDropdownState extends State<PlatformSpecificDropdown> {
       );
     } else {
       // Android Dropdown
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-            color: widget.borderColor,
-          )),
-          // borderRadius: BorderRadius.circular(8),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<Map<String, String>>(
-            style: TextStyle(color: widget.selectedOptionColor),
-            isDense: true,
-            iconEnabledColor: widget.selectedOptionColor,
-            value: selectedValue,
-            items: widget.options
-                .map(
-                  (option) => DropdownMenuItem(
-                    value: option,
-                    child: Text(
-                      option.values.first,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: option == selectedValue
-                            ? globalColorScheme.tertiaryContainer
-                            : globalColorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedValue = value!;
-                widget.onChanged(selectedValue);
-              });
-            },
-          ),
-        ),
+      return FrostedDropdown(
+        options: widget.options,
+        selectedValue: selectedValue,
+        onChanged: (value) {
+          setState(() {
+            selectedValue = value;
+            widget.onChanged(selectedValue);
+          });
+        },
+        selectedOptionColor: widget.selectedOptionColor,
       );
+      // return BackdropFilter(
+      //   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+      //   child: Container(
+      //     margin: EdgeInsets.all(12),
+      //     decoration: BoxDecoration(
+      //       color: Colors.white.withOpacity(0.1), // Semi-transparent
+      //       borderRadius: BorderRadius.circular(20),
+      //       border: Border.all(
+      //         color: Colors.white.withOpacity(0.2),
+      //       ),
+      //     ),
+      //     child: DropdownButtonHideUnderline(
+      //       child: DropdownButton<Map<String, String>>(
+      //         style: TextStyle(color: widget.selectedOptionColor),
+      //         isDense: true,
+      //         iconEnabledColor: widget.selectedOptionColor,
+      //         value: selectedValue,
+      //         items: widget.options
+      //             .map(
+      //               (option) => DropdownMenuItem(
+      //                 value: option,
+      //                 child: Text(
+      //                   option.values.first,
+      //                   style: TextStyle(
+      //                     fontSize: 16,
+      //                     color: globalColorScheme.primaryContainer,
+      //                   ),
+      //                 ),
+      //               ),
+      //             )
+      //             .toList(),
+      //         onChanged: (value) {
+      //           setState(() {
+      //             selectedValue = value!;
+      //             widget.onChanged(selectedValue);
+      //           });
+      //         },
+      //       ),
+      //     ),
+      //   ),
+      // );
     }
   }
 }

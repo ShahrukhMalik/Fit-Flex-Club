@@ -166,6 +166,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                             fontSize: 18),
                                       ),
                                       AppTextFields.basicTextField(
+                                        textAlign: TextAlign.start,
                                         hintText: "Enter your name",
                                         controller: _nameController,
                                         fieldType: TextFieldType.name,
@@ -188,6 +189,7 @@ class _FitFlexAuthSignUpPageState extends State<FitFlexAuthSignUpPage> {
                                             fontSize: 18),
                                       ),
                                       AppTextFields.basicTextField(
+                                        textAlign: TextAlign.start,
                                         hintText: "Enter your email",
                                         fieldType: TextFieldType.email,
                                         controller: _emailController,
