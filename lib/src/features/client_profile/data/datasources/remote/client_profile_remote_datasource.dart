@@ -283,7 +283,7 @@ class ClientProfileRemoteDatasourceImpl extends ClientProfileRemoteDatasource {
           (userDoc.data() as Map<String, dynamic>)['trainerId'] as String?;
       final trainerDocSnapshot =
           await gymRef.doc(gymId).collection('trainers').doc(trainerId).get();
-      final trainerImageUrl = (trainerDocSnapshot.data())!['trainerImageUrl'];
+      final trainerImageUrl = (trainerDocSnapshot.data())?['trainerImageUrl'];
 
       final mapObject = userDoc.data() as Map<String, dynamic>;
       mapObject['trainerImageUrl'] = trainerImageUrl;
