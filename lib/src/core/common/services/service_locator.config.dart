@@ -26,6 +26,8 @@ import '../../../features/authentication/domain/usecases/authenticate_user_useca
     as _i949;
 import '../../../features/authentication/domain/usecases/create_account_usecase.dart'
     as _i955;
+import '../../../features/authentication/domain/usecases/delete_account_usecase.dart'
+    as _i189;
 import '../../../features/authentication/domain/usecases/forgot_password_usecase.dart'
     as _i988;
 import '../../../features/authentication/domain/usecases/get_gyms_usecase.dart'
@@ -42,6 +44,8 @@ import '../../../features/authentication/domain/usecases/logout_usecase.dart'
     as _i447;
 import '../../../features/authentication/presentation/bloc/authentication_bloc.dart'
     as _i70;
+import '../../../features/authentication/presentation/bloc/deleteaccount/deleteaccount_cubit.dart'
+    as _i764;
 import '../../../features/authentication/presentation/bloc/getgyms/getgyms_cubit.dart'
     as _i695;
 import '../../../features/broadcast/data/datasources/broadcast_remote_datasource.dart'
@@ -413,6 +417,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i988.ForgotPasswordUsecase>(() =>
         _i988.ForgotPasswordUsecaseImpl(
             authRepository: gh<_i20.AuthRepository>()));
+    gh.singleton<_i189.DeleteAccountUsecase>(() =>
+        _i189.DeleteAccountUsecaseImpl(
+            authRepository: gh<_i20.AuthRepository>()));
     gh.singleton<_i671.PostAnnouncementUsecase>(() =>
         _i671.PostAnnouncementUsecaseImpl(
             broadcastRepository: gh<_i196.BroadcastRepository>()));
@@ -524,6 +531,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i208.LogWorkoutHistoryUsecase>(() =>
         _i208.LogWorkoutHistoryUsecaseImpl(
             workoutHistoryRepository: gh<_i198.WorkoutHistoryRepository>()));
+    gh.factory<_i764.DeleteAccountCubit>(
+        () => _i764.DeleteAccountCubit(gh<_i189.DeleteAccountUsecase>()));
     gh.singleton<_i250.GetChatUsecase>(() =>
         _i250.GetChatUsecaseImpl(chatRepository: gh<_i75.ChatRepository>()));
     gh.factory<_i90.WatchReactionsbyAnnouncmentIdCubit>(() =>

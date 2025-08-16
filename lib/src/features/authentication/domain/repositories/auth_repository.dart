@@ -4,6 +4,8 @@ import 'package:fit_flex_club/src/features/authentication/domain/entities/auth_e
 
 ///[Marker Interface] abstraction of auth repository
 abstract class AuthRepository {
+  Future<Either<Failures, void>>? deleteAccount({String? password});
+
   ///Let user login
   Future<Either<Failures, void>>? logIn({
     required String email,
@@ -40,6 +42,6 @@ abstract class AuthRepository {
   ///Checks whether user is signed in already
   Future<Either<Failures, Stream<bool>>>? checkWhetherUserIsLoggedIn();
 
-    ///
-  Future<Either<Failures, Stream<Map<String,dynamic>?>?>> listenToEvents();
+  ///
+  Future<Either<Failures, Stream<Map<String, dynamic>?>?>> listenToEvents();
 }

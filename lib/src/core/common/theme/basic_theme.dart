@@ -419,7 +419,7 @@ ThemeData basicTheme() {
           // color: crayola,
           fontWeight: FontWeight.bold),
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       //labelPadding: EdgeInsets.all(3.0),
       // labelColor: crayola,
       labelStyle: const TextStyle(color: Colors.orangeAccent),

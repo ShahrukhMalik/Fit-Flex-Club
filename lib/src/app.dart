@@ -6,6 +6,7 @@ import 'package:fit_flex_club/src/core/common/routes/go_router.dart';
 import 'package:fit_flex_club/src/core/common/services/service_locator.dart';
 import 'package:fit_flex_club/src/core/common/theme/basic_theme.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/bloc/deleteaccount/deleteaccount_cubit.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/getgyms/getgyms_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/addcomment/addcomment_cubit.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/cubit/addreaction/addreaction_cubit.dart';
@@ -187,6 +188,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => getIt<AddcommentCubit>()),
         BlocProvider(create: (context) => getIt<GetEmojisCubit>()),
         BlocProvider(create: (context) => getIt<AddReactionCubit>()),
+        BlocProvider(create: (context) => getIt<DeleteAccountCubit>()),
       ],
       child: localizations,
     );

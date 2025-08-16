@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/widgets/settings_bottomsheet.dart';
 import 'package:fit_flex_club/src/features/broadcast/presentation/widgets/announcement_image_widget.dart';
 import 'package:fit_flex_club/src/features/client_profile/presentation/widgets/trainer_image_widget.dart';
 import 'package:flutter/material.dart';
@@ -1148,13 +1149,12 @@ class _FitFlexClientProfilePageState extends State<FitFlexClientProfilePage> {
                               PlatformButton().buildButton(
                                 context: context,
                                 type: ButtonType.icon,
-                                icon: Icons.logout,
+                                icon: Icons.settings,
                                 foregroundColor:
                                     globalColorScheme.inversePrimary,
                                 text: "",
-                                onPressed: () => context
-                                    .read<AuthenticationBloc>()
-                                    .add(LogOutAuthenticationEvent()),
+                                onPressed: () =>
+                                    showAccountOptionsBottomSheet(context),
                               )!,
                             ],
                           ),

@@ -44,7 +44,7 @@ abstract class BroadcastLocalDatasource {
   );
 
   ///
-  Future<Stream<List<AnnouncementModel>>> watchAnnouncements();
+  Stream<List<AnnouncementModel>> watchAnnouncements();
 
   ///
   Future<void> addComment({
@@ -174,7 +174,7 @@ class BroadcastLocalDatasourceImpl extends BroadcastLocalDatasource {
   }
 
   @override
-  Future<Stream<List<AnnouncementModel>>> watchAnnouncements() async {
+  Stream<List<AnnouncementModel>> watchAnnouncements() {
     try {
       final announcementsStream = broadcastDao.watchAnnouncements();
 
@@ -193,13 +193,12 @@ class BroadcastLocalDatasourceImpl extends BroadcastLocalDatasource {
   Future<Stream<List<CommentModel>>> watchCommentsByAnnouncementId(
       String announcementId) async {
     try {
-      final commentsStream =  broadcastDao.watchCommentsForAnnouncement(
+      final commentsStream = broadcastDao.watchCommentsForAnnouncement(
         announcementId,
       );
       final transformedStream = commentsStream.map(
-        (chatList) => chatList
-            .map((chat) => CommentModel.fromDb(chat.toJson()))
-            .toList(),
+        (chatList) =>
+            chatList.map((chat) => CommentModel.fromDb(chat.toJson())).toList(),
       );
       return transformedStream;
     } catch (err) {

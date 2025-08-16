@@ -40,7 +40,7 @@ class WatchAnnouncementCubit extends Cubit<WatchAnnouncementState> {
             emit(
               WatchAnnouncementComplete(
                 announcements: announcements,
-                firstLoad: _isFirstLoad,
+                firstLoad: false,
               ),
             );
             _isFirstLoad = false;

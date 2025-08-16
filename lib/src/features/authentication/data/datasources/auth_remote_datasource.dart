@@ -47,6 +47,8 @@ abstract class AuthRemoteDatasource {
 
   ///
   Future<Stream<Map<String, dynamic>?>?> listenToEvents();
+
+  Future<void>? deleteAccount({String? password});
 }
 
 @Singleton(as: AuthRemoteDatasource)
@@ -62,6 +64,73 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     this.localDb, {
     required this.auth,
   });
+  @override
+  Future<void>? deleteAccount({String? password}) async {
+    try {
+      final user = auth.currentUser;
+      if (user == null) {
+        throw ServerException(
+            errorMessage: "No user currently signed in!",
+            errorCode: "no-user-found");
+      }
+
+      final uid = user.uid;
+
+      // 1. Fetch User Data from `Users`
+      final userDocRef = remoteDb.collection('Users').doc(uid);
+      final userSnapshot = await userDocRef.get();
+
+      if (userSnapshot.exists) {
+        final userData = userSnapshot.data();
+
+        // 2. Move to `deletedUsers` collection with timestamp
+        await remoteDb.collection('deletedUsers').doc(uid).set({
+          ...?userData,
+          'deletedAt': FieldValue.serverTimestamp(),
+        });
+
+        // 3. Delete from `Users`
+        await userDocRef.delete();
+      }
+
+      // ⚠️ TODO: If you have other collections (workouts, logs, events),
+      // consider moving or deleting them too. Otherwise, sensitive data remains.
+
+      // 4. Delete FirebaseAuth account
+      try {
+        await user.delete();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          if (password != null && user.email != null) {
+            final credential = EmailAuthProvider.credential(
+              email: user.email!,
+              password: password,
+            );
+            await user.reauthenticateWithCredential(credential);
+            await user.delete();
+          } else {
+            throw ServerException(
+              errorMessage: "Re-authentication required. Please login again.",
+              errorCode: e.code,
+            );
+          }
+        } else {
+          throw ServerException(
+            errorMessage: e.message ?? "Failed to delete user",
+          );
+        }
+      }
+
+      // 5. Clear local data
+      await prefs.clearAuthData();
+      await localDb.deleteAllTables();
+    } catch (err) {
+      throw ServerException(
+        errorMessage: err.toString(),
+      );
+    }
+  }
+
   @override
   Future<Stream<bool>>? checkWhetherUserIsLoggedIn() async => auth
       .authStateChanges()

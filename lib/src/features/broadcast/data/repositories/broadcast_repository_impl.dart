@@ -204,8 +204,7 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
       watchAnnouncements() async {
     try {
       final isConnected = await networkInfo.isConnected ?? false;
-      final localAnnouncementStream =
-          await broadcastLocalDatasource.watchAnnouncements();
+
       if (isConnected) {
         final remoteAnnouncementStream =
             await broadcastRemoteDatasource.watchAnnouncements();
@@ -222,7 +221,7 @@ class BroadcastRepositoryImpl extends BroadcastRepository {
           cancelOnError: false, // keep syncing even after recoverable errors
         );
       }
-      return Right(localAnnouncementStream);
+      return Right(broadcastLocalDatasource.watchAnnouncements());
     } on ServerException catch (error) {
       return Left(
         ServerFailure(
