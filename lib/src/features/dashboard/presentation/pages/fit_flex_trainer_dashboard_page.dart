@@ -28,6 +28,13 @@ class _FitFlexTrainerDashboardPageState
     extends State<FitFlexTrainerDashboardPage> {
   final ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
 
+  // Track icon positions/sizes
+  final List<GlobalKey> _iconKeys = List.generate(3, (_) => GlobalKey());
+  double _indicatorX = 0;
+  double _indicatorSize = 20; // default size
+
+  final GlobalKey _parentKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +50,32 @@ class _FitFlexTrainerDashboardPageState
       },
     );
     selectedIndex.value = widget.navigationShell.currentIndex;
+
+    // calculate initial position after first build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _moveIndicatorTo(selectedIndex.value);
+    });
+  }
+
+  void _moveIndicatorTo(int index) {
+    final key = _iconKeys[index];
+    final box = key.currentContext?.findRenderObject() as RenderBox?;
+    final parentBox =
+        _parentKey.currentContext?.findRenderObject() as RenderBox?;
+
+    if (box != null && parentBox != null) {
+      // Get the icon position relative to the parent container
+      final position = box.localToGlobal(Offset.zero, ancestor: parentBox);
+
+      setState(() {
+        // icon center relative to parent
+        final iconCenterX = position.dx + box.size.width / 2;
+
+        // indicator should align its center with icon center
+        _indicatorSize = box.size.width; // OR clamp if you want
+        _indicatorX = iconCenterX - _indicatorSize / 2;
+      });
+    }
   }
 
   Widget _buildBottomNavOverlay(BuildContext context, double width) {
@@ -70,17 +103,19 @@ class _FitFlexTrainerDashboardPageState
         ),
         child: Stack(
           alignment: Alignment.center,
+          key: _parentKey,
           children: [
+            // moving indicator
             ValueListenableBuilder<int>(
               valueListenable: selectedIndex,
               builder: (context, currentIndex, _) {
                 return AnimatedPositioned(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                  left: currentIndex * (width * 0.23),
+                  left: _indicatorX,
                   child: Container(
-                    width: 50,
-                    height: 50,
+                    width: 30,
+                    height: 30,
                     decoration: BoxDecoration(
                       color:
                           globalColorScheme.surfaceContainer.withOpacity(0.2),
@@ -139,12 +174,14 @@ class _FitFlexTrainerDashboardPageState
           index,
           initialLocation: index == navigationShell.currentIndex,
         );
+        _moveIndicatorTo(index);
       },
       child: ValueListenableBuilder<int>(
         valueListenable: valueNotifier,
         builder: (context, currentIndex, _) {
           bool isSelected = currentIndex == index;
           return Material(
+            key: _iconKeys[index],
             color: Colors.transparent,
             shape: const CircleBorder(),
             child: InkWell(

@@ -104,15 +104,24 @@ class _FitFlexClientWorkoutHistoryPageState
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: globalColorScheme.surface,
-      appBar: PreferredSize(
-        preferredSize: Size(
-          width,
-          160,
-        ),
-        child: _buildDateSelector(),
-      ),
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(
+      //     kToolbarHeight, // default fallback
+      //   ),
+      //   child: LayoutBuilder(
+      //     builder: (context, constraints) {
+      //       // Build your widget
+      //       final child = _buildDateSelector();
+
+      //       // Use IntrinsicHeight to let it size itself
+      //       return IntrinsicHeight(child: child);
+      //     },
+      //   ),
+      // ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          _buildDateSelector(),
           // ,
           Expanded(
             child: BlocListener<WorkoutHistoryBloc, WorkoutHistoryState>(
@@ -153,11 +162,15 @@ class _FitFlexClientWorkoutHistoryPageState
                       padding: const EdgeInsets.all(10),
                       child: ListView.builder(
                         itemCount: histories.length,
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
                         itemBuilder: (context, index) {
                           final exercise = histories[index];
                           return Container(
                             padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 10.0),
+                              vertical: 8.0,
+                              horizontal: 10.0,
+                            ),
                             margin: EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
                               color: globalColorScheme.primary,
@@ -496,85 +509,90 @@ class _FitFlexClientWorkoutHistoryPageState
 
   Widget _buildDateSelector() {
     return Container(
-      padding: EdgeInsets.only(top: 60, bottom: 10, left: 20, right: 20),
-      // margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),
-      decoration: BoxDecoration(
-        color: globalColorScheme.onPrimaryContainer,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(50),
-          bottomRight: Radius.circular(50),
+      color: globalColorScheme.onPrimaryContainer,
+      child: SafeArea(
+        child: Container(
+          // padding: EdgeInsets.only(top: 60, bottom: 10, left: 20, right: 20),
+          // margin: EdgeInsets.only(top: 0, bottom: 10, left: 0, right: 0),
+          decoration: BoxDecoration(
+            color: globalColorScheme.onPrimaryContainer,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(50),
+              bottomRight: Radius.circular(50),
+            ),
+          ),
+          child: ValueListenableBuilder(
+              valueListenable: _selectedDate,
+              builder: (context, selectedDate, _) {
+                return TableCalendar(
+                  calendarBuilders: CalendarBuilders(),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    // print(selectedDay);
+                    _selectedDate.value = selectedDay;
+                    _updateWorkoutHistory(selectedDay);
+                  },
+                  headerVisible: true,
+                  weekNumbersVisible: true,
+                  selectedDayPredicate: (day) => isSameDay(day, selectedDate),
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  calendarStyle: CalendarStyle(
+                    tablePadding: EdgeInsets.all(10),
+                    todayDecoration: BoxDecoration(
+                      color: globalColorScheme.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    todayTextStyle: TextStyle(
+                      color: globalColorScheme.onPrimaryContainer,
+                    ),
+                    selectedDecoration: BoxDecoration(
+                      color: globalColorScheme.secondary,
+                      shape: BoxShape.circle,
+                    ),
+                    selectedTextStyle: TextStyle(
+                      color: globalColorScheme.onSecondary,
+                    ),
+                    weekendTextStyle: TextStyle(
+                      color: globalColorScheme.tertiary,
+                    ),
+                    defaultTextStyle: TextStyle(
+                      color: globalColorScheme.surface,
+                    ),
+                    defaultDecoration: BoxDecoration(
+                        // color: globalColorScheme.surface,
+                        ),
+                    outsideDaysVisible: false,
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    leftChevronIcon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: globalColorScheme.onPrimaryContainer,
+                    ),
+                    rightChevronIcon: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: globalColorScheme.onPrimaryContainer,
+                    ),
+                    titleCentered: true,
+                    titleTextStyle: TextStyle(
+                      color: globalColorScheme.onSurface,
+                      fontSize: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: globalColorScheme.inversePrimary,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
+                      ),
+                    ),
+                  ),
+                  calendarFormat: CalendarFormat.week,
+                  firstDay: DateTime.utc(2010, 10, 16),
+                  lastDay: DateTime.utc(2030, 3, 14),
+                  focusedDay: selectedDate ?? DateTime.now(),
+                );
+              }),
         ),
       ),
-      child: ValueListenableBuilder(
-          valueListenable: _selectedDate,
-          builder: (context, selectedDate, _) {
-            return TableCalendar(
-              calendarBuilders: CalendarBuilders(),
-              onDaySelected: (selectedDay, focusedDay) {
-                // print(selectedDay);
-                _selectedDate.value = selectedDay;
-                _updateWorkoutHistory(selectedDay);
-              },
-              headerVisible: true,
-              weekNumbersVisible: true,
-              selectedDayPredicate: (day) => isSameDay(day, selectedDate),
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              calendarStyle: CalendarStyle(
-                tablePadding: EdgeInsets.all(10),
-                todayDecoration: BoxDecoration(
-                  color: globalColorScheme.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                todayTextStyle: TextStyle(
-                  color: globalColorScheme.onPrimaryContainer,
-                ),
-                selectedDecoration: BoxDecoration(
-                  color: globalColorScheme.secondary,
-                  shape: BoxShape.circle,
-                ),
-                selectedTextStyle: TextStyle(
-                  color: globalColorScheme.onSecondary,
-                ),
-                weekendTextStyle: TextStyle(
-                  color: globalColorScheme.tertiary,
-                ),
-                defaultTextStyle: TextStyle(
-                  color: globalColorScheme.surface,
-                ),
-                defaultDecoration: BoxDecoration(
-                    // color: globalColorScheme.surface,
-                    ),
-                outsideDaysVisible: false,
-              ),
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                leftChevronIcon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: globalColorScheme.onPrimaryContainer,
-                ),
-                rightChevronIcon: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: globalColorScheme.onPrimaryContainer,
-                ),
-                titleCentered: true,
-                titleTextStyle: TextStyle(
-                  color: globalColorScheme.onSurface,
-                  fontSize: 20,
-                ),
-                decoration: BoxDecoration(
-                  color: globalColorScheme.inversePrimary,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
-                  ),
-                ),
-              ),
-              calendarFormat: CalendarFormat.week,
-              firstDay: DateTime.utc(2010, 10, 16),
-              lastDay: DateTime.utc(2030, 3, 14),
-              focusedDay: selectedDate ?? DateTime.now(),
-            );
-          }),
     );
   }
 

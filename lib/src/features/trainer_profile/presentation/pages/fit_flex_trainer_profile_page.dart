@@ -4,6 +4,7 @@ import 'package:fit_flex_club/src/core/common/widgets/platform_appbar.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_button.dart';
 import 'package:fit_flex_club/src/core/common/widgets/platform_textfields.dart';
 import 'package:fit_flex_club/src/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:fit_flex_club/src/features/authentication/presentation/widgets/settings_bottomsheet.dart';
 import 'package:fit_flex_club/src/features/client_profile/domain/entities/client_entity.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/bloc/trainer_profile_bloc.dart';
 import 'package:fit_flex_club/src/features/trainer_profile/presentation/pages/fit_flex_trainer_client_details_page.dart';
@@ -83,12 +84,10 @@ class _GymClientsDashboardState extends State<GymClientsDashboard> {
           trailing: PlatformButton().buildButton(
             context: context,
             type: ButtonType.icon,
-            foregroundColor: globalColorScheme.primary,
-            icon: Icons.logout,
+            icon: Icons.settings,
+            foregroundColor: globalColorScheme.inversePrimary,
             text: "",
-            onPressed: () => context
-                .read<AuthenticationBloc>()
-                .add(LogOutAuthenticationEvent()),
+            onPressed: () => showAccountOptionsBottomSheet(context),
           )!,
         ),
         body: SafeArea(

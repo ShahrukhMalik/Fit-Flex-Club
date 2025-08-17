@@ -245,6 +245,8 @@ class _FitFlexClientWorkoutHistoryPageState
               padding: const EdgeInsets.all(10),
               child: ListView.builder(
                 itemCount: histories.length,
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
                 itemBuilder: (context, index) {
                   final exercise = histories[index];
                   return Container(
